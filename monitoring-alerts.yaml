@@ -1,0 +1,47 @@
+# Google Cloud Monitoring Alert Policies
+# Apply with: gcloud alpha monitoring policies create --policy-from-file=monitoring-alerts.yaml
+
+displayName: "High CPU Usage Alert"
+conditions:
+  - displayName: "CPU usage is above 80%"
+    conditionThreshold:
+      filter: 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"'
+      comparison: COMPARISON_GT
+      thresholdValue: 0.8
+      duration: 300s
+      aggregations:
+        - alignmentPeriod: 60s
+          perSeriesAligner: ALIGN_MEAN
+
+---
+displayName: "Cloud Run High Latency"
+conditions:
+  - displayName: "Request latency is high"
+    conditionThreshold:
+      filter: 'resource.type="cloud_run_revision" AND metric.type="run.googleapis.com/request_latencies"'
+      comparison: COMPARISON_GT
+      thresholdValue: 1000
+      duration: 300s
+      aggregations:
+        - alignmentPeriod: 60s
+          perSeriesAligner: ALIGN_PERCENTILE_95
+
+---
+displayName: "Error Rate Alert"
+conditions:
+  - displayName: "Error rate exceeds 5%"
+    conditionThreshold:
+      filter: 'resource.type="cloud_run_revision" AND metric.type="run.googleapis.com/request_count" AND metric.label.response_code_class="5xx"'
+      comparison: COMPARISON_GT
+      thresholdValue: 0.05
+      duration: 300s
+
+---
+displayName: "Budget Alert"
+conditions:
+  - displayName: "Monthly spend approaching limit"
+    conditionThreshold:
+      filter: 'resource.type="global" AND metric.type="billing.googleapis.com/project/billing/amount"'
+      comparison: COMPARISON_GT
+      thresholdValue: 90
+      duration: 0s
