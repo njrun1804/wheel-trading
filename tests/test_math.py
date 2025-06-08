@@ -1,8 +1,8 @@
 """Tests for options mathematics module."""
 
-import pytest
 import numpy as np
-from src.utils.math import black_scholes_price, calculate_delta, probability_itm, implied_volatility
+
+from src.utils.math import black_scholes_price, calculate_delta, implied_volatility, probability_itm
 
 
 class TestBlackScholesPrice:

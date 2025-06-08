@@ -1,8 +1,9 @@
 """Options mathematics module for Black-Scholes pricing and Greeks calculation."""
 
+from typing import Literal, Optional, Union
+
 import numpy as np
 from scipy.stats import norm
-from typing import Union, Literal, Optional
 
 
 def black_scholes_price(

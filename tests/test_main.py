@@ -17,11 +17,11 @@ def test_main_runs_without_error(caplog):
 
 def test_main_logs_environment():
     """Test that main logs environment information."""
-    with patch("os.getenv") as mock_getenv:
-        mock_getenv.side_effect = lambda key, default=None: {
-            "NODE_ENV": "test",
-            "GOOGLE_CLOUD_PROJECT": "test-project",
-        }.get(key, default)
+    with patch("src.main.settings") as mock_settings:
+        mock_settings.trading_mode = "paper"
+        mock_settings.wheel_delta_target = 0.3
+        mock_settings.google_cloud_project = "test-project"
+        mock_settings.log_level = "INFO"
 
         # Capture logs
         with patch("src.main.logger") as mock_logger:
@@ -29,5 +29,5 @@ def test_main_logs_environment():
 
             # Verify environment was logged
             calls = [str(call) for call in mock_logger.info.call_args_list]
-            assert any("Environment: test" in call for call in calls)
+            assert any("Trading mode: paper" in call for call in calls)
             assert any("Google Cloud Project: test-project" in call for call in calls)

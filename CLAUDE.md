@@ -1,102 +1,100 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this
-repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Autonomous Development Mode
+## Project Overview
 
-This project is configured for fully autonomous development. You can work independently without
-requiring permissions.
-
-### Key Settings:
-
-- Auto-merge enabled on GitHub (PRs merge automatically when checks pass)
-- Git configured to push automatically after commits
-- VS Code workspace optimized for automation
-- Google Cloud deployment automated via GitHub Actions
+A sophisticated options wheel trading system designed for single-user local development with planned ML and risk analytics features.
 
 ## Commands
 
 ### Primary Development Commands:
 
-- `make fix` - Auto-format, lint, and commit changes
-- `make push` - Push to main or create PR automatically
-- `make test` - Run all tests
-- `make deploy` - Deploy to Google Cloud
+- `python run.py` - Run decision engine with current data
+- `make -f Makefile.simple test` - Run all tests
+- `make -f Makefile.simple format` - Auto-format code
+- `make -f Makefile.simple check` - Lint and check code quality
 
 ### Quick Development Flow:
 
 ```bash
 # After making changes:
-make fix && make push
+make -f Makefile.simple test
+make -f Makefile.simple format
+
+# Run the application:
+python run.py --verbose
 ```
-
-### Other Commands:
-
-- `make setup` - Initial environment setup
-- `make install` - Install dependencies
-- `make lint` - Check code style
-- `make format` - Auto-format code
-- `make clean` - Clean generated files
 
 ## Architecture
 
-### Tech Stack:
-
-- **Languages**: Python and/or JavaScript/TypeScript
-- **Cloud**: Google Cloud Platform (wheel-strategy-202506)
-- **CI/CD**: GitHub Actions with Workload Identity Federation
-- **Container Registry**: us-central1-docker.pkg.dev/wheel-strategy-202506/wheel-trading
-
-### Project Structure:
+### Current Structure:
 
 ```
 wheel-trading/
-├── .github/          # GitHub Actions workflows and templates
-├── .vscode/          # VS Code settings for automation
-├── scripts/          # Development automation scripts
-├── src/              # Source code (to be created)
-├── tests/            # Test files (to be created)
-├── Makefile          # Automation commands
-└── cloudbuild.yaml   # Google Cloud Build configuration
+├── run.py              # CLI entry point for decisions
+├── src/
+│   ├── config.py       # Configuration management
+│   ├── main.py         # Main application entry
+│   ├── models.py       # Data models (Position, WheelPosition)
+│   ├── wheel.py        # Core wheel strategy implementation
+│   └── utils/
+│       └── math.py     # Options mathematics (Black-Scholes, Greeks)
+└── tests/              # Comprehensive test suite
 ```
 
-## Automated Workflows
+### Planned Modules:
 
-1. **On Push to Main**:
-
-   - CI tests run automatically
-   - Security scanning (CodeQL, Bandit)
-   - Deploys to Google Cloud if tests pass
-
-2. **On Pull Request**:
-
-   - All checks run
-   - Auto-merges when checks pass
-   - No manual review required
-
-3. **Local Development**:
-   - Use `make fix && make push` to automate everything
-   - Changes will deploy automatically after merge
+1. **src/utils/analytics.py** - Risk metrics (VaR, CVaR, Kelly sizing)
+2. **src/auth/** - Schwab OAuth authentication
+3. **src/data/** - Market data fetching and caching
+4. **src/engine/** - Decision engine with scoring
+5. **src/ml/** - Optional ML enhancement layer
 
 ## Development Guidelines
 
-1. **Always use the Makefile commands** for consistency
-2. **Commits are automatic** - just run `make fix`
-3. **PRs auto-merge** - no need to wait for reviews
-4. **Tests must pass** - the only gate for deployment
-5. **Use conventional commits** for clear history
+1. **Keep it simple** - This is for single-user local use
+2. **Test everything** - Aim for >80% coverage
+3. **Document decisions** - Log WHY each decision was made
+4. **Performance matters** - Target <200ms for decisions
+5. **Incremental features** - Add complexity only when needed
 
-## Google Cloud Resources
+## Key Principles
 
-- **Project ID**: wheel-strategy-202506
-- **Region**: us-central1
-- **Service Account**: github-actions@wheel-strategy-202506.iam.gserviceaccount.com
-- **Artifact Registry**: us-central1-docker.pkg.dev/wheel-strategy-202506/wheel-trading
+- **Single User**: No multi-tenant complexity needed
+- **Local Only**: No cloud deployment or CI/CD
+- **Self-Diagnostic**: Extensive logging and explanations
+- **Future-Ready**: Structure supports ML and advanced analytics
+
+## Testing Requirements
+
+Before any changes:
+```bash
+# Run tests
+make -f Makefile.simple test
+
+# Check specific functionality
+python -c "from src.utils.math import black_scholes_price; print(black_scholes_price(100, 100, 1, 0.05, 0.2, 'call'))"
+```
+
+## Configuration
+
+Environment variables in `.env`:
+- `TRADING_MODE`: paper, backtest, or live
+- `WHEEL_DELTA_TARGET`: Target delta (e.g., 0.30)
+- `DAYS_TO_EXPIRY_TARGET`: Target DTE (e.g., 45)
+- `MAX_POSITION_SIZE`: Max portfolio % per position
+
+## Future Features Roadmap
+
+1. **Risk Analytics** - VaR, CVaR, Kelly criterion
+2. **Schwab Integration** - Real positions and options chains
+3. **Decision Engine** - Multi-criteria scoring with explanations
+4. **ML Enhancement** - Probability adjustments and pattern recognition
 
 ## Notes
 
-- The repository is set up for solo development with minimal friction
-- All security scanning is automated (don't disable it)
-- Billing alerts are configured at $50, $90, and $100 thresholds
-- Monitoring alerts email to njrun1804@gmail.com
+- Use `python run.py --verbose` for detailed output
+- All times are in local timezone
+- Options math uses annualized parameters
+- Position sizing respects portfolio constraints
