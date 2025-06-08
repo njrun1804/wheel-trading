@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+      if: hashFiles('package-lock.json') != ''
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+      if: hashFiles('requirements.txt') != ''
+    
+    - name: Install dependencies
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        elif [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+    
+    - name: Run tests
+      run: |
+        if [ -f package.json ]; then
+          npm test --if-present
+        elif [ -f pytest.ini ] || [ -f tests/ ]; then
+          pytest
+        else
+          echo "No tests configured yet"
+        fi
+    
+    - name: Lint code
+      run: |
+        if [ -f package.json ]; then
+          npm run lint --if-present
+        elif [ -f .flake8 ] || [ -f .pylintrc ]; then
+          flake8 . || pylint **/*.py || true
+        else
+          echo "No linting configured yet"
+        fi
