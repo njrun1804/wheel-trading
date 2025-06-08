@@ -29,6 +29,7 @@ If you discover a security vulnerability within this project, please follow thes
 ## Security Measures
 
 This project implements:
+
 - Automated security scanning with Bandit (Python)
 - CodeQL analysis for code vulnerabilities
 - Dependabot for dependency updates

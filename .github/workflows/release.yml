@@ -17,54 +17,54 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-      if: hashFiles('package-lock.json') != ''
-    
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-      if: hashFiles('requirements.txt') != ''
-    
-    - name: Install dependencies
-      run: |
-        if [ -f package-lock.json ]; then
-          npm ci
-        elif [ -f requirements.txt ]; then
-          pip install -r requirements.txt
-        fi
-    
-    - name: Build project
-      run: |
-        if [ -f package.json ]; then
-          npm run build --if-present
-        elif [ -f setup.py ]; then
-          python setup.py sdist bdist_wheel
-        else
-          echo "No build process configured"
-        fi
-    
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }}
-        body: |
-          Changes in this Release
-          - First release
-        draft: false
-        prerelease: false
-      if: startsWith(github.ref, 'refs/tags/')
-    
-    - name: Upload Release Assets
-      run: |
-        echo "Release assets upload would go here when build artifacts are configured"
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+        if: hashFiles('package-lock.json') != ''
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+        if: hashFiles('requirements.txt') != ''
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Build project
+        run: |
+          if [ -f package.json ]; then
+            npm run build --if-present
+          elif [ -f setup.py ]; then
+            python setup.py sdist bdist_wheel
+          else
+            echo "No build process configured"
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            Changes in this Release
+            - First release
+          draft: false
+          prerelease: false
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Upload Release Assets
+        run: |
+          echo "Release assets upload would go here when build artifacts are configured"

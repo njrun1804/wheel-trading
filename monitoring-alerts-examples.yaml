@@ -1,9 +1,11 @@
 # Google Cloud Monitoring Alert Policies
-# Apply with: gcloud alpha monitoring policies create --policy-from-file=monitoring-alerts.yaml
+# Apply individually with: gcloud alpha monitoring policies create --policy-from-file=<file>
+# This file contains multiple alert policy examples
 
-displayName: "High CPU Usage Alert"
+# Example 1: High CPU Usage Alert
+displayName: 'High CPU Usage Alert'
 conditions:
-  - displayName: "CPU usage is above 80%"
+  - displayName: 'CPU usage is above 80%'
     conditionThreshold:
       filter: 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"'
       comparison: COMPARISON_GT
@@ -14,9 +16,9 @@ conditions:
           perSeriesAligner: ALIGN_MEAN
 
 ---
-displayName: "Cloud Run High Latency"
+displayName: 'Cloud Run High Latency'
 conditions:
-  - displayName: "Request latency is high"
+  - displayName: 'Request latency is high'
     conditionThreshold:
       filter: 'resource.type="cloud_run_revision" AND metric.type="run.googleapis.com/request_latencies"'
       comparison: COMPARISON_GT
@@ -27,9 +29,9 @@ conditions:
           perSeriesAligner: ALIGN_PERCENTILE_95
 
 ---
-displayName: "Error Rate Alert"
+displayName: 'Error Rate Alert'
 conditions:
-  - displayName: "Error rate exceeds 5%"
+  - displayName: 'Error rate exceeds 5%'
     conditionThreshold:
       filter: 'resource.type="cloud_run_revision" AND metric.type="run.googleapis.com/request_count" AND metric.label.response_code_class="5xx"'
       comparison: COMPARISON_GT
@@ -37,9 +39,9 @@ conditions:
       duration: 300s
 
 ---
-displayName: "Budget Alert"
+displayName: 'Budget Alert'
 conditions:
-  - displayName: "Monthly spend approaching limit"
+  - displayName: 'Monthly spend approaching limit'
     conditionThreshold:
       filter: 'resource.type="global" AND metric.type="billing.googleapis.com/project/billing/amount"'
       comparison: COMPARISON_GT

@@ -10,8 +10,8 @@ A project for managing and analyzing wheel trading strategies.
 
 ## Usage
 
-*Documentation to be added*
+_Documentation to be added_
 
 ## License
 
-*To be determined*
+_To be determined_

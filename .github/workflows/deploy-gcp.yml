@@ -2,7 +2,7 @@ name: Deploy to Google Cloud
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -14,59 +14,59 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       id-token: write
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-        workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-        service_account: ${{ env.SERVICE_ACCOUNT }}
-    
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
-    
-    - name: Configure Docker for Artifact Registry
-      run: gcloud auth configure-docker ${REGION}-docker.pkg.dev
-    
-    # Example deployment steps - customize based on your application type
-    
-    # For Cloud Run deployment:
-    # - name: Build and push container
-    #   run: |
-    #     docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/wheel-trading/app:${GITHUB_SHA} .
-    #     docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/wheel-trading/app:${GITHUB_SHA}
-    
-    # - name: Deploy to Cloud Run
-    #   run: |
-    #     gcloud run deploy wheel-trading \
-    #       --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/wheel-trading/app:${GITHUB_SHA} \
-    #       --region ${REGION} \
-    #       --platform managed \
-    #       --allow-unauthenticated
-    
-    # For App Engine deployment:
-    # - name: Deploy to App Engine
-    #   run: gcloud app deploy --quiet
-    
-    # For Cloud Functions deployment:
-    # - name: Deploy Cloud Function
-    #   run: |
-    #     gcloud functions deploy wheel-trading-function \
-    #       --runtime python311 \
-    #       --trigger-http \
-    #       --allow-unauthenticated \
-    #       --region=${REGION}
-    
-    - name: Verify deployment
-      run: |
-        echo "Deployment workflow configured!"
-        echo "Project: ${PROJECT_ID}"
-        echo "Region: ${REGION}"
-        gcloud config list
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${REGION}-docker.pkg.dev
+
+      # Example deployment steps - customize based on your application type
+
+      # For Cloud Run deployment:
+      # - name: Build and push container
+      #   run: |
+      #     docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/wheel-trading/app:${GITHUB_SHA} .
+      #     docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/wheel-trading/app:${GITHUB_SHA}
+
+      # - name: Deploy to Cloud Run
+      #   run: |
+      #     gcloud run deploy wheel-trading \
+      #       --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/wheel-trading/app:${GITHUB_SHA} \
+      #       --region ${REGION} \
+      #       --platform managed \
+      #       --allow-unauthenticated
+
+      # For App Engine deployment:
+      # - name: Deploy to App Engine
+      #   run: gcloud app deploy --quiet
+
+      # For Cloud Functions deployment:
+      # - name: Deploy Cloud Function
+      #   run: |
+      #     gcloud functions deploy wheel-trading-function \
+      #       --runtime python311 \
+      #       --trigger-http \
+      #       --allow-unauthenticated \
+      #       --region=${REGION}
+
+      - name: Verify deployment
+        run: |
+          echo "Deployment workflow configured!"
+          echo "Project: ${PROJECT_ID}"
+          echo "Region: ${REGION}"
+          gcloud config list

@@ -1,12 +1,15 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this
+repository.
 
 ## Autonomous Development Mode
 
-This project is configured for fully autonomous development. You can work independently without requiring permissions.
+This project is configured for fully autonomous development. You can work independently without
+requiring permissions.
 
 ### Key Settings:
+
 - Auto-merge enabled on GitHub (PRs merge automatically when checks pass)
 - Git configured to push automatically after commits
 - VS Code workspace optimized for automation
@@ -15,18 +18,21 @@ This project is configured for fully autonomous development. You can work indepe
 ## Commands
 
 ### Primary Development Commands:
+
 - `make fix` - Auto-format, lint, and commit changes
 - `make push` - Push to main or create PR automatically
 - `make test` - Run all tests
 - `make deploy` - Deploy to Google Cloud
 
 ### Quick Development Flow:
+
 ```bash
 # After making changes:
 make fix && make push
 ```
 
 ### Other Commands:
+
 - `make setup` - Initial environment setup
 - `make install` - Install dependencies
 - `make lint` - Check code style
@@ -36,12 +42,14 @@ make fix && make push
 ## Architecture
 
 ### Tech Stack:
+
 - **Languages**: Python and/or JavaScript/TypeScript
 - **Cloud**: Google Cloud Platform (wheel-strategy-202506)
 - **CI/CD**: GitHub Actions with Workload Identity Federation
 - **Container Registry**: us-central1-docker.pkg.dev/wheel-strategy-202506/wheel-trading
 
 ### Project Structure:
+
 ```
 wheel-trading/
 ├── .github/          # GitHub Actions workflows and templates
@@ -56,11 +64,13 @@ wheel-trading/
 ## Automated Workflows
 
 1. **On Push to Main**:
+
    - CI tests run automatically
    - Security scanning (CodeQL, Bandit)
    - Deploys to Google Cloud if tests pass
 
 2. **On Pull Request**:
+
    - All checks run
    - Auto-merges when checks pass
    - No manual review required

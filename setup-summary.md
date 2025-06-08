@@ -1,6 +1,7 @@
 # Project Setup Summary
 
 ## ✅ GitHub Configuration
+
 - **Security**: CodeQL, Bandit, Dependabot enabled
 - **Branch Protection**: Main branch requires PR reviews and status checks
 - **Features Enabled**: Discussions, Auto-merge, Commit sign-off
@@ -8,12 +9,14 @@
 - **Workflows**: CI/CD, Security scanning, Release automation, Google Cloud deployment
 
 ## ✅ Google Cloud Configuration
+
 - **Project**: wheel-strategy-202506
 - **Billing**: Linked to account 01C768-F853B7-29233E
 - **Authentication**: Workload Identity Federation (no keys needed!)
 - **Service Account**: github-actions@wheel-strategy-202506.iam.gserviceaccount.com
 
 ### Enabled APIs:
+
 - Core: IAM, Resource Manager, STS, Cloud Build
 - Security: KMS, Secret Manager, Binary Authorization, Security Center
 - Monitoring: Logging, Monitoring, Cloud Trace
@@ -23,6 +26,7 @@
 - Messaging: Pub/Sub, Cloud Scheduler
 
 ### Resources Created:
+
 - Artifact Registry: us-central1-docker.pkg.dev/wheel-strategy-202506/wheel-trading
 - Logs Bucket: gs://wheel-strategy-202506-logs
 - Monitoring Channel: Email alerts to njrun1804@gmail.com
@@ -59,6 +63,7 @@ gh api repos/njrun1804/wheel-trading/vulnerability-alerts
 ```
 
 ## 🔐 Security Features
+
 - Audit logs exported to Cloud Storage
 - Vulnerability scanning on all code pushes
 - Automated dependency updates
