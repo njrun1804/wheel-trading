@@ -27,8 +27,8 @@ class WheelStrategy:
             extra={
                 "delta_target": self.settings.wheel_delta_target,
                 "dte_target": self.settings.days_to_expiry_target,
-                "max_position_size": self.settings.max_position_size
-            }
+                "max_position_size": self.settings.max_position_size,
+            },
         )
 
     def find_optimal_put_strike(
@@ -94,8 +94,8 @@ class WheelStrategy:
                 "optimal_strike": optimal_strike,
                 "optimal_delta": float(optimal_delta),
                 "target_delta": float(target_delta),
-                "days_to_expiry": days_to_expiry
-            }
+                "days_to_expiry": days_to_expiry,
+            },
         )
 
         return optimal_strike
@@ -181,8 +181,8 @@ class WheelStrategy:
                 "optimal_delta": float(optimal_delta),
                 "target_delta": float(target_delta),
                 "probability_itm": float(prob_itm),
-                "days_to_expiry": days_to_expiry
-            }
+                "days_to_expiry": days_to_expiry,
+            },
         )
 
         return optimal_strike
@@ -218,8 +218,8 @@ class WheelStrategy:
                 "portfolio_value": portfolio_value,
                 "max_allocation": max_allocation,
                 "contracts": contracts,
-                "position_size_pct": self.settings.max_position_size
-            }
+                "position_size_pct": self.settings.max_position_size,
+            },
         )
 
         return max(1, contracts)  # At least 1 contract
@@ -256,8 +256,8 @@ class WheelStrategy:
                 extra={
                     "symbol": position.symbol,
                     "days_to_expiry": days_to_expiry,
-                    "reason": "approaching_expiry"
-                }
+                    "reason": "approaching_expiry",
+                },
             )
             return True
 
@@ -269,8 +269,8 @@ class WheelStrategy:
                     "symbol": position.symbol,
                     "option_type": "put",
                     "current_delta": current_delta,
-                    "reason": "deep_itm"
-                }
+                    "reason": "deep_itm",
+                },
             )
             return True
 
@@ -282,8 +282,8 @@ class WheelStrategy:
                     "symbol": position.symbol,
                     "option_type": "call",
                     "current_delta": current_delta,
-                    "reason": "deep_itm"
-                }
+                    "reason": "deep_itm",
+                },
             )
             return True
 

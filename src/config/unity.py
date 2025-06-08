@@ -28,9 +28,9 @@ MIN_VOLUME: Final[int] = 10
 
 # Strike selection parameters
 STRIKE_INTERVALS: Final[list[Decimal]] = [
-    Decimal("1.0"),   # For prices < $50
-    Decimal("2.5"),   # For prices $50-$100  
-    Decimal("5.0"),   # For prices > $100
+    Decimal("1.0"),  # For prices < $50
+    Decimal("2.5"),  # For prices $50-$100
+    Decimal("5.0"),  # For prices > $100
 ]
 
 # Market hours (Eastern Time)
@@ -50,12 +50,13 @@ MAX_NOTIONAL_PERCENT: Final[Decimal] = Decimal("0.25")  # Max 25% of portfolio
 STALE_DATA_SECONDS: Final[int] = 30
 MIN_CONFIDENCE_SCORE: Final[Decimal] = Decimal("0.80")
 
+
 def validate_unity_strike(strike: Decimal, current_price: Decimal) -> bool:
     """Validate if a strike price is reasonable for Unity."""
     # Strikes should be within 50% of current price for liquidity
     lower_bound = current_price * Decimal("0.5")
     upper_bound = current_price * Decimal("1.5")
-    
+
     return lower_bound <= strike <= upper_bound
 
 
@@ -72,15 +73,16 @@ def get_strike_interval(price: Decimal) -> Decimal:
 def is_market_hours() -> bool:
     """Check if currently in market hours (ET)."""
     from datetime import datetime
+
     import pytz
-    
-    et = pytz.timezone('US/Eastern')
+
+    et = pytz.timezone("US/Eastern")
     now = datetime.now(et)
-    
+
     if now.weekday() > 4:  # Weekend
         return False
-    
+
     market_open = now.replace(hour=9, minute=30, second=0, microsecond=0)
     market_close = now.replace(hour=16, minute=0, second=0, microsecond=0)
-    
+
     return market_open <= now <= market_close

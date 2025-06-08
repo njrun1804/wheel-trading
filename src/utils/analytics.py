@@ -55,33 +55,35 @@ def calculate_edge(
     """
     theoretical_value = np.asarray(theoretical_value)
     market_price = np.asarray(market_price)
-    
+
     # Avoid division by zero
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         edge = (theoretical_value - market_price) / market_price
-        
+
         # Handle edge cases
         if np.ndim(edge) == 0:
             if market_price == 0:
-                edge = np.inf if theoretical_value > 0 else (-np.inf if theoretical_value < 0 else 0.0)
+                edge = (
+                    np.inf if theoretical_value > 0 else (-np.inf if theoretical_value < 0 else 0.0)
+                )
         else:
             zero_mask = market_price == 0
             if np.any(zero_mask):
                 edge[zero_mask] = np.where(
                     theoretical_value[zero_mask] > 0,
                     np.inf,
-                    np.where(theoretical_value[zero_mask] < 0, -np.inf, 0.0)
+                    np.where(theoretical_value[zero_mask] < 0, -np.inf, 0.0),
                 )
-    
+
     logger.debug(
         "Edge calculation completed",
         extra={
             "function": "calculate_edge",
             "mean_edge": float(np.mean(edge)) if np.ndim(edge) > 0 else float(edge),
-            "output_shape": np.shape(edge)
-        }
+            "output_shape": np.shape(edge),
+        },
     )
-    
+
     return float(edge) if np.ndim(edge) == 0 else edge
 
 
@@ -128,20 +130,20 @@ def expected_value(
     """
     outcomes_arr = np.asarray(outcomes)
     probabilities_arr = np.asarray(probabilities)
-    
+
     # Validate probabilities
     prob_sum = np.sum(probabilities_arr)
     if not np.isclose(prob_sum, 1.0, rtol=1e-5):
         logger.warning(
             "Probabilities do not sum to 1.0",
-            extra={"prob_sum": prob_sum, "probabilities": probabilities}
+            extra={"prob_sum": prob_sum, "probabilities": probabilities},
         )
         # Normalize probabilities
         probabilities_arr = probabilities_arr / prob_sum
-    
+
     # Calculate expected value
     ev = np.sum(outcomes_arr * probabilities_arr)
-    
+
     logger.debug(
         "Expected value calculated",
         extra={
@@ -149,10 +151,10 @@ def expected_value(
             "num_outcomes": len(outcomes),
             "expected_value": ev,
             "min_outcome": np.min(outcomes_arr),
-            "max_outcome": np.max(outcomes_arr)
-        }
+            "max_outcome": np.max(outcomes_arr),
+        },
     )
-    
+
     return float(ev)
 
 
@@ -200,35 +202,33 @@ def sharpe_ratio(
     1.789...
     """
     returns = np.asarray(returns)
-    
+
     if len(returns) < 2:
         logger.warning(
-            "Insufficient returns data for Sharpe ratio",
-            extra={"num_returns": len(returns)}
+            "Insufficient returns data for Sharpe ratio", extra={"num_returns": len(returns)}
         )
         return 0.0
-    
+
     # Calculate excess returns
     excess_returns = returns - risk_free_rate
-    
+
     # Calculate mean and standard deviation
     mean_excess = np.mean(excess_returns)
     std_returns = np.std(returns, ddof=1)  # Sample standard deviation
-    
+
     # Handle zero volatility
     if std_returns == 0:
         logger.warning(
-            "Zero volatility in returns",
-            extra={"mean_return": mean_excess + risk_free_rate}
+            "Zero volatility in returns", extra={"mean_return": mean_excess + risk_free_rate}
         )
         return np.inf if mean_excess > 0 else (-np.inf if mean_excess < 0 else 0.0)
-    
+
     # Calculate Sharpe ratio
     sharpe = mean_excess / std_returns
-    
+
     # Annualize
     annualized_sharpe = sharpe * np.sqrt(periods_per_year)
-    
+
     logger.debug(
         "Sharpe ratio calculated",
         extra={
@@ -237,10 +237,10 @@ def sharpe_ratio(
             "mean_return": float(np.mean(returns)),
             "std_return": float(std_returns),
             "sharpe_ratio": float(sharpe),
-            "annualized_sharpe": float(annualized_sharpe)
-        }
+            "annualized_sharpe": float(annualized_sharpe),
+        },
     )
-    
+
     return float(annualized_sharpe)
 
 
@@ -277,13 +277,13 @@ def win_rate(
     0.4
     """
     returns = np.asarray(returns)
-    
+
     if len(returns) == 0:
         return 0.0
-    
+
     wins = np.sum(returns > threshold)
     rate = wins / len(returns)
-    
+
     logger.debug(
         "Win rate calculated",
         extra={
@@ -291,10 +291,10 @@ def win_rate(
             "num_trades": len(returns),
             "num_wins": int(wins),
             "win_rate": float(rate),
-            "threshold": threshold
-        }
+            "threshold": threshold,
+        },
     )
-    
+
     return float(rate)
 
 
@@ -330,25 +330,25 @@ def profit_factor(
     inf
     """
     returns = np.asarray(returns)
-    
+
     gross_profits = np.sum(returns[returns > 0])
     gross_losses = np.abs(np.sum(returns[returns < 0]))
-    
+
     if gross_losses == 0:
         factor = np.inf if gross_profits > 0 else 0.0
     else:
         factor = gross_profits / gross_losses
-    
+
     logger.debug(
         "Profit factor calculated",
         extra={
             "function": "profit_factor",
             "gross_profits": float(gross_profits),
             "gross_losses": float(gross_losses),
-            "profit_factor": float(factor)
-        }
+            "profit_factor": float(factor),
+        },
     )
-    
+
     return float(factor)
 
 
@@ -379,23 +379,23 @@ def maximum_drawdown(
     Max DD: 16.67% from index 3 to 5
     """
     cumulative_returns = np.asarray(cumulative_returns)
-    
+
     if len(cumulative_returns) < 2:
         return 0.0, 0, 0
-    
+
     # Calculate running maximum
     running_max = np.maximum.accumulate(cumulative_returns)
-    
+
     # Calculate drawdown at each point
     drawdown = (running_max - cumulative_returns) / running_max
-    
+
     # Find maximum drawdown
     max_dd_idx = np.argmax(drawdown)
     max_dd = drawdown[max_dd_idx]
-    
+
     # Find the peak (where the drawdown started)
-    peak_idx = np.where(cumulative_returns[:max_dd_idx+1] == running_max[max_dd_idx])[0][-1]
-    
+    peak_idx = np.where(cumulative_returns[: max_dd_idx + 1] == running_max[max_dd_idx])[0][-1]
+
     logger.debug(
         "Maximum drawdown calculated",
         extra={
@@ -404,10 +404,10 @@ def maximum_drawdown(
             "peak_index": int(peak_idx),
             "trough_index": int(max_dd_idx),
             "peak_value": float(cumulative_returns[peak_idx]),
-            "trough_value": float(cumulative_returns[max_dd_idx])
-        }
+            "trough_value": float(cumulative_returns[max_dd_idx]),
+        },
     )
-    
+
     return float(max_dd), int(peak_idx), int(max_dd_idx)
 
 
@@ -449,27 +449,27 @@ def sortino_ratio(
     1.89...
     """
     returns = np.asarray(returns)
-    
+
     if len(returns) < 2:
         return 0.0
-    
+
     # Calculate excess returns over target
     excess_returns = returns - target_return
     mean_excess = np.mean(excess_returns)
-    
+
     # Calculate downside deviation
     downside_returns = np.minimum(excess_returns, 0)
     downside_dev = np.std(downside_returns, ddof=1)
-    
+
     if downside_dev == 0:
         return np.inf if mean_excess > 0 else 0.0
-    
+
     # Calculate Sortino ratio
     sortino = mean_excess / downside_dev
-    
+
     # Annualize
     annualized_sortino = sortino * np.sqrt(periods_per_year)
-    
+
     logger.debug(
         "Sortino ratio calculated",
         extra={
@@ -477,8 +477,8 @@ def sortino_ratio(
             "mean_return": float(np.mean(returns)),
             "downside_deviation": float(downside_dev),
             "sortino_ratio": float(sortino),
-            "annualized_sortino": float(annualized_sortino)
-        }
+            "annualized_sortino": float(annualized_sortino),
+        },
     )
-    
+
     return float(annualized_sortino)

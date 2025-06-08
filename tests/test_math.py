@@ -6,8 +6,8 @@ import numpy as np
 
 from src.utils.math import (
     black_scholes_price,
-    calculate_delta,
     calculate_cvar,
+    calculate_delta,
     calculate_var,
     half_kelly_size,
     implied_volatility,
@@ -378,7 +378,7 @@ class TestCalculateVaR:
         # Generate returns with known statistics
         np.random.seed(42)
         returns = np.random.normal(0.001, 0.02, 1000)
-        
+
         var = calculate_var(returns, confidence_level=0.95)
         # Should be approximately 1.645 * 0.02 = 0.0329
         assert 0.025 < var < 0.035
@@ -386,27 +386,27 @@ class TestCalculateVaR:
     def test_var_time_scaling(self):
         """Test VaR scaling with time horizon."""
         daily_vol = 0.02
-        
+
         # Daily VaR
         var_1d = calculate_var(daily_vol, confidence_level=0.95, time_horizon=1)
-        
+
         # Monthly VaR (21 trading days)
         var_21d = calculate_var(daily_vol, confidence_level=0.95, time_horizon=21)
-        
+
         # Should scale with sqrt(time)
         assert abs(var_21d / var_1d - np.sqrt(21)) < 0.001
 
     def test_var_confidence_levels(self):
         """Test VaR at different confidence levels."""
         vol = 0.2
-        
+
         var_90 = calculate_var(vol, confidence_level=0.90)
         var_95 = calculate_var(vol, confidence_level=0.95)
         var_99 = calculate_var(vol, confidence_level=0.99)
-        
+
         # Higher confidence = higher VaR
         assert var_90 < var_95 < var_99
-        
+
         # Check specific values
         assert abs(var_90 - 0.2 * 1.282) < 0.001
         assert abs(var_95 - 0.2 * 1.645) < 0.001
@@ -416,7 +416,7 @@ class TestCalculateVaR:
         """Test VaR with positive expected returns."""
         returns = np.random.normal(0.01, 0.02, 1000)  # 1% mean, 2% vol
         var = calculate_var(returns, confidence_level=0.95)
-        
+
         # VaR should be lower due to positive drift
         var_zero_mean = calculate_var(0.02, confidence_level=0.95)
         assert var < var_zero_mean
@@ -427,9 +427,9 @@ class TestCalculateVaR:
         returns = np.random.normal(0.001, 0.02, size=(100, 3))
         returns[:, 1] *= 1.5  # Second asset more volatile
         returns[:, 2] *= 0.5  # Third asset less volatile
-        
+
         var = calculate_var(returns, confidence_level=0.95)
-        
+
         assert var.shape == (3,)
         assert var[1] > var[0] > var[2]  # Reflects volatility differences
 
@@ -442,7 +442,7 @@ class TestCalculateCVaR:
         vol = 0.2
         var = calculate_var(vol, confidence_level=0.95)
         cvar = calculate_cvar(vol, confidence_level=0.95, use_cornish_fisher=False)
-        
+
         # CVaR should be about 20-30% higher than VaR for normal distribution
         assert cvar > var
         assert 1.2 < cvar / var < 1.3
@@ -453,13 +453,14 @@ class TestCalculateCVaR:
         vol = 0.2
         alpha = 0.05
         z = -1.645  # 95% confidence
-        
+
         cvar = calculate_cvar(vol, confidence_level=0.95, use_cornish_fisher=False)
-        
+
         # Expected CVaR formula
         from scipy.stats import norm
+
         expected = vol * norm.pdf(z) / alpha
-        
+
         assert abs(cvar - expected) < 0.001
 
     def test_cvar_with_skewness_kurtosis(self):
@@ -467,20 +468,20 @@ class TestCalculateCVaR:
         # Generate skewed returns
         np.random.seed(42)
         returns = np.random.standard_t(df=5, size=1000) * 0.02  # Fat tails
-        
+
         cvar_normal = calculate_cvar(returns, use_cornish_fisher=False)
         cvar_cf = calculate_cvar(returns, use_cornish_fisher=True)
-        
+
         # Cornish-Fisher should give different (usually higher) CVaR for fat-tailed dist
         assert cvar_cf != cvar_normal
 
     def test_cvar_time_scaling(self):
         """Test CVaR time scaling."""
         daily_vol = 0.02
-        
+
         cvar_1d = calculate_cvar(daily_vol, time_horizon=1)
         cvar_21d = calculate_cvar(daily_vol, time_horizon=21)
-        
+
         # Should scale with sqrt(time) for normal distribution
         assert abs(cvar_21d / cvar_1d - np.sqrt(21)) < 0.01
 
@@ -488,15 +489,17 @@ class TestCalculateCVaR:
         """Test CVaR with actual return data."""
         # Simulate returns with known properties
         np.random.seed(42)
-        returns = np.concatenate([
-            np.random.normal(0.001, 0.02, 950),  # Normal market
-            np.random.normal(-0.05, 0.05, 50)    # Crisis periods
-        ])
+        returns = np.concatenate(
+            [
+                np.random.normal(0.001, 0.02, 950),  # Normal market
+                np.random.normal(-0.05, 0.05, 50),  # Crisis periods
+            ]
+        )
         np.random.shuffle(returns)
-        
+
         var = calculate_var(returns, confidence_level=0.95)
         cvar = calculate_cvar(returns, confidence_level=0.95)
-        
+
         # CVaR captures tail risk better
         assert cvar > var  # CVaR should always be higher than VaR
         # For this distribution with fat tails, CVaR should be notably higher
@@ -509,10 +512,10 @@ class TestHalfKellySize:
     def test_basic_kelly_calculation(self):
         """Test basic Kelly criterion calculation."""
         edge = 0.05  # 5% edge
-        odds = 2.0   # 2:1 odds
-        
+        odds = 2.0  # 2:1 odds
+
         size = half_kelly_size(edge, odds)
-        
+
         # Full Kelly = 0.05 / 2 = 0.025
         # Half Kelly = 0.0125
         assert abs(size - 0.0125) < 1e-6
@@ -522,9 +525,9 @@ class TestHalfKellySize:
         edge = 0.10
         odds = 3.0
         bankroll = 100000
-        
+
         size = half_kelly_size(edge, odds, bankroll)
-        
+
         # Full Kelly = 0.10 / 3 = 0.0333
         # Half Kelly = 0.0167
         # Position = 0.0167 * 100000 = 1667
@@ -535,9 +538,9 @@ class TestHalfKellySize:
         # Very high edge should still be capped
         edge = 0.8
         odds = 2.0
-        
+
         size = half_kelly_size(edge, odds)
-        
+
         # Full Kelly would be 0.4, half = 0.2
         # But capped at 0.25 max
         assert size == 0.2  # Half-Kelly gives 0.2, which is under the 0.25 cap
@@ -546,20 +549,20 @@ class TestHalfKellySize:
         """Test Kelly with negative edge."""
         edge = -0.05
         odds = 2.0
-        
+
         size = half_kelly_size(edge, odds)
-        
+
         # Should return 0 (don't bet on negative edge)
         assert size == 0.0
 
     def test_invalid_odds(self):
         """Test Kelly with invalid odds."""
         edge = 0.05
-        
+
         # Zero odds
         size = half_kelly_size(edge, 0)
         assert size == 0.0
-        
+
         # Negative odds
         size = half_kelly_size(edge, -1)
         assert size == 0.0
@@ -573,9 +576,9 @@ class TestHalfKellySize:
         odds = premium / max_loss  # 0.111
         edge = 0.05
         bankroll = 50000
-        
+
         size = half_kelly_size(edge, odds, bankroll)
-        
+
         # Full Kelly = 0.05 / 0.111 = 0.45 (would be capped)
         # Half Kelly = 0.225, not capped since it's under 0.25
         # Position = 0.225 * 50000 = 11250
@@ -588,12 +591,8 @@ class TestMarginRequirement:
     def test_basic_margin_calculation(self):
         """Test standard margin requirement."""
         # SPY at $450, sell $440 put for $5
-        margin = margin_requirement(
-            strike=440,
-            underlying_price=450,
-            option_price=5.0
-        )
-        
+        margin = margin_requirement(strike=440, underlying_price=450, option_price=5.0)
+
         # Method 1: 20% * 450 - 10 + 5 = 90 - 10 + 5 = 85
         # Method 2: 10% * 440 + 5 = 44 + 5 = 49
         # Max(85, 49) = 85 per share * 100 = 8500
@@ -601,12 +600,8 @@ class TestMarginRequirement:
 
     def test_deep_otm_margin(self):
         """Test margin for deep OTM put."""
-        margin = margin_requirement(
-            strike=400,
-            underlying_price=500,
-            option_price=1.0
-        )
-        
+        margin = margin_requirement(strike=400, underlying_price=500, option_price=1.0)
+
         # Method 1: 20% * 500 - 100 + 1 = 100 - 100 + 1 = 1
         # Method 2: 10% * 400 + 1 = 40 + 1 = 41
         # Max(1, 41) = 41 per share * 100 = 4100
@@ -614,12 +609,8 @@ class TestMarginRequirement:
 
     def test_itm_margin(self):
         """Test margin for ITM put."""
-        margin = margin_requirement(
-            strike=500,
-            underlying_price=480,
-            option_price=25.0
-        )
-        
+        margin = margin_requirement(strike=500, underlying_price=480, option_price=25.0)
+
         # Method 1: 20% * 480 - 0 + 25 = 96 + 25 = 121
         # Method 2: 10% * 500 + 25 = 50 + 25 = 75
         # Max(121, 75) = 121 per share * 100 = 12100
@@ -630,9 +621,9 @@ class TestMarginRequirement:
         strikes = np.array([440, 430, 420])
         underlying = 450
         premiums = np.array([5.0, 3.0, 1.5])
-        
+
         margins = margin_requirement(strikes, underlying, premiums)
-        
+
         assert margins.shape == (3,)
         # Verify specific margin values for each strike
         # Strike 440: Method1 = 90 - 10 + 5 = 85, Method2 = 44 + 5 = 49, Max = 85
@@ -649,9 +640,9 @@ class TestMarginRequirement:
             strike=100,
             underlying_price=100,
             option_price=2.0,
-            margin_rate=0.15  # 15% instead of 20%
+            margin_rate=0.15,  # 15% instead of 20%
         )
-        
+
         # Method 1: 15% * 100 - 0 + 2 = 15 + 2 = 17
         # Method 2: 10% * 100 + 2 = 10 + 2 = 12
         # Max(17, 12) = 17 per share * 100 = 1700
@@ -665,9 +656,9 @@ class TestMarginRequirement:
             strike=4400,
             underlying_price=4500,
             option_price=50.0,
-            multiplier=1  # Index options quoted per point
+            multiplier=1,  # Index options quoted per point
         )
-        
+
         # Method 1: 20% * 4500 - 100 + 50 = 900 - 100 + 50 = 850
         # Method 2: 10% * 4400 + 50 = 440 + 50 = 490
         # Max(850, 490) = 850 per share * 1 = 850
