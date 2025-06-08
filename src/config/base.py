@@ -1,6 +1,9 @@
 """Configuration management for wheel trading application."""
 
-from typing import Literal, Optional
+from __future__ import annotations
+
+from functools import lru_cache
+from typing import Literal
 
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr
@@ -20,12 +23,12 @@ class Settings(BaseSettings):
     )
 
     # Trading
-    broker_api_key: Optional[SecretStr] = Field(
+    broker_api_key: SecretStr | None = Field(
         None,
         description="Broker API key",
         alias="BROKER_API_KEY",
     )
-    broker_api_secret: Optional[SecretStr] = Field(
+    broker_api_secret: SecretStr | None = Field(
         None,
         description="Broker API secret",
         alias="BROKER_API_SECRET",
@@ -61,18 +64,19 @@ class Settings(BaseSettings):
     )
 
     # Google Cloud
-    google_cloud_project: Optional[str] = Field(
+    google_cloud_project: str | None = Field(
         None,
         description="Google Cloud project ID",
         alias="GOOGLE_CLOUD_PROJECT",
     )
-    google_application_credentials: Optional[str] = Field(
+    google_application_credentials: str | None = Field(
         None,
         description="Path to Google Cloud credentials",
         alias="GOOGLE_APPLICATION_CREDENTIALS",
     )
 
 
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Get application settings."""
+    """Get application settings (cached)."""
     return Settings()

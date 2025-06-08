@@ -1,12 +1,15 @@
 """Tests for the main module."""
 
+from __future__ import annotations
+
 import logging
+from typing import Any
 from unittest.mock import patch
 
 from src.main import main
 
 
-def test_main_runs_without_error(caplog):
+def test_main_runs_without_error(caplog: Any) -> None:
     """Test that main function runs without errors."""
     with caplog.at_level(logging.INFO):
         main()
@@ -15,7 +18,7 @@ def test_main_runs_without_error(caplog):
     assert "Application started successfully" in caplog.text
 
 
-def test_main_logs_environment():
+def test_main_logs_environment() -> None:
     """Test that main logs environment information."""
     with patch("src.main.settings") as mock_settings:
         mock_settings.trading_mode = "paper"

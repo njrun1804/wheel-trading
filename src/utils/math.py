@@ -1,19 +1,51 @@
 """Options mathematics module for Black-Scholes pricing and Greeks calculation."""
 
-from typing import Literal, Optional, Union
+from __future__ import annotations
+
+import logging
+from typing import Literal, Optional, Union, cast, overload
 
 import numpy as np
+import numpy.typing as npt
 from scipy.stats import norm
 
+# Configure structured logging
+logger = logging.getLogger(__name__)
+
+# Type aliases for clarity
+FloatArray = npt.NDArray[np.float64]
+FloatOrArray = Union[float, FloatArray]
+OptionType = Literal["call", "put"]
+
+
+@overload
+def black_scholes_price(
+    S: float,
+    K: float,
+    T: float,
+    r: float,
+    sigma: float,
+    option_type: OptionType = "call",
+) -> float: ...
+
+@overload
+def black_scholes_price(
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    sigma: FloatOrArray,
+    option_type: OptionType = "call",
+) -> FloatArray: ...
 
 def black_scholes_price(
-    S: Union[float, np.ndarray],
-    K: Union[float, np.ndarray],
-    T: Union[float, np.ndarray],
-    r: Union[float, np.ndarray],
-    sigma: Union[float, np.ndarray],
-    option_type: Literal["call", "put"] = "call",
-) -> Union[float, np.ndarray]:
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    sigma: FloatOrArray,
+    option_type: OptionType = "call",
+) -> FloatOrArray:
     """
     Calculate Black-Scholes option price for calls and puts.
 
@@ -143,17 +175,52 @@ def black_scholes_price(
                     -d2
                 ) - S_masked * norm.cdf(-d1)
 
+    logger.debug(
+        "Black-Scholes calculation completed",
+        extra={
+            "function": "black_scholes_price",
+            "option_type": option_type,
+            "input_shapes": {
+                "S": np.shape(S),
+                "K": np.shape(K),
+                "T": np.shape(T),
+                "r": np.shape(r),
+                "sigma": np.shape(sigma)
+            },
+            "output_shape": np.shape(result)
+        }
+    )
     return float(result) if np.ndim(result) == 0 else result
 
 
+@overload
 def calculate_delta(
-    S: Union[float, np.ndarray],
-    K: Union[float, np.ndarray],
-    T: Union[float, np.ndarray],
-    r: Union[float, np.ndarray],
-    sigma: Union[float, np.ndarray],
-    option_type: Literal["call", "put"] = "call",
-) -> Union[float, np.ndarray]:
+    S: float,
+    K: float,
+    T: float,
+    r: float,
+    sigma: float,
+    option_type: OptionType = "call",
+) -> float: ...
+
+@overload
+def calculate_delta(
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    sigma: FloatOrArray,
+    option_type: OptionType = "call",
+) -> FloatArray: ...
+
+def calculate_delta(
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    sigma: FloatOrArray,
+    option_type: OptionType = "call",
+) -> FloatOrArray:
     """
     Calculate the analytical delta of an option.
 
@@ -241,17 +308,45 @@ def calculate_delta(
         else:
             result[normal_mask] = norm.cdf(d1) - 1
 
+    logger.debug(
+        "Delta calculation completed",
+        extra={
+            "function": "calculate_delta",
+            "option_type": option_type,
+            "output_shape": np.shape(result)
+        }
+    )
     return float(result) if np.ndim(result) == 0 else result
 
 
+@overload
 def probability_itm(
-    S: Union[float, np.ndarray],
-    K: Union[float, np.ndarray],
-    T: Union[float, np.ndarray],
-    r: Union[float, np.ndarray],
-    sigma: Union[float, np.ndarray],
-    option_type: Literal["call", "put"] = "call",
-) -> Union[float, np.ndarray]:
+    S: float,
+    K: float,
+    T: float,
+    r: float,
+    sigma: float,
+    option_type: OptionType = "call",
+) -> float: ...
+
+@overload
+def probability_itm(
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    sigma: FloatOrArray,
+    option_type: OptionType = "call",
+) -> FloatArray: ...
+
+def probability_itm(
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    sigma: FloatOrArray,
+    option_type: OptionType = "call",
+) -> FloatOrArray:
     """
     Calculate the probability of an option finishing in the money.
 
@@ -337,20 +432,54 @@ def probability_itm(
         else:
             result[normal_mask] = norm.cdf(-d2)
 
+    logger.debug(
+        "Probability ITM calculation completed",
+        extra={
+            "function": "probability_itm",
+            "option_type": option_type,
+            "output_shape": np.shape(result)
+        }
+    )
     return float(result) if np.ndim(result) == 0 else result
 
 
+@overload
 def implied_volatility(
-    option_price: Union[float, np.ndarray],
-    S: Union[float, np.ndarray],
-    K: Union[float, np.ndarray],
-    T: Union[float, np.ndarray],
-    r: Union[float, np.ndarray],
-    option_type: Literal["call", "put"] = "call",
-    initial_guess: Optional[Union[float, np.ndarray]] = None,
+    option_price: float,
+    S: float,
+    K: float,
+    T: float,
+    r: float,
+    option_type: OptionType = "call",
+    initial_guess: Optional[float] = None,
     max_iterations: int = 100,
     tolerance: float = 1e-6,
-) -> Union[float, np.ndarray]:
+) -> float: ...
+
+@overload
+def implied_volatility(
+    option_price: FloatOrArray,
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    option_type: OptionType = "call",
+    initial_guess: Optional[FloatOrArray] = None,
+    max_iterations: int = 100,
+    tolerance: float = 1e-6,
+) -> FloatArray: ...
+
+def implied_volatility(
+    option_price: FloatOrArray,
+    S: FloatOrArray,
+    K: FloatOrArray,
+    T: FloatOrArray,
+    r: FloatOrArray,
+    option_type: OptionType = "call",
+    initial_guess: Optional[FloatOrArray] = None,
+    max_iterations: int = 100,
+    tolerance: float = 1e-6,
+) -> FloatOrArray:
     """
     Calculate implied volatility using Newton-Raphson method.
 
@@ -512,4 +641,399 @@ def implied_volatility(
         else:
             result[iterate_mask] = sigma
 
+    logger.debug(
+        "Implied volatility calculation completed",
+        extra={
+            "function": "implied_volatility",
+            "option_type": option_type,
+            "max_iterations": max_iterations,
+            "tolerance": tolerance,
+            "output_shape": np.shape(result)
+        }
+    )
     return float(result) if np.ndim(result) == 0 else result
+
+
+def calculate_var(
+    returns: FloatOrArray,
+    confidence_level: float = 0.95,
+    time_horizon: float = 1.0,
+) -> FloatOrArray:
+    """
+    Calculate Value at Risk using the normal distribution assumption.
+
+    VaR represents the maximum expected loss with a given confidence level
+    over a specified time horizon.
+
+    For normally distributed returns:
+    $$VaR_{\\alpha} = -\\mu - \\sigma \\cdot z_{\\alpha}$$
+
+    Where:
+    - μ is the mean return
+    - σ is the standard deviation of returns
+    - z_α is the inverse normal CDF at (1 - confidence_level)
+
+    Parameters
+    ----------
+    returns : float or array-like
+        Historical returns or expected return and volatility
+        If float: interpreted as volatility (assumes zero mean)
+        If 1D array: historical returns to calculate mean and std
+        If 2D array: rows are time periods, columns are assets
+    confidence_level : float, default 0.95
+        Confidence level (e.g., 0.95 for 95% VaR)
+    time_horizon : float, default 1.0
+        Time horizon in same units as returns (e.g., days, years)
+
+    Returns
+    -------
+    float or ndarray
+        Value at Risk (positive number representing loss)
+
+    Examples
+    --------
+    >>> # With volatility only (assumes zero mean)
+    >>> calculate_var(0.2, 0.95, 1.0)
+    0.328...
+    
+    >>> # With historical returns
+    >>> returns = np.random.normal(0.001, 0.02, 1000)
+    >>> calculate_var(returns, 0.95)
+    0.032...
+    """
+    returns = np.asarray(returns)
+    
+    # Handle different input formats
+    if returns.ndim == 0:
+        # Single value: interpret as volatility with zero mean
+        mean_return = 0.0
+        volatility = returns
+    elif returns.ndim == 1:
+        # 1D array: calculate mean and std from historical returns
+        mean_return = np.mean(returns)
+        volatility = np.std(returns, ddof=1)
+    else:
+        # 2D array: calculate VaR for each column (asset)
+        mean_return = np.mean(returns, axis=0)
+        volatility = np.std(returns, axis=0, ddof=1)
+    
+    # Scale by time horizon
+    mean_scaled = mean_return * time_horizon
+    vol_scaled = volatility * np.sqrt(time_horizon)
+    
+    # Calculate z-score for the confidence level
+    z_score = norm.ppf(1 - confidence_level)
+    
+    # Calculate VaR (negative of percentile, so positive VaR represents loss)
+    var = -(mean_scaled + z_score * vol_scaled)
+    
+    logger.debug(
+        "VaR calculation completed",
+        extra={
+            "function": "calculate_var",
+            "confidence_level": confidence_level,
+            "time_horizon": time_horizon,
+            "output_shape": np.shape(var)
+        }
+    )
+    
+    return float(var) if np.ndim(var) == 0 else var
+
+
+def calculate_cvar(
+    returns: FloatOrArray,
+    confidence_level: float = 0.95,
+    time_horizon: float = 1.0,
+    use_cornish_fisher: bool = True,
+) -> FloatOrArray:
+    """
+    Calculate Conditional Value at Risk (Expected Shortfall).
+
+    CVaR represents the expected loss conditional on the loss exceeding VaR.
+    Uses Cornish-Fisher expansion to account for skewness and kurtosis.
+
+    For normal distribution:
+    $$CVaR_{\\alpha} = -\\mu + \\sigma \\cdot \\frac{\\phi(z_{\\alpha})}{1-\\alpha}$$
+
+    With Cornish-Fisher expansion:
+    $$z_{CF} = z + \\frac{1}{6}(z^2-1)S + \\frac{1}{24}(z^3-3z)(K-3) - \\frac{1}{36}(2z^3-5z)S^2$$
+
+    Where:
+    - S is skewness
+    - K is kurtosis
+    - φ is the standard normal PDF
+
+    Parameters
+    ----------
+    returns : float or array-like
+        Historical returns or expected statistics
+        If float: interpreted as volatility (assumes normal dist)
+        If 1D array: historical returns to calculate statistics
+        If 2D array: rows are time periods, columns are assets
+    confidence_level : float, default 0.95
+        Confidence level (e.g., 0.95 for 95% CVaR)
+    time_horizon : float, default 1.0
+        Time horizon in same units as returns
+    use_cornish_fisher : bool, default True
+        Whether to use Cornish-Fisher expansion for non-normal returns
+
+    Returns
+    -------
+    float or ndarray
+        Conditional Value at Risk (positive number representing loss)
+
+    Examples
+    --------
+    >>> # With volatility only
+    >>> calculate_cvar(0.2, 0.95, 1.0)
+    0.399...
+    
+    >>> # With historical returns
+    >>> returns = np.random.normal(0.001, 0.02, 1000)
+    >>> calculate_cvar(returns, 0.95)
+    0.040...
+    """
+    returns = np.asarray(returns)
+    
+    # Handle different input formats
+    if returns.ndim == 0:
+        # Single value: interpret as volatility with zero mean
+        mean_return = 0.0
+        volatility = returns
+        skewness = 0.0
+        excess_kurtosis = 0.0
+        use_cornish_fisher = False  # No higher moments available
+    elif returns.ndim == 1:
+        # 1D array: calculate statistics from historical returns
+        mean_return = np.mean(returns)
+        volatility = np.std(returns, ddof=1)
+        if use_cornish_fisher and len(returns) > 3:
+            from scipy.stats import skew, kurtosis
+            skewness = skew(returns)
+            excess_kurtosis = kurtosis(returns, fisher=True)
+        else:
+            skewness = 0.0
+            excess_kurtosis = 0.0
+    else:
+        # 2D array: calculate CVaR for each column
+        mean_return = np.mean(returns, axis=0)
+        volatility = np.std(returns, axis=0, ddof=1)
+        if use_cornish_fisher and returns.shape[0] > 3:
+            from scipy.stats import skew, kurtosis
+            skewness = skew(returns, axis=0)
+            excess_kurtosis = kurtosis(returns, axis=0, fisher=True)
+        else:
+            skewness = np.zeros(returns.shape[1])
+            excess_kurtosis = np.zeros(returns.shape[1])
+    
+    # Scale by time horizon
+    mean_scaled = mean_return * time_horizon
+    vol_scaled = volatility * np.sqrt(time_horizon)
+    
+    # Base z-score
+    alpha = 1 - confidence_level
+    z = norm.ppf(alpha)
+    
+    # Apply Cornish-Fisher expansion if requested
+    if use_cornish_fisher:
+        z_cf = z + (1/6) * (z**2 - 1) * skewness
+        z_cf += (1/24) * (z**3 - 3*z) * excess_kurtosis
+        z_cf -= (1/36) * (2*z**3 - 5*z) * skewness**2
+        z_adjusted = z_cf
+    else:
+        z_adjusted = z
+    
+    # Calculate expected shortfall
+    # For normal distribution: ES = -μ + σ * φ(z) / α
+    pdf_value = norm.pdf(z)
+    cvar = -mean_scaled + vol_scaled * pdf_value / alpha
+    
+    # Adjust for non-normality if using Cornish-Fisher
+    if use_cornish_fisher:
+        # Apply adjustment factor based on modified quantile
+        adjustment = z_adjusted / z
+        cvar *= adjustment
+    
+    logger.debug(
+        "CVaR calculation completed",
+        extra={
+            "function": "calculate_cvar",
+            "confidence_level": confidence_level,
+            "time_horizon": time_horizon,
+            "use_cornish_fisher": use_cornish_fisher,
+            "output_shape": np.shape(cvar)
+        }
+    )
+    
+    return float(cvar) if np.ndim(cvar) == 0 else cvar
+
+
+def half_kelly_size(
+    edge: float,
+    odds: float,
+    bankroll: float = 1.0,
+) -> float:
+    """
+    Calculate position size using half-Kelly criterion.
+
+    The Kelly criterion maximizes long-term growth rate:
+    $$f^* = \\frac{p \\cdot b - q}{b}$$
+
+    Where:
+    - f* is the optimal fraction of bankroll to bet
+    - p is probability of winning
+    - q = 1 - p is probability of losing
+    - b is the odds (net gain on win / loss on loss)
+
+    For a given edge and odds:
+    $$f^* = \\frac{edge}{odds}$$
+
+    Half-Kelly uses f*/2 for reduced volatility and drawdown.
+
+    Parameters
+    ----------
+    edge : float
+        Expected edge as a fraction (e.g., 0.05 for 5% edge)
+        Edge = (probability of profit * profit - probability of loss * loss) / risk
+    odds : float
+        Ratio of win to loss amounts (e.g., 2.0 for 2:1 odds)
+        For options: premium received / max loss
+    bankroll : float, default 1.0
+        Total bankroll (returns fraction if 1.0, dollar amount otherwise)
+
+    Returns
+    -------
+    float
+        Recommended position size (fraction of bankroll or dollar amount)
+
+    Examples
+    --------
+    >>> # 5% edge with 2:1 odds
+    >>> half_kelly_size(0.05, 2.0)
+    0.0125
+    
+    >>> # With $100k bankroll
+    >>> half_kelly_size(0.05, 2.0, 100000)
+    1250.0
+    """
+    # Validate inputs
+    if edge < 0:
+        logger.warning(
+            "Negative edge provided to Kelly sizing",
+            extra={"edge": edge, "odds": odds}
+        )
+        return 0.0
+    
+    if odds <= 0:
+        logger.warning(
+            "Invalid odds provided to Kelly sizing",
+            extra={"edge": edge, "odds": odds}
+        )
+        return 0.0
+    
+    # Full Kelly fraction
+    kelly_fraction = edge / odds
+    
+    # Apply half-Kelly for safety
+    half_kelly_fraction = kelly_fraction / 2
+    
+    # Limit to reasonable bounds (max 25% of bankroll)
+    max_fraction = 0.25
+    safe_fraction = min(half_kelly_fraction, max_fraction)
+    
+    # Calculate position size
+    position_size = safe_fraction * bankroll
+    
+    logger.debug(
+        "Half-Kelly sizing calculated",
+        extra={
+            "function": "half_kelly_size",
+            "edge": edge,
+            "odds": odds,
+            "kelly_fraction": kelly_fraction,
+            "half_kelly_fraction": half_kelly_fraction,
+            "final_fraction": safe_fraction,
+            "position_size": position_size
+        }
+    )
+    
+    return position_size
+
+
+def margin_requirement(
+    strike: FloatOrArray,
+    underlying_price: FloatOrArray,
+    option_price: FloatOrArray,
+    multiplier: int = 100,
+    margin_rate: float = 0.20,
+) -> FloatOrArray:
+    """
+    Calculate margin requirement for naked put options.
+
+    Standard margin requirement for naked puts:
+    Greater of:
+    1. 20% of underlying - out of money amount + option premium
+    2. 10% of strike price + option premium
+
+    Parameters
+    ----------
+    strike : float or array-like
+        Strike price of the put option
+    underlying_price : float or array-like
+        Current price of the underlying
+    option_price : float or array-like
+        Premium received for the option
+    multiplier : int, default 100
+        Contract multiplier (shares per contract)
+    margin_rate : float, default 0.20
+        Margin rate (20% standard for equities)
+
+    Returns
+    -------
+    float or ndarray
+        Margin requirement in dollars
+
+    Examples
+    --------
+    >>> # SPY at $450, sell $440 put for $5.00
+    >>> margin_requirement(440, 450, 5.0)
+    8000.0
+    
+    >>> # Multiple positions
+    >>> strikes = np.array([440, 430, 420])
+    >>> margin_requirement(strikes, 450, [5.0, 3.0, 1.5])
+    array([8000., 8300., 8150.])
+    """
+    # Convert to numpy arrays
+    strike = np.asarray(strike)
+    underlying_price = np.asarray(underlying_price)
+    option_price = np.asarray(option_price)
+    
+    # Calculate out of money amount (positive if OTM)
+    otm_amount = np.maximum(underlying_price - strike, 0)
+    
+    # Method 1: 20% of underlying - OTM amount + premium
+    method1 = margin_rate * underlying_price - otm_amount + option_price
+    
+    # Method 2: 10% of strike + premium
+    method2 = 0.10 * strike + option_price
+    
+    # Take the greater of the two methods
+    margin_per_share = np.maximum(method1, method2)
+    
+    # Apply contract multiplier
+    total_margin = margin_per_share * multiplier
+    
+    logger.debug(
+        "Margin requirement calculated",
+        extra={
+            "function": "margin_requirement",
+            "method1_per_share": method1,
+            "method2_per_share": method2,
+            "margin_per_share": margin_per_share,
+            "total_margin": total_margin,
+            "output_shape": np.shape(total_margin)
+        }
+    )
+    
+    return float(total_margin) if np.ndim(total_margin) == 0 else total_margin

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Simple CLI runner for wheel trading decisions."""
 
+from __future__ import annotations
+
 import argparse
 import logging
 import sys
@@ -10,7 +12,7 @@ from src.config import get_settings
 from src.wheel import WheelStrategy
 
 
-def setup_logging(verbose: bool = False):
+def setup_logging(verbose: bool = False) -> None:
     """Configure logging for CLI output."""
     level = logging.DEBUG if verbose else logging.INFO
     format_str = "%(message)s" if not verbose else "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -22,11 +24,11 @@ def setup_logging(verbose: bool = False):
     )
 
 
-def main():
+def main() -> None:
     """Run wheel trading decision engine."""
     parser = argparse.ArgumentParser(description="Wheel Trading Strategy Decision Engine")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    parser.add_argument("--ticker", default="SPY", help="Ticker to analyze (default: SPY)")
+    parser.add_argument("--ticker", default="U", help="Ticker to analyze (default: U)")
     parser.add_argument("--portfolio", type=float, default=100000, help="Portfolio value")
     
     args = parser.parse_args()
@@ -48,9 +50,9 @@ def main():
     print(f"🎯 Target Delta: {settings.wheel_delta_target}")
     print(f"📆 Target DTE: {settings.days_to_expiry_target} days")
     
-    # Example strikes (will come from broker API)
-    current_price = 455
-    strikes = [440, 445, 450, 455, 460, 465, 470]
+    # Example strikes for Unity (will come from broker API)
+    current_price = 35.50
+    strikes = [30.0, 32.5, 35.0, 37.5, 40.0, 42.5, 45.0]
     
     print(f"\n💹 Current Price: ${current_price}")
     
@@ -58,7 +60,7 @@ def main():
     optimal_put = wheel.find_optimal_put_strike(
         current_price=current_price,
         available_strikes=strikes,
-        volatility=0.15,
+        volatility=0.65,  # Unity typical IV
         days_to_expiry=settings.days_to_expiry_target,
     )
     

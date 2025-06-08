@@ -1,24 +1,35 @@
 """Wheel strategy implementation."""
 
+from __future__ import annotations
+
 import logging
-from typing import Optional
 
 import numpy as np
+import numpy.typing as npt
 
-from .config import get_settings
+from .config import Settings, get_settings
 from .models import Position, WheelPosition
 from .utils.math import calculate_delta, probability_itm
 
+# Configure structured logging
 logger = logging.getLogger(__name__)
 
 
 class WheelStrategy:
     """Implements the wheel options strategy."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize wheel strategy."""
-        self.settings = get_settings()
+        self.settings: Settings = get_settings()
         self.positions: dict[str, WheelPosition] = {}
+        logger.info(
+            "Wheel strategy initialized",
+            extra={
+                "delta_target": self.settings.wheel_delta_target,
+                "dte_target": self.settings.days_to_expiry_target,
+                "max_position_size": self.settings.max_position_size
+            }
+        )
 
     def find_optimal_put_strike(
         self,
@@ -27,7 +38,7 @@ class WheelStrategy:
         volatility: float,
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
-    ) -> Optional[float]:
+    ) -> float | None:
         """Find optimal put strike near target delta.
 
         Parameters
@@ -55,7 +66,7 @@ class WheelStrategy:
         target_delta = -self.settings.wheel_delta_target  # Puts have negative delta
 
         # Calculate delta for each strike
-        deltas = []
+        deltas_list = []
         for strike in available_strikes:
             delta = calculate_delta(
                 S=current_price,
@@ -65,10 +76,10 @@ class WheelStrategy:
                 sigma=volatility,
                 option_type="put",
             )
-            deltas.append(delta)
+            deltas_list.append(delta)
 
         # Find strike closest to target delta
-        deltas = np.array(deltas)
+        deltas = np.array(deltas_list)
         distances = np.abs(deltas - target_delta)
         optimal_idx = np.argmin(distances)
 
@@ -76,8 +87,15 @@ class WheelStrategy:
         optimal_delta = deltas[optimal_idx]
 
         logger.info(
-            f"Selected put strike {optimal_strike} with delta {optimal_delta:.3f} "
-            f"(target: {target_delta:.3f})"
+            "Optimal put strike selected",
+            extra={
+                "function": "find_optimal_put_strike",
+                "current_price": current_price,
+                "optimal_strike": optimal_strike,
+                "optimal_delta": float(optimal_delta),
+                "target_delta": float(target_delta),
+                "days_to_expiry": days_to_expiry
+            }
         )
 
         return optimal_strike
@@ -90,7 +108,7 @@ class WheelStrategy:
         volatility: float,
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
-    ) -> Optional[float]:
+    ) -> float | None:
         """Find optimal call strike near target delta and above cost basis.
 
         Parameters
@@ -123,7 +141,7 @@ class WheelStrategy:
         target_delta = self.settings.wheel_delta_target
 
         # Calculate delta for each valid strike
-        deltas = []
+        deltas_list = []
         for strike in valid_strikes:
             delta = calculate_delta(
                 S=current_price,
@@ -133,10 +151,10 @@ class WheelStrategy:
                 sigma=volatility,
                 option_type="call",
             )
-            deltas.append(delta)
+            deltas_list.append(delta)
 
         # Find strike closest to target delta
-        deltas = np.array(deltas)
+        deltas = np.array(deltas_list)
         distances = np.abs(deltas - target_delta)
         optimal_idx = np.argmin(distances)
 
@@ -154,8 +172,17 @@ class WheelStrategy:
         )
 
         logger.info(
-            f"Selected call strike {optimal_strike} with delta {optimal_delta:.3f} "
-            f"(target: {target_delta:.3f}, P(ITM): {prob_itm:.2%})"
+            "Optimal call strike selected",
+            extra={
+                "function": "find_optimal_call_strike",
+                "current_price": current_price,
+                "cost_basis": cost_basis,
+                "optimal_strike": optimal_strike,
+                "optimal_delta": float(optimal_delta),
+                "target_delta": float(target_delta),
+                "probability_itm": float(prob_itm),
+                "days_to_expiry": days_to_expiry
+            }
         )
 
         return optimal_strike
@@ -183,9 +210,16 @@ class WheelStrategy:
         contracts = int(max_allocation / (current_price * 100))
 
         logger.info(
-            f"Position sizing for {symbol}: "
-            f"max allocation ${max_allocation:,.2f}, "
-            f"{contracts} contracts"
+            "Position size calculated",
+            extra={
+                "function": "calculate_position_size",
+                "symbol": symbol,
+                "current_price": current_price,
+                "portfolio_value": portfolio_value,
+                "max_allocation": max_allocation,
+                "contracts": contracts,
+                "position_size_pct": self.settings.max_position_size
+            }
         )
 
         return max(1, contracts)  # At least 1 contract
@@ -217,17 +251,40 @@ class WheelStrategy:
         """
         # Roll if too close to expiry
         if days_to_expiry <= 7:
-            logger.info(f"Rolling {position.symbol} - approaching expiry")
+            logger.info(
+                "Position roll triggered - approaching expiry",
+                extra={
+                    "symbol": position.symbol,
+                    "days_to_expiry": days_to_expiry,
+                    "reason": "approaching_expiry"
+                }
+            )
             return True
 
         # Roll puts if too far ITM (delta too negative)
         if position.option_type == "put" and current_delta < -0.7:
-            logger.info(f"Rolling {position.symbol} put - deep ITM")
+            logger.info(
+                "Position roll triggered - deep ITM put",
+                extra={
+                    "symbol": position.symbol,
+                    "option_type": "put",
+                    "current_delta": current_delta,
+                    "reason": "deep_itm"
+                }
+            )
             return True
 
         # Roll calls if too far ITM (delta too high)
         if position.option_type == "call" and current_delta > 0.7:
-            logger.info(f"Rolling {position.symbol} call - deep ITM")
+            logger.info(
+                "Position roll triggered - deep ITM call",
+                extra={
+                    "symbol": position.symbol,
+                    "option_type": "call",
+                    "current_delta": current_delta,
+                    "reason": "deep_itm"
+                }
+            )
             return True
 
         return False
