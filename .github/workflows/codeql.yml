@@ -27,16 +27,40 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Check for source code
+      id: check_files
+      run: |
+        if [[ "${{ matrix.language }}" == "javascript" ]]; then
+          if find . -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" | grep -q .; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+        elif [[ "${{ matrix.language }}" == "python" ]]; then
+          if find . -name "*.py" | grep -q .; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+        fi
+
     - name: Initialize CodeQL
+      if: steps.check_files.outputs.found == 'true'
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         # queries: security-extended,security-and-quality
 
     - name: Autobuild
+      if: steps.check_files.outputs.found == 'true'
       uses: github/codeql-action/autobuild@v3
 
     - name: Perform CodeQL Analysis
+      if: steps.check_files.outputs.found == 'true'
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+    
+    - name: Skip analysis - no source code
+      if: steps.check_files.outputs.found != 'true'
+      run: echo "No ${{ matrix.language }} source code found, skipping analysis"
