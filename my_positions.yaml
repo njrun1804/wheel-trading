@@ -1,0 +1,26 @@
+# My Current Positions
+# Updated with actual Unity Software position
+
+account:
+  cash: 41,001.67  
+  margin_available: 0.00
+  account_type: "cash"
+
+positions:
+  stocks:
+    - symbol: "U"
+      quantity: 7500
+      cost_basis: 19.32  # $144,914.67 / 7500 shares
+    
+  options:
+    - symbol: "U"
+      position_type: "covered_call"
+      strike: 25.00
+      expiry: "2025-07-18"
+      quantity: -75  # Short 75 contracts
+      premium_collected: 1.24  # $9,325.22 / 75 / 100
+      underlying_symbol: "U"
+
+# Current market price: $25.38
+# Unrealized gain on stock: +$45,435.33
+# Unrealized loss on calls: -$8,637.28

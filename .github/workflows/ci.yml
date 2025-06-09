@@ -1,0 +1,154 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 00:00 UTC to catch dependency issues
+    - cron: '0 0 * * *'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+    
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+    
+    - name: Install project
+      run: poetry install --no-interaction
+    
+    - name: Run pre-commit hooks
+      run: |
+        poetry run pre-commit install
+        poetry run pre-commit run --all-files
+    
+    - name: Run tests with coverage
+      run: |
+        poetry run pytest -v --cov=src/unity_wheel --cov-report=xml --cov-report=html --cov-fail-under=100
+    
+    - name: Run type checking
+      run: poetry run mypy src/
+    
+    - name: Run security checks
+      run: poetry run bandit -r src/ -f json -o bandit-report.json
+    
+    - name: Run environment validation
+      run: poetry run python -m unity_wheel.validate
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+    
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
+        path: |
+          htmlcov/
+          bandit-report.json
+          .coverage
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+    
+    - name: Build package
+      run: |
+        poetry build
+    
+    - name: Check package
+      run: |
+        pip install twine
+        twine check dist/*
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+  performance:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+    
+    - name: Install dependencies
+      run: poetry install --no-interaction
+    
+    - name: Run performance benchmarks
+      run: |
+        poetry run python -c "
+        import time
+        from unity_wheel.math import black_scholes_price_validated
+        
+        # Benchmark Black-Scholes calculation
+        start = time.time()
+        for _ in range(10000):
+            result = black_scholes_price_validated(100, 100, 1, 0.05, 0.2, 'call')
+        elapsed = time.time() - start
+        
+        print(f'10,000 Black-Scholes calculations: {elapsed:.3f}s')
+        print(f'Per calculation: {elapsed/10000*1000:.3f}ms')
+        
+        # Ensure performance target is met
+        assert elapsed < 2.0, 'Performance regression detected'
+        "
+    
+    - name: Check calculation accuracy
+      run: |
+        poetry run python -m unity_wheel.validate

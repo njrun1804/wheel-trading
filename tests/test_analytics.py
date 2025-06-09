@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from src.utils.analytics import (
+from unity_wheel.risk.analytics import (
     calculate_edge,
     expected_value,
     maximum_drawdown,

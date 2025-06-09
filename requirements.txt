@@ -3,8 +3,10 @@ numpy>=1.24.0
 scipy>=1.10.0
 pandas>=2.0.0
 pydantic>=2.0.0
+pydantic-settings>=2.0.0  # For settings management
 python-dotenv>=1.0.0
 pytz>=2023.3              # For market hours checking
+pyyaml>=6.0.0             # For YAML configuration
 
 # Development Tools
 pytest>=7.0.0
@@ -19,7 +21,20 @@ hypothesis>=6.0.0         # For property-based testing
 click>=8.0.0              # For better CLI
 rich>=13.0.0              # For pretty output
 
+# Authentication and API
+aiohttp>=3.9.0            # For async HTTP requests
+cryptography>=41.0.0      # For secure token storage
+python-jose>=3.3.0        # For JWT handling (if needed)
+tenacity>=8.0.0           # For retry logic with exponential backoff
+
+# Data Integration
+databento>=0.38.0         # For options data feed
+pyarrow>=14.0.0          # For Parquet file support
+google-cloud-storage>=2.10.0  # For GCS storage (optional)
+google-cloud-bigquery>=3.13.0 # For BigQuery analytics (optional)
+google-cloud-secret-manager>=2.20.0  # For secure credential storage (optional)
+
 # Future Features (uncomment as needed)
-# requests>=2.30.0          # For API calls
+# requests>=2.30.0          # For API calls (sync version)
 # joblib>=1.3.0             # For ML model saving
 # scikit-learn>=1.3.0       # For ML features

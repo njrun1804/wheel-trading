@@ -1,0 +1,60 @@
+# Advanced Position & Account Information
+
+account:
+  # Core Account Values
+  total_value: 213314.17
+  cash: 41001.67
+  securities_value: 189300.00  # Unity stock
+  options_value: -17962.50     # Short calls
+  
+  # Margin Account Details
+  account_type: "margin"
+  margin_balance: 0.00         # Not currently borrowing
+  margin_equity: 230301.67
+  margin_buying_power: 293546.00
+  sma: 146773.00              # Special Memorandum Account
+  
+  # External Financing
+  external_loans:
+    - type: "AMEX"
+      amount: 44000.00
+      rate: 0.07              # 7% annual rate
+      monthly_payment: 0.00   # Add if known
+  
+  # Cost of Capital
+  margin_rate: 0.10           # Schwab margin rate 10%
+  risk_free_rate: 0.05       # Treasury rate assumption
+
+positions:
+  stocks:
+    - symbol: "U"
+      quantity: 7500
+      cost_basis: 19.32
+      current_price: 25.38    # From your screenshot
+      margin_eligible: true
+      
+  options:
+    - symbol: "U"
+      position_type: "covered_call"
+      strike: 25.00
+      expiry: "2025-07-18"
+      quantity: -75
+      premium_collected: 1.24
+      current_price: 2.395
+      underlying_symbol: "U"
+      delta: 0.615           # Will calculate if not provided
+      
+# Performance Metrics
+performance:
+  realized_gains_ytd: 0.00   # Update if known
+  unrealized_gains:
+    U_stock: 45435.33
+    U_calls: -8637.28
+  total_gain: 36798.05
+  
+# Risk Parameters
+risk_preferences:
+  max_position_size_pct: 0.50     # Max 50% in any position
+  target_cash_allocation: 0.15    # Target 15% cash
+  use_margin: false               # Whether to use margin
+  max_margin_usage: 0.25          # Max 25% margin if enabled

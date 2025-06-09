@@ -1,0 +1,257 @@
+# Wheel Trading Configuration
+# All parameters for the Unity (U) wheel strategy system
+# Environment variables can override any value using WHEEL_ prefix
+# Example: WHEEL_STRATEGY__DELTA_TARGET=0.25 overrides strategy.delta_target
+
+# Dynamic optimization parameters
+optimization:
+  # Enable dynamic parameter adjustment (vs static)
+  enabled: true
+  # Optimization mode: 'dynamic' or 'tiered'
+  mode: 'dynamic'
+  # Minimum confidence score to use optimized parameters
+  min_confidence: 0.60
+  # Lookback period for volatility calculations
+  volatility_lookback: 20
+  # History required for optimization
+  min_history_days: 250
+  # Bounds for dynamic parameters
+  bounds:
+    delta_min: 0.10
+    delta_max: 0.40
+    dte_min: 21
+    dte_max: 49
+    kelly_min: 0.10
+    kelly_max: 0.50
+
+# Strategy parameters (used as fallback if optimization disabled)
+strategy:
+  # Target delta for short puts (0-1)
+  delta_target: 0.30
+  # Target days to expiry
+  days_to_expiry_target: 45
+  # Minimum days to expiry before considering roll
+  min_days_to_expiry: 21
+  # Maximum delta for short puts
+  max_delta_short_put: 0.35
+  # Strike selection intervals
+  strike_intervals: [1.0, 2.5, 5.0]
+  # Roll triggers
+  roll_triggers:
+    # Roll when profit target reached
+    profit_target_percent: 0.50
+    # Roll when delta breached
+    delta_breach_threshold: 0.45
+    # Roll when DTE below minimum
+    dte_threshold: 21
+
+# Risk management parameters
+risk:
+  # Maximum position size as fraction of portfolio
+  max_position_size: 0.20
+  # Maximum margin utilization
+  max_margin_percent: 0.50
+  # Maximum drawdown before halting
+  max_drawdown_percent: 0.20
+  # CVaR percentile for risk calculations
+  cvar_percentile: 0.95
+  # Risk weight in objective function (CAGR - λ * |CVaR|)
+  objective_risk_weight: 0.20
+  # Kelly criterion fraction (0.5 = Half-Kelly)
+  kelly_fraction: 0.50
+  # Value at Risk limits
+  limits:
+    max_var_95: 0.05  # 5% of portfolio
+    max_cvar_95: 0.075  # 7.5% of portfolio
+    max_kelly_fraction: 0.25  # Max 25% per position
+    max_delta_exposure: 100.0
+    max_gamma_exposure: 10.0
+    max_vega_exposure: 1000.0
+    max_contracts_per_trade: 10
+    max_notional_percent: 0.25
+
+# Market data parameters
+data:
+  # Cache time-to-live in seconds
+  cache_ttl:
+    options_chain: 300  # 5 minutes
+    stock_quotes: 60    # 1 minute
+    volatility: 900     # 15 minutes
+    greeks: 300         # 5 minutes
+  # API timeout settings
+  api_timeouts:
+    connect: 5.0
+    read: 30.0
+    write: 10.0
+    total: 60.0
+  # Data quality thresholds
+  quality:
+    stale_data_seconds: 30
+    min_confidence_score: 0.80
+    min_bid_ask_spread: 0.10
+    min_open_interest: 50
+    min_volume: 10
+
+# Trading environment
+trading:
+  # Mode: live, paper, or backtest
+  mode: paper
+  # Broker settings
+  broker:
+    name: schwab
+    api_key: ""  # Set via WHEEL_TRADING__BROKER__API_KEY env var
+    api_secret: ""  # Set via WHEEL_TRADING__BROKER__API_SECRET env var
+  # Market hours (Eastern Time)
+  market_hours:
+    open: "09:30:00"
+    close: "16:00:00"
+    pre_market_open: "07:00:00"
+    after_hours_close: "20:00:00"
+
+# Unity-specific settings
+unity:
+  ticker: "U"
+  company_name: "Unity Software Inc."
+  # Typical implied volatility characteristics
+  volatility:
+    typical_range: [0.40, 0.90]
+    average: 0.65
+    # Volatility regime thresholds
+    regimes:
+      low: 0.40
+      normal: 0.65
+      high: 0.80
+      extreme: 1.00
+
+# Machine learning settings
+ml:
+  # Enable ML enhancement
+  enabled: false
+  # Model storage path
+  model_path: "./models/"
+  # Feature flags
+  features:
+    use_iv_rank: true
+    use_iv_skew: true
+    use_realized_vol: true
+    use_macro_factors: false
+    use_sentiment: false
+  # Model parameters
+  models:
+    # Probability adjustment model
+    probability_model:
+      type: "gradient_boost"
+      retrain_days: 30
+      min_samples: 1000
+    # Volatility forecast model
+    volatility_model:
+      type: "garch"
+      lookback_days: 252
+
+# Operational settings
+operations:
+  # Logging configuration
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    format: "json"  # json or text
+    file: "./logs/wheel_trading.log"
+    rotation: "daily"
+    retention_days: 30
+  # Alert thresholds
+  alerts:
+    # Alert when margin utilization exceeds
+    margin_warning_percent: 0.40
+    # Alert when position delta exceeds
+    delta_warning: 0.40
+    # Alert when unrealized loss exceeds
+    loss_warning_percent: 0.10
+  # Performance tracking
+  performance:
+    track_decisions: true
+    track_parameters: true
+    export_format: "csv"  # csv or json
+    export_path: "./data/performance/"
+
+# Backtesting configuration
+backtest:
+  # Start date for backtests
+  start_date: "2023-01-01"
+  # End date (null for current date)
+  end_date: null
+  # Initial capital
+  initial_capital: 100000
+  # Commission per contract
+  commission_per_contract: 0.65
+  # Slippage model
+  slippage:
+    type: "fixed"  # fixed or proportional
+    value: 0.05  # $0.05 per contract or 0.05%
+
+# System configuration
+system:
+  # Performance targets
+  performance:
+    max_decision_time_ms: 200
+    max_memory_mb: 512
+  # Health checks
+  health_checks:
+    - math_library_sanity
+    - configuration_validity
+    - type_consistency
+    - data_connectivity
+    - risk_limits_valid
+  # Feature flags
+  features:
+    enable_diagnostics: true
+    enable_self_tuning: false
+    enable_config_tracking: true
+    enable_auto_recovery: true
+
+# Authentication configuration
+auth:
+  # OAuth credentials (set via environment variables for security)
+  # WHEEL_AUTH__CLIENT_ID and WHEEL_AUTH__CLIENT_SECRET
+  client_id: null
+  client_secret: null
+  
+  # OAuth endpoints
+  redirect_uri: "http://localhost:8182/callback"
+  auth_url: "https://api.schwabapi.com/v1/oauth/authorize"
+  token_url: "https://api.schwabapi.com/v1/oauth/token"
+  scope: "AccountsRead MarketDataRead"
+  
+  # Token management
+  auto_refresh: true
+  token_refresh_buffer_minutes: 5
+  
+  # Cache settings
+  enable_cache: true
+  cache_ttl_seconds: 3600  # 1 hour
+  cache_max_size_mb: 100
+  
+  # Rate limiting
+  rate_limit_rps: 10.0
+  rate_limit_burst: 20
+  enable_circuit_breaker: true
+  circuit_breaker_threshold: 5
+  circuit_breaker_recovery_seconds: 60
+  
+  # Retry settings
+  max_retry_attempts: 3
+  retry_backoff_factor: 2.0
+
+# Configuration metadata
+metadata:
+  version: "1.0.0"
+  last_updated: "2025-01-06"
+  environment: "development"
+  # Parameter tracking
+  tracking:
+    # Track which parameters affect outcomes
+    track_usage: true
+    # Suggest parameter adjustments
+    suggest_tuning: true
+    # Warn about unused parameters
+    warn_unused: true
+    # Auto-disable broken features
+    auto_disable_broken: true

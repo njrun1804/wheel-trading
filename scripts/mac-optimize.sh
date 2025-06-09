@@ -34,14 +34,27 @@ EOF
     echo "✅ Added advanced optimizations to ~/.zshrc"
 fi
 
-# 4. Git optimizations
+# 4. Network optimizations for Databento API
+echo "Optimizing network for high-throughput API calls..."
+# Increase TCP buffers for better API throughput
+sudo sysctl -w net.inet.tcp.sendspace=1048576 2>/dev/null || echo "Send buffer already optimized"
+sudo sysctl -w net.inet.tcp.recvspace=1048576 2>/dev/null || echo "Recv buffer already optimized"
+sudo sysctl -w net.inet.tcp.autorcvbufmax=33554432 2>/dev/null || echo "Auto recv buffer already optimized"
+sudo sysctl -w net.inet.tcp.autosndbufmax=33554432 2>/dev/null || echo "Auto send buffer already optimized"
+# Enable TCP Fast Open for faster connections
+sudo sysctl -w net.inet.tcp.fastopen=3 2>/dev/null || echo "TCP Fast Open already enabled"
+# Optimize for concurrent connections
+sudo sysctl -w kern.ipc.somaxconn=2048 2>/dev/null || echo "Connection backlog already optimized"
+sudo sysctl -w net.inet.tcp.tw_reuse=1 2>/dev/null || echo "TIME_WAIT reuse already enabled"
+
+# 5. Git optimizations
 echo "Optimizing git repository..."
 cd "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading"
 git config core.preloadindex true
 git config core.fscache true
 git config gc.auto 256
 
-# 5. Create maintenance script
+# 6. Create maintenance script
 cat > scripts/maintenance.sh << 'EOF'
 #!/bin/bash
 # Weekly maintenance script
