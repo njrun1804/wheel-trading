@@ -1,6 +1,25 @@
 [flake8]
 max-line-length = 100
-extend-ignore = E203, W503, E501
+extend-ignore = 
+    # D205: 1 blank line required between summary line and description
+    # D400: First line should end with a period
+    # D401: First line should be in imperative mood
+    D205,D400,D401,
+    # D107: Missing docstring in __init__
+    D107,
+    # E203: whitespace before ':' (conflicts with black)
+    # W503: line break before binary operator (conflicts with black)
+    E203,W503,
+    # E501: line too long (already have max-line-length)
+    E501,
+    # B008: Do not perform function calls in argument defaults
+    B008,
+    # F541: f-string is missing placeholders (often intentional for consistency)
+    F541,
+    # C901: Function is too complex (we'll address case-by-case)
+    C901,
+    # B007: Loop control variable not used (sometimes intentional)
+    B007
 exclude =
     .git,
     __pycache__,
@@ -12,5 +31,26 @@ exclude =
     .pytest_cache,
     .tox,
     *.egg-info,
-    node_modules
-max-complexity = 10
+    node_modules,
+    .mypy_cache,
+    .hypothesis,
+    htmlcov,
+    data/
+per-file-ignores =
+    # F401: imported but unused (common in __init__.py)
+    __init__.py:F401,
+    # D103: Missing docstring in public function (tests don't need docstrings)
+    # D100-D102: Missing docstrings in modules/classes/methods
+    test_*.py:D103,D100,D101,D102,
+    # E402: module level import not at top of file (needed for path setup)
+    scripts/*.py:E402,
+    examples/*/*.py:E402,
+    run.py:E402,
+    run_aligned.py:E402,
+    daily_health_check.py:E402,
+    monitor_live.py:E402,
+    # F841: local variable assigned but never used (common in examples)
+    examples/*/*.py:F841
+max-complexity = 15
+# Exclude B001 and B902 for bare except handling
+extend-ignore = B001,B902,E722

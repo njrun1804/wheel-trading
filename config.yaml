@@ -48,11 +48,13 @@ strategy:
 # Risk management parameters
 risk:
   # Maximum position size as fraction of portfolio
-  max_position_size: 0.20
+  # User preference: 100% allocation allowed (no cash reserve requirement)
+  max_position_size: 1.00
   # Maximum margin utilization
-  max_margin_percent: 0.50
+  # User preference: up to Schwab's limit
+  max_margin_percent: 0.95
   # Maximum drawdown before halting
-  max_drawdown_percent: 0.20
+  max_drawdown_percent: 0.50  # Increased for aggressive strategy
   # CVaR percentile for risk calculations
   cvar_percentile: 0.95
   # Risk weight in objective function (CAGR - λ * |CVaR|)
@@ -61,14 +63,14 @@ risk:
   kelly_fraction: 0.50
   # Value at Risk limits
   limits:
-    max_var_95: 0.05  # 5% of portfolio
-    max_cvar_95: 0.075  # 7.5% of portfolio
-    max_kelly_fraction: 0.25  # Max 25% per position
-    max_delta_exposure: 100.0
-    max_gamma_exposure: 10.0
-    max_vega_exposure: 1000.0
-    max_contracts_per_trade: 10
-    max_notional_percent: 0.25
+    max_var_95: 0.50  # 50% of portfolio (user accepts high risk)
+    max_cvar_95: 0.75  # 75% of portfolio (user accepts high risk)
+    max_kelly_fraction: 1.00  # Kelly sizing up to 100% (will be limited by margin)
+    max_delta_exposure: 200.0  # Allow leveraged delta exposure
+    max_gamma_exposure: 50.0  # Higher gamma acceptable
+    max_vega_exposure: 5000.0  # Higher vega acceptable
+    max_contracts_per_trade: 100  # No artificial limit
+    max_notional_percent: 2.00  # Allow up to 200% notional (margin)
 
 # Market data parameters
 data:
