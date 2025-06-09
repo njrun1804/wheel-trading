@@ -5,14 +5,13 @@ description = "Sophisticated options wheel trading system optimized for autonomo
 authors = ["Claude Code <noreply@anthropic.com>"]
 readme = "README.md"
 packages = [{include = "unity_wheel", from = "src"}]
-python = "^3.12"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 numpy = "1.26.4"
 scipy = "1.13.0"
 pandas = "2.2.1"
-pydantic = "2.6.3"
+pydantic = "2.7.0"
 python-dotenv = "1.0.1"
 pytz = "2024.1"
 click = "8.1.7"

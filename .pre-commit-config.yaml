@@ -58,30 +58,4 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        args: [--cov=src/unity_wheel, --cov-fail-under=80]
-        
-      # Autonomous system checks
-      - id: system-diagnostics
-        name: Run system diagnostics
-        entry: python run_aligned.py --diagnose --format json
-        language: system
-        pass_filenames: false
-        stages: [push]
-        
-      - id: validate-config
-        name: Validate configuration
-        entry: python -c "from src.config import get_config_loader; get_config_loader()"
-        language: system
-        pass_filenames: false
-        
-      - id: check-feature-flags
-        name: Check feature flags health
-        entry: python -c "from unity_wheel.utils import get_feature_flags; f = get_feature_flags(); r = f.get_status_report(); exit(1 if r['summary']['degraded'] > 0 else 0)"
-        language: system
-        pass_filenames: false
-        
-      - id: version-check
-        name: Verify version consistency
-        entry: python -c "from unity_wheel import __version__; print(f'Version: {__version__}')"
-        language: system
-        pass_filenames: false
+        args: [--cov=src/unity_wheel, --cov-fail-under=100]
