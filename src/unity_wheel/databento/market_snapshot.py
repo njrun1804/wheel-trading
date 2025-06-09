@@ -4,12 +4,12 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
-from src.unity_wheel.api.types import MarketSnapshot, OptionData
-from src.unity_wheel.databento.types import InstrumentDefinition, OptionChain
-from src.unity_wheel.math.options import implied_volatility_validated
-from src.unity_wheel.models.position import Position
-from src.unity_wheel.storage import Storage
-from src.unity_wheel.utils.logging import StructuredLogger
+from ..api.types import MarketSnapshot, OptionData
+from .types import InstrumentDefinition, OptionChain
+from ..math.options import implied_volatility_validated
+from ..models.position import Position
+from ..storage import Storage
+from ..utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -140,17 +140,6 @@ class DatentoMarketSnapshotBuilder:
 
             # In pull-when-asked architecture, cache checking is handled by Storage
             # This method would be replaced by storage.get_or_fetch pattern
-            # For now, return None to trigger fresh data fetch
-            if False:  # Placeholder for cache check
-                logger.info(
-                    "Found stored data",
-                    extra={"ticker": ticker, "date": date_str, "path": str(path)},
-                )
-
-                # Load and reconstruct chain
-                # This would need implementation to load from parquet
-                # For now, return None to indicate we need fresh data
-                return None
 
         logger.warning("No recent data found", extra={"ticker": ticker})
         return None

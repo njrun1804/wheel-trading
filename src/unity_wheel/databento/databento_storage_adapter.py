@@ -13,6 +13,7 @@ from ..storage import Storage
 from ..utils import get_logger
 from .types import InstrumentDefinition, OptionChain, OptionQuote
 from .validation import DataValidator
+from ..config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -20,16 +21,21 @@ logger = get_logger(__name__)
 class DatabentoStorageAdapter:
     """Storage adapter for Databento options data with moneyness filtering."""
 
-    # Storage optimization constants from plan
-    MONEYNESS_RANGE = 0.20  # Keep options within 20% of spot
-    MAX_EXPIRATIONS = 3  # Maximum monthly expirations to store
-    INTRADAY_TTL_MINUTES = 15  # Real-time quotes cache
-    GREEKS_TTL_MINUTES = 5  # Greeks calculations cache
-
     def __init__(self, storage: Storage):
         """Initialize with unified storage layer."""
         self.storage = storage
         self.validator = DataValidator()
+
+        # Load configuration
+        config = get_config()
+
+        # Storage optimization constants from config
+        self.MONEYNESS_RANGE = config.databento.filters.moneyness_range
+        self.MAX_EXPIRATIONS = config.databento.filters.max_expirations
+        self.INTRADAY_TTL_MINUTES = (
+            config.data.cache_ttl.intraday / 60
+        )  # Convert seconds to minutes
+        self.GREEKS_TTL_MINUTES = config.data.cache_ttl.greeks / 60  # Convert seconds to minutes
 
         # Track storage metrics
         self._metrics = {

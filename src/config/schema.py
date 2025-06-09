@@ -20,16 +20,25 @@ class RollTriggers(BaseModel):
         0.50, ge=0.0, le=1.0, description="Roll when profit target reached (0-1)"
     )
     delta_breach_threshold: float = Field(
-        0.45, ge=0.0, le=1.0, description="Roll when delta breached"
+        0.70, ge=0.0, le=1.0, description="Roll when delta breached"
     )
-    dte_threshold: int = Field(21, ge=0, le=365, description="Roll when DTE below threshold")
+    dte_threshold: int = Field(7, ge=0, le=365, description="Roll when DTE below threshold")
+    profit_threshold_1: float = Field(0.50, ge=0.0, le=1.0, description="First profit trigger")
+    profit_threshold_2: float = Field(0.95, ge=0.0, le=1.0, description="Second profit trigger")
+
+
+class StrikeRange(BaseModel):
+    """Strike range configuration."""
+
+    min_moneyness: float = Field(0.80, ge=0.0, le=1.0, description="Minimum moneyness (% of spot)")
+    max_moneyness: float = Field(1.10, ge=1.0, le=2.0, description="Maximum moneyness (% of spot)")
 
 
 class StrategyConfig(BaseModel):
     """Strategy parameters configuration."""
 
     delta_target: float = Field(0.30, ge=0.0, le=1.0, description="Target delta for short puts")
-    days_to_expiry_target: int = Field(45, ge=1, le=365, description="Target days to expiry")
+    days_to_expiry_target: int = Field(35, ge=1, le=365, description="Target days to expiry")
     min_days_to_expiry: int = Field(
         21, ge=0, le=365, description="Minimum DTE before considering roll"
     )
@@ -37,6 +46,8 @@ class StrategyConfig(BaseModel):
         0.35, ge=0.0, le=1.0, description="Maximum delta for short puts"
     )
     strike_intervals: List[float] = Field([1.0, 2.5, 5.0], description="Strike selection intervals")
+    strike_range: StrikeRange = Field(default_factory=StrikeRange)
+    min_premium_yield: float = Field(0.01, ge=0.0, description="Minimum premium yield")
     roll_triggers: RollTriggers = Field(default_factory=RollTriggers)
 
     @field_validator("strike_intervals")
@@ -68,9 +79,10 @@ class RiskLimits(BaseModel):
     max_delta_exposure: float = Field(100.0, ge=0.0, description="Max delta exposure")
     max_gamma_exposure: float = Field(10.0, ge=0.0, description="Max gamma exposure")
     max_vega_exposure: float = Field(1000.0, ge=0.0, description="Max vega exposure")
-    max_contracts_per_trade: int = Field(10, ge=1, description="Max contracts per trade")
+    max_theta_decay: float = Field(100.0, ge=0.0, description="Max daily theta decay")
+    max_contracts_per_trade: int = Field(100, ge=1, description="Max contracts per trade")
     max_notional_percent: float = Field(
-        0.25, ge=0.0, le=1.0, description="Max notional as percent of portfolio"
+        2.00, ge=0.0, le=10.0, description="Max notional as percent of portfolio"
     )
 
     @model_validator(mode="after")
@@ -80,17 +92,82 @@ class RiskLimits(BaseModel):
         return self
 
 
+class GreekLimits(BaseModel):
+    """Greek exposure limits."""
+
+    max_delta_exposure: float = Field(100.0, ge=0.0, description="Maximum delta exposure")
+    max_gamma_exposure: float = Field(10.0, ge=0.0, description="Maximum gamma exposure")
+    max_vega_exposure: float = Field(1000.0, ge=0.0, description="Maximum vega exposure ($)")
+    max_theta_decay: float = Field(100.0, ge=0.0, description="Maximum daily theta decay")
+    max_rho_exposure: float = Field(500.0, ge=0.0, description="Maximum rho exposure")
+
+
+class MarginConfig(BaseModel):
+    """Margin and leverage configuration."""
+
+    max_utilization: float = Field(0.50, ge=0.0, le=1.0, description="Maximum margin utilization")
+    safety_factor: float = Field(0.80, ge=0.0, le=1.0, description="Safety factor for margin")
+    margin_requirement: float = Field(
+        0.20, ge=0.0, le=1.0, description="Simplified margin requirement"
+    )
+    margin_multiplier: float = Field(0.50, ge=0.0, description="Safety multiplier for margin")
+
+
+class CircuitBreakers(BaseModel):
+    """Circuit breaker configuration for safety stops."""
+
+    # Position-level circuit breakers
+    max_position_pct: float = Field(
+        0.20, ge=0.0, le=1.0, description="Max % of portfolio in one position"
+    )
+    max_contracts: int = Field(10, ge=1, description="Max contracts per trade")
+    min_portfolio_value: float = Field(10000, ge=0.0, description="Stop trading below this value")
+
+    # Market condition circuit breakers
+    max_volatility: float = Field(1.5, ge=0.0, description="Max annual volatility (150%)")
+    max_gap_percent: float = Field(0.10, ge=0.0, le=1.0, description="Max price gap (10%)")
+    min_volume_ratio: float = Field(0.5, ge=0.0, le=1.0, description="Min volume vs average")
+
+    # Loss circuit breakers
+    max_daily_loss_pct: float = Field(0.02, ge=0.0, le=1.0, description="Max daily loss %")
+    max_weekly_loss_pct: float = Field(0.05, ge=0.0, le=1.0, description="Max weekly loss %")
+    max_consecutive_losses: int = Field(3, ge=1, description="Stop after N consecutive losses")
+
+    # System health circuit breakers
+    min_confidence: float = Field(0.30, ge=0.0, le=1.0, description="Min confidence to trade")
+    max_warnings: int = Field(3, ge=0, description="Max warnings before stopping")
+    blackout_hours: List[int] = Field([], description="Hours to avoid trading (24h format)")
+
+
+class AdaptiveLimits(BaseModel):
+    """Adaptive parameter adjustment configuration."""
+
+    enabled: bool = Field(True, description="Enable adaptive adjustments")
+    base_max_position_pct: float = Field(0.20, ge=0.0, le=1.0, description="Base position size %")
+    base_min_confidence: float = Field(0.30, ge=0.0, le=1.0, description="Base minimum confidence")
+
+    # Scaling features
+    volatility_scaling: bool = Field(True, description="Scale with volatility")
+    confidence_scaling: bool = Field(True, description="Scale with confidence")
+    performance_scaling: bool = Field(True, description="Scale with performance")
+    regime_scaling: bool = Field(True, description="Scale with market regime")
+
+    # ML integration
+    ml_blend_max: float = Field(0.80, ge=0.0, le=1.0, description="Max ML weight")
+    ml_confidence_threshold: float = Field(0.60, ge=0.0, le=1.0, description="Min ML confidence")
+
+
 class RiskConfig(BaseModel):
     """Risk management configuration."""
 
     max_position_size: float = Field(
-        0.20, ge=0.0, le=1.0, description="Max position size as fraction of portfolio"
+        1.00, ge=0.0, le=1.0, description="Max position size as fraction of portfolio"
     )
     max_margin_percent: float = Field(
-        0.50, ge=0.0, le=1.0, description="Maximum margin utilization"
+        0.95, ge=0.0, le=1.0, description="Maximum margin utilization"
     )
     max_drawdown_percent: float = Field(
-        0.20, ge=0.0, le=1.0, description="Maximum drawdown before halting"
+        0.50, ge=0.0, le=1.0, description="Maximum drawdown before halting"
     )
     cvar_percentile: float = Field(
         0.95, ge=0.0, le=1.0, description="CVaR percentile for risk calculations"
@@ -100,6 +177,10 @@ class RiskConfig(BaseModel):
     )
     kelly_fraction: float = Field(0.50, ge=0.0, le=1.0, description="Kelly criterion fraction")
     limits: RiskLimits = Field(default_factory=RiskLimits)
+    greeks: GreekLimits = Field(default_factory=GreekLimits)
+    margin: MarginConfig = Field(default_factory=MarginConfig)
+    circuit_breakers: CircuitBreakers = Field(default_factory=CircuitBreakers)
+    adaptive_limits: AdaptiveLimits = Field(default_factory=AdaptiveLimits)
 
     @model_validator(mode="after")
     def validate_risk_consistency(self) -> "RiskConfig":
@@ -113,10 +194,14 @@ class RiskConfig(BaseModel):
 class CacheTTL(BaseModel):
     """Cache TTL configuration."""
 
-    options_chain: int = Field(300, ge=0, description="Options chain cache TTL in seconds")
+    options_chain: int = Field(900, ge=0, description="Options chain cache TTL in seconds")
     stock_quotes: int = Field(60, ge=0, description="Stock quotes cache TTL in seconds")
     volatility: int = Field(900, ge=0, description="Volatility cache TTL in seconds")
     greeks: int = Field(300, ge=0, description="Greeks cache TTL in seconds")
+    account_data: int = Field(30, ge=0, description="Account data cache TTL in seconds")
+    historical: int = Field(86400, ge=0, description="Historical data cache TTL in seconds")
+    market_data: int = Field(60, ge=0, description="Market data cache TTL in seconds")
+    intraday: int = Field(900, ge=0, description="Intraday data cache TTL in seconds")
 
 
 class APITimeouts(BaseModel):
@@ -134,6 +219,23 @@ class APITimeouts(BaseModel):
         return self
 
 
+class RetryConfig(BaseModel):
+    """Retry configuration for API calls."""
+
+    max_attempts: int = Field(3, ge=1, le=10, description="Maximum retry attempts")
+    delays: List[int] = Field([1, 2, 5], description="Exponential backoff delays in seconds")
+    rate_limit_wait: int = Field(60, ge=0, description="Wait after rate limit in seconds")
+
+
+class LiquidityRequirements(BaseModel):
+    """Minimum liquidity requirements."""
+
+    volume: int = Field(10, ge=0, description="Minimum daily volume")
+    open_interest: int = Field(100, ge=0, description="Minimum open interest")
+    bid_size: int = Field(1, ge=0, description="Minimum bid size")
+    max_bid_ask_spread: float = Field(0.50, ge=0.0, description="Maximum bid-ask spread")
+
+
 class DataQuality(BaseModel):
     """Data quality configuration."""
 
@@ -141,9 +243,12 @@ class DataQuality(BaseModel):
     min_confidence_score: float = Field(
         0.80, ge=0.0, le=1.0, description="Minimum confidence score"
     )
-    min_bid_ask_spread: float = Field(0.10, ge=0.0, description="Minimum bid-ask spread")
-    min_open_interest: int = Field(50, ge=0, description="Minimum open interest")
-    min_volume: int = Field(10, ge=0, description="Minimum volume")
+    max_spread_pct: float = Field(10.0, ge=0.0, description="Maximum bid-ask spread %")
+    min_quote_size: int = Field(1, ge=0, description="Minimum quote size")
+    max_price_change_pct: float = Field(50.0, ge=0.0, description="Maximum price change %")
+    min_options_per_expiry: int = Field(10, ge=0, description="Minimum option contracts")
+    stale_data_minutes: int = Field(15, ge=0, description="Data considered stale after")
+    min_liquidity: LiquidityRequirements = Field(default_factory=LiquidityRequirements)
 
 
 class DataConfig(BaseModel):
@@ -151,6 +256,7 @@ class DataConfig(BaseModel):
 
     cache_ttl: CacheTTL = Field(default_factory=CacheTTL)
     api_timeouts: APITimeouts = Field(default_factory=APITimeouts)
+    retry: RetryConfig = Field(default_factory=RetryConfig)
     quality: DataQuality = Field(default_factory=DataQuality)
 
 
@@ -180,6 +286,16 @@ class MarketHours(BaseModel):
         return v
 
 
+class TradingExecutionConfig(BaseModel):
+    """Trading execution parameters."""
+
+    commission_per_contract: float = Field(
+        0.65, ge=0.0, description="Commission per options contract"
+    )
+    contracts_per_trade: int = Field(100, ge=1, description="Standard lot size")
+    max_concurrent_puts: int = Field(3, ge=1, description="Max concurrent put positions")
+
+
 class TradingConfig(BaseModel):
     """Trading environment configuration."""
 
@@ -190,6 +306,7 @@ class TradingConfig(BaseModel):
     )
     broker: BrokerConfig = Field(default_factory=BrokerConfig)
     market_hours: MarketHours = Field(default_factory=MarketHours)
+    execution: TradingExecutionConfig = Field(default_factory=TradingExecutionConfig)
 
 
 class VolatilityRegimes(BaseModel):
@@ -224,12 +341,109 @@ class UnityVolatility(BaseModel):
         return v
 
 
+class UnityEarnings(BaseModel):
+    """Unity earnings behavior configuration."""
+
+    typical_move_pct: float = Field(0.20, ge=0.0, le=1.0, description="Typical earnings move %")
+    blackout_days_before: int = Field(7, ge=0, description="Days before earnings to stop trading")
+    iv_expansion_factor: float = Field(1.5, ge=1.0, description="IV expansion factor into earnings")
+
+
+class UnityGapBehavior(BaseModel):
+    """Unity gap behavior configuration."""
+
+    typical_overnight_move: float = Field(0.05, ge=0.0, description="Typical overnight move")
+    max_acceptable_gap: float = Field(0.15, ge=0.0, description="Max gap to trade after")
+    gap_recovery_hours: int = Field(48, ge=0, description="Hours to wait after major gap")
+
+
+class UnityCorrelations(BaseModel):
+    """Unity market correlations."""
+
+    qqq_correlation: float = Field(0.65, ge=-1.0, le=1.0, description="QQQ correlation")
+    vix_sensitivity: float = Field(1.5, ge=0.0, description="VIX beta")
+    sector_etfs: List[str] = Field(["GAMR", "METV", "XLC"], description="Related sector ETFs")
+
+
 class UnityConfig(BaseModel):
     """Unity-specific configuration."""
 
     ticker: str = Field("U", description="Stock ticker")
     company_name: str = Field("Unity Software Inc.", description="Company name")
     volatility: UnityVolatility = Field(default_factory=UnityVolatility)
+    earnings: UnityEarnings = Field(default_factory=UnityEarnings)
+    gap_behavior: UnityGapBehavior = Field(default_factory=UnityGapBehavior)
+    correlations: UnityCorrelations = Field(default_factory=UnityCorrelations)
+
+
+class VolatilityFactors(BaseModel):
+    """Volatility-based position sizing factors."""
+
+    low: float = Field(1.20, ge=0.0, description="Factor for low volatility")
+    normal: float = Field(1.00, ge=0.0, description="Factor for normal volatility")
+    high: float = Field(0.70, ge=0.0, description="Factor for high volatility")
+    extreme: float = Field(0.50, ge=0.0, description="Factor for extreme volatility")
+
+
+class VolatilityThresholds(BaseModel):
+    """Volatility thresholds for position sizing."""
+
+    low: float = Field(0.40, ge=0.0, description="Low volatility threshold")
+    normal: float = Field(0.60, ge=0.0, description="Normal volatility threshold")
+    high: float = Field(0.80, ge=0.0, description="High volatility threshold")
+    extreme: float = Field(1.00, ge=0.0, description="Extreme volatility threshold")
+
+
+class RegimeParams(BaseModel):
+    """Parameters for a specific market regime."""
+
+    put_delta: float = Field(0.30, ge=0.0, le=1.0, description="Target delta for puts")
+    target_dte: int = Field(35, ge=1, le=365, description="Days to expiration")
+    roll_profit_target: float = Field(0.50, ge=0.0, le=1.0, description="Roll at profit %")
+    position_size_factor: float = Field(1.0, ge=0.0, description="Position size multiplier")
+
+
+class AdaptiveStopConditions(BaseModel):
+    """Stop conditions for adaptive system."""
+
+    max_volatility: float = Field(1.0, ge=0.0, description="Stop above this volatility")
+    max_drawdown: float = Field(0.20, ge=0.0, le=1.0, description="Stop at this drawdown")
+    min_days_to_earnings: int = Field(7, ge=0, description="Skip if earnings within days")
+
+
+class OutcomeTracking(BaseModel):
+    """Outcome tracking configuration."""
+
+    enabled: bool = Field(True, description="Enable outcome tracking")
+    database_path: str = Field("~/.wheel_trading/wheel_outcomes.db", description="Database path")
+    retention_days: int = Field(365, ge=1, description="Keep outcomes for days")
+
+
+class AdaptiveConfig(BaseModel):
+    """Adaptive system configuration."""
+
+    regime_persistence_days: int = Field(3, ge=1, description="Days to confirm regime change")
+    base_position_pct: float = Field(0.20, ge=0.0, le=1.0, description="Base position size %")
+    max_position_pct: float = Field(0.25, ge=0.0, le=1.0, description="Max position size %")
+
+    volatility_factors: VolatilityFactors = Field(default_factory=VolatilityFactors)
+    volatility_thresholds: VolatilityThresholds = Field(default_factory=VolatilityThresholds)
+
+    regime_params: Dict[str, RegimeParams] = Field(
+        default_factory=lambda: {
+            "normal": RegimeParams(),
+            "volatile": RegimeParams(
+                put_delta=0.25, target_dte=28, roll_profit_target=0.25, position_size_factor=0.7
+            ),
+            "stressed": RegimeParams(
+                put_delta=0.20, target_dte=21, roll_profit_target=0.25, position_size_factor=0.5
+            ),
+            "low_volatility": RegimeParams(put_delta=0.35, target_dte=42, position_size_factor=1.2),
+        }
+    )
+
+    stop_conditions: AdaptiveStopConditions = Field(default_factory=AdaptiveStopConditions)
+    outcome_tracking: OutcomeTracking = Field(default_factory=OutcomeTracking)
 
 
 class MLFeatures(BaseModel):
@@ -312,12 +526,111 @@ class PerformanceConfig(BaseModel):
     export_path: Path = Field(Path("./data/performance/"), description="Export path")
 
 
+class DatentoFilters(BaseModel):
+    """Databento data filtering parameters."""
+
+    moneyness_range: float = Field(0.20, ge=0.0, le=1.0, description="Range around spot price")
+    max_expirations: int = Field(3, ge=1, description="Number of expirations to keep")
+    min_volume: int = Field(0, ge=0, description="Minimum volume filter")
+
+
+class DatentoStorage(BaseModel):
+    """Databento storage configuration."""
+
+    local_retention_days: int = Field(30, ge=1, description="Days to keep locally")
+    compression: bool = Field(True, description="Enable compression")
+    partitioning: str = Field("daily", description="Data partitioning scheme")
+
+
+class DatentoRateLimits(BaseModel):
+    """Databento rate limits (provider-specific)."""
+
+    max_concurrent_live: int = Field(10, ge=1, description="Max concurrent live connections")
+    max_historical_rps: int = Field(100, ge=1, description="Max requests per second")
+    max_symbols_per_request: int = Field(2000, ge=1, description="Max symbols per request")
+    max_file_size_gb: int = Field(2, ge=1, description="Max file size in GB")
+
+
+class DatentoLoader(BaseModel):
+    """Databento data loader configuration."""
+
+    max_workers: int = Field(8, ge=1, description="Parallel processing workers")
+    chunk_size: int = Field(250, ge=1, description="Symbols per chunk")
+    max_requests_per_second: int = Field(100, ge=1, description="Rate limit")
+    retry_delays: List[int] = Field([1, 2, 5, 10], description="Retry delays in seconds")
+    required_days: int = Field(750, ge=1, description="Required historical days")
+    minimum_days: int = Field(500, ge=1, description="Minimum acceptable days")
+
+
+class DatentoConfig(BaseModel):
+    """Databento configuration."""
+
+    filters: DatentoFilters = Field(default_factory=DatentoFilters)
+    storage: DatentoStorage = Field(default_factory=DatentoStorage)
+    rate_limits: DatentoRateLimits = Field(default_factory=DatentoRateLimits)
+    loader: DatentoLoader = Field(default_factory=DatentoLoader)
+
+
+class IVSurfaceConfig(BaseModel):
+    """IV surface configuration."""
+
+    lookback_days: int = Field(252, ge=1, description="Historical days for IV calculation")
+    min_history: int = Field(30, ge=1, description="Minimum days required")
+    default_iv_rank: float = Field(50.0, ge=0.0, le=100.0, description="Default IV rank")
+    default_half_life: float = Field(30.0, ge=1.0, description="Default decay rate")
+
+
+class SeasonalityConfig(BaseModel):
+    """Seasonality analysis configuration."""
+
+    min_samples: int = Field(10, ge=1, description="Minimum samples per period")
+    min_years: int = Field(2, ge=1, description="Minimum years of data")
+
+
+class PerformanceTrackerConfig(BaseModel):
+    """Performance tracker configuration."""
+
+    database_path: str = Field("~/.wheel_trading/performance.db", description="Database path")
+    track_all_decisions: bool = Field(True, description="Track all decisions")
+
+
+class DynamicOptimizationConfig(BaseModel):
+    """Dynamic optimization configuration."""
+
+    cvar_penalty: float = Field(0.20, ge=0.0, description="CVaR penalty in objective")
+    base_kelly: float = Field(0.50, ge=0.0, le=1.0, description="Half-Kelly base")
+
+
+class AnalyticsConfig(BaseModel):
+    """Analytics configuration."""
+
+    iv_surface: IVSurfaceConfig = Field(default_factory=IVSurfaceConfig)
+    seasonality: SeasonalityConfig = Field(default_factory=SeasonalityConfig)
+    performance_tracker: PerformanceTrackerConfig = Field(default_factory=PerformanceTrackerConfig)
+    dynamic_optimization: DynamicOptimizationConfig = Field(
+        default_factory=DynamicOptimizationConfig
+    )
+
+
+class APIOperationConfig(BaseModel):
+    """API operation parameters."""
+
+    max_concurrent_puts: int = Field(3, ge=1, description="Max concurrent put positions")
+    max_position_pct: float = Field(0.12, ge=0.0, le=1.0, description="Max % per leg")
+    min_confidence: float = Field(0.75, ge=0.0, le=1.0, description="Min confidence for trades")
+    max_decision_time: float = Field(0.2, ge=0.0, description="Max decision time in seconds")
+    max_bid_ask_spread: float = Field(0.50, ge=0.0, description="Maximum spread allowed")
+    min_volume: int = Field(10, ge=0, description="Minimum volume")
+    min_open_interest: int = Field(100, ge=0, description="Minimum open interest")
+
+
 class OperationsConfig(BaseModel):
     """Operational settings configuration."""
 
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
     alerts: AlertsConfig = Field(default_factory=AlertsConfig)
     performance: PerformanceConfig = Field(default_factory=PerformanceConfig)
+    api: APIOperationConfig = Field(default_factory=APIOperationConfig)
 
 
 class SlippageConfig(BaseModel):
@@ -347,11 +660,33 @@ class BacktestConfig(BaseModel):
         return v
 
 
+class PerformanceSLA(BaseModel):
+    """Performance SLA thresholds."""
+
+    black_scholes_ms: int = Field(50, ge=1, description="Black-Scholes calculation time")
+    greeks_ms: int = Field(100, ge=1, description="Greeks calculation time")
+    risk_metrics_ms: int = Field(200, ge=1, description="Risk metrics calculation time")
+    decision_ms: int = Field(500, ge=1, description="Total decision time")
+    api_call_ms: int = Field(5000, ge=1, description="External API call time")
+    event_analysis_ms: int = Field(30, ge=1, description="Event analysis time")
+    iv_calculation_ms: int = Field(10, ge=1, description="IV calculation time")
+
+
+class PerformanceMonitoring(BaseModel):
+    """Performance monitoring configuration."""
+
+    metrics_retention_days: int = Field(90, ge=1, description="Keep metrics for days")
+    alert_threshold_pct: int = Field(150, ge=100, description="Alert if >X% of SLA")
+    sample_rate: float = Field(0.1, ge=0.0, le=1.0, description="Sample rate for operations")
+
+
 class SystemPerformance(BaseModel):
     """System performance targets."""
 
     max_decision_time_ms: int = Field(200, ge=1, description="Max decision time in ms")
     max_memory_mb: int = Field(512, ge=1, description="Max memory usage in MB")
+    sla: PerformanceSLA = Field(default_factory=PerformanceSLA)
+    monitoring: PerformanceMonitoring = Field(default_factory=PerformanceMonitoring)
 
 
 class SystemFeatures(BaseModel):
@@ -361,6 +696,21 @@ class SystemFeatures(BaseModel):
     enable_self_tuning: bool = Field(False, description="Enable self-tuning")
     enable_config_tracking: bool = Field(True, description="Enable config tracking")
     enable_auto_recovery: bool = Field(True, description="Enable auto-recovery")
+
+
+class DatabasePaths(BaseModel):
+    """Database storage paths."""
+
+    performance: str = Field("~/.wheel_trading/performance.db", description="Performance DB")
+    schwab_data: str = Field("~/.wheel_trading/schwab_data.db", description="Schwab data DB")
+    cache: str = Field("~/.wheel_trading/cache/wheel_cache.duckdb", description="Cache DB")
+
+
+class StorageConfig(BaseModel):
+    """Storage configuration."""
+
+    databases: DatabasePaths = Field(default_factory=DatabasePaths)
+    backup_interval_hours: int = Field(24, ge=1, description="Backup interval in hours")
 
 
 class SystemConfig(BaseModel):
@@ -378,6 +728,7 @@ class SystemConfig(BaseModel):
         description="Health checks to run",
     )
     features: SystemFeatures = Field(default_factory=SystemFeatures)
+    storage: StorageConfig = Field(default_factory=StorageConfig)
 
 
 class TrackingConfig(BaseModel):
@@ -454,15 +805,43 @@ class AuthConfig(BaseModel):
         return self
 
 
+class OptimizationBounds(BaseModel):
+    """Optimization parameter bounds."""
+
+    delta_min: float = Field(0.10, ge=0.0, le=1.0, description="Minimum delta")
+    delta_max: float = Field(0.40, ge=0.0, le=1.0, description="Maximum delta")
+    dte_min: int = Field(21, ge=1, description="Minimum DTE")
+    dte_max: int = Field(49, ge=1, description="Maximum DTE")
+    kelly_min: float = Field(0.10, ge=0.0, le=1.0, description="Minimum Kelly")
+    kelly_max: float = Field(0.50, ge=0.0, le=1.0, description="Maximum Kelly")
+
+
+class OptimizationConfig(BaseModel):
+    """Dynamic optimization configuration."""
+
+    enabled: bool = Field(True, description="Enable dynamic optimization")
+    mode: str = Field("dynamic", pattern="^(dynamic|tiered)$", description="Optimization mode")
+    min_confidence: float = Field(
+        0.60, ge=0.0, le=1.0, description="Min confidence for optimization"
+    )
+    volatility_lookback: int = Field(20, ge=1, description="Volatility lookback days")
+    min_history_days: int = Field(250, ge=1, description="History required for optimization")
+    bounds: OptimizationBounds = Field(default_factory=OptimizationBounds)
+
+
 class WheelConfig(BaseModel):
     """Root configuration schema for the wheel trading system."""
 
+    optimization: OptimizationConfig = Field(default_factory=OptimizationConfig)
     strategy: StrategyConfig = Field(default_factory=StrategyConfig)
     risk: RiskConfig = Field(default_factory=RiskConfig)
     data: DataConfig = Field(default_factory=DataConfig)
+    databento: DatentoConfig = Field(default_factory=DatentoConfig)
     trading: TradingConfig = Field(default_factory=TradingConfig)
     unity: UnityConfig = Field(default_factory=UnityConfig)
+    adaptive: AdaptiveConfig = Field(default_factory=AdaptiveConfig)
     ml: MLConfig = Field(default_factory=MLConfig)
+    analytics: AnalyticsConfig = Field(default_factory=AnalyticsConfig)
     operations: OperationsConfig = Field(default_factory=OperationsConfig)
     backtest: BacktestConfig = Field(default_factory=BacktestConfig)
     system: SystemConfig = Field(default_factory=SystemConfig)
@@ -533,11 +912,12 @@ def validate_config_health(config: WheelConfig) -> Dict[str, Union[bool, str]]:
     if config.strategy.days_to_expiry_target < 30:
         health["warnings"].append("days_to_expiry_target < 30 may not capture enough premium")
 
-    # Check data quality thresholds
-    if config.data.quality.min_open_interest < 100:
-        health["recommendations"].append(
-            "Consider increasing min_open_interest to 100+ for better liquidity"
-        )
+    # Check API operation thresholds
+    if hasattr(config, "api") and hasattr(config.api, "operation"):
+        if config.api.operation.min_open_interest < 100:
+            health["recommendations"].append(
+                "Consider increasing min_open_interest to 100+ for better liquidity"
+            )
 
     # Check ML configuration
     if config.ml.enabled and not config.ml.model_path.exists():

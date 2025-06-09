@@ -402,10 +402,9 @@ class SchwabDataIngestion:
 
         Returns summary of data pulled.
         """
-        structured_logger.log(
-            level="INFO",
-            message="Starting comprehensive data pull",
-            context={
+        logger.info(
+            "Starting comprehensive data pull",
+            extra={
                 "function": "pull_all_data",
                 "account": account_number,
                 "requirements": asdict(self.requirements),
@@ -455,10 +454,9 @@ class SchwabDataIngestion:
             if validation_results["warnings"]:
                 results["warnings"].extend(validation_results["warnings"])
 
-            structured_logger.log(
-                level="INFO",
-                message="Data pull completed successfully",
-                context={
+            logger.info(
+                "Data pull completed successfully",
+                extra={
                     "function": "pull_all_data",
                     "results": results,
                     "duration_seconds": None,  # Will be filled by timed_operation

@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 from scipy import signal, stats
 
+from ..config.loader import get_config
 from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
@@ -42,7 +43,10 @@ class PatternMetrics:
 class SeasonalityDetector:
     """Detects and analyzes seasonal patterns in trading data."""
 
-    def __init__(self, symbol: str = "U", min_samples: int = 10):
+    def __init__(self, symbol: str = None, min_samples: int = 10):
+        if symbol is None:
+            config = get_config()
+            symbol = config.unity.ticker
         self.symbol = symbol
         self.min_samples = min_samples
         self.patterns: Dict[str, SeasonalPattern] = {}

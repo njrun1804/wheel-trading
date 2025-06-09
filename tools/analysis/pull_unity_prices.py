@@ -14,11 +14,13 @@ import pandas as pd
 # Add src to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.secrets import SecretManager
+from src.config.loader import get_config
 
 # Constants
-TICKER = "U"
+config = get_config()
+TICKER = config.unity.ticker
 REQUIRED_DAYS = 750
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 
@@ -117,7 +119,7 @@ async def main():
 
     # Initialize Databento client
     print(f"\n🔄 Initializing Databento client...")
-    client = DatentoClient(api_key=api_key)
+    client = DatabentoClient(api_key=api_key)
 
     # Calculate date range
     # Use Friday if it's a weekend

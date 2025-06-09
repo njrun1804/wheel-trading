@@ -50,7 +50,7 @@ async def test_databento_credentials():
     print("\n--- Testing Databento Credentials ---")
     try:
         # Initialize client (will use SecretManager)
-        client = DatentoClient()
+        client = DatabentoClient()
         print("✓ Databento credentials loaded successfully")
 
         # Try to validate connection

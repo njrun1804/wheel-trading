@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import List, NamedTuple, Optional, Tuple
 
@@ -25,6 +25,8 @@ from ..utils import (
     timed_operation,
     with_recovery,
 )
+from ..utils.position_sizing import DynamicPositionSizer
+from ...config.loader import get_config
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(__name__)
@@ -45,15 +47,32 @@ class StrikeRecommendation(NamedTuple):
 class WheelParameters:
     """Configuration for wheel strategy."""
 
-    target_delta: float = 0.30
-    target_dte: int = 45
-    max_position_size: float = 0.20
-    min_premium_yield: float = 0.01  # 1% minimum
-    roll_dte_threshold: int = 7
-    roll_delta_threshold: float = 0.70
+    target_delta: float = field(default=None)
+    target_dte: int = field(default=None)
+    max_position_size: float = field(default=None)
+    min_premium_yield: float = field(default=None)
+    roll_dte_threshold: int = field(default=None)
+    roll_delta_threshold: float = field(default=None)
 
     def __post_init__(self) -> None:
-        """Validate parameters."""
+        """Initialize from config and validate parameters."""
+        config = get_config()
+
+        # Use config values as defaults if not explicitly set
+        if self.target_delta is None:
+            self.target_delta = config.strategy.delta_target
+        if self.target_dte is None:
+            self.target_dte = config.strategy.days_to_expiry_target
+        if self.max_position_size is None:
+            self.max_position_size = config.risk.circuit_breakers.max_position_pct
+        if self.min_premium_yield is None:
+            self.min_premium_yield = config.strategy.min_premium_yield
+        if self.roll_dte_threshold is None:
+            self.roll_dte_threshold = config.strategy.roll_triggers.dte_threshold
+        if self.roll_delta_threshold is None:
+            self.roll_delta_threshold = config.strategy.roll_triggers.delta_breach_threshold
+
+        # Validate parameters
         if not 0 < self.target_delta < 1:
             raise ValueError(f"Target delta must be between 0 and 1, got {self.target_delta}")
         if self.target_dte < 1:
@@ -75,6 +94,7 @@ class WheelStrategy:
         """Initialize wheel strategy."""
         self.params = parameters or WheelParameters()
         self.risk_analyzer = risk_analyzer or RiskAnalyzer()
+        self.position_sizer = DynamicPositionSizer()
 
         logger.info(
             "Wheel strategy initialized",
@@ -119,144 +139,149 @@ class WheelStrategy:
         Optional[StrikeRecommendation]
             Recommendation with confidence score, or None if no suitable strike
         """
+        # Use the vectorized implementation for better performance
+        return self.find_optimal_put_strike_vectorized(
+            current_price=current_price,
+            available_strikes=available_strikes,
+            volatility=volatility,
+            days_to_expiry=days_to_expiry,
+            risk_free_rate=risk_free_rate,
+            target_delta=target_delta,
+        )
+
+    @timed_operation(threshold_ms=20.0)  # Much faster!
+    def find_optimal_put_strike_vectorized(
+        self,
+        current_price: float,
+        available_strikes: List[float],
+        volatility: float,
+        days_to_expiry: int,
+        risk_free_rate: float = 0.05,
+        target_delta: Optional[float] = None,
+    ) -> Optional[StrikeRecommendation]:
+        """
+        Vectorized version of find_optimal_put_strike for better performance.
+        Processes all strikes at once using numpy arrays.
+        """
         if not available_strikes:
-            logger.warning("No available strikes provided")
+            logger.warning("No strikes available")
             return None
 
-        # Validate inputs
-        if current_price <= 0 or volatility <= 0:
-            logger.error("Invalid inputs for put strike selection")
-            return None
+        if target_delta is None:
+            target_delta = self.params.target_delta
 
         time_to_expiry = days_to_expiry / 365.0
-        target_delta = -self.params.target_delta  # Puts have negative delta
 
-        best_strike = None
-        best_score = float("inf")
-        results = []
+        # Convert to numpy array for vectorized operations
+        strikes = np.array(available_strikes)
 
-        for strike in available_strikes:
-            # Skip strikes too far OTM (> 20% below current)
-            if strike < current_price * 0.8:
-                continue
+        # Filter strikes by moneyness
+        config = get_config()
+        min_moneyness = config.strategy.strike_range.min_moneyness
+        valid_mask = strikes >= current_price * min_moneyness
+        strikes = strikes[valid_mask]
 
-            # Calculate Greeks with validation
-            greeks, greek_confidence = calculate_all_greeks(
-                S=current_price,
-                K=strike,
-                T=time_to_expiry,
-                r=risk_free_rate,
-                sigma=volatility,
-                option_type="put",
-            )
-
-            if greek_confidence < 0.5:
-                logger.warning(f"Low confidence Greeks for strike {strike}")
-                continue
-
-            delta = greeks.get("delta", 0)
-
-            # Calculate premium
-            price_result = black_scholes_price_validated(
-                S=current_price,
-                K=strike,
-                T=time_to_expiry,
-                r=risk_free_rate,
-                sigma=volatility,
-                option_type="put",
-            )
-
-            if price_result.confidence < 0.5:
-                logger.warning(f"Low confidence price for strike {strike}")
-                continue
-
-            premium = price_result.value
-
-            # Calculate probability ITM
-            prob_result = probability_itm_validated(
-                S=current_price,
-                K=strike,
-                T=time_to_expiry,
-                r=risk_free_rate,
-                sigma=volatility,
-                option_type="put",
-            )
-
-            # Calculate premium yield
-            premium_yield = premium / strike
-
-            # Score based on delta distance and premium yield
-            delta_distance = abs(delta - target_delta)
-
-            # Penalize low premium yield
-            if premium_yield < self.params.min_premium_yield:
-                delta_distance += 0.1  # Add penalty
-
-            # Overall confidence
-            confidence = min(greek_confidence, price_result.confidence, prob_result.confidence)
-
-            results.append(
-                {
-                    "strike": strike,
-                    "delta": delta,
-                    "premium": premium,
-                    "prob_itm": prob_result.value,
-                    "yield": premium_yield,
-                    "score": delta_distance,
-                    "confidence": confidence,
-                }
-            )
-
-            if delta_distance < best_score:
-                best_score = delta_distance
-                best_strike = {
-                    "strike": strike,
-                    "delta": delta,
-                    "premium": premium,
-                    "prob_itm": prob_result.value,
-                    "confidence": confidence,
-                }
-
-        if not best_strike:
-            logger.warning("No suitable put strike found")
+        if len(strikes) == 0:
+            logger.warning("No strikes within valid moneyness range")
             return None
 
-        # Determine reason for selection
-        reason = f"Delta {best_strike['delta']:.2f} closest to target {target_delta:.2f}"
-        if best_strike["premium"] / best_strike["strike"] >= 0.02:
+        # Vectorized Greeks calculation - all strikes at once!
+        greeks, greek_confidence = calculate_all_greeks(
+            S=current_price,
+            K=strikes,  # Array of strikes
+            T=time_to_expiry,
+            r=risk_free_rate,
+            sigma=volatility,
+            option_type="put",
+        )
+
+        # Vectorized price calculation
+        price_result = black_scholes_price_validated(
+            S=current_price,
+            K=strikes,  # Array of strikes
+            T=time_to_expiry,
+            r=risk_free_rate,
+            sigma=volatility,
+            option_type="put",
+        )
+
+        # Vectorized probability ITM
+        prob_result = probability_itm_validated(
+            S=current_price,
+            K=strikes,  # Array of strikes
+            T=time_to_expiry,
+            r=risk_free_rate,
+            sigma=volatility,
+            option_type="put",
+        )
+
+        # Extract arrays
+        deltas = greeks["delta"]
+        premiums = price_result.value
+        prob_itms = prob_result.value
+
+        # Calculate scores for all strikes at once
+        delta_scores = np.abs(deltas - target_delta)
+        premium_ratios = premiums / strikes
+
+        # Combined scoring
+        scores = delta_scores + 0.1 * (1 - premium_ratios)
+
+        # Apply confidence filtering
+        confidence_mask = (
+            (greek_confidence > 0.5)
+            & (price_result.confidence > 0.5)
+            & (prob_result.confidence > 0.5)
+        )
+
+        valid_indices = np.where(confidence_mask)[0]
+        if len(valid_indices) == 0:
+            logger.warning("No strikes with sufficient confidence")
+            return None
+
+        # Find best among valid strikes
+        valid_scores = scores[valid_indices]
+        best_idx = valid_indices[np.argmin(valid_scores)]
+
+        # Extract best strike data
+        best_strike = strikes[best_idx]
+        best_delta = deltas[best_idx]
+        best_premium = premiums[best_idx]
+        best_prob_itm = prob_itms[best_idx]
+
+        # Calculate overall confidence
+        confidence = np.mean(
+            [
+                greek_confidence,
+                price_result.confidence,
+                prob_result.confidence,
+                0.9 if abs(best_delta - target_delta) < 0.05 else 0.7,
+            ]
+        )
+
+        # Determine reason
+        reason = f"Delta {best_delta:.2f} closest to target {target_delta:.2f}"
+        if best_premium / best_strike >= 0.02:
             reason += " with attractive premium"
 
-        structured_logger.log(
-            level="INFO",
-            message="Optimal put strike selected",
-            context={
-                "function": "find_optimal_put_strike",
-                "inputs": {
-                    "current_price": current_price,
-                    "volatility": volatility,
-                    "days_to_expiry": days_to_expiry,
-                    "available_strikes": len(available_strikes),
-                },
-                "output": {
-                    "strike": best_strike["strike"],
-                    "delta": best_strike["delta"],
-                    "premium": best_strike["premium"],
-                    "prob_itm": best_strike["prob_itm"],
-                    "confidence": best_strike["confidence"],
-                },
-                "performance": {
-                    "candidates_evaluated": len(results),
-                    "best_score": best_score,
-                },
+        logger.info(
+            "Optimal put strike selected (vectorized)",
+            extra={
+                "strike": best_strike,
+                "delta": best_delta,
+                "premium": best_premium,
+                "prob_itm": best_prob_itm,
+                "confidence": confidence,
+                "strikes_evaluated": len(strikes),
             },
         )
 
         return StrikeRecommendation(
-            strike=best_strike["strike"],
-            delta=best_strike["delta"],
-            probability_itm=best_strike["prob_itm"],
-            premium=best_strike["premium"],
-            confidence=best_strike["confidence"],
+            strike=float(best_strike),
+            delta=float(best_delta),
+            probability_itm=float(best_prob_itm),
+            premium=float(best_premium),
+            confidence=float(confidence),
             reason=reason,
         )
 
@@ -306,9 +331,12 @@ class WheelStrategy:
         best_strike = None
         best_score = float("inf")
 
+        config = get_config()
+        max_moneyness = config.strategy.strike_range.max_moneyness
+
         for strike in valid_strikes:
-            # Skip strikes too far OTM (> 10% above current)
-            if strike > current_price * 1.1:
+            # Skip strikes too far OTM (above max moneyness)
+            if strike > current_price * max_moneyness:
                 continue
 
             # Calculate Greeks
@@ -420,49 +448,16 @@ class WheelStrategy:
         Tuple[int, float]
             (Number of contracts, confidence in sizing)
         """
-        # Maximum allocation based on position size limit
-        max_allocation = portfolio_value * self.params.max_position_size
-
-        # Calculate contracts based on strike (100 shares per contract)
-        max_contracts = int(max_allocation / (strike_price * 100))
-
-        # Apply Kelly criterion if we have win rate data
-        # For now, use conservative sizing
-        kelly_contracts = max(1, int(max_contracts * 0.5))  # Half-Kelly
-
-        # Check margin constraints
-        # Assume 20% margin requirement for naked puts
-        margin_per_contract = strike_price * 100 * 0.20
-        available_margin = portfolio_value * 0.5 - current_margin_used
-        margin_contracts = int(available_margin / margin_per_contract)
-
-        # Take minimum of all constraints
-        final_contracts = max(1, min(kelly_contracts, margin_contracts))
-
-        # Confidence based on how many constraints are binding
-        constraints_ok = sum(
-            [
-                final_contracts == kelly_contracts,
-                final_contracts < max_contracts,
-                margin_contracts > kelly_contracts,
-            ]
-        )
-        confidence = constraints_ok / 3.0
-
-        logger.info(
-            "Position size calculated",
-            extra={
-                "strike_price": strike_price,
-                "portfolio_value": portfolio_value,
-                "max_contracts": max_contracts,
-                "kelly_contracts": kelly_contracts,
-                "margin_contracts": margin_contracts,
-                "final_contracts": final_contracts,
-                "confidence": confidence,
-            },
+        # Use DynamicPositionSizer for consistent position sizing across the system
+        result = self.position_sizer.calculate_position_size(
+            portfolio_value=portfolio_value,
+            option_price=1.0,  # Placeholder - actual premium will be calculated later
+            strike_price=strike_price,
+            buying_power=portfolio_value - current_margin_used,
+            kelly_fraction=get_config().risk.kelly_fraction,
         )
 
-        return final_contracts, confidence
+        return result.contracts, result.confidence
 
     @timed_operation(threshold_ms=50.0)
     def should_roll_position(
@@ -503,12 +498,15 @@ class WheelStrategy:
             reasons.append(f"Deep ITM (delta={current_delta:.2f})")
 
         # Check moneyness
+        config = get_config()
+        profit_threshold = config.strategy.roll_triggers.profit_threshold_2  # 95% threshold
+
         if position.strike:
             if position.position_type == PositionType.PUT:
-                if current_price < position.strike * 0.95:
+                if current_price < position.strike * profit_threshold:
                     reasons.append("Put moving ITM")
             elif position.position_type == PositionType.CALL:
-                if current_price > position.strike * 0.95:
+                if current_price > position.strike * profit_threshold:
                     reasons.append("Call moving ITM")
 
         # Check theta decay

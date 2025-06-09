@@ -1,354 +1,437 @@
-# Project Housekeeping Guide
+# HOUSEKEEPING_GUIDE.md
 
-## Quick Instruction for Claude
+Unity Wheel Trading Bot v2.2 - File organization rules for autonomous operation.
 
-To request housekeeping, simply say:
-> "Please run project housekeeping according to HOUSEKEEPING_GUIDE.md"
+## Session Start Checklist
 
-Or for specific areas:
-> "Please run housekeeping on the new files we just created"
-
-## Housekeeping Principles
-
-### 1. Project Structure Standards
-
-```
-wheel-trading/
-├── Root (minimal - only essentials)
-│   ├── Configuration files (.yaml, .toml, .txt)
-│   ├── Core documentation (README, CLAUDE, guides)
-│   ├── Primary entry points (run_aligned.py)
-│   └── User-facing operational scripts
-├── src/                    # All source code
-├── tests/                  # ALL test files
-├── examples/               # Organized by category
-│   ├── core/              # Config, risk, validation
-│   ├── data/              # Integration examples
-│   └── auth/              # Authentication examples
-├── tools/                  # Development utilities
-│   ├── debug/             # Debugging tools
-│   ├── analysis/          # Data analysis scripts
-│   └── verification/      # System checks
-├── deployment/            # Docker, cloud configs
-├── scripts/               # Shell scripts
-└── docs/archive/          # Old/outdated docs
-```
-
-### 2. File Placement Rules
-
-#### Keep in Root
-- Primary entry points (run_aligned.py)
-- Core documentation (README.md, CLAUDE.md, *_GUIDE.md)
-- Configuration files (config.yaml, my_positions.yaml)
-- Build files (Makefile, pyproject.toml, requirements*.txt)
-- User-facing operational scripts (daily_health_check.py, monitor_live.py)
-
-#### Move to tests/
-- ANY file starting with `test_`
-- Must fix imports: `sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))`
-
-#### Move to tools/
-- One-off analysis scripts
-- Debug utilities
-- Data fetching scripts
-- Verification tools
-- Scripts that duplicate main functionality
-
-#### Move to examples/
-- Files demonstrating usage (example_*.py)
-- Template configurations
-- Sample data files
-
-#### Archive in docs/archive/
-- Implementation summaries
-- Status reports
-- Migration guides
-- Any documentation that's been consolidated
-
-### 3. Import Fixing
-
-When moving files, check and fix:
-
-```python
-# FROM (when in root):
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-# TO (when in subdirectory):
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Or for deeper nesting:
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))  # Add more .parent as needed
-```
-
-### 4. Cleanup Checklist
-
-1. **Identify Violations**
-   - [ ] Files with `test_` prefix not in tests/
-   - [ ] Example files not in examples/
-   - [ ] Utility scripts in root instead of tools/
-   - [ ] Outdated documentation not archived
-
-2. **Check for Duplicates**
-   - [ ] Multiple scripts doing same thing
-   - [ ] Overlapping documentation
-   - [ ] Legacy vs new implementations
-
-3. **Verify v2.0 Alignment**
-   - [ ] Remove trading execution code
-   - [ ] Keep recommendation-only focus
-   - [ ] Ensure autonomous operation
-
-4. **Fix Imports**
-   - [ ] Test moved files compile
-   - [ ] Update sys.path manipulations
-   - [ ] Fix module imports for moved files
-
-5. **Update References**
-   - [ ] Update documentation if needed
-   - [ ] Add deprecation warnings to legacy scripts
-   - [ ] Ensure CI/CD configs still work
-
-6. **Check for Hardcoded Values**
-   - [ ] Search for numeric constants in source files
-   - [ ] Identify execution-level parameters
-   - [ ] Assess if values should be centralized
-   - [ ] Consider if values should be "smart"/adaptive
-
-7. **Make Values Smart**
-   - [ ] Replace static thresholds with adaptive ones
-   - [ ] Use ML/analytics for dynamic adjustment
-   - [ ] Consider market conditions in limits
-   - [ ] Implement confidence-based scaling
-
-### 5. Decision Guidelines
-
-#### When to Keep in Root
-- Is it a primary user interface? (run_aligned.py)
-- Is it run daily by users? (daily_health_check.py)
-- Is it core configuration? (config.yaml)
-- Is it essential documentation? (README.md)
-
-#### When to Move to tools/
-- Is it a debugging script?
-- Is it a one-off analysis?
-- Does it duplicate main functionality?
-- Is it a development utility?
-
-#### When to Archive
-- Has it been superseded?
-- Is it a status/summary document?
-- Has it been consolidated into another doc?
-- Is it no longer relevant to v2.0?
-
-### 6. Centralization Guidelines
-
-#### Values to Centralize in config.yaml
-1. **Risk Limits**
-   - Position size limits
-   - Loss limits (daily, weekly, consecutive)
-   - Margin/leverage limits
-   - Greek exposure limits
-
-2. **Strategy Parameters**
-   - Delta targets and ranges
-   - DTE targets and minimums
-   - Roll triggers and thresholds
-   - Strike selection intervals
-
-3. **Performance Thresholds**
-   - Minimum confidence scores
-   - SLA targets (response times)
-   - Cache TTL values
-   - Retry counts and timeouts
-
-4. **Market Condition Thresholds**
-   - Volatility limits
-   - Volume requirements
-   - Liquidity minimums
-   - Gap/shock thresholds
-
-#### Values to Keep Local (with rationale)
-1. **Math Constants**
-   - Black-Scholes parameters
-   - Greeks calculation constants
-   - Numerical solver tolerances
-
-2. **Technical Limits**
-   - Database connection pools
-   - API rate limits (provider-specific)
-   - Thread pool sizes
-
-3. **Debug/Development Values**
-   - Log levels for specific modules
-   - Test timeouts
-   - Mock data parameters
-
-### 7. Smart Value Implementation
-
-#### Adaptive Value Patterns
-
-1. **Market-Aware Scaling**
-```python
-# Instead of:
-max_position_size = 0.20  # Static 20%
-
-# Use:
-max_position_size = config.risk.base_position_size * market_volatility_scalar
-```
-
-2. **Confidence-Based Adjustment**
-```python
-# Instead of:
-min_delta = 0.10  # Always 10 delta
-
-# Use:
-min_delta = optimizer.get_dynamic_delta_bound(
-    confidence_score, 
-    market_state,
-    historical_performance
-)
-```
-
-3. **ML-Driven Parameters**
-```python
-# Instead of:
-roll_threshold = 0.50  # Always roll at 50% profit
-
-# Use:
-roll_threshold = decision_engine.predict_optimal_roll_point(
-    position_metrics,
-    market_conditions,
-    learned_patterns
-)
-```
-
-4. **Regime-Adaptive Limits**
-```python
-# Instead of:
-max_contracts = 10  # Fixed limit
-
-# Use:
-max_contracts = risk_regime.calculate_position_limit(
-    account_size,
-    market_regime,
-    recent_performance
-)
-```
-
-#### Implementation Checklist
-- [ ] Identify all static thresholds
-- [ ] Categorize by adaptability potential
-- [ ] Design adaptation functions
-- [ ] Add confidence scoring
-- [ ] Implement fallback to static values
-- [ ] Monitor adaptation effectiveness
-
-### 8. Standard Housekeeping Report
-
-After housekeeping, create a summary:
-
-```markdown
-## Housekeeping Summary
-
-### Changes Made
-- Moved X test files to tests/
-- Moved Y scripts to tools/
-- Archived Z documentation files
-- Fixed imports in N files
-
-### Final State
-- Root directory: X files (was Y)
-- Tests organized: X files
-- Documentation consolidated: X guides
-
-### Key Improvements
-- [List major improvements]
-```
-
-## Usage Examples
-
-### Full Housekeeping
-> "Please run complete project housekeeping"
-
-### After Adding Features
-> "We just added new analytics modules and tests. Please run housekeeping on these new files."
-
-### Documentation Cleanup
-> "Please consolidate and archive outdated documentation"
-
-### Test Organization
-> "Please ensure all test files are properly organized in tests/"
-
-## Automated Checking
-
-### Run Housekeeping Check
 ```bash
-make housekeeping-check
+# 1. Ultra-quick Unity check (2 seconds)
+./scripts/housekeeping.sh --unity-check
+
+# 2. Standard check if issues found (5 seconds)
+./scripts/housekeeping.sh --quick
+
+# 3. Auto-fix if needed
+./scripts/housekeeping.sh --fix --quiet
+
+# Note: Use FULL check before commits (not --quick)
 ```
 
-This command will:
-- ✅ Check all test files are in tests/
-- ✅ Check all example files are in examples/
-- ✅ Check no status/summary docs in root
-- ✅ Check data scripts are in tools/
-- ✅ Check for empty directories
-- 📊 Show project statistics
+## Pre-Commit Checklist
 
-The check will exit with error code 1 if any violations are found, making it suitable for CI/CD pipelines.
-
-### Search for Hardcoded Values
-
-#### Common Patterns to Search
 ```bash
-# Risk limits and thresholds
-grep -r "max_.*=" src/ | grep -E "0\.[0-9]+|[0-9]+"
-grep -r "min_.*=" src/ | grep -E "0\.[0-9]+|[0-9]+"
-grep -r "threshold.*=" src/ | grep -E "0\.[0-9]+|[0-9]+"
-
-# Default values in function signatures
-grep -r "def.*=" src/ | grep -E "0\.[0-9]+|[0-9]+"
-
-# Hardcoded timeouts and retries
-grep -r "timeout.*=" src/ | grep -E "[0-9]+"
-grep -r "retry.*=" src/ | grep -E "[0-9]+"
-
-# Performance constants
-grep -r "limit.*=" src/ | grep -E "[0-9]+"
-grep -r "DEFAULT_" src/
+# Run before EVERY commit
+./scripts/housekeeping.sh --check-staged || exit 1
 ```
 
-#### Examples of Values to Centralize
-```python
-# BEFORE: Hardcoded in src/unity_wheel/risk/limits.py
-max_position_pct: float = 0.20
-max_consecutive_losses: int = 3
-min_confidence: float = 0.30
+## Complete Commit Workflow
 
-# AFTER: In config.yaml
+Use the automated commit workflow script for a comprehensive commit process:
+
+```bash
+# Full workflow: checks + commit + push + CI monitoring
+./scripts/commit-workflow.sh -m "Add feature X"
+
+# Quick commit (skip CI wait)
+./scripts/commit-workflow.sh -m "Update documentation" -w
+
+# Local commit only (no push)
+./scripts/commit-workflow.sh -m "WIP: Testing changes" -n
+
+# Skip checks for docs
+./scripts/commit-workflow.sh -m "Fix typo in README" -s -w
+```
+
+### Workflow Steps:
+1. **Housekeeping checks** - Ensures code organization
+2. **Stage changes** - Adds all modified files
+3. **Pre-commit hooks** - Runs formatters and validators
+4. **Create commit** - With your message
+5. **Push to GitHub** - Updates remote repository
+6. **Monitor CI/CD** - Waits for tests to pass
+
+### Options:
+- `-m MSG` - Commit message (required)
+- `-s` - Skip housekeeping checks
+- `-n` - No push (local commit only)
+- `-w` - No wait (skip CI/CD monitoring)
+- `-y` - Auto-yes to all prompts (see note below)
+
+### Auto-Yes Coverage (-y flag):
+**✅ Automatically handles:**
+- Git operations (add, commit, push, merge)
+- SSH host verification
+- File overwrites
+- Pre-commit hook changes
+- All script confirmations
+
+**❌ Cannot auto-approve:**
+- Claude Code prompts ("Can I check/create/run...?")
+- GitHub OAuth logins
+- Security prompts requiring passwords
+
+See `AUTO_YES_NOTE.md` for full details.
+
+### Manual Alternative:
+If you prefer manual control:
+```bash
+./scripts/housekeeping.sh        # Check issues
+git add -A                       # Stage all
+pre-commit run --all-files       # Run hooks
+git commit -m "Your message"     # Commit
+git push                         # Push
+gh run watch                     # Watch CI
+```
+
+## Core Rules (Non-Negotiable)
+
+### 1. File Placement - EXACT PATTERNS
+
+| Pattern                    | MUST GO TO                  | Example                                                              |
+| -------------------------- | --------------------------- | -------------------------------------------------------------------- |
+| `test_*.py` or `*_test.py` | `tests/`                    | `test_risk.py` → `tests/test_risk.py`                                |
+| `adaptive_*.py`            | `src/unity_wheel/adaptive/` | `adaptive_sizing.py` → `src/unity_wheel/adaptive/adaptive_sizing.py` |
+| `fetch_*.py`               | `tools/data/`               | `fetch_chains.py` → `tools/data/fetch_chains.py`                     |
+
+### 2. Root Directory - ALLOWED FILES
+
+```
+run_aligned.py           # Main entry point
+run.py                   # Legacy entry (being phased out)
+daily_health_check.py    # Morning check
+monitor_live.py          # Live monitor
+monitor_data_quality.py  # Data quality monitor
+config.yaml              # Configuration
+my_positions.yaml        # User positions
+README.md, CLAUDE.md     # Core docs
+*_GUIDE.md               # Guides (HOUSEKEEPING_GUIDE, etc.)
+pyproject.toml           # Poetry config
+requirements*.txt        # Dependencies
+Makefile                 # Build automation
+SESSION_START.txt        # Pre-task checklist
+```
+
+Python scripts starting with specific patterns MUST be in subdirectories!
+
+### 3. Unity-Specific Structure
+
+```
+src/unity_wheel/
+├── adaptive.py    # Volatility-based sizing (OR adaptive/ directory)
+├── strategy/      # Wheel logic (NO EXECUTION)
+├── risk/          # VaR, CVaR calculations
+├── schwab/        # Data fetch only (NO TRADING)
+└── databento/     # Options chains
+```
+
+## Confidence Score Compliance
+
+Functions starting with `calculate_`, `get_`, or `fetch_` MUST return `(result, confidence_score)`:
+
+```python
+# WRONG
+def calculate_delta(option):
+    return black_scholes_delta(option)
+
+# CORRECT
+def calculate_delta(option):
+    delta = black_scholes_delta(option)
+    confidence = 1.0 if option.volume > 100 else 0.7
+    return delta, confidence
+```
+
+The script checks for pattern: `def (calculate_|get_|fetch_)` followed by non-tuple returns.
+
+Quick manual check: `grep -r "return [^(]" src/ --include="*.py" | grep -v "return None"`
+
+## Hardcoded Values Check
+
+NO HARDCODED:
+- Position sizes (use adaptive system)
+- Unity ticker "U" (use config)
+- Volatility thresholds (use config)
+- Time constants > 1 (use config)
+
+```bash
+# Quick scan (should return NOTHING)
+grep -r "position.*=.*0\.[0-9]" src/ --include="*.py" | grep -v config
+grep -r "['\"]U['\"]" src/ --include="*.py" | grep -v config
+grep -r "if.*volatility.*[<>].*[0-9]" src/ --include="*.py"
+```
+
+## Import Fix Pattern (One Way Only)
+
+```python
+# At TOP of any moved file
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[N]))  # N = directory depth
+```
+
+Depth examples:
+- `tests/test_foo.py` → `parents[1]`
+- `tools/debug/bar.py` → `parents[2]`
+- `tests/unit/baz.py` → `parents[2]`
+
+## Automated Enforcement
+
+### housekeeping.sh v2.2 Features
+
+```bash
+# Show all options
+./scripts/housekeeping.sh --help
+
+# Key modes
+--fix             # Auto-fix file placement
+--json            # Machine-parseable output
+--quick           # Skip expensive checks (5 sec)
+--check-staged    # Pre-commit mode
+--dry-run         # Preview changes without applying
+--explain         # Include violation details
+--unity-check     # Quick Unity-specific validation (2 sec)
+
+# Exit codes
+0 = Success (no issues)
+1 = Non-critical (can be auto-fixed)
+2 = CRITICAL (execution code found)
+```
+
+### Performance Optimizations (v2.2)
+
+- Combined pattern matching - Single pass per file
+- Pre-flight validation - Fails fast if not in Unity repo
+- Unity-check mode - Ultra-fast critical checks only
+- Uses ripgrep if available (10x faster)
+- OS-aware (Mac/Linux compatible)
+
+### When to Use Each Mode
+
+| Mode | Use Case | Time | What It Checks |
+|------|----------|------|----------------|
+| `--unity-check` | Session start | 2 sec | Execution code, adaptive system, Unity config |
+| `--quick` | During development | 5 sec | File placement + basic Unity compliance |
+| *(no flag)* | **Before commits** | 10-15 sec | Everything including confidence scores |
+| `--check-staged` | Pre-commit hook | Varies | Only staged files (full checks) |
+
+### Critical Unity Checks
+
+1. Execution Code (exit 2)
+   - `execute_trade`, `place_order`, `submit_order`
+   - `broker.execute`, `broker.place`
+   - Cannot be auto-fixed
+   - Blocks all commits
+
+2. File Placement (exit 1)
+   - Auto-fixable with `--fix`
+   - Updates imports automatically
+
+3. Unity Compliance (warnings)
+   - Hardcoded ticker "U"
+   - Static position sizes
+   - Missing confidence scores
+
+### Quick Fix Commands
+
+```bash
+# See what would be fixed (v2.1+)
+./scripts/housekeeping.sh --fix --dry-run
+
+# Auto-fix all placement issues
+./scripts/housekeeping.sh --fix
+
+# Get detailed violation report
+./scripts/housekeeping.sh --explain --json
+
+# Extract a hardcoded value to config
+# Add to config.yaml:
 risk:
   limits:
-    max_position_pct: 0.20
-    max_consecutive_losses: 3
-    min_confidence: 0.30
+    max_volatility: 1.0
+# Then update code:
+sed -i 's/MAX_VOLATILITY = 1.0/config.risk.limits.max_volatility/g' src/file.py
 ```
 
-#### Examples of Smart Value Implementation
+## CI/CD Integration
+
+```yaml
+# .github/workflows/housekeeping.yml
+name: Housekeeping
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Housekeeping
+        run: |
+          ./scripts/housekeeping.sh --check-staged
+          # Fail if execution code exists
+          ! grep -r "execute_trade\|place_order" src/
+```
+
+## Common Violations & Fixes
+
+### 1. Test in Wrong Place
+```bash
+# Fix
+git mv test_adaptive.py tests/
+echo 'from pathlib import Path\nimport sys\nsys.path.insert(0, str(Path(__file__).resolve().parents[1]))' | cat - tests/test_adaptive.py > temp && mv temp tests/test_adaptive.py
+```
+
+### 2. Hardcoded Unity Reference
 ```python
-# BEFORE: Static threshold
-if volatility > 1.5:  # Hardcoded 150% vol limit
-    return "Too volatile"
+# Before
+ticker = "U"
 
-# AFTER: Adaptive threshold
-volatility_limit = config.get_adaptive_limit(
-    'max_volatility',
-    base_value=1.5,
-    market_conditions=market_state,
-    confidence=confidence_score
-)
-if volatility > volatility_limit:
-    return f"Volatility {volatility:.1%} exceeds adaptive limit {volatility_limit:.1%}"
+# After
+ticker = config.unity.ticker
 ```
 
----
+### 3. Missing Confidence Score
+```python
+# Before
+def fetch_positions():
+    return schwab_client.get_positions()
 
-Remember: The goal is a clean, intuitive structure that supports the v2.0 autonomous, recommendation-only architecture.
+# After
+def fetch_positions():
+    try:
+        positions = schwab_client.get_positions()
+        confidence = 1.0 if positions.timestamp > time.time() - 300 else 0.5
+        return positions, confidence
+    except Exception:
+        return [], 0.0
+```
+
+### 4. Execution Code (CRITICAL)
+```python
+# NEVER HAVE THIS
+def execute_trade(order):  # DELETE ENTIRELY
+    broker.place_order(order)
+
+# ONLY THIS
+def recommend_trade(params):
+    recommendation = strategy.analyze(params)
+    return recommendation, confidence
+```
+
+## Exceptions
+
+The script automatically excludes:
+- `.venv/*`, `venv/*`, `*env/*`
+- `__pycache__/*`
+- `build/*`, `dist/*`
+- `.git/*`
+
+No configuration file needed - these are hardcoded exclusions.
+
+## Health Score
+
+```bash
+# Human-readable
+./scripts/housekeeping.sh
+
+Unity Wheel Bot Housekeeping v2.2.0
+Score: 92/100
+
+⚠️  2 issues found
+   Run with --fix to auto-resolve file placement
+   Run with --explain for details
+
+# Machine-readable
+./scripts/housekeeping.sh --json
+
+{
+  "timestamp": "2025-01-15T09:00:00Z",
+  "version": "2.2.0",
+  "score": 92,
+  "critical": false,
+  "violations": {
+    "test_files": 1,
+    "missing_confidence": 1,
+    "execution_code": 0,
+    "adaptive_files": 0,
+    "fetch_files": 0,
+    "hardcoded_ticker": 0,
+    "static_positions": 0
+  }
+}
+
+# With details
+./scripts/housekeeping.sh --json --explain
+```
+
+## Remember
+
+1. Start every session: Run unity-check (2 seconds)
+2. Before every commit: Run staged check (blocks bad commits)
+3. No execution code: Recommendations only
+4. Confidence scores: Every data function returns (result, confidence)
+5. Use adaptive sizing: Never hardcode positions
+6. Unity in config: Never hardcode ticker "U"
+
+This is not optional - it's how we maintain autonomous operation.
+
+## Complete Session Workflow
+
+### Session Start
+Paste at the beginning of every Claude Code session:
+```
+### UNITY WHEEL v2.2 — PRE-TASK CHECKS
+
+**RUN FIRST (2 sec):**
+```bash
+./scripts/housekeeping.sh --unity-check
+```
+✓ Checks: No execution code, adaptive system exists, Unity config
+
+**CRITICAL RULES:**
+1. NO TRADING EXECUTION (recommendations only)
+2. Every data function returns `(result, confidence_score)`
+3. Unity ticker from `config.unity.ticker` only (line 238)
+4. Files: `test_*.py` → `tests/`, `adaptive_*.py` → `src/unity_wheel/adaptive/`
+
+**COMMIT GATE:**
+```bash
+./scripts/housekeeping.sh --check-staged || exit 1
+```
+--- BEGIN TASK ---
+```
+
+### Session End
+When ready to commit your work:
+```
+### UNITY WHEEL v2.2 — SESSION END
+
+**FINAL CHECKS:**
+```bash
+# Full housekeeping validation
+./scripts/housekeeping.sh
+
+# View changes
+git status
+```
+
+**COMMIT & PUSH:**
+```bash
+# Full workflow (auto-yes to all prompts)
+./scripts/commit-workflow.sh -m "Your commit message" -y
+
+# Quick commit without CI wait
+./scripts/commit-workflow.sh -m "Your commit message" -y -w
+
+# Local only (no push)
+./scripts/commit-workflow.sh -m "WIP: Your message" -y -n
+```
+
+*Note: -y auto-approves git/system prompts only, not Claude's "Can I...?" prompts*
+
+--- END SESSION ---
+```
+
+### Quick Reference Files
+- **SESSION_START.txt** - Copy/paste for session start
+- **SESSION_END.txt** - Copy/paste for session end
+- **./scripts/housekeeping.sh** - File organization enforcement
+- **./scripts/commit-workflow.sh** - Complete commit automation

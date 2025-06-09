@@ -3,20 +3,16 @@
 from __future__ import annotations
 
 import json
-import statistics
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from unity_wheel.metrics import metrics_collector
-from unity_wheel.monitoring import get_performance_monitor
-from unity_wheel.utils import StructuredLogger, get_logger
+from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
-structured_logger = StructuredLogger(__name__)
 
 
 @dataclass
@@ -180,10 +176,9 @@ class ConfigAutoTuner:
         if len(self.parameter_performance) > 0 and timestamp.minute % 5 == 0:
             self._save_history()
 
-        structured_logger.log(
-            level="INFO",
-            message="Recorded decision outcome for tuning",
-            context={
+        logger.info(
+            "Recorded decision outcome for tuning",
+            extra={
                 "decision_id": decision_id,
                 "parameters": list(parameters_used.keys()),
                 "outcome_success": outcome.get("success", False),

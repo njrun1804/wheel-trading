@@ -47,7 +47,7 @@ repos:
         language: system
         pass_filenames: false
         stages: [push]
-      
+
       # Verify configuration is valid
       - id: validate-config
         name: Validate configuration

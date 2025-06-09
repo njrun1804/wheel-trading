@@ -139,8 +139,9 @@ def timed_operation(threshold_ms: float = 200, include_args: bool = False) -> Ca
 class DecisionLogger:
     """Specialized logger for trading decisions with confidence tracking."""
 
-    def __init__(self, logger: StructuredLogger):
-        self.logger = logger
+    def __init__(self, structured_logger: StructuredLogger):
+        self.logger = structured_logger.logger  # Get the underlying logger
+        self.structured_logger = structured_logger
         self.decision_history: List[Dict[str, Any]] = []
 
     def log_decision(

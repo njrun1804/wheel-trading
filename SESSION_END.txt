@@ -1,0 +1,26 @@
+### UNITY WHEEL v2.2 — SESSION END
+
+**FINAL CHECKS:**
+```bash
+# Full housekeeping validation
+./scripts/housekeeping.sh
+
+# View changes
+git status
+```
+
+**COMMIT & PUSH:**
+```bash
+# Full workflow (auto-yes to all prompts)
+./scripts/commit-workflow.sh -m "Your commit message" -y
+
+# Quick commit without CI wait
+./scripts/commit-workflow.sh -m "Your commit message" -y -w
+
+# Local only (no push)
+./scripts/commit-workflow.sh -m "WIP: Your message" -y -n
+```
+
+*Note: -y auto-approves git/system prompts only, not Claude's "Can I...?" prompts*
+
+--- END SESSION ---

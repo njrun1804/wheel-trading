@@ -244,20 +244,20 @@ class TestDataValidator:
 
 
 @pytest.mark.asyncio
-class TestDatentoClient:
+class TestDatabentoClient:
     """Test Databento client functionality."""
 
     async def test_client_initialization(self):
         """Test client initialization."""
         with patch.dict("os.environ", {"DATABENTO_API_KEY": "test_key"}):
-            client = DatentoClient()
+            client = DatabentoClient()
             assert client.api_key == "test_key"
             assert client.use_cache
             await client.close()
 
     async def test_rate_limiting(self):
         """Test rate limiting enforcement."""
-        client = DatentoClient(api_key="test_key")
+        client = DatabentoClient(api_key="test_key")
 
         # Mock the underlying client
         client.client = Mock()
@@ -282,7 +282,7 @@ class TestDatentoClient:
 
     async def test_data_quality_validation(self):
         """Test data quality validation."""
-        client = DatentoClient(api_key="test_key")
+        client = DatabentoClient(api_key="test_key")
 
         # Use fixed timestamps to ensure consistent staleness
         base_time = datetime(2025, 6, 8, 12, 0, 0)  # Fixed time

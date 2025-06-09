@@ -12,7 +12,7 @@ from databento_dbn import Schema
 
 from ..storage import Storage
 from ..utils import get_logger, with_recovery
-from .client import DatentoClient
+from .client import DatabentoClient
 
 logger = get_logger(__name__)
 
@@ -24,7 +24,7 @@ class PriceHistoryLoader:
     REQUIRED_DAYS = 250  # For reliable VaR/CVaR calculations
     MINIMUM_DAYS = 20  # Absolute minimum for basic risk metrics
 
-    def __init__(self, client: DatentoClient, storage: Storage):
+    def __init__(self, client: DatabentoClient, storage: Storage):
         self.client = client
         self.storage = storage
 

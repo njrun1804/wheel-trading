@@ -14,11 +14,12 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from src.unity_wheel.databento import DatentoClient
-from src.unity_wheel.databento.types import InstrumentDefinition, OptionChain, OptionQuote
-from src.unity_wheel.math.options import calculate_all_greeks, implied_volatility_validated
-from src.unity_wheel.models.position import Position
-from src.unity_wheel.utils.logging import StructuredLogger
+from . import DatentoClient
+from .types import InstrumentDefinition, OptionChain, OptionQuote
+from ..math.options import calculate_all_greeks, implied_volatility_validated
+from ..models.position import Position
+from ..utils.logging import StructuredLogger
+from ..config.loader import get_config
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -28,9 +29,9 @@ class DatentoIntegration:
 
     def __init__(
         self,
-        client: DatentoClient,
+        client: DatabentoClient,
         storage_adapter: Optional["DatabentoStorageAdapter"] = None,
-        risk_free_rate: float = 0.05,
+        risk_free_rate: float = None,
     ):
         """Initialize integration.
 
@@ -41,17 +42,24 @@ class DatentoIntegration:
         """
         self.client = client
         self.storage_adapter = storage_adapter
-        self.risk_free_rate = risk_free_rate
+
+        # Use config value if not provided
+        if risk_free_rate is None:
+            # Default risk-free rate - could be added to config if needed
+            # Using current approximate US Treasury rate
+            self.risk_free_rate = 0.05
+        else:
+            self.risk_free_rate = risk_free_rate
 
         # Cache for instrument definitions
         self._definition_cache: Dict[int, InstrumentDefinition] = {}
 
     async def get_wheel_candidates(
         self,
-        underlying: str = "U",
-        target_delta: float = 0.30,
-        dte_range: Tuple[int, int] = (30, 60),
-        min_premium_pct: float = 1.0,
+        underlying: str = None,
+        target_delta: float = None,
+        dte_range: Tuple[int, int] = None,
+        min_premium_pct: float = None,
     ) -> List[Dict]:
         """Find suitable options for wheel strategy.
 
@@ -64,6 +72,17 @@ class DatentoIntegration:
         Returns:
             List of candidate positions with analytics
         """
+        # Use config values as defaults
+        config = get_config()
+        if underlying is None:
+            underlying = config.unity.ticker
+        if target_delta is None:
+            target_delta = config.strategy.delta_target
+        if dte_range is None:
+            dte_range = (config.strategy.min_days_to_expiry, config.strategy.days_to_expiry_target)
+        if min_premium_pct is None:
+            min_premium_pct = config.strategy.min_premium_yield * 100  # Convert to percentage
+
         logger.info(
             "finding_wheel_candidates",
             extra={

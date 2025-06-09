@@ -17,6 +17,7 @@ from scipy import stats
 from ..models.greeks import Greeks
 from ..models.position import Position
 from ..utils import RecoveryStrategy, cached, get_logger, timed_operation, with_recovery
+from ...config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -81,16 +82,36 @@ class RiskLimitBreach:
 class RiskLimits:
     """Configuration-driven risk limits."""
 
-    max_var_95: float = 0.05  # 5% of portfolio
-    max_cvar_95: float = 0.075  # 7.5% of portfolio
-    max_kelly_fraction: float = 0.25  # Max 25% per position
-    max_delta_exposure: float = 100.0  # Delta-adjusted shares
-    max_gamma_exposure: float = 10.0
-    max_vega_exposure: float = 1000.0  # $1000 per 1% vol move
-    max_margin_utilization: float = 0.5  # 50% max
+    max_var_95: float = field(default=None)
+    max_cvar_95: float = field(default=None)
+    max_kelly_fraction: float = field(default=None)
+    max_delta_exposure: float = field(default=None)
+    max_gamma_exposure: float = field(default=None)
+    max_vega_exposure: float = field(default=None)
+    max_margin_utilization: float = field(default=None)
 
     # Dynamic scaling factors
-    volatility_scalar: float = 1.0  # Scales with market volatility
+    volatility_scalar: float = field(default=1.0)
+
+    def __post_init__(self):
+        """Initialize from config if values not provided."""
+        config = get_config()
+
+        # Use config values as defaults if not explicitly set
+        if self.max_var_95 is None:
+            self.max_var_95 = config.risk.limits.max_var_95
+        if self.max_cvar_95 is None:
+            self.max_cvar_95 = config.risk.limits.max_cvar_95
+        if self.max_kelly_fraction is None:
+            self.max_kelly_fraction = config.risk.limits.max_kelly_fraction
+        if self.max_delta_exposure is None:
+            self.max_delta_exposure = config.risk.greeks.max_delta_exposure
+        if self.max_gamma_exposure is None:
+            self.max_gamma_exposure = config.risk.greeks.max_gamma_exposure
+        if self.max_vega_exposure is None:
+            self.max_vega_exposure = config.risk.greeks.max_vega_exposure
+        if self.max_margin_utilization is None:
+            self.max_margin_utilization = config.risk.margin.max_utilization
 
     def scale_by_volatility(self, current_vol: float, baseline_vol: float = 0.15) -> None:
         """Scale limits based on current volatility regime."""
@@ -115,6 +136,7 @@ class RiskAnalyzer:
 
     def __init__(
         self,
+        config: Optional[Dict[str, Any]] = None,
         limits: Optional[RiskLimits] = None,
         history_file: Optional[Path] = None,
     ):
@@ -123,11 +145,14 @@ class RiskAnalyzer:
 
         Parameters
         ----------
+        config : Dict, optional
+            Configuration dictionary
         limits : RiskLimits, optional
             Risk limits configuration
         history_file : Path, optional
             Path to store historical accuracy data
         """
+        self.config = config or {}
         self.limits = limits or RiskLimits()
         self.history_file = history_file or Path("risk_history.json")
         self.accuracy_tracker = AccuracyTracker(self.history_file)
@@ -392,7 +417,7 @@ class RiskAnalyzer:
     def aggregate_portfolio_greeks(
         self,
         positions: List[Tuple[Position, Greeks, float]],
-    ) -> Dict[str, float]:
+    ) -> Tuple[Dict[str, float], float]:
         """
         Aggregate Greeks across portfolio.
 
@@ -403,8 +428,8 @@ class RiskAnalyzer:
 
         Returns
         -------
-        Dict[str, float]
-            Aggregated Greeks
+        Tuple[Dict[str, float], float]
+            Aggregated Greeks and confidence score
         """
         total_delta = 0.0
         total_gamma = 0.0
@@ -450,12 +475,24 @@ class RiskAnalyzer:
             extra={"greeks": aggregated, "position_count": len(positions)},
         )
 
-        return aggregated
+        # Calculate confidence based on data quality
+        confidence = 0.95 if positions else 0.0
+
+        # Reduce confidence if any Greeks are missing
+        missing_greeks = sum(
+            1
+            for pos, greeks, _ in positions
+            if any(getattr(greeks, g) is None for g in ["delta", "gamma", "vega", "theta"])
+        )
+        if positions and missing_greeks > 0:
+            confidence *= 1.0 - missing_greeks / len(positions) * 0.2
+
+        return aggregated, confidence
 
     def estimate_margin_requirement(
         self,
         positions: List[Tuple[Position, float, float]],
-    ) -> float:
+    ) -> Tuple[float, float]:
         """
         Estimate total margin requirement.
 
@@ -466,8 +503,8 @@ class RiskAnalyzer:
 
         Returns
         -------
-        float
-            Total margin requirement
+        Tuple[float, float]
+            Total margin requirement and confidence score
         """
         total_margin = 0.0
 
@@ -487,7 +524,17 @@ class RiskAnalyzer:
                 # Naked calls require stock margin
                 total_margin += abs(position.quantity) * 100 * underlying_price * 0.5
 
-        return total_margin
+        # High confidence for standard margin calculations
+        confidence = 0.90 if positions else 0.0
+
+        # Slightly reduce confidence for complex positions
+        complex_positions = sum(
+            1 for pos, _, _ in positions if pos.position_type not in ["put", "call", "stock"]
+        )
+        if positions and complex_positions > 0:
+            confidence *= 0.85
+
+        return total_margin, confidence
 
     def check_limits(
         self,

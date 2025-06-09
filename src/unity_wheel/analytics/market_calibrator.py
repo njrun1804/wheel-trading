@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from ..config.loader import get_config
 from ..risk.regime_detector import RegimeDetector, RegimeInfo
 from ..utils import get_logger
 
@@ -52,7 +53,10 @@ class OptimalParameters:
 class MarketCalibrator:
     """Calibrates strategy parameters using historical data."""
 
-    def __init__(self, symbol: str = "U"):
+    def __init__(self, symbol: str = None):
+        if symbol is None:
+            config = get_config()
+            symbol = config.unity.ticker
         self.symbol = symbol
         self.regime_detector = RegimeDetector()
         self.historical_performance: Dict = {}

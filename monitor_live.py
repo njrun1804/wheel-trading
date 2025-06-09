@@ -14,7 +14,7 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.config.loader import get_config_loader
+from src.config.loader import get_config_loader, get_config
 from src.unity_wheel.analytics import IntegratedDecisionEngine
 from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
 from src.unity_wheel.risk.limits import RiskLimitChecker, TradingLimits
@@ -50,7 +50,8 @@ async def display_dashboard(
     print()
 
     # 1. Current market data
-    latest = await storage.get_latest_price("U")
+    config = get_config()
+    latest = await storage.get_latest_price(config.unity.ticker)
     if latest:
         print("📊 Market Data:")
         print(f"   Price: ${latest.get('close', 0):.2f}")
@@ -58,7 +59,7 @@ async def display_dashboard(
         print(f"   Change: {latest.get('returns', 0)*100:+.2f}%")
 
         # Calculate realized vol
-        history = await storage.get_price_history("U", days=20)
+        history = await storage.get_price_history(config.unity.ticker, days=20)
         if len(history) >= 20:
             import numpy as np
 
@@ -138,11 +139,12 @@ async def check_for_opportunities(
     """Check for trading opportunities."""
     try:
         # Get current data
-        latest = await storage.get_latest_price("U")
+        config = get_config()
+        latest = await storage.get_latest_price(config.unity.ticker)
         if not latest:
             return
 
-        historical = await storage.get_price_history("U", days=750)
+        historical = await storage.get_price_history(config.unity.ticker, days=750)
         if len(historical) < 500:
             return
 
@@ -209,7 +211,8 @@ async def main():
 
     # Initialize components
     storage = UnifiedStorage()
-    engine = IntegratedDecisionEngine("U", 100000)
+    config = get_config()
+    engine = IntegratedDecisionEngine(config.unity.ticker, 100000)
     risk_checker = RiskLimitChecker()
     tracker = PerformanceTracker()
 

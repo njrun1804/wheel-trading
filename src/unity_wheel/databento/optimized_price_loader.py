@@ -5,7 +5,6 @@ Handles Databento API limitations and maximizes throughput.
 
 import asyncio
 import os
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
@@ -13,8 +12,9 @@ import pandas as pd
 from databento_dbn import Schema
 
 from ..storage import Storage
-from ..utils import get_logger, with_recovery
-from .client import DatentoClient
+from ..utils import get_logger
+from .client import DatabentoClient
+from ..config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -22,22 +22,24 @@ logger = get_logger(__name__)
 class OptimizedPriceHistoryLoader:
     """Optimized loader for M4 Pro with proper error handling."""
 
-    # M4 Pro optimizations
-    MAX_WORKERS = 8  # M4 Pro has 10 cores, leave some for system
-    CHUNK_SIZE = 250  # Databento allows up to 365 days per request
+    def __init__(self, client: DatabentoClient, storage: Storage):
+        # Load configuration
+        config = get_config()
 
-    # Databento API limits
-    MAX_REQUESTS_PER_SECOND = 100  # Historical API soft limit
-    RETRY_DELAYS = [1, 2, 5, 10]  # Exponential backoff
+        # M4 Pro optimizations
+        self.MAX_WORKERS = config.databento.loader.max_workers
+        self.CHUNK_SIZE = config.databento.loader.chunk_size
 
-    # Data requirements from our analysis
-    REQUIRED_DAYS = 750  # For statistically valid risk metrics
-    MINIMUM_DAYS = 500  # Absolute minimum for decent VaR
+        # Databento API limits
+        self.MAX_REQUESTS_PER_SECOND = config.databento.loader.max_requests_per_second
+        self.RETRY_DELAYS = config.databento.loader.retry_delays
 
-    def __init__(self, client: DatentoClient, storage: Storage):
+        # Data requirements from our analysis
+        self.REQUIRED_DAYS = config.databento.loader.required_days
+        self.MINIMUM_DAYS = config.databento.loader.minimum_days
+
         self.client = client
         self.storage = storage
-        self.executor = ThreadPoolExecutor(max_workers=self.MAX_WORKERS)
 
         # Rate limiting
         self._request_semaphore = asyncio.Semaphore(10)  # Concurrent requests
@@ -282,34 +284,20 @@ class OptimizedPriceHistoryLoader:
                 ).fetchone()
 
                 return result[0] if result else 0
-        except:
+        except (sqlite3.Error, AttributeError) as e:
+            logger.warning(f"Failed to get existing days count: {e}")
             return 0
 
     def _get_dataset_for_symbol(self, symbol: str) -> str:
         """Determine correct Databento dataset."""
+        config = get_config()
         # Unity trades on NYSE American
-        if symbol in ["U", "UNIT"]:
+        if symbol in [config.unity.ticker, "UNIT"]:
             return "XNAS.BASIC"  # Try NASDAQ first
         elif symbol in ["SPY", "QQQ", "IWM"]:
             return "ARCX.BASIC"  # NYSE Arca for ETFs
         else:
             return "XNAS.BASIC"  # Default
-
-    async def optimize_system_settings(self):
-        """Optimize system settings for data loading on M4 Pro."""
-        logger.info("Optimizing system settings for M4 Pro")
-
-        # macOS specific optimizations
-        if os.uname().sysname == "Darwin":
-            # Increase file descriptor limit
-            os.system("ulimit -n 4096")
-
-            # Optimize network settings for throughput
-            os.system("sudo sysctl -w net.inet.tcp.win_scale_factor=8")
-            os.system("sudo sysctl -w net.core.rmem_max=134217728")
-            os.system("sudo sysctl -w net.core.wmem_max=134217728")
-
-            logger.info("System settings optimized for macOS")
 
     async def verify_data_quality(self, symbol: str) -> Dict[str, any]:
         """Verify data quality after loading."""

@@ -1,13 +1,15 @@
 """
 Risk limits and circuit breakers for autonomous safety.
 Prevents the system from making dangerous trades.
+Now with adaptive limits that adjust to market conditions.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional
+from typing import Dict, List, NamedTuple, Optional, Tuple
 
 from ..utils import get_logger
+from ...config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -25,79 +27,111 @@ class RiskLimit(NamedTuple):
 
 @dataclass
 class TradingLimits:
-    """Hard limits for safe autonomous operation."""
+    """Trading limits for safe autonomous operation."""
 
     # Position limits
-    max_position_pct: float = 0.20  # Max % of portfolio in one position
-    max_contracts: int = 10  # Max contracts per trade
-    min_portfolio_value: float = 10000  # Stop trading below this
+    max_position_pct: float = field(default=None)
+    max_contracts: int = field(default=None)
+    min_portfolio_value: float = field(default=None)
 
     # Market condition limits
-    max_volatility: float = 1.5  # 150% annual vol
-    max_gap_percent: float = 0.10  # 10% gap
-    min_volume_ratio: float = 0.5  # Half normal volume
+    max_volatility: float = field(default=None)
+    max_gap_percent: float = field(default=None)
+    min_volume_ratio: float = field(default=None)
 
     # Loss limits
-    max_daily_loss_pct: float = 0.02  # 2% daily loss
-    max_weekly_loss_pct: float = 0.05  # 5% weekly loss
-    max_consecutive_losses: int = 3  # Stop after 3 losses
+    max_daily_loss_pct: float = field(default=None)
+    max_weekly_loss_pct: float = field(default=None)
+    max_consecutive_losses: int = field(default=None)
 
     # Confidence limits
-    min_confidence: float = 0.30  # Don't trade below 30% confidence
-    max_warnings: int = 3  # Don't trade with >3 warnings
+    min_confidence: float = field(default=None)
+    max_warnings: int = field(default=None)
 
     # Time limits
-    blackout_hours: List[int] = None  # Hours to avoid (e.g., [0, 1, 2])
-    min_days_between_trades: int = 0  # Cooling off period
-    
+    blackout_hours: List[int] = field(default=None)
+    min_days_between_trades: int = field(default=0)
+
+    def __post_init__(self):
+        """Initialize from config if values not provided."""
+        config = get_config()
+        circuit_breakers = config.risk.circuit_breakers
+
+        # Use config values as defaults if not explicitly set
+        if self.max_position_pct is None:
+            self.max_position_pct = circuit_breakers.max_position_pct
+        if self.max_contracts is None:
+            self.max_contracts = circuit_breakers.max_contracts
+        if self.min_portfolio_value is None:
+            self.min_portfolio_value = circuit_breakers.min_portfolio_value
+        if self.max_volatility is None:
+            self.max_volatility = circuit_breakers.max_volatility
+        if self.max_gap_percent is None:
+            self.max_gap_percent = circuit_breakers.max_gap_percent
+        if self.min_volume_ratio is None:
+            self.min_volume_ratio = circuit_breakers.min_volume_ratio
+        if self.max_daily_loss_pct is None:
+            self.max_daily_loss_pct = circuit_breakers.max_daily_loss_pct
+        if self.max_weekly_loss_pct is None:
+            self.max_weekly_loss_pct = circuit_breakers.max_weekly_loss_pct
+        if self.max_consecutive_losses is None:
+            self.max_consecutive_losses = circuit_breakers.max_consecutive_losses
+        if self.min_confidence is None:
+            self.min_confidence = circuit_breakers.min_confidence
+        if self.max_warnings is None:
+            self.max_warnings = circuit_breakers.max_warnings
+        if self.blackout_hours is None:
+            self.blackout_hours = circuit_breakers.blackout_hours or []
+
     @classmethod
-    def from_config(cls, config: Dict) -> 'TradingLimits':
+    def from_config(cls, config: Dict) -> "TradingLimits":
         """Create limits from configuration."""
-        risk_config = config.get('risk', {})
-        limits_config = risk_config.get('limits', {})
-        
-        # Map config values to limit attributes
+        risk_config = config.get("risk", {})
+        circuit_breakers = risk_config.get("circuit_breakers", {})
+
         return cls(
-            max_position_pct=risk_config.get('max_position_size', 0.20),
-            max_contracts=limits_config.get('max_contracts_per_trade', 10),
-            min_portfolio_value=risk_config.get('min_portfolio_value', 10000),
-            max_volatility=limits_config.get('max_volatility', 1.5),
-            max_gap_percent=limits_config.get('max_gap_percent', 0.10),
-            min_volume_ratio=limits_config.get('min_volume_ratio', 0.5),
-            max_daily_loss_pct=limits_config.get('max_daily_loss_pct', 0.02),
-            max_weekly_loss_pct=limits_config.get('max_weekly_loss_pct', 0.05),
-            max_consecutive_losses=limits_config.get('max_consecutive_losses', 3),
-            min_confidence=risk_config.get('min_confidence', 0.30),
-            max_warnings=limits_config.get('max_warnings', 3),
-            blackout_hours=limits_config.get('blackout_hours'),
-            min_days_between_trades=limits_config.get('min_days_between_trades', 0),
+            max_position_pct=circuit_breakers.get("max_position_pct", 0.20),
+            max_contracts=circuit_breakers.get("max_contracts", 10),
+            min_portfolio_value=circuit_breakers.get("min_portfolio_value", 10000),
+            max_volatility=circuit_breakers.get("max_volatility", 1.5),
+            max_gap_percent=circuit_breakers.get("max_gap_percent", 0.10),
+            min_volume_ratio=circuit_breakers.get("min_volume_ratio", 0.5),
+            max_daily_loss_pct=circuit_breakers.get("max_daily_loss_pct", 0.02),
+            max_weekly_loss_pct=circuit_breakers.get("max_weekly_loss_pct", 0.05),
+            max_consecutive_losses=circuit_breakers.get("max_consecutive_losses", 3),
+            min_confidence=circuit_breakers.get("min_confidence", 0.30),
+            max_warnings=circuit_breakers.get("max_warnings", 3),
+            blackout_hours=circuit_breakers.get("blackout_hours"),
         )
-    
+
     def check_position_size(self, position_value: float, portfolio_value: float) -> bool:
         """Check if position size is within limits."""
         position_pct = position_value / portfolio_value
         return position_pct <= self.max_position_pct
-    
+
     def check_margin_usage(self, margin_usage: float) -> bool:
         """Check if margin usage is acceptable."""
-        # Get max margin from config (default 0.95 for aggressive strategy)
-        return margin_usage <= 0.95
-    
+        config = get_config()
+        max_margin = config.risk.margin.max_utilization
+        return margin_usage <= max_margin
+
     def check_var_limit(self, var_value: float, portfolio_value: float) -> bool:
         """Check if VaR is within limits."""
-        # For aggressive strategy, allow up to 50% VaR
-        return abs(var_value) <= 0.50 * portfolio_value
-    
+        config = get_config()
+        max_var = config.risk.limits.max_var_95
+        return abs(var_value) <= max_var * portfolio_value
+
     def check_delta_exposure(self, total_delta: float) -> bool:
         """Check if delta exposure is within limits."""
-        # For aggressive strategy, allow up to 200x delta
-        return abs(total_delta) <= 200.0 * 100  # Assuming 100 as base
-    
+        config = get_config()
+        max_delta = config.risk.greeks.max_delta_exposure
+        return abs(total_delta) <= max_delta * 100  # Assuming 100 as base
+
     def check_contracts_limit(self, contracts: int) -> bool:
         """Check if number of contracts is within limits."""
         return contracts <= self.max_contracts
-    
-    def check_risk_metrics(self, metrics: 'RiskMetrics', portfolio_value: float) -> bool:
+
+    def check_risk_metrics(self, metrics: "RiskMetrics", portfolio_value: float) -> bool:
         """Check all risk metrics against limits."""
         # For aggressive strategy, very permissive
         return True  # All risk accepted per user preference

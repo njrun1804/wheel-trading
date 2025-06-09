@@ -12,6 +12,7 @@ import pandas as pd
 from scipy import stats
 from sklearn.ensemble import IsolationForest
 
+from ..config.loader import get_config
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
 
@@ -45,10 +46,13 @@ class AnomalyDetector:
 
     def __init__(
         self,
-        symbol: str = "U",
+        symbol: str = None,
         lookback_days: int = 500,
         sensitivity: float = 2.5,  # Z-score threshold
     ):
+        if symbol is None:
+            config = get_config()
+            symbol = config.unity.ticker
         self.symbol = symbol
         self.lookback_days = lookback_days
         self.sensitivity = sensitivity

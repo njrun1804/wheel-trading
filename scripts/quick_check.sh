@@ -53,7 +53,7 @@ from src.config.loader import get_config_loader
 try:
     loader = get_config_loader()
     config = loader.config
-    
+
     # Key settings for aggressive strategy
     print(f'   ✓ Max position size: {config[\"risk\"][\"max_position_size\"]:.0%}')
     print(f'   ✓ Max margin usage: {config[\"risk\"][\"max_margin_percent\"]:.0%}')

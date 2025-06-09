@@ -90,7 +90,12 @@ class SchwabClient:
     async def connect(self):
         """Initialize session and authenticate."""
         if not self.session:
-            timeout = aiohttp.ClientTimeout(total=30, connect=10)
+            from ..config.loader import get_config
+
+            config = get_config()
+            timeout = aiohttp.ClientTimeout(
+                total=config.data.api_timeouts.total, connect=config.data.api_timeouts.connect
+            )
             self.session = aiohttp.ClientSession(timeout=timeout)
 
         # Authenticate if needed

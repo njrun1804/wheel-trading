@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config.unity import TICKER
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.databento.databento_storage_adapter import DatabentoStorageAdapter
 from src.unity_wheel.databento.integration import DatentoIntegration
 from src.unity_wheel.storage import Storage, StorageConfig
@@ -37,7 +37,7 @@ async def test_complete_integration():
 
     # 3. Initialize Databento client
     print("\n3️⃣ Initializing Databento Client...")
-    client = DatentoClient()
+    client = DatabentoClient()
     print("   ✅ Using Google Secrets for API key")
 
     # 4. Initialize integration

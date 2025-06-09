@@ -2,175 +2,572 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
-
-Unity Wheel Trading Bot v2.0 - An autonomous options wheel strategy recommendation system with self-monitoring, auto-tuning, and enterprise-grade reliability. Designed for single-user local operation with NO BROKER INTEGRATION (recommendations only).
-
-## Commands
-
-### Primary Commands (v2.0):
-
-- `python run_aligned.py --portfolio 100000` - Get trading recommendation
-- `python run_aligned.py --diagnose` - Run system diagnostics
-- `python run_aligned.py --performance` - View performance metrics
-- `python run_aligned.py --export-metrics` - Export dashboard metrics
-- `python run_aligned.py --version` - Show version info
-- `./scripts/autonomous-checks.sh` - Run all autonomous checks
-- `./scripts/monitor.sh` - Start continuous monitoring
-
-### Development Commands:
-
-- `pre-commit run --all-files` - Run all quality checks
-- `pytest tests/test_autonomous_flow.py -v` - Run integration tests
-- `black src/ tests/` - Auto-format code
-- `mypy src/` - Type checking
-
-### Quick Development Flow:
+## 🚀 QUICK START (Most Common Tasks)
 
 ```bash
-# After making changes:
-pre-commit run --all-files
+# Get trading recommendation
+python run_aligned.py -p 100000
 
-# Check system health:
+# If errors, run diagnostics
 python run_aligned.py --diagnose
 
-# Monitor performance:
-python run_aligned.py --performance
+# Quick commit
+./scripts/commit-workflow.sh -y
 
-# View configuration health:
-python -c "from src.config.loader import get_config_loader; print(get_config_loader().generate_health_report())"
+# Run tests for new modules
+pytest tests/test_databento_unity.py tests/test_position_sizing.py -v
+```
+
+**Key Files:** `run_aligned.py:112` (main), `api/advisor.py:106` (logic), `config.yaml` (settings)
+
+**Common Errors:**
+- "Invalid credentials" → `python scripts/setup-secrets.py`
+- "Rate limit" → Wait 60s
+- "No liquid strikes" → `export DATABENTO_SKIP_VALIDATION=true`
+
+**Quick Navigation:** [Commands](#quick-reference) • [Files](#key-file-locations) • [Errors](#troubleshooting) • [Config](#configuration-system) • [Architecture](#architecture) • [Workflows](#common-workflows)
+
+---
+
+## Project Overview
+
+Unity Wheel Trading Bot v2.2 - An autonomous options wheel strategy recommendation system with self-monitoring, auto-tuning, and enterprise-grade reliability. Designed for single-user local operation with NO BROKER INTEGRATION (recommendations only).
+
+### Recent Optimizations (Jan 2025)
+- **5x Performance**: Vectorized option calculations process all strikes at once
+- **Configurable Ticker**: No more hardcoded "U" - uses `config.unity.ticker`
+- **Enhanced Safety**: All calculations now return confidence scores
+- **Unified Position Sizing**: Single implementation via `DynamicPositionSizer`
+- **Better Error Handling**: No bare except clauses, specific exceptions only
+
+## Quick Reference
+
+### One-Liner Cheat Sheet
+```bash
+# Get recommendation
+python run_aligned.py -p 100000
+
+# Quick health check
+./scripts/housekeeping.sh -q
+
+# Test single function
+python -c "from src.unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100,100,1,0.05,0.2,'call'))"
+
+# View config value
+python -c "from src.config.loader import get_config as gc; print(gc().strategy.greeks.delta_target)"
+
+# Check performance
+python -c "from src.unity_wheel.metrics import metrics_collector as mc; print(mc.get_performance_stats())"
+
+# Validate environment
+python -m unity_wheel.validate
+
+# Quick commit
+git add -A && git commit -m "msg" && git push
+
+# Export metrics
+python run_aligned.py --export-metrics > metrics.json
+```
+
+### Most Used Commands
+```bash
+# Primary operations
+python run_aligned.py --portfolio 100000      # Get recommendation
+python run_aligned.py --diagnose             # System health
+pre-commit run --all-files                   # Run all checks
+./scripts/commit-workflow.sh -y              # Auto-commit
+
+# Testing
+pytest tests/test_autonomous_flow.py -v      # Integration test
+pytest tests/test_math.py::test_black_scholes_edge_cases -v  # Specific test
+
+# Monitoring
+./monitor_live.py                            # Real-time dashboard
+./daily_health_check.py                      # Morning checks
+```
+
+### Key File Locations
+```python
+# Entry Points
+run_aligned.py:264       # main() function
+run_aligned.py:112       # generate_recommendation()
+
+# Core Components
+src/unity_wheel/api/advisor.py:74           # WheelAdvisor class
+src/unity_wheel/api/advisor.py:106          # advise_position() - Main logic
+src/unity_wheel/strategy/wheel.py:153       # find_optimal_put_strike_vectorized() - NEW!
+src/unity_wheel/strategy/wheel.py:626       # WheelStrategy implementation
+src/unity_wheel/risk/analytics.py:798       # Risk calculations (now with confidence)
+src/unity_wheel/math/options.py:746         # Black-Scholes, Greeks
+src/unity_wheel/utils/position_sizing.py:71 # DynamicPositionSizer (unified)
+
+# Configuration
+src/config/schema.py:924                    # All config schemas
+src/config/loader.py                        # Config loading & tracking
+config.yaml                                  # Main config file
+
+# Data Integration
+src/unity_wheel/schwab/client.py            # Schwab API client
+src/unity_wheel/databento/client.py         # Databento client
+```
+
+### Critical Constants & Performance SLAs
+```python
+# Position Limits
+MAX_POSITION_SIZE = 0.20          # 20% of portfolio per position
+MAX_CONCURRENT_PUTS = 3           # Unity-specific limit
+MIN_CONFIDENCE = 0.30             # 30% minimum confidence required
+UNITY_TICKER = config.unity.ticker # Configurable, defaults to "U"
+
+# Risk Thresholds
+MAX_VOLATILITY = 1.50             # 150% - stop trading above this
+MAX_DRAWDOWN = -0.20              # -20% - circuit breaker
+CONSECUTIVE_LOSS_LIMIT = 3        # Stop after 3 losses
+
+# Trading Parameters
+TARGET_DELTA = 0.30               # Default delta for puts
+TARGET_DTE = 45                   # Days to expiry
+CONTRACTS_PER_TRADE = 100         # Unity shares per contract
+
+# Performance SLAs (milliseconds)
+BLACK_SCHOLES_SLA = 0.2           # Options pricing
+GREEKS_SLA = 0.3                  # All Greeks calculation
+VAR_SLA = 10.0                    # VaR calculation (1000 points)
+STRIKE_SELECTION_SLA = 100.0      # Find optimal strike
+DECISION_SLA = 200.0              # Full recommendation
+API_CALL_SLA = 1000.0             # External API calls
+
+# Circuit Breaker Settings
+FAILURE_THRESHOLD = 5             # Consecutive failures before open
+RESET_TIMEOUT = 60                # Seconds before circuit reset
+RATE_LIMIT = 60                   # Requests per minute
+```
+
+### Common Code Patterns
+```python
+# Validated calculation pattern
+from src.unity_wheel.math.options import black_scholes_price_validated
+result = black_scholes_price_validated(S=100, K=100, T=1, r=0.05, sigma=0.2, option_type='call')
+if result.confidence > 0.95:
+    price = result.value
+
+# Decorator usage
+@timed_operation(threshold_ms=10.0)
+@with_recovery(strategy=RecoveryStrategy.FALLBACK)
+@cached(ttl_seconds=300)
+def expensive_calculation():
+    pass
+
+# Config access
+from src.config.loader import get_config
+config = get_config()
+delta = config.strategy.greeks.delta_target
+
+# Structured logging
+logger.info("Operation completed", extra={
+    "function": "calculate_risk",
+    "execution_time_ms": 5.2,
+    "confidence": 0.98
+})
+```
+
+### Quick Debugging Actions
+```python
+# When recommendation fails
+python run_aligned.py --diagnose  # Check system health
+python -c "from src.unity_wheel.databento import validate_connection; validate_connection()"  # Check data
+python -c "from src.unity_wheel.schwab import test_auth; test_auth()"  # Check auth
+
+# When performance is slow
+python -c "from src.unity_wheel.utils.cache import get_cache; print(get_cache().stats())"  # Cache stats
+python -c "from src.unity_wheel.metrics import metrics_collector as mc; print(mc.get_slow_operations(threshold_ms=50))"  # Slow ops
+
+# When getting unexpected results
+python -c "from src.config.loader import get_config_loader as gcl; print(gcl().get_unused_parameters())"  # Unused config
+python -c "from src.unity_wheel.diagnostics import run_diagnostics; run_diagnostics(verbose=True)"  # Full diagnostics
+```
+
+### Common Gotchas
+```python
+# ❌ WRONG: Using relative imports
+from math import black_scholes  # Will import system math module!
+
+# ✅ RIGHT: Use absolute imports
+from src.unity_wheel.math.options import black_scholes_price_validated
+
+# ❌ WRONG: Not checking confidence
+price = calculate_option_price(...).value  # May be NaN!
+
+# ✅ RIGHT: Always check confidence
+result = calculate_option_price(...)
+if result.confidence > 0.95:
+    price = result.value
+
+# ❌ WRONG: Catching all exceptions
+try:
+    risky_operation()
+except:  # Never do this!
+    pass
+
+# ✅ RIGHT: Specific exception handling
+try:
+    risky_operation()
+except (ValueError, KeyError) as e:
+    logger.error(f"Operation failed: {e}")
+    return fallback_value()
+```
+
+## Troubleshooting
+
+### Common Error Messages & Solutions
+
+#### Authentication Errors
+```bash
+# "Invalid credentials" or "Failed to retrieve credentials"
+python scripts/setup-secrets.py  # Re-run setup
+export SCHWAB_CLIENT_ID=xxx
+export SCHWAB_CLIENT_SECRET=xxx
+
+# "Access token expired"
+# Auto-refreshes, but if persistent:
+python tools/verification/schwab_oauth_fixed.py
+
+# "Rate limit exceeded"
+# Wait 60s for circuit breaker reset
+# Check: python -c "from src.unity_wheel.auth.rate_limiter import get_rate_limiter; print(get_rate_limiter().get_status())"
+```
+
+#### Data Quality Issues
+```bash
+# "Insufficient data for reliable VaR calculation"
+# Need 20+ data points, check:
+python -c "from src.unity_wheel.databento import get_historical_data; print(len(get_historical_data('U', days=30)))"
+
+# "Data quality issues: X errors found"
+python run_aligned.py --diagnose  # See specific issues
+
+# "No liquid strikes available"
+# Check liquidity thresholds:
+# MIN_VOLUME = 100, MIN_OPEN_INTEREST = 100
+```
+
+#### Performance Violations
+```bash
+# "SLA violation: operation took Xms (threshold: Yms)"
+# Enable profiling to identify bottleneck:
+python -c "from src.unity_wheel.utils import enable_profiling; enable_profiling()"
+python run_aligned.py --portfolio 100000  # Run with profiling
+
+# View performance stats:
+python -c "from src.unity_wheel.metrics import metrics_collector; print(metrics_collector.get_sla_report())"
+```
+
+### Common Issues
+```bash
+# Databento connection issues
+export DATABENTO_SKIP_VALIDATION=true       # Temporary skip
+python tools/debug/debug_databento.py       # Debug connection
+
+# Schwab auth problems
+python tools/verification/schwab_oauth_fixed.py  # Fix OAuth
+python tools/verification/schwab_status_check.py # Check status
+
+# Secret/credential issues
+python scripts/test-secrets.py              # Validate all secrets
+python tools/verification/verify_secret.py  # Check specific secret
+
+# Config validation errors
+python -c "from src.config.loader import validate_config; validate_config()"
+```
+
+### Performance Debugging
+```python
+# Profile slow operations
+from src.unity_wheel.utils import enable_profiling
+enable_profiling()  # Logs all operations >10ms
+
+# Check cache effectiveness
+from src.unity_wheel.metrics import metrics_collector
+print(metrics_collector.get_cache_stats())
+
+# View SLA violations
+print(metrics_collector.get_sla_report())
+
+# Check circuit breaker status
+from src.unity_wheel.auth.rate_limiter import get_rate_limiter
+print(get_rate_limiter().get_circuit_status())
+```
+
+### Log Analysis & Metrics
+```bash
+# View recent errors
+grep -E "ERROR|CRITICAL" logs/wheel.log | tail -20
+
+# Count warnings by type
+grep "WARNING" logs/wheel.log | grep -oE '"message":"[^"]+"' | sort | uniq -c | sort -nr
+
+# Performance violations
+grep "SLA violation" logs/wheel.log | tail -10
+
+# View structured logs (JSON)
+jq '.level == "ERROR"' logs/wheel.json | jq -s '.[0:5]'
+
+# Export metrics database
+sqlite3 exports/metrics.db "SELECT * FROM decisions ORDER BY timestamp DESC LIMIT 10;"
+
+# View recommendation history
+sqlite3 exports/metrics.db "SELECT decision_id, action, confidence, expected_return FROM decisions WHERE confidence > 0.5;"
+```
+
+### Database Queries
+```sql
+-- Recent high-confidence decisions
+SELECT decision_id, action, confidence, expected_return, execution_time_ms
+FROM decisions
+WHERE confidence > 0.7
+ORDER BY timestamp DESC
+LIMIT 10;
+
+-- Performance trends
+SELECT
+  DATE(timestamp) as date,
+  AVG(execution_time_ms) as avg_time,
+  MAX(execution_time_ms) as max_time,
+  COUNT(*) as count
+FROM decisions
+GROUP BY DATE(timestamp)
+ORDER BY date DESC;
+
+-- Feature usage analysis
+SELECT features_used, COUNT(*) as usage_count
+FROM decisions
+GROUP BY features_used
+ORDER BY usage_count DESC;
 ```
 
 ## Architecture
 
-### Current Structure:
+### Key Classes & Methods
+```python
+# Main Recommendation Flow
+WheelAdvisor.advise_position()              # advisor.py:106
+├── validate_market_data()                   # advisor.py:138
+├── WheelStrategy.find_optimal_put_strike()  # wheel.py:187
+├── calculate_position_size()                # wheel.py:325
+├── RiskAnalyzer.calculate_metrics()         # analytics.py:156
+└── create_recommendation()                  # advisor.py:273
 
-```
-wheel-trading/
-├── config.yaml         # Comprehensive configuration file
-├── pyproject.toml      # Poetry configuration with exact pins
-├── run.py              # CLI entry point for decisions
-├── src/
-│   ├── config/         # Intelligent configuration system
-│   │   ├── schema.py   # Pydantic validation schemas
-│   │   ├── loader.py   # Config loader with tracking
-│   │   └── integration.py # Legacy compatibility
-│   ├── unity_wheel/
-│   │   ├── models/     # Immutable data models with validation
-│   │   │   ├── position.py # Position with OCC symbol parsing
-│   │   │   ├── greeks.py   # Greeks with range validation
-│   │   │   └── account.py  # Account state tracking
-│   │   ├── math/       # Self-validating options mathematics
-│   │   │   └── options.py  # BS with confidence scores
-│   │   ├── risk/       # Risk analytics with self-monitoring
-│   │   │   └── analytics.py # VaR, CVaR, Kelly, limits
-│   │   ├── schwab/     # Reliable Schwab client with validation
-│   │   │   ├── client.py    # Main client with retry logic
-│   │   │   ├── types.py     # Position/account data models
-│   │   │   └── exceptions.py # Error hierarchy
-│   │   └── validate.py # Environment validation script
-│   ├── wheel.py        # Core wheel strategy implementation
-│   └── utils/          # Utilities
-└── tests/              # Property-based test suite
+# Risk Calculations
+RiskAnalytics.calculate_portfolio_risk()     # analytics.py:432
+├── calculate_var()                          # analytics.py:234
+├── calculate_cvar()                         # analytics.py:289
+├── calculate_kelly_fraction()               # analytics.py:367
+└── check_risk_limits()                      # limits.py:89
+
+# Options Math (all with confidence scores)
+black_scholes_price_validated()              # options.py:123
+calculate_greeks_validated()                 # options.py:287
+implied_volatility_validated()               # options.py:412
+probability_itm_validated()                  # options.py:189
 ```
 
-### Key Design Principles:
+### Directory Structure (Simplified)
+```
+src/
+├── config/          # Config validation (schema.py:924 lines)
+├── unity_wheel/
+│   ├── api/         # External API (advisor.py)
+│   ├── math/        # Options calculations
+│   ├── risk/        # Risk management
+│   ├── strategy/    # Trading strategies
+│   ├── databento/   # Market data
+│   └── schwab/      # Broker integration
+└── tests/           # Property-based tests
+```
 
-1. **Autonomous Operation** - Self-monitoring, self-healing, self-optimizing
-2. **Self-Validation** - Every calculation includes confidence score
-3. **Type Safety** - 100% type hints, mypy strict mode
-4. **Immutable Models** - All data models are frozen dataclasses
-5. **Property Testing** - Hypothesis for edge case discovery
-6. **Structured Logging** - Machine-parseable JSON logs
-7. **Performance Monitoring** - Automatic SLA tracking
-8. **Graceful Degradation** - Feature flags for resilience
+### Design Principles & Guidelines
 
-## Development Guidelines
+1. **Every calculation returns confidence** - `(value, confidence)` tuples
+2. **Never crash** - Use `@with_recovery`, return NaN with explanation
+3. **Log everything** - Function name, inputs, outputs, timing
+4. **Type everything** - 100% type hints, mypy strict mode
+5. **Track performance** - Alert on calculations >10ms
+6. **Validate inputs** - Use Pydantic models everywhere
+7. **Test edge cases** - Property-based testing with Hypothesis
+8. **Self-monitor** - Automatic SLA tracking and alerting
 
-1. **Logging Everything** - Include function name, inputs, outputs
-2. **Confidence Scores** - All calculations return (result, confidence)
-3. **100% Coverage** - Tests must maintain complete coverage
-4. **Error Recovery** - Never crash, return NaN with explanation
-5. **Performance Tracking** - Log any calculation >10ms
+## Quick Test Commands
 
-## Testing Requirements
-
-Before any changes:
 ```bash
-# Validate environment
-poetry run python -m unity_wheel.validate
+# Fast tests only (30 seconds)
+pytest -v -m "not slow"
 
-# Run full test suite
-poetry run pytest -v
+# Test specific module
+pytest tests/test_math.py -v
 
-# Check specific functionality
-poetry run python -c "
-from unity_wheel.math import black_scholes_price_validated
-result = black_scholes_price_validated(100, 100, 1, 0.05, 0.2, 'call')
-print(f'Price: {result.value:.2f}, Confidence: {result.confidence:.0%}')
-"
+# Test with coverage
+pytest --cov=src --cov-report=html
+
+# Quick validation
+python -c "from unity_wheel.math import black_scholes_price_validated as bs; print(bs(100,100,1,0.05,0.2,'call'))"
+
+# Performance benchmark
+pytest tests/test_performance_benchmarks.py::test_black_scholes_performance -v
 ```
 
 ## Configuration System
 
-### Overview
+### Quick Config Access
+```python
+# Get config value
+from src.config.loader import get_config
+config = get_config()
+delta = config.strategy.greeks.delta_target      # 0.30
+max_pos = config.risk.position_limits.max_position_size  # 0.20
 
-The project uses an intelligent YAML-based configuration system with:
-- **Comprehensive validation** using Pydantic schemas
-- **Environment variable overrides** (WHEEL_SECTION__PARAM format)
-- **Parameter usage tracking** to identify unused settings
-- **Impact tracking** to suggest parameter tuning
-- **Health reporting** with warnings and recommendations
-- **Self-tuning capabilities** based on outcome tracking
+# Check config health
+from src.config.loader import get_config_loader
+print(get_config_loader().generate_health_report())
 
-### Key Configuration Sections:
-
-1. **Strategy** (`strategy.*`)
-   - `delta_target`: Target delta for short puts (default: 0.30)
-   - `days_to_expiry_target`: Target DTE (default: 45)
-   - `roll_triggers`: Profit targets, delta breaches, DTE thresholds
-
-2. **Risk** (`risk.*`)
-   - `max_position_size`: Max position as % of portfolio (default: 0.20)
-   - `kelly_fraction`: Kelly criterion fraction (default: 0.50 = Half-Kelly)
-   - `limits`: VaR, CVaR, Greek exposures, margin utilization
-
-3. **Data** (`data.*`)
-   - `cache_ttl`: Cache expiration times
-   - `api_timeouts`: Connection and request timeouts
-   - `quality`: Data staleness and minimum liquidity thresholds
-
-4. **ML** (`ml.*`)
-   - `enabled`: Toggle ML enhancement
-   - `features`: IV rank, skew, realized vol, macro factors
-   - `models`: Probability and volatility model configurations
-
-### Environment Variable Overrides:
-
-```bash
-# Override delta target
-export WHEEL_STRATEGY__DELTA_TARGET=0.25
-
-# Enable ML features
-export WHEEL_ML__ENABLED=true
-
-# Set trading mode
-export WHEEL_TRADING__MODE=paper
+# Override via environment
+export WHEEL_STRATEGY__GREEKS__DELTA_TARGET=0.25
 ```
 
-### Configuration Health Monitoring:
+### Most Important Settings
+```yaml
+strategy:
+  greeks:
+    delta_target: 0.30          # Target delta for puts
+  expiration:
+    days_to_expiry_target: 45   # Target DTE
+
+risk:
+  position_limits:
+    max_position_size: 0.20     # 20% of portfolio max
+  circuit_breakers:
+    max_volatility: 1.50        # Stop at 150% vol
+    max_drawdown: -0.20         # Stop at -20% drawdown
+
+operations:
+  api:
+    max_concurrent_puts: 3      # Unity-specific
+    min_confidence: 0.30        # 30% minimum
+```
+
+### Unity Adaptive System (Key Feature)
+
+The project includes a Unity-specific adaptive system at `src/unity_wheel/adaptive.py:221` that adjusts position sizing based on market conditions.
+
+#### Quick Usage:
+```python
+from src.unity_wheel.strategy.adaptive_wheel import create_adaptive_wheel_strategy
+
+# Simple usage
+strategy = create_adaptive_wheel_strategy(portfolio_value=200000)
+rec = strategy.get_recommendation(
+    unity_price=35.00,
+    available_strikes=[30, 32.5, 35, 37.5, 40],
+    available_expirations=[7, 14, 21, 28, 35, 42],
+    portfolio_drawdown=-0.05
+)
+
+if rec['should_trade']:
+    print(f"Trade ${rec['position_size']:,.0f} at ${rec['recommended_strike']}")
+```
+
+#### Adaptive Rules Summary:
+- **<40% vol**: 120% position (opportunity)
+- **40-60% vol**: 100% position (normal)
+- **60-80% vol**: 70% position (caution)
+- **>80% vol**: 50% position (defensive)
+- **>100% vol**: STOP TRADING
+- **Earnings <7 days**: SKIP TRADE
+- **Drawdown >20%**: STOP TRADING
+
+#### Quick Volatility Check:
+```python
+# Check current Unity volatility tier
+from src.unity_wheel.adaptive import get_volatility_tier
+tier = get_volatility_tier(current_vol=0.65)  # Returns: 'caution'
+
+# Check if should trade
+from src.unity_wheel.adaptive import should_trade_unity
+can_trade = should_trade_unity(vol=0.85, drawdown=-0.15, days_to_earnings=10)  # Returns: (False, "High volatility")
+```
+
+#### Usage Examples:
 
 ```python
-# Check configuration health
-from src.config.loader import get_config_loader
-loader = get_config_loader()
-print(loader.generate_health_report())
+# Create adaptive wheel strategy
+from src.unity_wheel.strategy.adaptive_wheel import create_adaptive_wheel_strategy
 
-# Track parameter usage
-loader.track_parameter_usage("strategy.delta_target")
+# Initialize with portfolio value
+strategy = create_adaptive_wheel_strategy(portfolio_value=200000)
 
-# Report decision impact
-loader.track_parameter_impact("strategy.delta_target", 0.75)
+# Get recommendation
+recommendation = strategy.get_recommendation(
+    unity_price=35.00,
+    available_strikes=[30, 32.5, 35, 37.5, 40],
+    available_expirations=[7, 14, 21, 28, 35, 42],
+    portfolio_drawdown=-0.05  # Currently down 5%
+)
+
+# Check result
+if recommendation['should_trade']:
+    print(f"Trade: ${recommendation['position_size']:,.0f} position")
+    print(f"Strike: ${recommendation['recommended_strike']}")
+    print(f"DTE: {recommendation['target_dte']} days")
+else:
+    print(f"Skip: {recommendation['skip_reason']}")
+
+# Record outcome later
+strategy.record_outcome(
+    recommendation['recommendation_id'],
+    actual_pnl=1500,  # Made $1,500
+    was_assigned=False
+)
+```
+
+#### Adaptive Rules:
+
+1. **Volatility-Based Position Sizing**:
+   - <40% vol: 120% of base (opportunity)
+   - 40-60% vol: 100% of base (normal)
+   - 60-80% vol: 70% of base (caution)
+   - >80% vol: 50% of base (defensive)
+
+2. **Drawdown Management**:
+   - Linear reduction from 0% to -20%
+   - Complete stop at -20% drawdown
+   - Preserves capital during losses
+
+3. **Earnings Awareness**:
+   - Skip trades <7 days to earnings
+   - Adjust DTE to expire before earnings
+   - Avoids Unity's ±15-25% earnings moves
+
+4. **Parameter Adaptation**:
+   - High vol: Lower delta (20-25 vs 30)
+   - High vol: Shorter DTE (28 vs 35)
+   - High vol: Quick profits (25% vs 50%)
+
+5. **Stop Conditions**:
+   - Volatility >100%: Stop trading
+   - Drawdown >20%: Stop trading
+   - Earnings <7 days: Skip trade
+
+#### Configuration:
+
+```yaml
+# No complex configuration needed!
+# Adaptive rules are built into the system
+# Just set your risk tolerance:
+
+risk:
+  max_position_size: 1.00  # For aggressive traders
+  circuit_breakers:
+    max_position_pct: 0.20   # Base position size
+    min_portfolio_value: 10000
 ```
 
 ## Performance Targets
@@ -185,76 +582,163 @@ loader.track_parameter_impact("strategy.delta_target", 0.75)
 
 Maximize: **CAGR - 0.20 × |CVaR₉₅|** with **½-Kelly** position sizing
 
-## Schwab Integration
+## Common Workflows
 
-The project now includes a reliable Schwab client with:
-- **Automatic retry logic** for network failures
-- **Position validation** with OCC symbol parsing
-- **Corporate action detection** from position anomalies
-- **Fallback to cached data** during outages
-- **Self-validation** of all data consistency
-
-### Schwab Client Usage:
-
+### 1. Add New Risk Check
 ```python
+# Quick template for adding a new risk check
+# 1. Add to risk/limits.py:
+class RiskLimits:
+    def check_new_limit(self, value: float) -> Tuple[bool, str]:
+        threshold = self.config.risk.new_limit_threshold
+        if value > threshold:
+            return False, f"New limit exceeded: {value:.2f} > {threshold:.2f}"
+        return True, ""
+
+# 2. Add to schema.py:
+class RiskConfig(BaseModel):
+    new_limit_threshold: float = Field(0.5, ge=0, le=1)
+
+# 3. Update analytics.py:
+def check_risk_limits(self, ...):
+    checks.append(self.limits.check_new_limit(calculated_value))
+
+# 4. Test: pytest tests/test_risk.py::test_new_limit -v
+```
+
+### 2. Add New Options Calculation
+```python
+# Template for new validated calculation
+# In src/unity_wheel/math/options.py:
+@timed_operation(threshold_ms=1.0)
+@validate_inputs
+def new_calculation_validated(
+    S: float, K: float, T: float, r: float, sigma: float
+) -> CalculationResult:
+    \"\"\"New calculation with validation.\"\"\"
+    try:
+        # Validate inputs
+        if not all(x > 0 for x in [S, K, T, sigma]):
+            return CalculationResult(value=float('nan'), confidence=0.0)
+
+        # Calculate
+        result = your_math_here(S, K, T, r, sigma)
+
+        # Validate output
+        if not (0 <= result <= S):
+            return CalculationResult(value=result, confidence=0.5)
+
+        return CalculationResult(value=result, confidence=0.99)
+
+    except Exception as e:
+        logger.error(f"Calculation failed: {e}")
+        return CalculationResult(value=float('nan'), confidence=0.0)
+```
+
+### 3. Debug Production Issue
+```bash
+# 1. Check logs for errors
+grep -E "ERROR|CRITICAL" logs/wheel.log | tail -50 | grep -E "function|message"
+
+# 2. Run diagnostics
+python run_aligned.py --diagnose > diagnostics.txt
+
+# 3. Check specific subsystem
+python -c "
 from src.unity_wheel.schwab import SchwabClient
+from src.unity_wheel.auth import get_auth_client
+auth = get_auth_client()
+print('Auth valid:', auth.is_authenticated())
+print('Token expires:', auth.token_expires_at)
+"
 
-async with SchwabClient(client_id, client_secret) as client:
-    positions = await client.get_positions()  # Never cached
-    account = await client.get_account()      # Cached briefly (30s)
+# 4. Enable debug logging
+export LOG_LEVEL=DEBUG
+python run_aligned.py --portfolio 100000 2>&1 | tee debug.log
 
-    # Detect corporate actions
-    actions = client.detect_corporate_actions(positions)
+# 5. Check metrics database
+sqlite3 exports/metrics.db "
+SELECT * FROM decisions
+WHERE confidence < 0.3 OR execution_time_ms > 500
+ORDER BY timestamp DESC LIMIT 10;"
 ```
 
-### Required Environment Variables:
-- `SCHWAB_CLIENT_ID` - OAuth client ID
-- `SCHWAB_CLIENT_SECRET` - OAuth client secret
+### 4. Performance Optimization
+```bash
+# 1. Profile current performance
+pytest tests/test_performance_benchmarks.py -v
 
-## Future Features Roadmap
+# 2. Make changes with @timed_operation decorator
 
-1. **Schwab OAuth Flow** - Complete OAuth implementation
-2. **Decision Engine** - Multi-criteria scoring with explanations
-3. **ML Enhancement** - Probability adjustments, pattern recognition
-4. **Backtesting** - Historical validation with transaction costs
+# 3. Verify improvement
+python -c "from src.unity_wheel.metrics import metrics_collector; print(metrics_collector.get_performance_stats())"
+```
 
-## Databento Integration
+## Data Sources
 
-The project now includes comprehensive Databento integration for options data:
-
-### Key Features:
-- **Rate-limited client** with automatic retry logic
-- **Smart data filtering** to reduce storage by 80%
-- **Hybrid storage** (local for recent, cloud for historical)
-- **Comprehensive validation** for data quality
-- **Integration with wheel strategy** for candidate selection
-
-### Usage:
+### Databento (Options Data)
 ```python
-# Find wheel candidates
-from src.unity_wheel.databento.integration import DatentoIntegration
-integration = DatentoIntegration(client, storage)
-candidates = await integration.get_wheel_candidates(
-    underlying="U",
-    target_delta=0.30,
-    dte_range=(30, 60)
-)
+# Quick setup
+from src.unity_wheel.databento import DatentoClient
+client = DatentoClient(api_key="xxx")  # Or use DATABENTO_API_KEY env
+
+# Get Unity options
+from src.unity_wheel.databento.integration import get_wheel_candidates
+candidates = await get_wheel_candidates("U", target_delta=0.30)
+
+# Debug connection
+python tools/debug/debug_databento.py
 ```
 
-### Storage:
-- Local: 30 days of data (~5GB for Unity)
-- Cloud: Optional GCS/BigQuery for historical
-- Monthly cost: <$1 for typical usage
+### Schwab (Account Data)
+```python
+# OAuth setup required - see tools/verification/schwab_oauth_fixed.py
+from src.unity_wheel.schwab import SchwabClient
+client = SchwabClient()  # Uses env vars
+positions = await client.get_positions()
+```
 
-See `DATABENTO_INTEGRATION.md` for full details.
+## Critical Implementation Notes
 
-## Notes
+### Data Flow
+```
+Market Data → Validation → Risk Analysis → Strategy → Recommendation
+     ↓             ↓            ↓             ↓            ↓
+  Schwab      DataQuality   RiskLimits   WheelParams   Decision
+ Databento     Anomalies     Analytics    Adaptive      Logging
+```
 
-- Always validate calculations with known test cases
-- Use property-based testing for new functions
-- Log confidence degradation for monitoring
-- Prefer self-diagnostic approaches over manual debugging
+### Key Decorators
+- `@timed_operation(threshold_ms=10.0)` - Performance tracking
+- `@with_recovery(strategy=RecoveryStrategy.FALLBACK)` - Error handling
+- `@cached(ttl_seconds=300)` - Result caching
+- `@validate_inputs` - Pydantic validation
+- `@track_confidence` - Confidence scoring
+
+### Testing Strategy
+- Unit tests: Fast, isolated, property-based
+- Integration tests: `test_autonomous_flow.py`
+- Benchmarks: `test_performance_benchmarks.py`
+- Always validate with known test cases
 - NO BROKER INTEGRATION - recommendations only
+
+## v2.2 Enhancements (January 2025)
+
+### Performance Optimizations
+- **Vectorized Strike Selection**: Process all strikes at once with numpy (10x faster)
+- **Lazy Import Removal**: Moved imports out of hot paths
+- **Confidence-Based Filtering**: Skip low-confidence calculations early
+
+### Code Quality Improvements
+- **No Bare Excepts**: All exceptions are specific with proper logging
+- **Configurable Ticker**: Unity ticker from config, not hardcoded
+- **Unified Position Sizing**: Single source of truth for position calculations
+- **Enhanced Tests**: New tests for databento_unity and position_sizing modules
+
+### New Methods
+- `WheelStrategy.find_optimal_put_strike_vectorized()` - 10x faster strike selection
+- `RiskAnalytics.aggregate_portfolio_greeks()` - Now returns confidence score
+- `PositionSizeResult.confidence` - All position sizing includes confidence
 
 ## v2.0 Enhancements
 
@@ -309,13 +793,121 @@ Pre-commit hooks run automatically:
   - No trading above 150% volatility
   - Minimum 30% confidence required
 
-### Daily Health Check
-- **Script**: `./daily_health_check.py`
-- **Run**: Every morning before trading
-- **Checks**: Data freshness, config health, credentials, performance
+### Monitoring & Health Checks
 
-### Live Monitor
-- **Script**: `./monitor_live.py`
-- **Purpose**: Real-time dashboard with alerts
-- **Updates**: Every 10 seconds
-- **Features**: Risk status, performance, market data, alerts
+#### Daily Health Check
+```bash
+./daily_health_check.py  # Run every morning
+# Checks:
+# - Data freshness (<5min stale)
+# - Config validation
+# - Credentials active
+# - Performance within SLAs
+# - Risk limits not breached
+```
+
+#### Live Monitor
+```bash
+./monitor_live.py  # Real-time dashboard
+# Updates every 10 seconds:
+# - Current positions & P&L
+# - Risk metrics (VaR, Greeks)
+# - Market data status
+# - System health score
+# - Alert notifications
+```
+
+#### Quick Validation
+```bash
+./scripts/housekeeping.sh --quick  # <30 second check
+python -m unity_wheel.validate     # Full environment validation
+```
+
+## Environment Variables
+
+### Required
+```bash
+SCHWAB_CLIENT_ID=xxx
+SCHWAB_CLIENT_SECRET=xxx
+DATABENTO_API_KEY=xxx        # Optional if DATABENTO_SKIP_VALIDATION=true
+```
+
+### Optional Overrides
+```bash
+WHEEL_STRATEGY__DELTA_TARGET=0.25
+WHEEL_ML__ENABLED=true
+WHEEL_TRADING__MODE=paper
+WHEEL_RISK__MAX_POSITION_SIZE=0.30
+DATABENTO_SKIP_VALIDATION=true
+```
+
+## Memory & Resource Optimization
+
+### Memory Usage Tips
+```python
+# Check current memory usage
+import psutil
+import os
+process = psutil.Process(os.getpid())
+print(f"Memory: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+
+# Clear caches if needed
+from src.unity_wheel.utils.cache import get_cache
+get_cache().clear()  # Clears all cached data
+
+# Garbage collection for large operations
+import gc
+gc.collect()  # Force garbage collection
+```
+
+### Resource Limits
+- **Target Memory**: <100MB for typical portfolio
+- **Cache Size**: 1000 entries max
+- **Log Rotation**: 100MB per file, 5 files max
+- **Database Size**: 50MB for metrics.db
+
+## Integration Testing Shortcuts
+
+```bash
+# Test full recommendation flow
+pytest tests/test_autonomous_flow.py::test_full_recommendation_flow -v -s
+
+# Test with real market data (requires credentials)
+pytest tests/test_e2e_recommendation_flow.py -v -m "integration"
+
+# Benchmark performance
+pytest tests/test_performance_benchmarks.py -v --benchmark-only
+
+# Test specific strategy
+pytest tests/test_adaptive_system.py::test_volatility_based_sizing -v
+```
+
+## Monitoring Specific Subsystems
+
+```python
+# Monitor Schwab connection
+from src.unity_wheel.schwab import monitor_connection
+monitor_connection(interval=60)  # Check every 60s
+
+# Monitor Databento data quality
+from src.unity_wheel.databento import monitor_data_quality
+monitor_data_quality(symbol="U", interval=300)  # Every 5 min
+
+# Monitor risk limits
+from src.unity_wheel.risk import monitor_risk_limits
+monitor_risk_limits(portfolio_value=100000)  # Real-time risk monitoring
+```
+
+## Less Common Topics (See below for details)
+
+- [Memory & Resource Optimization](#memory--resource-optimization)
+- [Integration Testing Shortcuts](#integration-testing-shortcuts)
+- [Monitoring Specific Subsystems](#monitoring-specific-subsystems)
+- [v2.0 Enhancements](#v20-enhancements)
+- [Git Hooks & Shell Scripts](#git-hooks)
+
+---
+
+# DETAILED SECTIONS BELOW
+
+The sections below contain detailed information for less common tasks. The quick reference above covers 90% of typical usage.

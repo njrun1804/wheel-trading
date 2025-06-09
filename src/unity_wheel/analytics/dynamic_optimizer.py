@@ -9,11 +9,9 @@ from typing import Dict, NamedTuple, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import scipy.optimize as opt
-from scipy.interpolate import interp1d
 
-from ..utils import get_logger, timed_operation, with_recovery
-from ..utils.recovery import RecoveryStrategy
+from ..config.loader import get_config
+from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
 
@@ -53,10 +51,25 @@ class DynamicOptimizer:
     CVAR_PENALTY = 0.20  # Penalty weight for CVaR
     BASE_KELLY = 0.50  # Half-Kelly as specified
 
-    def __init__(self, symbol: str = "U"):
+    def __init__(self, symbol: str = None, config: Optional[Dict] = None):
+        if symbol is None:
+            app_config = get_config()
+            symbol = app_config.unity.ticker
         self.symbol = symbol
+        self.config = config or {}
         self.vol_history: Optional[pd.Series] = None
         self.optimization_history: list = []
+
+    def _get_config_bounds(self, param_type: str) -> Tuple[float, float]:
+        """Get min/max bounds from config or defaults."""
+        defaults = {"delta": (0.10, 0.40), "dte": (21, 49), "kelly": (0.10, 0.50)}
+        if self.config:
+            bounds = self.config.get("optimization", {}).get("bounds", {})
+            return (
+                bounds.get(f"{param_type}_min", defaults[param_type][0]),
+                bounds.get(f"{param_type}_max", defaults[param_type][1]),
+            )
+        return defaults[param_type]
 
     @timed_operation(threshold_ms=50)
     def optimize_parameters(
@@ -159,8 +172,9 @@ class DynamicOptimizer:
             base_delta + vol_adjustment + momentum_adjustment + iv_adjustment + earnings_adjustment
         )
 
-        # Bounds for safety
-        return np.clip(delta, 0.10, 0.40)
+        # Get bounds and apply
+        delta_min, delta_max = self._get_config_bounds("delta")
+        return np.clip(delta, delta_min, delta_max)
 
     def _calculate_dynamic_dte(self, state: MarketState) -> int:
         """
@@ -181,8 +195,9 @@ class DynamicOptimizer:
         # Round to nearest weekly expiration
         dte_target = int(round(dte_continuous / 7) * 7)
 
-        # Bounds
-        return np.clip(dte_target, 21, 49)
+        # Get bounds and apply
+        dte_min, dte_max = self._get_config_bounds("dte")
+        return int(np.clip(dte_target, dte_min, dte_max))
 
     def _calculate_dynamic_kelly(self, state: MarketState, historical_returns: np.ndarray) -> float:
         """
@@ -211,8 +226,9 @@ class DynamicOptimizer:
 
         kelly = base_kelly * sharpe_factor * vol_factor * data_factor
 
-        # Never exceed half-Kelly, can go lower
-        return min(self.BASE_KELLY, kelly)
+        # Get bounds and apply
+        kelly_min, kelly_max = self._get_config_bounds("kelly")
+        return np.clip(kelly, kelly_min, kelly_max)
 
     def _estimate_cagr(self, delta: float, dte: int, kelly: float, state: MarketState) -> float:
         """Estimate expected CAGR for given parameters."""

@@ -3,7 +3,7 @@
 Provides efficient data ingestion from OPRA options feed and US equities data.
 """
 
-from .client import DatentoClient
+from .client import DatabentoClient
 from .types import (
     DataQuality,
     InstrumentDefinition,
@@ -14,7 +14,7 @@ from .types import (
 )
 
 __all__ = [
-    "DatentoClient",
+    "DatabentoClient",
     "OptionChain",
     "OptionQuote",
     "UnderlyingPrice",

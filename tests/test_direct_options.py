@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import databento as db
 from databento_dbn import Schema, SType
 
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.utils import setup_structured_logging
 
 
@@ -21,7 +21,7 @@ async def test_direct_options():
 
     print("🔍 Testing different approaches for options data...\n")
 
-    client = DatentoClient()
+    client = DatabentoClient()
 
     try:
         # Get a valid date range

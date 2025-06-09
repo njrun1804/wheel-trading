@@ -20,28 +20,23 @@ import pandas as pd
 from databento_dbn import Schema, SType
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from src.unity_wheel.databento.types import (
+from .types import (
     DataQuality,
     InstrumentDefinition,
     OptionChain,
     OptionQuote,
     UnderlyingPrice,
 )
-from src.unity_wheel.secrets.integration import get_databento_api_key
-from src.unity_wheel.utils.logging import StructuredLogger
-from src.unity_wheel.utils.recovery import RecoveryContext
+from ..secrets.integration import get_databento_api_key
+from ..utils.logging import StructuredLogger
+from ..utils.recovery import RecoveryContext
+from ...config.loader import get_config
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
 
-class DatentoClient:
+class DatabentoClient:
     """Databento client optimized for wheel strategy data needs."""
-
-    # Rate limits for Standard plan
-    MAX_CONCURRENT_LIVE = 10  # Per dataset after Feb 16, 2025
-    MAX_HISTORICAL_RPS = 100  # Soft limit
-    MAX_SYMBOLS_PER_REQUEST = 2000
-    MAX_FILE_SIZE_GB = 2  # For HTTP streaming
 
     def __init__(
         self,
@@ -56,6 +51,13 @@ class DatentoClient:
             use_cache: Enable local caching of definitions
             cache_dir: Directory for cached data
         """
+        # Load rate limits from config
+        config = get_config()
+        self.MAX_CONCURRENT_LIVE = config.databento.rate_limits.max_concurrent_live
+        self.MAX_HISTORICAL_RPS = config.databento.rate_limits.max_historical_rps
+        self.MAX_SYMBOLS_PER_REQUEST = config.databento.rate_limits.max_symbols_per_request
+        self.MAX_FILE_SIZE_GB = config.databento.rate_limits.max_file_size_gb
+
         # Use provided API key or fall back to SecretManager
         if not api_key:
             logger.info("No API key provided, retrieving from SecretManager")
@@ -70,7 +72,9 @@ class DatentoClient:
         self.cache_dir = cache_dir
 
         # Rate limiting
-        self._historical_semaphore = asyncio.Semaphore(10)  # Concurrent requests
+        self._historical_semaphore = asyncio.Semaphore(
+            self.MAX_CONCURRENT_LIVE
+        )  # Concurrent requests
         self._last_request_time = 0.0
         self._request_interval = 1.0 / self.MAX_HISTORICAL_RPS
 
@@ -138,24 +142,32 @@ class DatentoClient:
             puts=sorted(puts, key=lambda x: x.instrument_id),
         )
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=2, max=10),
-        retry=retry_if_exception_type((ConnectionError, TimeoutError)),
-    )
     async def _get_definitions(
         self, underlying: str, expiration: datetime
     ) -> List[InstrumentDefinition]:
         """Get instrument definitions with caching and retry."""
-        cache_key = f"{underlying}_{expiration.strftime('%Y%m%d')}"
+        config = get_config()
+        retry_config = config.data.retry
 
-        # Check cache first
-        if self.use_cache and cache_key in self._definitions_cache:
-            logger.debug("definitions_cache_hit", extra={"key": cache_key})
-            return self._definitions_cache[cache_key]
+        @retry(
+            stop=stop_after_attempt(retry_config.max_attempts),
+            wait=wait_exponential(
+                multiplier=1,
+                min=retry_config.delays[0] if retry_config.delays else 2,
+                max=retry_config.delays[-1] if retry_config.delays else 10,
+            ),
+            retry=retry_if_exception_type((ConnectionError, TimeoutError)),
+        )
+        async def _get_with_retry():
+            cache_key = f"{underlying}_{expiration.strftime('%Y%m%d')}"
 
-        async with self._historical_semaphore:
-            await self._rate_limit()
+            # Check cache first
+            if self.use_cache and cache_key in self._definitions_cache:
+                logger.debug("definitions_cache_hit", extra={"key": cache_key})
+                return self._definitions_cache[cache_key]
+
+            async with self._historical_semaphore:
+                await self._rate_limit()
 
             # Request definitions using most recent available date
             # Options definitions are available on trading days before expiration
@@ -195,7 +207,7 @@ class DatentoClient:
                 start=start,
                 end=end,
                 symbols=[f"{underlying}.OPT"],  # Options for underlying
-                stype_in=SType.PARENT,
+                stype_in=SType.PARENT,  # CRITICAL: Must use PARENT for .OPT symbols
             )
 
             # Parse definitions
@@ -224,6 +236,9 @@ class DatentoClient:
             )
 
             return definitions
+
+        # Call the retry-wrapped function
+        return await _get_with_retry()
 
     async def _get_quotes_by_ids(
         self, instrument_ids: List[int], timestamp: Optional[datetime] = None
@@ -343,9 +358,17 @@ class DatentoClient:
         self._last_request_time = asyncio.get_event_loop().time()
 
     async def validate_data_quality(
-        self, chain: OptionChain, max_spread_pct: float = 5.0, min_size: int = 10
+        self, chain: OptionChain, max_spread_pct: float = None, min_size: int = None
     ) -> DataQuality:
         """Validate option chain data quality."""
+        config = get_config()
+
+        # Use config values as defaults
+        if max_spread_pct is None:
+            max_spread_pct = config.data.quality.max_spread_pct
+        if min_size is None:
+            min_size = config.data.quality.min_quote_size
+
         issues = []
 
         # Check spreads

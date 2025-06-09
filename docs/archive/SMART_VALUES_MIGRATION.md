@@ -45,7 +45,7 @@ max_warnings: int = 3
        max_consecutive_losses: 3
        max_daily_loss_pct: 0.02
        max_weekly_loss_pct: 0.05
-     
+
      adaptive_limits:
        base_max_position_pct: 0.20
        volatility_scaling_enabled: true
@@ -136,28 +136,28 @@ max_warnings: int = 3
 ```python
 class AdaptiveRiskLimits:
     """Smart risk limits that adapt to market conditions."""
-    
+
     def __init__(self, config: Config, market_state: MarketState):
         self.config = config
         self.market_state = market_state
         self.performance_tracker = PerformanceTracker()
-        
+
     def get_position_limit(self) -> float:
         """Get adaptive position size limit."""
         base_limit = self.config.risk.base_max_position_pct
-        
+
         # Scale by volatility
         vol_scalar = self._get_volatility_scalar()
-        
+
         # Scale by recent performance
         perf_scalar = self._get_performance_scalar()
-        
+
         # Scale by confidence
         conf_scalar = self._get_confidence_scalar()
-        
+
         # Combine scalars (multiplicative)
         final_limit = base_limit * vol_scalar * perf_scalar * conf_scalar
-        
+
         # Apply bounds
         return max(0.05, min(final_limit, 1.0))  # 5% to 100%
 ```

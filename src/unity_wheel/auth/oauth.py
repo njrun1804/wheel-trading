@@ -16,6 +16,7 @@ from aiohttp import web
 
 from ..utils.logging import get_logger
 from .exceptions import AuthError, InvalidCredentialsError
+from ..config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -183,9 +184,10 @@ class OAuth2Handler:
 
             # Wait for callback with timeout
             try:
-                code = await asyncio.wait_for(
-                    self._auth_code_future, timeout=300  # 5 minute timeout
-                )
+                config = get_config()
+                # Use a longer timeout for OAuth flow (5 minutes)
+                oauth_timeout = max(300, config.data.api_timeouts.total * 5)
+                code = await asyncio.wait_for(self._auth_code_future, timeout=oauth_timeout)
                 logger.info("authorize", status="success", has_code=bool(code))
                 return code
 
@@ -219,8 +221,10 @@ class OAuth2Handler:
 
         async with aiohttp.ClientSession() as session:
             try:
+                config = get_config()
+                timeout = aiohttp.ClientTimeout(total=config.data.api_timeouts.total)
                 async with session.post(
-                    self.token_url, data=token_data, timeout=aiohttp.ClientTimeout(total=30)
+                    self.token_url, data=token_data, timeout=timeout
                 ) as response:
                     response_data = await response.json()
 
@@ -270,8 +274,10 @@ class OAuth2Handler:
 
         async with aiohttp.ClientSession() as session:
             try:
+                config = get_config()
+                timeout = aiohttp.ClientTimeout(total=config.data.api_timeouts.total)
                 async with session.post(
-                    self.token_url, data=token_data, timeout=aiohttp.ClientTimeout(total=30)
+                    self.token_url, data=token_data, timeout=timeout
                 ) as response:
                     response_data = await response.json()
 

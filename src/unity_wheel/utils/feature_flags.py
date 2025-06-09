@@ -10,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
-from . import get_logger
+from .logging import get_logger
 
 logger = get_logger(__name__)
 

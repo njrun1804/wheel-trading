@@ -22,30 +22,59 @@ from ..utils import (
 )
 from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
 
-# from ..data import get_market_validator, get_anomaly_detector  # TODO: Fix circular import
+# Lazy imports to avoid circular dependency
+_market_validator = None
+_anomaly_detector = None
+
+
+def _get_market_validator():
+    """Lazy import market validator."""
+    global _market_validator
+    if _market_validator is None:
+        from ..data import get_market_validator
+
+        _market_validator = get_market_validator()
+    return _market_validator
+
+
+def _get_anomaly_detector():
+    """Lazy import anomaly detector."""
+    global _anomaly_detector
+    if _anomaly_detector is None:
+        from ..data import get_anomaly_detector
+
+        _anomaly_detector = get_anomaly_detector()
+    return _anomaly_detector
+
 
 logger = get_logger(__name__)
-structured_logger = StructuredLogger(__name__)
+structured_logger = StructuredLogger(logger)
 decision_logger = DecisionLogger(structured_logger)
 
 
 class TradingConstraints:
     """Trading constraints and validation rules."""
 
-    # Unity-specific constraints
-    MAX_CONCURRENT_PUTS = 3
-    MAX_POSITION_PCT = 0.12  # 12% per leg
-    MIN_CONFIDENCE = 0.75  # 75% confidence threshold
-    MAX_DECISION_TIME = 0.2  # 200ms
+    def __init__(self):
+        """Initialize constraints from config."""
+        from ..config.loader import get_config
 
-    # Liquidity requirements
-    MIN_BID_ASK_SPREAD = 0.20
-    MIN_VOLUME = 10
-    MIN_OPEN_INTEREST = 100
+        config = get_config()
 
-    # Commission
-    COMMISSION_PER_CONTRACT = 0.65
-    CONTRACTS_PER_TRADE = 100
+        # Unity-specific constraints
+        self.MAX_CONCURRENT_PUTS = config.operations.api.max_concurrent_puts
+        self.MAX_POSITION_PCT = config.operations.api.max_position_pct
+        self.MIN_CONFIDENCE = config.operations.api.min_confidence
+        self.MAX_DECISION_TIME = config.operations.api.max_decision_time
+
+        # Liquidity requirements
+        self.MIN_BID_ASK_SPREAD = config.operations.api.min_bid_ask_spread
+        self.MIN_VOLUME = config.operations.api.min_volume
+        self.MIN_OPEN_INTEREST = config.operations.api.min_open_interest
+
+        # Commission
+        self.COMMISSION_PER_CONTRACT = config.trading.execution.commission_per_contract
+        self.CONTRACTS_PER_TRADE = config.trading.execution.contracts_per_trade
 
 
 class WheelAdvisor:
@@ -99,28 +128,21 @@ class WheelAdvisor:
 
         # Log decision start
         decision_logger.log_decision(
-            decision_id=decision_id,
             action="START",
+            rationale="Starting position analysis",
             confidence=0.0,
-            expected_return=0.0,
             risk_metrics={},
-            features_used=[],
+            metadata={
+                "decision_id": decision_id,
+                "expected_return": 0.0,
+                "features_used": [],
+            },
         )
 
         try:
             # Validate market data with comprehensive data quality checks
-            # validator = get_market_validator()
-            # validation_result = validator.validate(market_snapshot)
-            # TODO: Fix circular import
-            validation_result = type(
-                "obj",
-                (object,),
-                {
-                    "is_valid": True,
-                    "issues": [],
-                    "quality_level": type("obj", (object,), {"value": "good"}),
-                },
-            )()
+            validator = _get_market_validator()
+            validation_result = validator.validate(market_snapshot)
 
             if not validation_result.is_valid:
                 error_msg = f"Data quality issues: {len(validation_result.issues)} errors found"
@@ -134,9 +156,8 @@ class WheelAdvisor:
                 return self._create_hold_recommendation(error_msg)
 
             # Check for anomalies
-            # anomaly_detector = get_anomaly_detector()
-            # anomalies = anomaly_detector.detect_market_anomalies(market_snapshot)
-            anomalies = []  # TODO: Fix circular import
+            anomaly_detector = _get_anomaly_detector()
+            anomalies = anomaly_detector.detect_market_anomalies(market_snapshot)
             if anomalies:
                 logger.info(
                     f"Detected {len(anomalies)} market anomalies",
@@ -276,21 +297,24 @@ class WheelAdvisor:
 
             # Log successful decision
             decision_logger.log_decision(
-                decision_id=decision_id,
                 action="ADJUST",
+                rationale=f"Sell {contracts} put contracts at {strike_rec.strike} strike",
                 confidence=confidence,
-                expected_return=risk_metrics["expected_return"],
                 risk_metrics=risk_metrics,
-                features_used=[
-                    "delta",
-                    "volatility",
-                    "dte",
-                    "premium_yield",
-                    "edge_ratio",
-                    "var_95",
-                    "margin_utilization",
-                ],
-                execution_time_ms=elapsed * 1000,
+                metadata={
+                    "decision_id": decision_id,
+                    "expected_return": risk_metrics["expected_return"],
+                    "features_used": [
+                        "delta",
+                        "volatility",
+                        "dte",
+                        "premium_yield",
+                        "edge_ratio",
+                        "var_95",
+                        "margin_utilization",
+                    ],
+                    "execution_time_ms": elapsed * 1000,
+                },
             )
 
             # Track in metrics collector
@@ -311,13 +335,17 @@ class WheelAdvisor:
             # Log failed decision
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             decision_logger.log_decision(
-                decision_id=decision_id,
                 action="ERROR",
+                rationale=f"Error generating recommendation: {str(e)}",
                 confidence=0.0,
-                expected_return=0.0,
                 risk_metrics={},
-                features_used=[],
-                execution_time_ms=elapsed * 1000,
+                metadata={
+                    "decision_id": decision_id,
+                    "expected_return": 0.0,
+                    "features_used": [],
+                    "execution_time_ms": elapsed * 1000,
+                    "error": str(e),
+                },
             )
 
             return self._create_hold_recommendation(f"Calculation error: {str(e)}")

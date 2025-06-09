@@ -10,6 +10,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple
 import numpy as np
 import pandas as pd
 
+from ..config.loader import get_config
 from ..models.position import Position
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
@@ -62,8 +63,11 @@ class IntegratedDecisionEngine:
     """
 
     def __init__(
-        self, symbol: str = "U", portfolio_value: float = 100000, config: Optional[Dict] = None
+        self, symbol: str = None, portfolio_value: float = 100000, config: Optional[Dict] = None
     ):
+        if symbol is None:
+            app_config = get_config()
+            symbol = app_config.unity.ticker
         self.symbol = symbol
         self.portfolio_value = portfolio_value
         self.config = config or {}

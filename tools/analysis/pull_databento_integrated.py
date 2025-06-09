@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.config.unity import TICKER
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.databento.databento_storage_adapter import DatabentoStorageAdapter
 from src.unity_wheel.databento.integration import DatentoIntegration
 from src.unity_wheel.databento.validation import DataValidator
@@ -38,7 +38,7 @@ async def pull_wheel_data_integrated():
     await databento_adapter.initialize()
 
     # Initialize client - will use Google Secrets for API key
-    client = DatentoClient()
+    client = DatabentoClient()
 
     # Initialize integration with storage
     integration = DatentoIntegration(client, databento_adapter)

@@ -19,7 +19,7 @@ async def test_spy_options():
 
     print("🔍 Testing Databento with SPY options...\n")
 
-    client = DatentoClient()
+    client = DatabentoClient()
     storage = DataStorage(local_dir="data/databento")
     integration = DatentoIntegration(client, storage)
 

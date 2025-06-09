@@ -283,10 +283,9 @@ class ObservabilityExporter:
             system_health = self._calculate_system_health(perf_stats, validation_stats, flag_report)
 
             # Log export
-            structured_logger.log(
-                level="INFO",
-                message="Collected observability metrics",
-                context={
+            logger.info(
+                "Collected observability metrics",
+                extra={
                     "metrics_count": len(metrics),
                     "events_count": len(events),
                     "alerts_count": len(alerts),
@@ -579,8 +578,8 @@ class ObservabilityExporter:
                     "avg_confidence": result[1] or 0.0,
                     "success_rate": 0.0,  # Not tracked in recommendation-only system
                 }
-        except:
-            pass
+        except (duckdb.Error, AttributeError) as e:
+            logger.warning(f"Failed to get decision statistics: {e}")
         return {"total_decisions": 0}
 
     def _get_validation_statistics(self, conn: duckdb.DuckDBPyConnection) -> Dict[str, Any]:
@@ -614,7 +613,8 @@ class ObservabilityExporter:
             }
 
             return {"features": features}
-        except:
+        except (duckdb.Error, KeyError) as e:
+            logger.warning(f"Failed to get system health report: {e}")
             return {"features": {}}
 
 

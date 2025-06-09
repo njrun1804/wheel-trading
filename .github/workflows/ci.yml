@@ -17,75 +17,75 @@ jobs:
         include:
           - os: ubuntu-latest
             name: "Development Environment (Claude Code)"
-          - os: macos-latest  
+          - os: macos-latest
             name: "Runtime Environment (User)"
         python-version: ["3.12"]
-    
+
     name: ${{ matrix.name }}
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
         virtualenvs-create: true
         virtualenvs-in-project: true
-    
+
     - name: Load cached dependencies
       uses: actions/cache@v4
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-    
+
     - name: Install dependencies
       run: poetry install --no-interaction
-    
+
     # Core functionality tests only
     - name: Test options mathematics
       run: |
         poetry run pytest tests/test_math.py -v
         poetry run pytest tests/test_options_properties.py -v
-    
+
     - name: Test risk calculations
       run: poetry run pytest tests/test_analytics.py tests/test_regime_aware_risk.py -v
-    
+
     - name: Test recommendation flow
       run: poetry run pytest tests/test_e2e_recommendation_flow.py -v
-    
+
     - name: Validate configuration
       run: poetry run python -m unity_wheel.validate
-    
+
     # Type checking for critical modules only
     - name: Type check critical code
       if: matrix.os == 'ubuntu-latest'  # Only need to run once
       run: |
         poetry run mypy src/unity_wheel/math/ --strict
         poetry run mypy src/unity_wheel/risk/ --strict
-    
+
   quick-validation:
     needs: test-environments
     runs-on: ubuntu-latest
     name: "Validate Recommendations"
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    
+
     - name: Install Poetry and dependencies
       run: |
         pip install poetry
         poetry install --no-interaction
-    
+
     - name: Sanity check recommendations
       run: |
         poetry run python -c "
@@ -94,7 +94,7 @@ jobs:
         from src.unity_wheel.databento.types import OptionChain, OptionQuote
         from decimal import Decimal
         from datetime import datetime, timedelta
-        
+
         # Quick sanity check
         advisor = WheelAdvisor()
         account = AccountInfo(
@@ -102,7 +102,7 @@ jobs:
             cash_balance=Decimal('100000'),
             buying_power=Decimal('200000')
         )
-        
+
         # Create minimal market data
         chain = OptionChain(
             underlying='U',
@@ -121,14 +121,14 @@ jobs:
                 delta=Decimal('-0.30')
             )]
         )
-        
+
         result = advisor.advise_position(account, [], {'U': chain})
-        
+
         # Basic sanity checks
         assert result is not None, 'Should produce recommendation'
         assert result.confidence > 0, 'Should have positive confidence'
         assert result.primary_action is not None, 'Should have an action'
-        
+
         print(f'✓ Recommendation system working')
         print(f'  Action: {result.primary_action.action_type}')
         print(f'  Confidence: {result.confidence:.0%}')

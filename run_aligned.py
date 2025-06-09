@@ -5,9 +5,13 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 from datetime import datetime
 from typing import Any, Final, Literal
+
+# Add project root to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import click
 from rich.console import Console
@@ -17,6 +21,7 @@ import src.unity_wheel as unity_wheel
 from src.config import get_settings
 from src.config.unity import COMPANY_NAME, TICKER
 from src.unity_wheel import __version__, get_version_string
+from src.unity_wheel.__version__ import API_VERSION
 from src.unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
 from src.unity_wheel.diagnostics import SelfDiagnostics
 from src.unity_wheel.monitoring import get_performance_monitor
@@ -56,7 +61,7 @@ def setup_deterministic_environment() -> None:
         extra={
             "seed": SEED,
             "version": __version__,
-            "api_version": unity_wheel.__version__.API_VERSION,
+            "api_version": API_VERSION,
         },
     )
 
@@ -280,7 +285,7 @@ def main(
                         "components": {
                             k: v for k, v in unity_wheel.__version__.COMPONENT_VERSIONS.items()
                         },
-                        "api_version": unity_wheel.__version__.API_VERSION,
+                        "api_version": API_VERSION,
                     },
                     indent=2,
                 )

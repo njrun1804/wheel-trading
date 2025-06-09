@@ -14,10 +14,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from src.unity_wheel.analytics import IntegratedDecisionEngine
 from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.secrets import SecretManager
 from src.unity_wheel.storage import UnifiedStorage
 from src.unity_wheel.utils import get_logger
+from src.config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -27,7 +28,8 @@ async def check_data_freshness(storage: UnifiedStorage) -> dict:
     results = {"status": "✅", "issues": []}
 
     # Check Unity price data
-    latest = await storage.get_latest_price("U")
+    config = get_config()
+    latest = await storage.get_latest_price(config.unity.ticker)
     if latest:
         days_old = (datetime.now() - latest["date"]).days
         if days_old > 1:
@@ -38,7 +40,7 @@ async def check_data_freshness(storage: UnifiedStorage) -> dict:
         results["issues"].append("No price data found")
 
     # Check if we have enough historical data
-    historical = await storage.get_price_history("U", days=750)
+    historical = await storage.get_price_history(config.unity.ticker, days=750)
     if len(historical) < 500:
         results["status"] = "⚠️"
         results["issues"].append(f"Only {len(historical)} days of history (need 750)")
@@ -105,7 +107,8 @@ async def test_decision_engine() -> dict:
     results = {"status": "✅", "issues": []}
 
     try:
-        engine = IntegratedDecisionEngine("U", 100000)
+        config = get_config()
+        engine = IntegratedDecisionEngine(config.unity.ticker, 100000)
 
         # Mock minimal data for testing
         mock_prices = {

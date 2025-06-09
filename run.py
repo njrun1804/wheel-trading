@@ -9,6 +9,7 @@ import sys
 from datetime import datetime
 
 from src.config import get_settings
+from src.config.loader import get_config
 from src.unity_wheel.diagnostics import SelfDiagnostics
 from src.unity_wheel.strategy import WheelParameters, WheelStrategy
 
@@ -32,7 +33,13 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Unity Wheel Trading Strategy Decision Engine")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    parser.add_argument("--ticker", default="U", help="Ticker to analyze (default: U)")
+
+    config = get_config()
+    parser.add_argument(
+        "--ticker",
+        default=config.unity.ticker,
+        help=f"Ticker to analyze (default: {config.unity.ticker})",
+    )
     parser.add_argument("--portfolio", type=float, default=100000, help="Portfolio value")
     parser.add_argument("--diagnose", action="store_true", help="Run self-diagnostics")
 

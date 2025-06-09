@@ -26,6 +26,9 @@ coverage.xml
 # pyenv
 .python-version
 
+# Mypy
+.mypy_cache/
+
 # Coverage reports
 htmlcov/
 .nyc_output/

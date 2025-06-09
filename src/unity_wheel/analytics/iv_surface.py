@@ -12,6 +12,7 @@ import pandas as pd
 import scipy.stats as stats
 from scipy.interpolate import interp1d
 
+from ..config.loader import get_config
 from ..models.position import PositionType
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
@@ -55,7 +56,7 @@ class IVSurfaceAnalyzer:
         self.iv_history: Dict[str, pd.DataFrame] = {}
 
     @timed_operation(threshold_ms=50)
-    def analyze_iv_surface(self, option_chain: Dict, symbol: str = "U") -> IVMetrics:
+    def analyze_iv_surface(self, option_chain: Dict, symbol: str = None) -> IVMetrics:
         """
         Analyze current IV surface and historical patterns.
 
@@ -66,6 +67,9 @@ class IVSurfaceAnalyzer:
         Returns:
             Comprehensive IV metrics
         """
+        if symbol is None:
+            config = get_config()
+            symbol = config.unity.ticker
         logger.info(f"Analyzing IV surface for {symbol}")
 
         # Extract current ATM IV

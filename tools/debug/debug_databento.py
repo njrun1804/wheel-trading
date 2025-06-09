@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.utils import setup_structured_logging
 
 
@@ -18,7 +18,7 @@ async def debug_databento():
 
     print("🔍 Debugging Databento data retrieval...\n")
 
-    client = DatentoClient()
+    client = DatabentoClient()
 
     try:
         # Test 1: Check if we can get any data

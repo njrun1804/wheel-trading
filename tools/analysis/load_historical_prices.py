@@ -12,7 +12,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.config.unity import TICKER
-from src.unity_wheel.databento import DatentoClient
+from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.databento.price_history_loader import PriceHistoryLoader
 from src.unity_wheel.storage import Storage, StorageConfig
 from src.unity_wheel.utils import setup_structured_logging
@@ -35,7 +35,7 @@ async def load_historical_data():
     storage = Storage(StorageConfig())
     await storage.initialize()
 
-    client = DatentoClient()
+    client = DatabentoClient()
     loader = PriceHistoryLoader(client, storage)
 
     try:
