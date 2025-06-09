@@ -101,27 +101,27 @@ class DatabentoStorage:
     async def store_options_data(self, chain_data):
         # 1. Apply moneyness filter
         filtered = self._filter_by_moneyness(chain_data)
-        
+
         # 2. Calculate Greeks if missing
         enriched = await self._enrich_with_greeks(filtered)
-        
+
         # 3. Store in DuckDB
         await self.cache.store_option_chain(enriched)
-        
+
         # 4. Optional GCS backup (daily aggregates only)
         if self.gcs_enabled:
             await self._backup_daily_snapshot(enriched)
-    
+
     def _filter_by_moneyness(self, chain_data):
         """Keep only options within 20% of spot"""
         spot = chain_data['spot_price']
         min_strike = spot * 0.8
         max_strike = spot * 1.2
-        
+
         return {
-            'calls': [c for c in chain_data['calls'] 
+            'calls': [c for c in chain_data['calls']
                      if min_strike <= c['strike'] <= max_strike],
-            'puts': [p for p in chain_data['puts'] 
+            'puts': [p for p in chain_data['puts']
                     if min_strike <= p['strike'] <= max_strike]
         }
 ```
@@ -131,19 +131,19 @@ class DatabentoStorage:
 async def get_wheel_candidates(self, symbol, target_delta=0.30):
     # 1. Check cache first
     cached = await self.storage.get_candidates(
-        symbol, 
+        symbol,
         target_delta,
         max_age_minutes=15
     )
     if cached:
         return cached
-    
+
     # 2. Fetch from Databento
     chain = await self.databento.get_option_chain(symbol)
-    
+
     # 3. Filter and calculate
     candidates = self._find_wheel_candidates(chain, target_delta)
-    
+
     # 4. Store and return
     await self.storage.store_candidates(candidates)
     return candidates

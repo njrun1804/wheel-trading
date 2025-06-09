@@ -9,33 +9,27 @@ Implements:
 """
 
 import asyncio
+import logging
 import os
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional, Dict, Set, AsyncIterator
 from decimal import Decimal
-import logging
+from typing import AsyncIterator, Dict, List, Optional, Set
 
 import databento as db
-from databento_dbn import SType, Schema
 import pandas as pd
-from tenacity import (
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-    retry_if_exception_type,
-)
+from databento_dbn import Schema, SType
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from src.unity_wheel.utils.logging import StructuredLogger
-from src.unity_wheel.utils.recovery import RecoveryContext
-from src.unity_wheel.secrets.integration import get_databento_api_key
 from src.unity_wheel.databento.types import (
+    DataQuality,
     InstrumentDefinition,
+    OptionChain,
     OptionQuote,
     UnderlyingPrice,
-    OptionChain,
-    DataQuality,
 )
-
+from src.unity_wheel.secrets.integration import get_databento_api_key
+from src.unity_wheel.utils.logging import StructuredLogger
+from src.unity_wheel.utils.recovery import RecoveryContext
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -66,7 +60,7 @@ class DatentoClient:
         if not api_key:
             logger.info("No API key provided, retrieving from SecretManager")
             api_key = get_databento_api_key()
-        
+
         self.api_key = api_key
         if not self.api_key:
             raise ValueError("Databento API key required")
@@ -87,7 +81,9 @@ class DatentoClient:
         # Live session management
         self._live_sessions: Dict[str, db.Live] = {}
 
-        logger.info("databento_client_initialized", extra={"use_cache": use_cache, "cache_dir": cache_dir})
+        logger.info(
+            "databento_client_initialized", extra={"use_cache": use_cache, "cache_dir": cache_dir}
+        )
 
     async def get_option_chain(
         self, underlying: str, expiration: datetime, timestamp: Optional[datetime] = None
@@ -108,7 +104,7 @@ class DatentoClient:
                 "underlying": underlying,
                 "expiration": expiration.isoformat(),
                 "timestamp": timestamp.isoformat() if timestamp else "live",
-            }
+            },
         )
 
         # Get instrument definitions first
@@ -164,7 +160,7 @@ class DatentoClient:
             # Request definitions using most recent available date
             # Options definitions are available on trading days before expiration
             today = datetime.now(timezone.utc)
-            
+
             # Find last trading day (skip weekends)
             if today.weekday() >= 5:  # Saturday or Sunday
                 days_back = today.weekday() - 4  # Back to Friday
@@ -172,9 +168,9 @@ class DatentoClient:
             else:
                 # Use previous day for weekdays
                 last_trading_day = today - timedelta(days=1)
-            
+
             last_trading_day = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
-            
+
             if expiration > today:
                 # Use last trading day for future expirations
                 end = last_trading_day
@@ -190,7 +186,7 @@ class DatentoClient:
                     "underlying": underlying,
                     "start": start.isoformat(),
                     "end": end.isoformat(),
-                }
+                },
             )
 
             response = self.client.timeseries.get_range(
@@ -210,7 +206,9 @@ class DatentoClient:
                     if defn.expiration.date() == expiration.date():
                         definitions.append(defn)
                 except Exception as e:
-                    logger.warning("definition_parse_error", extra={"error": str(e), "record": record})
+                    logger.warning(
+                        "definition_parse_error", extra={"error": str(e), "record": record}
+                    )
 
             # Cache results
             if self.use_cache:
@@ -222,7 +220,7 @@ class DatentoClient:
                     "count": len(definitions),
                     "underlying": underlying,
                     "expiration": expiration.isoformat(),
-                }
+                },
             )
 
             return definitions
@@ -304,7 +302,7 @@ class DatentoClient:
             else:
                 # Get latest available data from last trading day
                 today = datetime.now(timezone.utc)
-                
+
                 # Find last trading day (skip weekends)
                 if today.weekday() >= 5:  # Saturday or Sunday
                     days_back = today.weekday() - 4  # Back to Friday
@@ -312,7 +310,7 @@ class DatentoClient:
                 else:
                     # Use previous day for weekdays
                     last_trading_day = today - timedelta(days=1)
-                
+
                 end = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
                 start = end - timedelta(days=1)
 
@@ -367,7 +365,9 @@ class DatentoClient:
         liquidity_ok = low_liquidity < len(chain.calls + chain.puts) * 0.2
 
         # Check staleness
-        staleness = (datetime.now(timezone.utc).replace(tzinfo=None) - chain.timestamp).total_seconds()
+        staleness = (
+            datetime.now(timezone.utc).replace(tzinfo=None) - chain.timestamp
+        ).total_seconds()
 
         # Calculate confidence
         confidence = 1.0

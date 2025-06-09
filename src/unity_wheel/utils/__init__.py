@@ -1,6 +1,7 @@
 """Utility modules for Unity wheel trading."""
 
 from .cache import cached, get_cache_stats, invalidate_cache
+from .feature_flags import FeatureFlags, FeatureStatus, get_feature_flags
 from .logging import (
     DecisionLogger,
     PerformanceLogger,
@@ -17,11 +18,6 @@ from .recovery import (
     degradation_manager,
     recovery_manager,
     with_recovery,
-)
-from .feature_flags import (
-    FeatureFlags,
-    FeatureStatus,
-    get_feature_flags,
 )
 
 __all__ = [

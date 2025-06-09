@@ -19,7 +19,7 @@ log() {
 
 check_health() {
     log "Running system health check..."
-    
+
     # Run diagnostics
     if python "$PROJECT_ROOT/run_on_demand.py" --diagnose 2>&1; then
         log "✅ System diagnostics passed"
@@ -32,10 +32,10 @@ check_health() {
 
 check_storage() {
     log "Checking storage health..."
-    
+
     # Check storage statistics
     python "$PROJECT_ROOT/run_on_demand.py" --storage-stats > /tmp/storage_stats.json 2>&1
-    
+
     # Parse results if jq is available
     if command -v jq &> /dev/null; then
         DB_SIZE=$(jq '.db_size_mb' /tmp/storage_stats.json 2>/dev/null || echo "0")
@@ -52,7 +52,7 @@ check_storage() {
 
 check_cache() {
     log "Checking cache efficiency..."
-    
+
     python -c "
 import asyncio
 from src.unity_wheel.storage import Storage
@@ -61,7 +61,7 @@ async def check():
     storage = Storage()
     await storage.initialize()
     stats = await storage.get_storage_stats()
-    
+
     # Calculate cache age
     for table in ['option_chains', 'position_snapshots']:
         key = f'{table}_oldest_days'
@@ -71,16 +71,16 @@ async def check():
                 print(f'⚠️  Old data in {table}: {days} days')
             else:
                 print(f'✅ {table} data age: {days} days')
-    
+
     print(f'Cache size: {stats[\"db_size_mb\"]:.1f} MB')
-    
+
 asyncio.run(check())
 " 2>&1 || log "Failed to check cache statistics"
 }
 
 check_credentials() {
     log "Checking API credentials..."
-    
+
     python -c "
 from src.unity_wheel.secrets import SecretManager
 
@@ -110,14 +110,14 @@ else:
 
 cleanup_old_data() {
     log "Cleaning up old data..."
-    
+
     # Remove old cache files
     find "$PROJECT_ROOT" -name "*.cache" -mtime +7 -delete 2>/dev/null || true
-    
+
     # Remove old export files
     find "$PROJECT_ROOT/exports" -name "*.json" -mtime +30 -delete 2>/dev/null || true
     find "$PROJECT_ROOT/exports" -name "*.csv" -mtime +30 -delete 2>/dev/null || true
-    
+
     log "✅ Cleanup complete"
 }
 
@@ -126,10 +126,10 @@ export_metrics() {
         log "Exporting metrics..."
         timestamp=$(date +%Y%m%d_%H%M%S)
         mkdir -p "$PROJECT_ROOT/exports"
-        
+
         # Export storage stats
         python "$PROJECT_ROOT/run_on_demand.py" --storage-stats > "$PROJECT_ROOT/exports/storage_${timestamp}.json" 2>&1
-        
+
         log "✅ Metrics exported to exports/storage_${timestamp}.json"
     fi
 }

@@ -16,21 +16,21 @@ We have 766 days of Unity (U) historical price data with identified volatility r
 ```python
 class IVSurfaceAnalyzer:
     """Analyze implied volatility patterns from options data."""
-    
+
     def calculate_iv_metrics(self):
         # IV Rank (0-100 percentile over 1 year)
         # IV Percentile (% of days below current IV)
         # Term structure (front month vs back month)
         # Skew (25 delta put vs 25 delta call)
         # IV mean reversion speed
-        
+
     def detect_iv_regime(self):
         # Contango vs backwardation
         # High vs low IV environment
         # Skew regime (crash protection demand)
 ```
 
-**Why Important**: 
+**Why Important**:
 - High IV rank (>70) = sell premium aggressively
 - Low IV rank (<30) = reduce positions, tighten strikes
 - Skew changes = market fear indicators
@@ -40,7 +40,7 @@ class IVSurfaceAnalyzer:
 ```python
 class SeasonalityDetector:
     """Detect recurring patterns in Unity's behavior."""
-    
+
     def analyze_patterns(self):
         # Day of week effects
         # Monthly patterns (option expiration effects)
@@ -60,13 +60,13 @@ class SeasonalityDetector:
 ```python
 class EventImpactAnalyzer:
     """Quantify impact of scheduled events."""
-    
+
     def analyze_earnings_impact(self):
         # Average move on earnings
         # IV expansion timeline (when to enter)
         # IV crush magnitude (profit potential)
         # Optimal strategy adjustments
-        
+
     def analyze_macro_impact(self):
         # Fed meeting impacts
         # CPI/Jobs report correlation
@@ -83,7 +83,7 @@ class EventImpactAnalyzer:
 ```python
 class AnomalyDetector:
     """Detect when current market deviates from historical norms."""
-    
+
     def detect_anomalies(self):
         # Price action anomalies (unusual moves)
         # Volume anomalies (institutional activity)
@@ -103,13 +103,13 @@ class AnomalyDetector:
 ```python
 class DynamicOptimizer:
     """Continuously optimize parameters based on recent performance."""
-    
+
     def optimize_parameters(self):
         # Track actual vs expected outcomes
         # Adjust deltas based on assignment frequency
         # Optimize DTE based on theta decay curves
         # Fine-tune position sizing
-        
+
     def calculate_expectancy(self):
         # Win rate by delta/DTE combination
         # Average profit per trade
@@ -124,16 +124,16 @@ class DynamicOptimizer:
 async def make_wheel_decision(current_market_data):
     # 1. Identify current regime
     regime = regime_detector.get_current_regime()
-    
+
     # 2. Get optimal parameters
     params = market_calibrator.calibrate_from_history()
-    
+
     # 3. Check for anomalies
     anomalies = anomaly_detector.check_current_market()
-    
+
     # 4. Adjust for events
     event_adj = event_analyzer.get_adjustments()
-    
+
     # 5. Generate final recommendation
     return WheelRecommendation(
         action="SELL_PUT",
@@ -152,31 +152,31 @@ async def make_wheel_decision(current_market_data):
 analytics:
   iv_rank_period: 252  # days for IV rank calculation
   regime_lookback: 60  # days for regime detection
-  
+
   # Regime-specific overrides
   regimes:
     low_vol:
       delta_target: 0.30
       dte_target: 45
       kelly_fraction: 0.50
-    
+
     medium_vol:
       delta_target: 0.25
       dte_target: 35
       kelly_fraction: 0.33
-    
+
     high_vol:
       delta_target: 0.20
       dte_target: 25
       kelly_fraction: 0.25
-  
+
   # Event adjustments
   events:
     earnings:
       avoid_days_before: 5
       iv_expansion_threshold: 1.5
       position_reduction: 0.5
-    
+
     fed_meetings:
       position_reduction: 0.25
 ```
@@ -186,13 +186,13 @@ analytics:
 ```python
 class WheelBacktester:
     """Validate parameters using historical data."""
-    
+
     def backtest_parameters(self, params: OptimalParameters):
         # Simulate wheel trades using historical data
         # Account for assignment probability
         # Include transaction costs
         # Calculate risk-adjusted returns
-        
+
     def optimize_via_backtest(self):
         # Grid search parameter space
         # Find optimal delta/DTE combinations
@@ -202,7 +202,7 @@ class WheelBacktester:
 ## Implementation Priority
 
 1. **IV Surface Analyzer** (High) - Critical for timing entries
-2. **Anomaly Detection** (High) - Avoid trading in abnormal conditions  
+2. **Anomaly Detection** (High) - Avoid trading in abnormal conditions
 3. **Event Impact Analyzer** (Medium) - Important for Unity earnings
 4. **Dynamic Optimizer** (Medium) - Continuous improvement
 5. **Seasonality Detector** (Low) - Nice to have

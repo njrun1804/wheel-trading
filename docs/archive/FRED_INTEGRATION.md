@@ -56,7 +56,7 @@ rate, confidence = await manager.get_or_fetch_risk_free_rate(
 FRED data is stored in these DuckDB tables:
 
 1. **fred_series** - Series metadata
-2. **fred_observations** - Time series data  
+2. **fred_observations** - Time series data
 3. **fred_features** - Calculated features (SMA, volatility)
 4. **risk_metrics** - Daily risk metrics cache
 
@@ -70,7 +70,7 @@ FRED data is stored in these DuckDB tables:
 The system tracks these key series for wheel strategy:
 
 - **Risk-free rates**: DGS3, DGS1, DFF
-- **Volatility**: VIXCLS, VXDCLS  
+- **Volatility**: VIXCLS, VXDCLS
 - **Liquidity**: TEDRATE, BAMLH0A0HYM2
 - **Economic**: UNRATE, CPIAUCSL
 

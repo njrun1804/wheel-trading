@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 class Account:
     """
     Immutable account snapshot with validation.
-    
+
     Represents the state of a trading account at a specific point in time.
     All monetary values are in USD.
-    
+
     Attributes
     ----------
     cash_balance : float
@@ -28,7 +28,7 @@ class Account:
         Amount of margin currently in use
     timestamp : datetime
         When this snapshot was taken (UTC)
-    
+
     Properties
     ----------
     net_liquidation_value : float
@@ -37,7 +37,7 @@ class Account:
         Remaining margin capacity
     margin_utilization : float
         Percentage of margin capacity used
-    
+
     Examples
     --------
     >>> from datetime import datetime, timezone
@@ -63,22 +63,22 @@ class Account:
         # Validate cash balance
         if self.cash_balance < 0:
             raise ValueError(f"Cash balance cannot be negative, got {self.cash_balance}")
-        
+
         # Validate buying power
         if self.buying_power < 0:
             raise ValueError(f"Buying power cannot be negative, got {self.buying_power}")
-        
+
         # Validate margin used
         if self.margin_used < 0:
             raise ValueError(f"Margin used cannot be negative, got {self.margin_used}")
-        
+
         # Buying power should be at least cash balance
         if self.buying_power < self.cash_balance:
             raise ValueError(
                 f"Buying power ({self.buying_power}) cannot be less than "
                 f"cash balance ({self.cash_balance})"
             )
-        
+
         # Margin used cannot exceed total margin available
         total_margin = self.buying_power - self.cash_balance
         if self.margin_used > total_margin:
@@ -86,11 +86,11 @@ class Account:
                 f"Margin used ({self.margin_used}) exceeds total margin "
                 f"available ({total_margin})"
             )
-        
+
         # Ensure timestamp is timezone-aware
         if self.timestamp.tzinfo is None:
             raise ValueError("Timestamp must be timezone-aware")
-        
+
         logger.debug(
             "Account snapshot created",
             extra={
@@ -134,12 +134,12 @@ class Account:
     def validate_position_size(self, required_capital: float) -> bool:
         """
         Check if account can support a position requiring given capital.
-        
+
         Parameters
         ----------
         required_capital : float
             Capital required for the position
-        
+
         Returns
         -------
         bool
@@ -166,7 +166,7 @@ class Account:
         timestamp = data["timestamp"]
         if isinstance(timestamp, str):
             timestamp = datetime.fromisoformat(timestamp)
-        
+
         return cls(
             cash_balance=float(data["cash_balance"]),
             buying_power=float(data["buying_power"]),

@@ -2,7 +2,7 @@
 
 ## ✅ What's Working
 - Secret management system (local encrypted storage)
-- FRED API integration  
+- FRED API integration
 - Databento API integration (when configured)
 - Options math calculations (Black-Scholes, Greeks, IV)
 - Risk analytics (VaR, CVaR, Kelly criterion)
@@ -27,7 +27,7 @@ positions:
     - symbol: "AAPL"
       quantity: 100
       cost_basis: 220.50
-  
+
   options:
     - symbol: "AAPL"
       position_type: "covered_call"
@@ -58,7 +58,7 @@ python get_recommendation.py
    ```bash
    # Calculate option Greeks
    python run_aligned.py --calculate-greeks AAPL 225 230 30 0.25
-   
+
    # Risk analytics examples
    python example_risk_analytics.py
    ```

@@ -122,7 +122,7 @@ The Unity Wheel Trading Bot has been successfully migrated from a continuous mon
    ```bash
    # Health check
    ./scripts/health_check.sh
-   
+
    # Get recommendation
    python run_on_demand.py --portfolio 100000
    ```
@@ -131,7 +131,7 @@ The Unity Wheel Trading Bot has been successfully migrated from a continuous mon
    ```bash
    # Stop any running monitors
    pkill -f monitor.sh
-   
+
    # Remove old SQLite databases (optional)
    rm ~/.wheel_trading/*.db
    ```

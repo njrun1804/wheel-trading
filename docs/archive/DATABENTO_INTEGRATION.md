@@ -46,7 +46,7 @@ async def fetch_option_chain(symbol: str, expiration: datetime):
         expiration=expiration,
         timestamp=None  # Latest data
     )
-    
+
     # Convert to storage format
     return {
         'symbol': symbol,
@@ -82,7 +82,7 @@ CREATE TABLE option_chains (
 )
 
 -- Auto cleanup after 30 days
-DELETE FROM option_chains 
+DELETE FROM option_chains
 WHERE created_at < CURRENT_TIMESTAMP - INTERVAL '30 days'
 ```
 
@@ -94,17 +94,17 @@ def filter_strikes(chain: OptionChain) -> OptionChain:
     spot = chain.spot_price
     min_strike = spot * 0.80
     max_strike = spot * 1.20
-    
+
     filtered_calls = [
         opt for opt in chain.calls
         if min_strike <= opt.strike <= max_strike
     ]
-    
+
     filtered_puts = [
-        opt for opt in chain.puts  
+        opt for opt in chain.puts
         if min_strike <= opt.strike <= max_strike
     ]
-    
+
     # Reduces data by ~80%
     return OptionChain(
         calls=filtered_calls,
@@ -147,7 +147,7 @@ def filter_strikes(chain: OptionChain) -> OptionChain:
 ```
 Assumptions:
 - 100 recommendations/month
-- 2 expirations per recommendation  
+- 2 expirations per recommendation
 - 50% cache hit rate
 
 API Calls:
@@ -225,7 +225,7 @@ databento:
   # No API key here - use SecretManager
   cache_ttl_minutes: 15
   moneyness_filter: 0.20  # ±20% of spot
-  
+
   validation:
     max_spread_pct: 5.0
     min_bid_size: 10
@@ -297,7 +297,7 @@ chain = await storage.get_or_fetch_option_chain(...)
 
 1. **Use Appropriate TTLs**
    - Option chains: 15 minutes
-   - Definitions: 24 hours  
+   - Definitions: 24 hours
    - Underlying price: 5 minutes
 
 2. **Filter Aggressively**
@@ -316,10 +316,10 @@ chain = await storage.get_or_fetch_option_chain(...)
 
 The pull-when-asked Databento integration provides:
 
-✅ **Simplicity** - No streaming complexity  
-✅ **Cost Control** - Pay only for what you use  
-✅ **Performance** - Local cache for fast responses  
-✅ **Reliability** - Fewer failure modes  
-✅ **Flexibility** - Easy to add new data sources  
+✅ **Simplicity** - No streaming complexity
+✅ **Cost Control** - Pay only for what you use
+✅ **Performance** - Local cache for fast responses
+✅ **Reliability** - Fewer failure modes
+✅ **Flexibility** - Easy to add new data sources
 
 Perfect for a recommendation-only system that values cost efficiency and simplicity over real-time streaming.

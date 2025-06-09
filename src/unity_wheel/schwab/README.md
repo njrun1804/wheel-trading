@@ -27,10 +27,10 @@ client = SchwabClient(
 async with client:
     # Get positions (never cached)
     positions = await client.get_positions()
-    
+
     # Get account info (cached for 30 seconds)
     account = await client.get_account()
-    
+
     # Detect corporate actions
     actions = client.detect_corporate_actions(positions)
 ```

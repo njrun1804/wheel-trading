@@ -202,7 +202,7 @@ from src.unity_wheel.schwab import SchwabClient
 async with SchwabClient(client_id, client_secret) as client:
     positions = await client.get_positions()  # Never cached
     account = await client.get_account()      # Cached briefly (30s)
-    
+
     # Detect corporate actions
     actions = client.detect_corporate_actions(positions)
 ```
@@ -214,7 +214,7 @@ async with SchwabClient(client_id, client_secret) as client:
 ## Future Features Roadmap
 
 1. **Schwab OAuth Flow** - Complete OAuth implementation
-2. **Decision Engine** - Multi-criteria scoring with explanations  
+2. **Decision Engine** - Multi-criteria scoring with explanations
 3. **ML Enhancement** - Probability adjustments, pattern recognition
 4. **Backtesting** - Historical validation with transaction costs
 

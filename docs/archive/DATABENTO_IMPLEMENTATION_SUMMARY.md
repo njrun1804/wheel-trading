@@ -87,7 +87,7 @@ Only stores options within 20% of spot price:
 ### 2. **Smart Caching**
 Different TTLs for different data types:
 - Option chains: 15 minutes
-- Greeks calculations: 5 minutes  
+- Greeks calculations: 5 minutes
 - Position snapshots: 30 minutes
 - Historical data: 30 days max
 

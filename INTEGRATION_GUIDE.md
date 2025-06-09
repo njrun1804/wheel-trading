@@ -157,10 +157,10 @@ await manager.store_secret("schwab", {
 async with SchwabClient(client_id, client_secret) as client:
     # Get positions (never cached)
     positions = await client.get_positions()
-    
+
     # Get account info (cached 30s)
     account = await client.get_account()
-    
+
     # Detect corporate actions
     actions = client.detect_corporate_actions(positions)
     if actions:
@@ -209,7 +209,7 @@ vix = await client.get_vix()
 
 # Get with specific date
 historical_rate = await client.get_series_value(
-    "DGS3MO", 
+    "DGS3MO",
     date="2024-01-01"
 )
 ```
@@ -228,7 +228,7 @@ fred:
 ### Features
 
 - **Local caching** to minimize API calls
-- **Automatic fallback** values for resilience  
+- **Automatic fallback** values for resilience
 - **Business day adjustment** for weekends/holidays
 - **Rate limiting** compliance (120 req/min)
 
@@ -276,7 +276,7 @@ Each integration includes comprehensive tests:
 ```bash
 # Test specific integration
 pytest tests/test_databento.py -v
-pytest tests/test_schwab.py -v  
+pytest tests/test_schwab.py -v
 pytest tests/test_fred.py -v
 
 # Integration tests

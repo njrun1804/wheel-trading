@@ -21,12 +21,13 @@ logger = get_logger(__name__)
 @dataclass
 class PerformanceMetric:
     """Single performance measurement."""
+
     operation: str
     duration_ms: float
     timestamp: datetime
     success: bool
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
@@ -41,6 +42,7 @@ class PerformanceMetric:
 @dataclass
 class PerformanceStats:
     """Aggregated performance statistics."""
+
     operation: str
     count: int
     success_rate: float
@@ -50,7 +52,7 @@ class PerformanceStats:
     p99_duration_ms: float
     min_duration_ms: float
     max_duration_ms: float
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for reporting."""
         return {
@@ -69,10 +71,10 @@ class PerformanceStats:
 class PerformanceMonitor:
     """
     Centralized performance monitoring system.
-    
+
     Tracks operation latencies, success rates, and performance trends.
     """
-    
+
     # Performance thresholds (ms)
     THRESHOLDS = {
         "black_scholes_price": 0.2,
@@ -86,7 +88,7 @@ class PerformanceMonitor:
         "api_call": 1000.0,
         "default": 100.0,
     }
-    
+
     def __init__(self, max_history: int = 10000):
         """Initialize performance monitor."""
         self.max_history = max_history
@@ -95,13 +97,13 @@ class PerformanceMonitor:
         )
         self.lock = Lock()
         self.start_time = datetime.now(timezone.utc)
-        
+
         # Alert callbacks
         self.alert_callbacks: List[Callable[[str, PerformanceMetric], None]] = []
-        
+
         # SLA violations
         self.sla_violations: List[Dict[str, Any]] = []
-        
+
     def record(
         self,
         operation: str,
@@ -117,15 +119,15 @@ class PerformanceMonitor:
             success=success,
             metadata=metadata or {},
         )
-        
+
         with self.lock:
             self.metrics[operation].append(metric)
-        
+
         # Check for SLA violation
         threshold = self.THRESHOLDS.get(operation, self.THRESHOLDS["default"])
         if duration_ms > threshold:
             self._handle_sla_violation(metric, threshold)
-    
+
     def _handle_sla_violation(self, metric: PerformanceMetric, threshold: float) -> None:
         """Handle SLA violation."""
         violation = {
@@ -135,23 +137,23 @@ class PerformanceMonitor:
             "timestamp": metric.timestamp,
             "severity": self._calculate_severity(metric.duration_ms, threshold),
         }
-        
+
         self.sla_violations.append(violation)
-        
+
         # Log warning
         logger.warning(
             f"SLA violation: {metric.operation} took {metric.duration_ms:.1f}ms "
             f"(threshold: {threshold:.1f}ms)",
             extra=violation,
         )
-        
+
         # Trigger alerts
         for callback in self.alert_callbacks:
             try:
                 callback(f"SLA violation: {metric.operation}", metric)
             except Exception as e:
                 logger.error(f"Alert callback failed: {e}")
-    
+
     def _calculate_severity(self, actual: float, threshold: float) -> str:
         """Calculate violation severity."""
         ratio = actual / threshold
@@ -163,27 +165,24 @@ class PerformanceMonitor:
             return "high"
         else:
             return "critical"
-    
+
     def get_stats(self, operation: str, window_minutes: int = 60) -> Optional[PerformanceStats]:
         """Get performance statistics for an operation."""
         with self.lock:
             if operation not in self.metrics:
                 return None
-            
+
             # Filter by time window
             cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_minutes)
-            recent_metrics = [
-                m for m in self.metrics[operation]
-                if m.timestamp > cutoff
-            ]
-            
+            recent_metrics = [m for m in self.metrics[operation] if m.timestamp > cutoff]
+
             if not recent_metrics:
                 return None
-            
+
             # Calculate statistics
             durations = [m.duration_ms for m in recent_metrics]
             successes = sum(1 for m in recent_metrics if m.success)
-            
+
             return PerformanceStats(
                 operation=operation,
                 count=len(recent_metrics),
@@ -195,7 +194,7 @@ class PerformanceMonitor:
                 min_duration_ms=min(durations),
                 max_duration_ms=max(durations),
             )
-    
+
     def get_all_stats(self, window_minutes: int = 60) -> Dict[str, PerformanceStats]:
         """Get statistics for all tracked operations."""
         stats = {}
@@ -204,7 +203,7 @@ class PerformanceMonitor:
             if op_stats:
                 stats[operation] = op_stats
         return stats
-    
+
     def get_slow_operations(
         self,
         window_minutes: int = 60,
@@ -213,23 +212,24 @@ class PerformanceMonitor:
         """Get operations that are consistently slow."""
         stats = self.get_all_stats(window_minutes)
         slow_ops = []
-        
+
         for operation, op_stats in stats.items():
             if op_stats.count < min_count:
                 continue
-            
+
             threshold = self.THRESHOLDS.get(operation, self.THRESHOLDS["default"])
             if op_stats.p95_duration_ms > threshold:
                 slow_ops.append((operation, op_stats))
-        
+
         # Sort by severity (ratio of p95 to threshold)
         slow_ops.sort(
-            key=lambda x: x[1].p95_duration_ms / self.THRESHOLDS.get(x[0], self.THRESHOLDS["default"]),
+            key=lambda x: x[1].p95_duration_ms
+            / self.THRESHOLDS.get(x[0], self.THRESHOLDS["default"]),
             reverse=True,
         )
-        
+
         return slow_ops
-    
+
     def get_performance_trends(
         self,
         operation: str,
@@ -240,15 +240,15 @@ class PerformanceMonitor:
         with self.lock:
             if operation not in self.metrics:
                 return []
-            
+
             # Group metrics by time bucket
             cutoff = datetime.now(timezone.utc) - timedelta(hours=window_hours)
             buckets = defaultdict(list)
-            
+
             for metric in self.metrics[operation]:
                 if metric.timestamp < cutoff:
                     continue
-                
+
                 # Round to bucket
                 bucket_time = metric.timestamp.replace(
                     minute=(metric.timestamp.minute // bucket_minutes) * bucket_minutes,
@@ -256,23 +256,25 @@ class PerformanceMonitor:
                     microsecond=0,
                 )
                 buckets[bucket_time].append(metric)
-            
+
             # Calculate stats per bucket
             trends = []
             for bucket_time, metrics in sorted(buckets.items()):
                 durations = [m.duration_ms for m in metrics]
                 successes = sum(1 for m in metrics if m.success)
-                
-                trends.append({
-                    "timestamp": bucket_time.isoformat(),
-                    "count": len(metrics),
-                    "success_rate": successes / len(metrics) if metrics else 0,
-                    "avg_duration_ms": np.mean(durations) if durations else 0,
-                    "p95_duration_ms": np.percentile(durations, 95) if durations else 0,
-                })
-            
+
+                trends.append(
+                    {
+                        "timestamp": bucket_time.isoformat(),
+                        "count": len(metrics),
+                        "success_rate": successes / len(metrics) if metrics else 0,
+                        "avg_duration_ms": np.mean(durations) if durations else 0,
+                        "p95_duration_ms": np.percentile(durations, 95) if durations else 0,
+                    }
+                )
+
             return trends
-    
+
     def generate_report(self, format: str = "json") -> str:
         """Generate performance report."""
         report_data = {
@@ -280,10 +282,7 @@ class PerformanceMonitor:
             "uptime_hours": (datetime.now(timezone.utc) - self.start_time).total_seconds() / 3600,
             "operations_tracked": len(self.metrics),
             "total_measurements": sum(len(metrics) for metrics in self.metrics.values()),
-            "statistics": {
-                op: stats.to_dict()
-                for op, stats in self.get_all_stats(60).items()
-            },
+            "statistics": {op: stats.to_dict() for op, stats in self.get_all_stats(60).items()},
             "slow_operations": [
                 {
                     "operation": op,
@@ -294,7 +293,7 @@ class PerformanceMonitor:
             ],
             "recent_sla_violations": self.sla_violations[-10:],  # Last 10 violations
         }
-        
+
         if format == "json":
             return json.dumps(report_data, indent=2)
         else:
@@ -310,32 +309,36 @@ class PerformanceMonitor:
                 f"Total Measurements: {report_data['total_measurements']}",
                 "",
             ]
-            
+
             # Statistics table
             if report_data["statistics"]:
-                lines.extend([
-                    "OPERATION STATISTICS (last 60 minutes):",
-                    "-" * 60,
-                    f"{'Operation':<30} {'Count':>8} {'Avg(ms)':>10} {'P95(ms)':>10}",
-                    "-" * 60,
-                ])
-                
+                lines.extend(
+                    [
+                        "OPERATION STATISTICS (last 60 minutes):",
+                        "-" * 60,
+                        f"{'Operation':<30} {'Count':>8} {'Avg(ms)':>10} {'P95(ms)':>10}",
+                        "-" * 60,
+                    ]
+                )
+
                 for op, stats in report_data["statistics"].items():
                     lines.append(
                         f"{op:<30} {stats['count']:>8} "
                         f"{stats['avg_duration_ms']:>10.1f} "
                         f"{stats['p95_duration_ms']:>10.1f}"
                     )
-                
+
                 lines.append("")
-            
+
             # Slow operations
             if report_data["slow_operations"]:
-                lines.extend([
-                    "SLOW OPERATIONS:",
-                    "-" * 60,
-                ])
-                
+                lines.extend(
+                    [
+                        "SLOW OPERATIONS:",
+                        "-" * 60,
+                    ]
+                )
+
                 for op_data in report_data["slow_operations"]:
                     op = op_data["operation"]
                     stats = op_data["stats"]
@@ -344,49 +347,53 @@ class PerformanceMonitor:
                         f"  {op}: P95={stats['p95_duration_ms']:.1f}ms "
                         f"(threshold={threshold:.1f}ms)"
                     )
-                
+
                 lines.append("")
-            
+
             # Recent violations
             if report_data["recent_sla_violations"]:
-                lines.extend([
-                    "RECENT SLA VIOLATIONS:",
-                    "-" * 60,
-                ])
-                
+                lines.extend(
+                    [
+                        "RECENT SLA VIOLATIONS:",
+                        "-" * 60,
+                    ]
+                )
+
                 for violation in report_data["recent_sla_violations"][-5:]:
                     lines.append(
                         f"  {violation['operation']}: {violation['duration_ms']:.1f}ms "
                         f"at {violation['timestamp']}"
                     )
-            
+
             lines.append("=" * 60)
-            
+
             return "\n".join(lines)
-    
+
     def export_metrics(self, file_path: Path) -> None:
         """Export all metrics to file for analysis."""
         with self.lock:
             all_metrics = []
             for operation, metrics in self.metrics.items():
                 for metric in metrics:
-                    all_metrics.append({
-                        **metric.to_dict(),
-                        "operation": operation,
-                    })
-            
+                    all_metrics.append(
+                        {
+                            **metric.to_dict(),
+                            "operation": operation,
+                        }
+                    )
+
             with open(file_path, "w") as f:
                 json.dump(all_metrics, f, indent=2)
-    
+
     def register_alert_callback(self, callback: Callable[[str, PerformanceMetric], None]) -> None:
         """Register callback for performance alerts."""
         self.alert_callbacks.append(callback)
-    
+
     def clear_old_metrics(self, days: int = 7) -> int:
         """Clear metrics older than specified days."""
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)
         cleared = 0
-        
+
         with self.lock:
             for operation in list(self.metrics.keys()):
                 old_size = len(self.metrics[operation])
@@ -395,7 +402,7 @@ class PerformanceMonitor:
                     maxlen=self.max_history,
                 )
                 cleared += old_size - len(self.metrics[operation])
-        
+
         return cleared
 
 
@@ -414,26 +421,27 @@ def get_performance_monitor() -> PerformanceMonitor:
 def performance_monitored(operation: Optional[str] = None):
     """
     Decorator to monitor function performance.
-    
+
     Parameters
     ----------
     operation : str, optional
         Operation name. If not provided, uses function name.
-    
+
     Examples
     --------
     @performance_monitored("critical_calculation")
     def calculate_something():
         ...
     """
+
     def decorator(func: Callable) -> Callable:
         op_name = operation or func.__name__
-        
+
         def wrapper(*args, **kwargs):
             monitor = get_performance_monitor()
             start_time = time.time()
             success = True
-            
+
             try:
                 result = func(*args, **kwargs)
                 return result
@@ -443,7 +451,7 @@ def performance_monitored(operation: Optional[str] = None):
             finally:
                 duration_ms = (time.time() - start_time) * 1000
                 monitor.record(op_name, duration_ms, success)
-        
+
         return wrapper
-    
+
     return decorator

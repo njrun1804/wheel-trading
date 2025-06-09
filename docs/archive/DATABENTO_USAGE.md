@@ -15,7 +15,7 @@ The wheel trading system now integrates with Databento for real options data usi
 - **Local Storage**: SQLite for structured data, Parquet files for options chains
   - Location: `data/databento/`
   - Retention: 30 days of tick data
-- **Cloud Storage** (Optional): 
+- **Cloud Storage** (Optional):
   - Google Cloud Storage via `GCS_BUCKET` environment variable
   - BigQuery via `BQ_PROJECT` environment variable
 

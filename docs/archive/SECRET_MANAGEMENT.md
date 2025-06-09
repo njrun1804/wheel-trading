@@ -124,7 +124,7 @@ from src.unity_wheel.secrets.integration import SecretInjector
 
 # Temporarily inject credentials into environment
 with SecretInjector(service="schwab"):
-    # WHEEL_AUTH__CLIENT_ID and WHEEL_AUTH__CLIENT_SECRET 
+    # WHEEL_AUTH__CLIENT_ID and WHEEL_AUTH__CLIENT_SECRET
     # are now available as environment variables
     client = SchwabClient()  # Will read from env
 ```

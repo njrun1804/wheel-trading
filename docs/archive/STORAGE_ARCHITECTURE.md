@@ -28,7 +28,7 @@ option_chains (
     created_at TIMESTAMP
 )
 
--- Position snapshots  
+-- Position snapshots
 position_snapshots (
     account_id VARCHAR,
     timestamp TIMESTAMP,
@@ -266,7 +266,7 @@ async def check():
     stats = await s.get_storage_stats()
     print(f'DB Size: {stats['db_size_mb']} MB')
     print(f'Oldest data: {stats['option_chains_oldest_days']} days')
-    
+
 asyncio.run(check())
 "
 
@@ -280,7 +280,7 @@ async def cleanup():
     await s.initialize()
     await s.cleanup_old_data()
     print('Cleanup complete')
-    
+
 asyncio.run(cleanup())
 "
 ```
@@ -324,7 +324,7 @@ for _, row in positions.iterrows():
 
 ```python
 # Check why cache is missing
-logger.info("cache_miss_reason", 
+logger.info("cache_miss_reason",
     age_minutes=data_age,
     max_age_minutes=max_age)
 ```

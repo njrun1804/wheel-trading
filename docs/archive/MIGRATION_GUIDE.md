@@ -215,8 +215,8 @@ strikes = [30, 32.5, 35, 37.5, 40]
 volatility = 0.65
 
 strike = find_optimal_put_strike(
-    current_price, 
-    strikes, 
+    current_price,
+    strikes,
     volatility,
     config.delta_target
 )

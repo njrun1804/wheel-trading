@@ -7,17 +7,18 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp import ClientError, ClientResponseError
-from hypothesis import given, strategies as st, settings, HealthCheck
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
 from src.unity_wheel.schwab import (
-    SchwabClient,
-    SchwabPosition,
-    SchwabAccount,
     PositionType,
-    SchwabError,
+    SchwabAccount,
     SchwabAuthError,
+    SchwabClient,
     SchwabDataError,
+    SchwabError,
     SchwabNetworkError,
+    SchwabPosition,
 )
 
 

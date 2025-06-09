@@ -1,7 +1,7 @@
 # Schwab OAuth - Confirmed Issue
 
 ## What We Know
-✅ Your credentials are correct: 
+✅ Your credentials are correct:
 - App Key: OB1E7lHclAbxMCFplibjuDvQlOnmwkEN
 - Secret: iIO3BpwOwIn9eLtD
 

@@ -17,12 +17,12 @@ echo -e "${GREEN}🤖 Claude Code Development Helper${NC}"
 # Auto-fix common issues
 fix_issues() {
     echo -e "${YELLOW}Fixing common issues...${NC}"
-    
+
     # Fix line endings
     find . -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" | \
         grep -v node_modules | grep -v venv | \
         xargs -I {} sh -c 'if [ -f "{}" ] && [ "$(tail -c 1 "{}" | wc -l)" -eq 0 ]; then echo >> "{}"; fi'
-    
+
     # Remove trailing whitespace
     find . -name "*.py" -o -name "*.js" -o -name "*.ts" | \
         grep -v node_modules | grep -v venv | \
@@ -32,11 +32,11 @@ fix_issues() {
 # Run tests
 run_tests() {
     echo -e "${YELLOW}Running tests...${NC}"
-    
+
     if [ -f "package.json" ]; then
         npm test --if-present || true
     fi
-    
+
     if [ -f "requirements.txt" ] || [ -f "setup.py" ]; then
         python -m pytest tests/ 2>/dev/null || echo "No Python tests found"
     fi
@@ -57,7 +57,7 @@ auto_commit() {
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
         git push origin main || echo "Push to main failed, creating PR..."
-        
+
         if [ $? -ne 0 ]; then
             BRANCH="auto-update-$(date +%s)"
             git checkout -b "$BRANCH"

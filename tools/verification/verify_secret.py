@@ -3,10 +3,12 @@
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.unity_wheel.secrets import SecretManager
 import getpass
+
+from src.unity_wheel.secrets import SecretManager
 
 print("\n=== Secret Verification ===\n")
 
@@ -27,7 +29,7 @@ if not portal_secret:
     sys.exit(1)
 
 # Compare
-stored_secret = creds['client_secret']
+stored_secret = creds["client_secret"]
 
 print(f"\nPortal secret length: {len(portal_secret)} characters")
 print(f"Stored secret length: {len(stored_secret)} characters")
@@ -42,12 +44,9 @@ if portal_secret == stored_secret:
 else:
     print("\n❌ MISMATCH! The secrets are different.")
     print("\nUpdating stored secret...")
-    
-    updated_creds = {
-        "client_id": creds['client_id'],
-        "client_secret": portal_secret
-    }
-    
+
+    updated_creds = {"client_id": creds["client_id"], "client_secret": portal_secret}
+
     manager.set_credentials("schwab", updated_creds)
     print("✅ Secret updated!")
     print("\nNow run: python test_new_secret.py")

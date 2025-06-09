@@ -10,7 +10,7 @@ import enum
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Optional, List
+from typing import List, Optional
 
 import pandas as pd
 
@@ -45,7 +45,7 @@ class InstrumentDefinition:
         # Handle Databento's InstrumentDefMsg object
         # Strike price is already in correct units (not scaled)
         strike = Decimal(str(msg.strike_price))
-        
+
         # Convert nanosecond timestamp to datetime
         expiration = pd.to_datetime(msg.expiration, unit="ns", utc=True).to_pydatetime()
 

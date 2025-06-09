@@ -7,26 +7,21 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-from .types import (
-    Action,
-    MarketSnapshot,
-    OptionData,
-    Recommendation,
-    RiskMetrics,
-)
 from ..math import probability_itm_validated
+from ..metrics import metrics_collector
 from ..models import Account, Position
 from ..risk import RiskAnalyzer, RiskLimits
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
+    DecisionLogger,
+    RecoveryStrategy,
+    StructuredLogger,
     get_logger,
     timed_operation,
     with_recovery,
-    RecoveryStrategy,
-    DecisionLogger,
-    StructuredLogger,
 )
-from ..metrics import metrics_collector
+from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
+
 # from ..data import get_market_validator, get_anomaly_detector  # TODO: Fix circular import
 
 logger = get_logger(__name__)
@@ -36,18 +31,18 @@ decision_logger = DecisionLogger(structured_logger)
 
 class TradingConstraints:
     """Trading constraints and validation rules."""
-    
+
     # Unity-specific constraints
     MAX_CONCURRENT_PUTS = 3
     MAX_POSITION_PCT = 0.12  # 12% per leg
-    MIN_CONFIDENCE = 0.75    # 75% confidence threshold
+    MIN_CONFIDENCE = 0.75  # 75% confidence threshold
     MAX_DECISION_TIME = 0.2  # 200ms
-    
+
     # Liquidity requirements
     MIN_BID_ASK_SPREAD = 0.20
     MIN_VOLUME = 10
     MIN_OPEN_INTEREST = 100
-    
+
     # Commission
     COMMISSION_PER_CONTRACT = 0.65
     CONTRACTS_PER_TRADE = 100
@@ -55,7 +50,7 @@ class TradingConstraints:
 
 class WheelAdvisor:
     """Enhanced wheel trading advisor with autonomous operation."""
-    
+
     def __init__(
         self,
         wheel_params: Optional[WheelParameters] = None,
@@ -69,11 +64,11 @@ class WheelAdvisor:
             max_position_size=0.20,
         )
         self.risk_limits = risk_limits or RiskLimits()
-        
+
         # Initialize components
         self.strategy = WheelStrategy(self.wheel_params)
         self.risk_analyzer = RiskAnalyzer(self.risk_limits)
-        
+
         logger.info(
             "WheelAdvisor initialized",
             extra={
@@ -82,18 +77,18 @@ class WheelAdvisor:
                 "max_concurrent_puts": self.constraints.MAX_CONCURRENT_PUTS,
             },
         )
-    
+
     @timed_operation(threshold_ms=200.0)  # 200ms SLA
     @with_recovery(strategy=RecoveryStrategy.FALLBACK)
     def advise_position(self, market_snapshot: MarketSnapshot) -> Recommendation:
         """
         Generate trading recommendation with full validation.
-        
+
         Parameters
         ----------
         market_snapshot : MarketSnapshot
             Current market data including positions and option chain
-        
+
         Returns
         -------
         Recommendation
@@ -101,7 +96,7 @@ class WheelAdvisor:
         """
         start_time = datetime.now(timezone.utc)
         decision_id = f"wheel_{uuid.uuid4().hex[:8]}_{int(start_time.timestamp())}"
-        
+
         # Log decision start
         decision_logger.log_decision(
             decision_id=decision_id,
@@ -111,14 +106,22 @@ class WheelAdvisor:
             risk_metrics={},
             features_used=[],
         )
-        
+
         try:
             # Validate market data with comprehensive data quality checks
             # validator = get_market_validator()
             # validation_result = validator.validate(market_snapshot)
             # TODO: Fix circular import
-            validation_result = type('obj', (object,), {'is_valid': True, 'issues': [], 'quality_level': type('obj', (object,), {'value': 'good'})})()
-            
+            validation_result = type(
+                "obj",
+                (object,),
+                {
+                    "is_valid": True,
+                    "issues": [],
+                    "quality_level": type("obj", (object,), {"value": "good"}),
+                },
+            )()
+
             if not validation_result.is_valid:
                 error_msg = f"Data quality issues: {len(validation_result.issues)} errors found"
                 logger.warning(
@@ -126,10 +129,10 @@ class WheelAdvisor:
                     extra={
                         "issues": [issue.message for issue in validation_result.issues[:3]],
                         "quality_level": validation_result.quality_level.value,
-                    }
+                    },
                 )
                 return self._create_hold_recommendation(error_msg)
-            
+
             # Check for anomalies
             # anomaly_detector = get_anomaly_detector()
             # anomalies = anomaly_detector.detect_market_anomalies(market_snapshot)
@@ -137,33 +140,33 @@ class WheelAdvisor:
             if anomalies:
                 logger.info(
                     f"Detected {len(anomalies)} market anomalies",
-                    extra={"anomalies": anomalies[:2]}
+                    extra={"anomalies": anomalies[:2]},
                 )
-            
+
             # Basic validation (legacy)
             basic_validation = self._validate_snapshot(market_snapshot)
             if not basic_validation[0]:
                 return self._create_hold_recommendation(basic_validation[1])
-            
+
             # Check position limits
             current_positions = self._parse_positions(market_snapshot["positions"])
             open_puts = sum(1 for p in current_positions if p.position_type.value == "put")
-            
+
             if open_puts >= self.constraints.MAX_CONCURRENT_PUTS:
                 return self._create_hold_recommendation(
                     f"Maximum {self.constraints.MAX_CONCURRENT_PUTS} concurrent puts limit reached"
                 )
-            
+
             # Extract market data
             current_price = market_snapshot["current_price"]
             volatility = market_snapshot["implied_volatility"]
             option_chain = market_snapshot["option_chain"]
-            
+
             # Find optimal strikes
             available_strikes = self._extract_liquid_strikes(option_chain)
             if not available_strikes:
                 return self._create_hold_recommendation("No liquid strikes available")
-            
+
             # Get strike recommendation
             strike_rec = self.strategy.find_optimal_put_strike(
                 current_price=current_price,
@@ -173,33 +176,33 @@ class WheelAdvisor:
                 risk_free_rate=market_snapshot.get("risk_free_rate", 0.05),
                 portfolio_value=market_snapshot["buying_power"],
             )
-            
+
             if not strike_rec or strike_rec.confidence < self.constraints.MIN_CONFIDENCE:
                 confidence = strike_rec.confidence if strike_rec else 0.0
                 return self._create_hold_recommendation(
                     f"Low confidence ({confidence:.0%}) in strike selection"
                 )
-            
+
             # Calculate position size with risk constraints
             account = Account(
                 cash_balance=market_snapshot["buying_power"],
                 buying_power=market_snapshot["buying_power"],
                 margin_used=market_snapshot.get("margin_used", 0.0),
             )
-            
+
             contracts, size_confidence = self.strategy.calculate_position_size(
                 strike_price=strike_rec.strike,
                 portfolio_value=account.cash_balance,
                 current_margin_used=account.margin_used,
             )
-            
+
             # Validate position size
             position_value = strike_rec.strike * self.constraints.CONTRACTS_PER_TRADE * contracts
             if position_value > account.cash_balance * self.constraints.MAX_POSITION_PCT:
                 return self._create_hold_recommendation(
                     f"Position size would exceed {self.constraints.MAX_POSITION_PCT:.0%} portfolio limit"
                 )
-            
+
             # Calculate comprehensive risk metrics
             risk_metrics = self._calculate_risk_metrics(
                 strike=strike_rec.strike,
@@ -210,7 +213,7 @@ class WheelAdvisor:
                 volatility=volatility,
                 portfolio_value=account.cash_balance,
             )
-            
+
             # Calculate edge
             edge = self._calculate_edge(
                 premium=strike_rec.premium,
@@ -219,16 +222,16 @@ class WheelAdvisor:
                 probability_assign=strike_rec.probability_itm,
                 contracts=contracts,
             )
-            
+
             risk_metrics["edge_ratio"] = edge
-            
+
             # Overall confidence
             confidence = min(
                 strike_rec.confidence,
                 size_confidence,
                 1.0 if edge > 0.01 else edge * 100,  # Scale edge to confidence
             )
-            
+
             # Check decision latency
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             if elapsed > self.constraints.MAX_DECISION_TIME:
@@ -236,7 +239,7 @@ class WheelAdvisor:
                     f"Decision latency {elapsed:.3f}s exceeds {self.constraints.MAX_DECISION_TIME}s target"
                 )
                 confidence *= 0.9
-            
+
             # Final decision
             if confidence < self.constraints.MIN_CONFIDENCE:
                 return Recommendation(
@@ -251,10 +254,10 @@ class WheelAdvisor:
                         "decision_time": elapsed,
                     },
                 )
-            
+
             # Generate recommendation
             expiry_str = f"{self.wheel_params.target_dte}DTE"
-            
+
             recommendation = Recommendation(
                 action="ADJUST",
                 rationale=f"Sell {contracts} {market_snapshot['ticker']} ${strike_rec.strike:.0f}P @ ${strike_rec.premium:.2f} ({expiry_str})",
@@ -270,7 +273,7 @@ class WheelAdvisor:
                     "strike_reason": strike_rec.reason,
                 },
             )
-            
+
             # Log successful decision
             decision_logger.log_decision(
                 decision_id=decision_id,
@@ -279,12 +282,17 @@ class WheelAdvisor:
                 expected_return=risk_metrics["expected_return"],
                 risk_metrics=risk_metrics,
                 features_used=[
-                    "delta", "volatility", "dte", "premium_yield",
-                    "edge_ratio", "var_95", "margin_utilization"
+                    "delta",
+                    "volatility",
+                    "dte",
+                    "premium_yield",
+                    "edge_ratio",
+                    "var_95",
+                    "margin_utilization",
                 ],
                 execution_time_ms=elapsed * 1000,
             )
-            
+
             # Track in metrics collector
             metrics_collector.record_decision(
                 decision_id=decision_id,
@@ -292,16 +300,14 @@ class WheelAdvisor:
                 confidence=confidence,
                 expected_return=risk_metrics["expected_return"],
                 execution_time_ms=elapsed * 1000,
-                features_used=[
-                    "delta", "volatility", "dte", "edge_ratio"
-                ],
+                features_used=["delta", "volatility", "dte", "edge_ratio"],
             )
-            
+
             return recommendation
-            
+
         except Exception as e:
             logger.error(f"Failed to generate recommendation: {e}", exc_info=True)
-            
+
             # Log failed decision
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             decision_logger.log_decision(
@@ -313,9 +319,9 @@ class WheelAdvisor:
                 features_used=[],
                 execution_time_ms=elapsed * 1000,
             )
-            
+
             return self._create_hold_recommendation(f"Calculation error: {str(e)}")
-    
+
     def _validate_snapshot(self, snapshot: MarketSnapshot) -> Tuple[bool, str]:
         """Validate market snapshot data."""
         # Check required fields
@@ -323,19 +329,19 @@ class WheelAdvisor:
         for field in required:
             if field not in snapshot:
                 return False, f"Missing required field: {field}"
-        
+
         # Validate values
         if snapshot["current_price"] <= 0:
             return False, "Invalid current price"
-        
+
         if snapshot["buying_power"] <= 0:
             return False, "Insufficient buying power"
-        
+
         if not snapshot["option_chain"]:
             return False, "Empty option chain"
-        
+
         return True, ""
-    
+
     def _parse_positions(self, positions_data: List[Any]) -> List[Position]:
         """Parse position data into Position objects."""
         positions = []
@@ -347,7 +353,7 @@ class WheelAdvisor:
                     symbol = self._build_occ_symbol(pos_data)
                 else:
                     symbol = pos_data["symbol"]
-                
+
                 position = Position(
                     symbol=symbol,
                     quantity=pos_data["quantity"],
@@ -355,59 +361,59 @@ class WheelAdvisor:
                 positions.append(position)
             except Exception as e:
                 logger.warning(f"Failed to parse position: {e}")
-        
+
         return positions
-    
+
     def _build_occ_symbol(self, pos_data: Dict[str, Any]) -> str:
         """Build OCC option symbol from position data."""
         # Format: TICKER + YYMMDD + C/P + 00000000 (strike * 1000)
         ticker = pos_data["symbol"]
-        
+
         # Parse expiration
         exp_str = pos_data["expiration"]  # Assume YYYY-MM-DD format
         exp_date = datetime.strptime(exp_str, "%Y-%m-%d")
         date_str = exp_date.strftime("%y%m%d")
-        
+
         # Option type
         opt_type = "C" if pos_data["option_type"] == "call" else "P"
-        
+
         # Strike
         strike_str = f"{int(pos_data['strike'] * 1000):08d}"
-        
+
         return f"{ticker}{date_str}{opt_type}{strike_str}"
-    
+
     def _extract_liquid_strikes(self, option_chain: Dict[str, OptionData]) -> List[float]:
         """Extract strikes that meet liquidity requirements."""
         liquid_strikes = []
-        
+
         for strike_str, option_data in option_chain.items():
             # Check liquidity
             if self._validate_option_liquidity(option_data):
                 liquid_strikes.append(float(strike_str))
-        
+
         return sorted(liquid_strikes)
-    
+
     def _validate_option_liquidity(self, option_data: OptionData) -> bool:
         """Check if option meets liquidity requirements."""
         bid = option_data.get("bid", 0)
         ask = option_data.get("ask", float("inf"))
         volume = option_data.get("volume", 0)
         open_interest = option_data.get("open_interest", 0)
-        
+
         # Check bid-ask spread
         if ask - bid > self.constraints.MIN_BID_ASK_SPREAD:
             return False
-        
+
         # Check volume
         if volume < self.constraints.MIN_VOLUME:
             return False
-        
+
         # Check open interest
         if open_interest < self.constraints.MIN_OPEN_INTEREST:
             return False
-        
+
         return True
-    
+
     def _calculate_risk_metrics(
         self,
         strike: float,
@@ -421,18 +427,18 @@ class WheelAdvisor:
         """Calculate comprehensive risk metrics."""
         # Max loss (assignment at strike)
         max_loss = strike * self.constraints.CONTRACTS_PER_TRADE * contracts
-        
+
         # Expected return (annualized)
         days_to_expiry = self.wheel_params.target_dte
         premium_return = (premium / strike) * (365 / days_to_expiry)
         expected_return = premium_return * (1 - probability_itm)
-        
+
         # VaR calculation (simplified)
         position_var = max_loss * volatility * 1.65 * probability_itm
-        
+
         # Margin requirement
         margin_required = strike * self.constraints.CONTRACTS_PER_TRADE * contracts * 0.20
-        
+
         return RiskMetrics(
             max_loss=max_loss,
             probability_assignment=probability_itm,
@@ -441,7 +447,7 @@ class WheelAdvisor:
             var_95=position_var,
             margin_required=margin_required,
         )
-    
+
     def _calculate_edge(
         self,
         premium: float,
@@ -453,25 +459,29 @@ class WheelAdvisor:
         """Calculate edge probability as profit expectation / risk capital."""
         # Risk capital
         risk_capital = strike * self.constraints.CONTRACTS_PER_TRADE * contracts
-        
+
         # Expected profit
         premium_collected = premium * self.constraints.CONTRACTS_PER_TRADE * contracts
         commission_cost = 2 * self.constraints.COMMISSION_PER_CONTRACT * contracts
-        
+
         # Assignment loss
-        assignment_loss = max(0, strike - current_price) * self.constraints.CONTRACTS_PER_TRADE * contracts
+        assignment_loss = (
+            max(0, strike - current_price) * self.constraints.CONTRACTS_PER_TRADE * contracts
+        )
         expected_assignment_loss = assignment_loss * probability_assign
-        
+
         # Total expected profit
         expected_profit = (
-            premium_collected * (1 - probability_assign) - expected_assignment_loss - commission_cost
+            premium_collected * (1 - probability_assign)
+            - expected_assignment_loss
+            - commission_cost
         )
-        
+
         # Edge ratio
         edge = expected_profit / risk_capital if risk_capital > 0 else 0.0
-        
+
         return edge
-    
+
     def _create_hold_recommendation(self, reason: str) -> Recommendation:
         """Create a HOLD recommendation with given reason."""
         return Recommendation(

@@ -16,11 +16,11 @@ from pydantic import ValidationError
 
 from src.config.loader import ConfigurationLoader, get_config, get_config_loader
 from src.config.schema import (
+    RiskConfig,
+    StrategyConfig,
     WheelConfig,
     load_config,
     validate_config_health,
-    StrategyConfig,
-    RiskConfig,
 )
 
 
@@ -198,35 +198,35 @@ class TestConfigLoader:
         """Test environment variable overrides."""
         monkeypatch.setenv("WHEEL_STRATEGY__DELTA_TARGET", "0.25")
         monkeypatch.setenv("WHEEL_ML__ENABLED", "true")
-        
+
         loader = ConfigurationLoader(str(valid_config_yaml))
         config = loader.config
-        
+
         assert config.strategy.delta_target == 0.25
         assert config.ml.enabled is True
 
     def test_nested_environment_override(self, valid_config_yaml, monkeypatch):
         """Test nested environment variable overrides."""
         monkeypatch.setenv("WHEEL_RISK__LIMITS__MAX_VAR_95", "0.10")
-        
+
         loader = ConfigurationLoader(str(valid_config_yaml))
         config = loader.config
-        
+
         assert config.risk.limits.max_var_95 == 0.10
 
     def test_list_environment_override(self, valid_config_yaml, monkeypatch):
         """Test list environment variable overrides."""
         monkeypatch.setenv("WHEEL_BROKER__SCOPES", '["read", "trade"]')
-        
+
         loader = ConfigurationLoader(str(valid_config_yaml))
         config = loader.config
-        
+
         assert config.broker.scopes == ["read", "trade"]
 
     def test_invalid_environment_override(self, valid_config_yaml, monkeypatch):
         """Test that invalid environment overrides are handled."""
         monkeypatch.setenv("WHEEL_STRATEGY__DELTA_TARGET", "invalid")
-        
+
         with pytest.raises(ValidationError):
             ConfigurationLoader(str(valid_config_yaml))
 
@@ -237,12 +237,12 @@ class TestConfigTracking:
     def test_parameter_usage_tracking(self, valid_config_yaml):
         """Test that parameter usage is tracked."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Track some usage
         loader.track_parameter_usage("strategy.delta_target")
         loader.track_parameter_usage("strategy.delta_target")
         loader.track_parameter_usage("risk.max_position_size")
-        
+
         usage = loader.get_parameter_usage()
         assert usage["strategy.delta_target"] == 2
         assert usage["risk.max_position_size"] == 1
@@ -250,12 +250,12 @@ class TestConfigTracking:
     def test_parameter_impact_tracking(self, valid_config_yaml):
         """Test that parameter impact is tracked."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Track some impacts
         loader.track_parameter_impact("strategy.delta_target", 0.75)
         loader.track_parameter_impact("strategy.delta_target", 0.80)
         loader.track_parameter_impact("strategy.delta_target", 0.70)
-        
+
         # Check average confidence
         impacts = loader.parameter_impacts["strategy.delta_target"]
         avg_confidence = sum(impacts) / len(impacts)
@@ -264,11 +264,11 @@ class TestConfigTracking:
     def test_unused_parameters_detection(self, valid_config_yaml):
         """Test detection of unused parameters."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Track usage of only some parameters
         loader.track_parameter_usage("strategy.delta_target")
         loader.track_parameter_usage("risk.max_position_size")
-        
+
         unused = loader.get_unused_parameters()
         assert "ml.enabled" in unused
         assert "backtest.start_date" in unused
@@ -281,14 +281,14 @@ class TestConfigHealth:
     def test_health_report_generation(self, valid_config_yaml):
         """Test that health report is generated correctly."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Simulate some usage
         loader.track_parameter_usage("strategy.delta_target")
         loader.track_parameter_impact("strategy.delta_target", 0.90)
         loader.track_parameter_impact("risk.max_position_size", 0.40)
-        
+
         report = loader.generate_health_report()
-        
+
         assert "warnings" in report
         assert "recommendations" in report
         assert "statistics" in report
@@ -297,25 +297,25 @@ class TestConfigHealth:
     def test_low_confidence_warning(self, valid_config_yaml):
         """Test that low confidence parameters generate warnings."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Track low confidence
         for _ in range(10):
             loader.track_parameter_impact("risk.max_position_size", 0.30)
-        
+
         report = loader.generate_health_report()
         warnings = report["warnings"]
-        
+
         assert any("low average confidence" in w for w in warnings)
 
     def test_tuning_suggestions(self, valid_config_yaml):
         """Test that tuning suggestions are generated."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Track varying confidences
         loader.track_parameter_impact("strategy.delta_target", 0.90)
         loader.track_parameter_impact("strategy.delta_target", 0.60)
         loader.track_parameter_impact("strategy.delta_target", 0.95)
-        
+
         suggestions = loader.suggest_parameter_tuning()
         assert "strategy.delta_target" in suggestions
 
@@ -326,19 +326,19 @@ class TestConfigPersistence:
     def test_save_and_load_tracking(self, valid_config_yaml, tmp_path):
         """Test saving and loading tracking data."""
         loader = ConfigurationLoader(str(valid_config_yaml))
-        
+
         # Track some data
         loader.track_parameter_usage("strategy.delta_target")
         loader.track_parameter_impact("strategy.delta_target", 0.85)
-        
+
         # Save tracking
         tracking_file = tmp_path / "tracking.json"
         loader.save_tracking_data(str(tracking_file))
-        
+
         # Load into new loader
         new_loader = ConfigurationLoader(str(valid_config_yaml))
         new_loader.load_tracking_data(str(tracking_file))
-        
+
         assert new_loader.parameter_usage["strategy.delta_target"] == 1
         assert len(new_loader.parameter_impacts["strategy.delta_target"]) == 1
 
@@ -350,7 +350,7 @@ class TestConfigValidation:
         """Test configuration health validation."""
         config = WheelConfig(**valid_config_dict)
         issues = validate_config_health(config)
-        
+
         # Should have no critical issues with valid config
         assert all(issue["severity"] != "critical" for issue in issues)
 
@@ -359,10 +359,10 @@ class TestConfigValidation:
         # Create conflict: paper mode but trading enabled
         valid_config_dict["trading"]["mode"] = "paper"
         valid_config_dict["trading"]["enable_trading"] = True
-        
+
         config = WheelConfig(**valid_config_dict)
         issues = validate_config_health(config)
-        
+
         # Should detect the conflict
         assert any("paper mode" in issue["message"] for issue in issues)
 
@@ -373,35 +373,35 @@ class TestConfigIntegration:
     def test_get_config_singleton(self, valid_config_yaml, monkeypatch):
         """Test that get_config returns singleton."""
         monkeypatch.setenv("WHEEL_CONFIG_PATH", str(valid_config_yaml))
-        
+
         config1 = get_config()
         config2 = get_config()
-        
+
         assert config1 is config2
 
     def test_get_config_loader_singleton(self, valid_config_yaml, monkeypatch):
         """Test that get_config_loader returns singleton."""
         monkeypatch.setenv("WHEEL_CONFIG_PATH", str(valid_config_yaml))
-        
+
         loader1 = get_config_loader()
         loader2 = get_config_loader()
-        
+
         assert loader1 is loader2
 
     def test_config_reload(self, valid_config_yaml, tmp_path, monkeypatch):
         """Test configuration reload functionality."""
         monkeypatch.setenv("WHEEL_CONFIG_PATH", str(valid_config_yaml))
-        
+
         loader = get_config_loader()
         original_delta = loader.config.strategy.delta_target
-        
+
         # Modify config file
         config_dict = yaml.safe_load(valid_config_yaml.read_text())
         config_dict["strategy"]["delta_target"] = 0.35
         valid_config_yaml.write_text(yaml.dump(config_dict))
-        
+
         # Reload
         loader.reload()
-        
+
         assert loader.config.strategy.delta_target == 0.35
         assert loader.config.strategy.delta_target != original_delta

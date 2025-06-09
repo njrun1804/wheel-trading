@@ -164,7 +164,7 @@ broker = BrokerAdapter(BrokerFactory.create_broker("mock"))
 async def get_option_data(symbol: str):
     """Get option data with caching, retry, and performance tracking."""
     chain = await broker.get_option_chain(symbol)
-    
+
     # Track decision
     metrics_collector.record_decision(
         decision_id=f"opt_{symbol}_{time.time()}",
@@ -174,7 +174,7 @@ async def get_option_data(symbol: str):
         execution_time_ms=50,
         features_used=["symbol", "market_hours"],
     )
-    
+
     return chain
 ```
 

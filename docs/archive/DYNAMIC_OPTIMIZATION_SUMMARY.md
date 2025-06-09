@@ -23,7 +23,7 @@ objective_value = expected_cagr - 0.20 * abs(expected_cvar)
 
 **Delta Target** (continuous):
 ```
-delta = base_delta 
+delta = base_delta
         + volatility_adjustment     # -0.15 * sigmoid((vol_percentile - 0.5) * 4)
         + momentum_adjustment       # +0.05 * tanh(momentum * 10)
         + iv_rank_adjustment       # +0.05 * (iv_rank - 50) / 50
@@ -95,7 +95,7 @@ optimization:
   enabled: true
   mode: 'dynamic'  # vs 'tiered' or 'static'
   min_confidence: 0.60
-  
+
   # Continuous bounds (not discrete levels)
   bounds:
     delta_min: 0.10
@@ -164,23 +164,23 @@ The negative objective value correctly indicates that at current volatility leve
    async def get_wheel_recommendation():
        # 1. Gather market data
        market_state = await gather_market_state()
-       
+
        # 2. Run optimization
        result = optimizer.optimize_parameters(market_state, returns)
-       
+
        # 3. Validate
        if result.confidence_score < 0.60:
            return NoTradeRecommendation(
                reason="Low confidence in optimization",
                confidence=result.confidence_score
            )
-       
+
        # 4. Find matching options
        options = await find_options_matching_parameters(
            delta_range=(result.delta_target - 0.02, result.delta_target + 0.02),
            dte_range=(result.dte_target - 7, result.dte_target + 7)
        )
-       
+
        # 5. Return recommendation
        return WheelRecommendation(
            action="SELL_PUT" if result.objective_value > 0 else "NO_TRADE",

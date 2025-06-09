@@ -1,8 +1,8 @@
 """Observability and monitoring dashboard components."""
 
 from .dashboard import (
-    MetricPoint,
     DashboardExport,
+    MetricPoint,
     ObservabilityExporter,
     get_observability_exporter,
 )

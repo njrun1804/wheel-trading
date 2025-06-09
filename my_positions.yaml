@@ -2,7 +2,7 @@
 # Updated with actual Unity Software position
 
 account:
-  cash: 41,001.67  
+  cash: 41,001.67
   margin_available: 0.00
   account_type: "cash"
 
@@ -11,7 +11,7 @@ positions:
     - symbol: "U"
       quantity: 7500
       cost_basis: 19.32  # $144,914.67 / 7500 shares
-    
+
   options:
     - symbol: "U"
       position_type: "covered_call"

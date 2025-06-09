@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 class Greeks:
     """
     Option Greeks with validation ranges.
-    
+
     All values are optional as they may not be available for stocks
     or in certain market conditions.
-    
+
     Attributes
     ----------
     delta : Optional[float]
@@ -34,13 +34,13 @@ class Greeks:
     rho : Optional[float]
         Rate of change of option price w.r.t. risk-free rate
         Range: (-∞, ∞) (calls: positive, puts: negative)
-    
+
     Examples
     --------
     >>> greeks = Greeks(delta=0.5, gamma=0.02, theta=-0.05, vega=0.15)
     >>> greeks.delta
     0.5
-    
+
     >>> # Invalid delta
     >>> Greeks(delta=1.5)  # doctest: +SKIP
     ValueError: Delta must be between -1 and 1, got 1.5
@@ -58,34 +58,28 @@ class Greeks:
         if self.delta is not None:
             if not -1 <= self.delta <= 1:
                 raise ValueError(f"Delta must be between -1 and 1, got {self.delta}")
-        
+
         # Gamma validation: gamma >= 0
         if self.gamma is not None:
             if self.gamma < 0:
                 raise ValueError(f"Gamma must be non-negative, got {self.gamma}")
-        
+
         # Theta validation: typically negative but can be positive in rare cases
         # No strict validation, just warning for unusual values
         if self.theta is not None:
             if self.theta > 0:
-                logger.warning(
-                    "Positive theta detected (unusual)",
-                    extra={"theta": self.theta}
-                )
-        
+                logger.warning("Positive theta detected (unusual)", extra={"theta": self.theta})
+
         # Vega validation: vega >= 0
         if self.vega is not None:
             if self.vega < 0:
                 raise ValueError(f"Vega must be non-negative, got {self.vega}")
-        
+
         # Rho validation: no strict bounds but warn on extreme values
         if self.rho is not None:
             if abs(self.rho) > 1000:  # Arbitrary large value
-                logger.warning(
-                    "Extreme rho value detected",
-                    extra={"rho": self.rho}
-                )
-        
+                logger.warning("Extreme rho value detected", extra={"rho": self.rho})
+
         logger.debug(
             "Greeks created",
             extra={
@@ -101,15 +95,14 @@ class Greeks:
     def has_all_greeks(self) -> bool:
         """Check if all Greeks are populated."""
         return all(
-            greek is not None
-            for greek in [self.delta, self.gamma, self.theta, self.vega, self.rho]
+            greek is not None for greek in [self.delta, self.gamma, self.theta, self.vega, self.rho]
         )
 
     @property
     def speed(self) -> Optional[float]:
         """
         Calculate speed (rate of change of gamma).
-        
+
         Note: This is a placeholder as speed requires price changes to calculate.
         In practice, this would be computed by the pricing engine.
         """
@@ -151,5 +144,5 @@ class Greeks:
             parts.append(f"ν={self.vega:.3f}")
         if self.rho is not None:
             parts.append(f"ρ={self.rho:.3f}")
-        
+
         return f"Greeks({', '.join(parts)})" if parts else "Greeks(empty)"

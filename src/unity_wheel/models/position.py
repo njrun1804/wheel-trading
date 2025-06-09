@@ -24,7 +24,7 @@ class PositionType(str, Enum):
 class Position:
     """
     Immutable position representation with symbol validation.
-    
+
     Attributes
     ----------
     symbol : str
@@ -32,7 +32,7 @@ class Position:
         For options: OCC format (e.g., "U241220C00080000")
     quantity : int
         Signed integer (positive for long, negative for short)
-    
+
     Properties
     ----------
     position_type : PositionType
@@ -43,7 +43,7 @@ class Position:
         Strike price for options (None for stocks)
     expiration : Optional[date]
         Expiration date for options (None for stocks)
-    
+
     Examples
     --------
     >>> pos = Position("U", 100)
@@ -51,7 +51,7 @@ class Position:
     <PositionType.STOCK: 'stock'>
     >>> pos.quantity
     100
-    
+
     >>> opt = Position("U241220C00080000", -1)
     >>> opt.position_type
     <PositionType.CALL: 'call'>
@@ -74,17 +74,17 @@ class Position:
         # Validate symbol
         if not self.symbol or not isinstance(self.symbol, str):
             raise ValueError(f"Symbol must be a non-empty string, got: {self.symbol}")
-        
+
         # Validate quantity
         if not isinstance(self.quantity, int):
             raise TypeError(f"Quantity must be an integer, got: {type(self.quantity)}")
-        
+
         if self.quantity == 0:
             raise ValueError("Quantity cannot be zero")
-        
+
         # Parse symbol to determine type
         self._parse_symbol()
-        
+
         logger.debug(
             "Position created",
             extra={
@@ -101,31 +101,29 @@ class Position:
         """Parse symbol to determine position type and extract details."""
         # OCC option symbol pattern: TICKER + YYMMDD + C/P + 00000000 (strike * 1000)
         # Example: U241220C00080000 = U, Dec 20 2024, Call, $80 strike
-        option_pattern = re.compile(
-            r"^([A-Z]{1,6})(\d{6})([CP])(\d{8})$"
-        )
-        
+        option_pattern = re.compile(r"^([A-Z]{1,6})(\d{6})([CP])(\d{8})$")
+
         match = option_pattern.match(self.symbol.upper())
-        
+
         if match:
             # It's an option
             ticker, date_str, option_type, strike_str = match.groups()
-            
+
             # Set underlying
             object.__setattr__(self, "_underlying", ticker)
-            
+
             # Set position type
             if option_type == "C":
                 object.__setattr__(self, "_position_type", PositionType.CALL)
             else:
                 object.__setattr__(self, "_position_type", PositionType.PUT)
-            
+
             # Parse expiration date (YYMMDD format)
             year = 2000 + int(date_str[:2])
             month = int(date_str[2:4])
             day = int(date_str[4:6])
             object.__setattr__(self, "_expiration", date(year, month, day))
-            
+
             # Parse strike (last 8 digits represent strike * 1000)
             strike = int(strike_str) / 1000.0
             object.__setattr__(self, "_strike", strike)
@@ -143,7 +141,7 @@ class Position:
                     "Expected stock ticker (e.g., 'U') or OCC option format "
                     "(e.g., 'U241220C00080000')"
                 )
-        
+
         object.__setattr__(self, "_parsed", True)
 
     @property
@@ -192,7 +190,7 @@ class Position:
     def __str__(self) -> str:
         """Human-readable string representation."""
         direction = "Long" if self.is_long else "Short"
-        
+
         if self.position_type == PositionType.STOCK:
             return f"{direction} {self.abs_quantity} {self.symbol}"
         else:

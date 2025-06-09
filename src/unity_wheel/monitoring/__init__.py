@@ -1,8 +1,8 @@
 """Monitoring and observability components."""
 
 from .performance import (
-    PerformanceMonitor,
     PerformanceMetric,
+    PerformanceMonitor,
     PerformanceStats,
     get_performance_monitor,
     performance_monitored,
@@ -10,7 +10,7 @@ from .performance import (
 
 __all__ = [
     "PerformanceMonitor",
-    "PerformanceMetric", 
+    "PerformanceMetric",
     "PerformanceStats",
     "get_performance_monitor",
     "performance_monitored",

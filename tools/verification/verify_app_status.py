@@ -3,6 +3,7 @@
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 from src.unity_wheel.secrets import SecretManager
@@ -42,7 +43,7 @@ print("   - Is your Schwab brokerage account active?")
 print("   - Any restrictions on your account?")
 print("   - Try logging into schwab.com normally")
 
-print("\n" + "="*50)
+print("\n" + "=" * 50)
 print("\nPOSSIBLE ISSUES:")
 print("\n1. 🔑 Wrong Credentials")
 print("   The most common issue - double-check every character")

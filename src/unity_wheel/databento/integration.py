@@ -9,24 +9,16 @@ Bridges:
 import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional, Dict, Tuple, Any
 from decimal import Decimal
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from src.unity_wheel.utils.logging import StructuredLogger
 from src.unity_wheel.databento import DatentoClient
-from src.unity_wheel.databento.types import (
-    OptionChain,
-    OptionQuote,
-    InstrumentDefinition,
-)
+from src.unity_wheel.databento.types import InstrumentDefinition, OptionChain, OptionQuote
+from src.unity_wheel.math.options import calculate_all_greeks, implied_volatility_validated
 from src.unity_wheel.models.position import Position
-from src.unity_wheel.math.options import (
-    calculate_all_greeks,
-    implied_volatility_validated,
-)
-
+from src.unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -34,7 +26,12 @@ logger = StructuredLogger(logging.getLogger(__name__))
 class DatentoIntegration:
     """Integrates Databento data with wheel strategy."""
 
-    def __init__(self, client: DatentoClient, storage_adapter: Optional['DatabentoStorageAdapter'] = None, risk_free_rate: float = 0.05):
+    def __init__(
+        self,
+        client: DatentoClient,
+        storage_adapter: Optional["DatabentoStorageAdapter"] = None,
+        risk_free_rate: float = 0.05,
+    ):
         """Initialize integration.
 
         Args:
@@ -73,7 +70,7 @@ class DatentoIntegration:
                 "underlying": underlying,
                 "target_delta": target_delta,
                 "dte_range": dte_range,
-            }
+            },
         )
 
         candidates = []
@@ -92,7 +89,7 @@ class DatentoIntegration:
 
         # Use most recent trading day for market data
         today = datetime.now(timezone.utc)
-        
+
         # Find last trading day (skip weekends)
         if today.weekday() >= 5:  # Saturday or Sunday
             days_back = today.weekday() - 4  # Back to Friday
@@ -100,16 +97,14 @@ class DatentoIntegration:
         else:
             # Use previous day for weekdays
             last_trading_day = today - timedelta(days=1)
-            
+
         market_timestamp = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
-        
+
         for expiry in expirations:
             try:
                 # Fetch option chain with historical timestamp
                 chain = await self.client.get_option_chain(
-                    underlying=underlying, 
-                    expiration=expiry,
-                    timestamp=market_timestamp
+                    underlying=underlying, expiration=expiry, timestamp=market_timestamp
                 )
 
                 # Get definitions
@@ -152,7 +147,10 @@ class DatentoIntegration:
                         )
 
             except Exception as e:
-                logger.error("chain_analysis_error", extra={"expiration": expiry.isoformat(), "error": str(e)})
+                logger.error(
+                    "chain_analysis_error",
+                    extra={"expiration": expiry.isoformat(), "error": str(e)},
+                )
 
         # Sort by expected return
         candidates.sort(key=lambda x: x["expected_return"], reverse=True)
@@ -162,7 +160,7 @@ class DatentoIntegration:
             extra={
                 "count": len(candidates),
                 "best_return": candidates[0]["expected_return"] if candidates else 0,
-            }
+            },
         )
 
         return candidates
@@ -248,11 +246,11 @@ class DatentoIntegration:
             current = start_date.replace(day=1)
         else:
             current = datetime.combine(start_date.replace(day=1), datetime.min.time())
-        
+
         # Ensure timezone info
         if current.tzinfo is None:
             current = current.replace(tzinfo=timezone.utc)
-        
+
         while current.date() <= end_date:
             # Find first Friday
             first_day = current.replace(day=1)
@@ -266,7 +264,7 @@ class DatentoIntegration:
             third_friday_date = third_friday.date()
             start_compare = start_date.date() if isinstance(start_date, datetime) else start_date
             end_compare = end_date.date() if isinstance(end_date, datetime) else end_date
-            
+
             if start_compare <= third_friday_date <= end_compare:
                 # Ensure expiration has timezone info
                 if third_friday.tzinfo is None:
@@ -331,7 +329,7 @@ class DatentoIntegration:
                 "start": start_date.isoformat(),
                 "end": end_date.isoformat(),
                 "frequency": frequency,
-            }
+            },
         )
 
         # This would fetch from storage and format for backtesting
@@ -348,29 +346,27 @@ class DatentoIntegration:
 
         Args:
             positions: List of positions to analyze
-            
+
         Returns:
             Analysis results with current Greeks and recommendations
         """
         results = {}
-        
+
         for pos in positions:
             # Get latest option data for position
             if pos.is_option():
                 # Parse option details from position
                 underlying = pos.symbol[:1]  # Simplified parsing
-                
+
                 # Fetch current market data
                 chain = await self.client.get_option_chain(
-                    underlying=underlying,
-                    expiration=pos.expiration,
-                    timestamp=None  # Latest data
+                    underlying=underlying, expiration=pos.expiration, timestamp=None  # Latest data
                 )
-                
+
                 # Find specific option in chain
                 option_type = "CALL" if "C" in pos.symbol else "PUT"
                 options = chain.calls if option_type == "CALL" else chain.puts
-                
+
                 for opt in options:
                     # Match by strike
                     if abs(opt.strike - pos.strike) < 0.01:
@@ -380,13 +376,13 @@ class DatentoIntegration:
                             "ask": opt.ask,
                             "spread_pct": opt.spread_pct,
                             "volume": opt.volume,
-                            "timestamp": chain.timestamp
+                            "timestamp": chain.timestamp,
                         }
                         break
-        
+
         logger.info(
-            "positions_analyzed", 
-            extra={"position_count": len(positions), "results_count": len(results)}
+            "positions_analyzed",
+            extra={"position_count": len(positions), "results_count": len(results)},
         )
-        
+
         return results

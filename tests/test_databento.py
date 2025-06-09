@@ -1,20 +1,21 @@
 """Tests for Databento integration."""
 
 import asyncio
-import pytest
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
-from src.unity_wheel.databento.types import (
-    InstrumentDefinition,
-    OptionQuote,
-    UnderlyingPrice,
-    OptionType,
-    DataQuality,
-    OptionChain,
-)
+import pytest
+
 from src.unity_wheel.databento.client import DatentoClient
+from src.unity_wheel.databento.types import (
+    DataQuality,
+    InstrumentDefinition,
+    OptionChain,
+    OptionQuote,
+    OptionType,
+    UnderlyingPrice,
+)
 from src.unity_wheel.databento.validation import DataValidator
 
 
@@ -83,36 +84,6 @@ class TestDatentoTypes:
 
 # DataStorage tests removed - using new pull-when-asked architecture
 # Tests for unified storage are in test_storage.py
-                InstrumentDefinition(
-                    instrument_id=strike * 100,
-                    raw_symbol=f"U 24 06 21 {strike:05d} P",
-                    underlying="U",
-                    option_type=OptionType.PUT,
-                    strike_price=Decimal(str(strike)),
-                    expiration=chain.expiration,
-                )
-            )
-
-            # Add corresponding quote
-            chain.puts.append(
-                OptionQuote(
-                    instrument_id=strike * 100,
-                    timestamp=datetime.now(),
-                    bid_price=Decimal("1.00"),
-                    ask_price=Decimal("1.10"),
-                    bid_size=100,
-                    ask_size=100,
-                )
-            )
-
-        # Apply filter
-        filtered = storage._filter_by_moneyness(chain, definitions)
-
-        # Should keep strikes 40-60 (within 20% of 50)
-        assert len(filtered.puts) == 5
-        kept_ids = {q.instrument_id for q in filtered.puts}
-        assert 3000 not in kept_ids  # 30 strike filtered
-        assert 7000 not in kept_ids  # 70 strike filtered
 
 
 class TestDataValidator:
@@ -188,6 +159,7 @@ class TestDataValidator:
         # Add more realistic data with highly varied prices
         chain.puts = []
         import random
+
         random.seed(42)  # For reproducibility
         # Use realistic option prices with varying implied volatilities
         base_prices = [1.05, 1.23, 1.32, 1.58, 1.72, 1.95, 2.18, 2.35, 2.67, 2.89]
@@ -315,7 +287,7 @@ class TestDatentoClient:
         # Use fixed timestamps to ensure consistent staleness
         base_time = datetime(2025, 6, 8, 12, 0, 0)  # Fixed time
         chain_time = base_time - timedelta(seconds=30)
-        
+
         chain = OptionChain(
             underlying="U",
             expiration=base_time + timedelta(days=45),
@@ -342,12 +314,13 @@ class TestDatentoClient:
 
         # Mock datetime.now to return our base_time
         from datetime import timezone as tz
-        with patch('src.unity_wheel.databento.client.datetime') as mock_datetime:
+
+        with patch("src.unity_wheel.databento.client.datetime") as mock_datetime:
             # Mock now() to return our base_time with UTC timezone
             mock_datetime.now.return_value = base_time.replace(tzinfo=tz.utc)
             mock_datetime.timedelta = timedelta
             mock_datetime.timezone = tz
-            
+
             quality = await client.validate_data_quality(chain)
 
         assert isinstance(quality, DataQuality)

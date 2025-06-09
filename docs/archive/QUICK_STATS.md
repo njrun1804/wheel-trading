@@ -32,7 +32,7 @@
 # Check recommendations
 python get_recommendation.py
 
-# Advanced analysis  
+# Advanced analysis
 python advanced_recommendations.py
 
 # After trades, update

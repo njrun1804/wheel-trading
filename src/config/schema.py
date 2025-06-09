@@ -36,9 +36,7 @@ class StrategyConfig(BaseModel):
     max_delta_short_put: float = Field(
         0.35, ge=0.0, le=1.0, description="Maximum delta for short puts"
     )
-    strike_intervals: List[float] = Field(
-        [1.0, 2.5, 5.0], description="Strike selection intervals"
-    )
+    strike_intervals: List[float] = Field([1.0, 2.5, 5.0], description="Strike selection intervals")
     roll_triggers: RollTriggers = Field(default_factory=RollTriggers)
 
     @field_validator("strike_intervals")
@@ -100,9 +98,7 @@ class RiskConfig(BaseModel):
     objective_risk_weight: float = Field(
         0.20, ge=0.0, description="Risk weight in objective function"
     )
-    kelly_fraction: float = Field(
-        0.50, ge=0.0, le=1.0, description="Kelly criterion fraction"
-    )
+    kelly_fraction: float = Field(0.50, ge=0.0, le=1.0, description="Kelly criterion fraction")
     limits: RiskLimits = Field(default_factory=RiskLimits)
 
     @model_validator(mode="after")
@@ -261,9 +257,7 @@ class MLModels(BaseModel):
     probability_model: ModelConfig = Field(
         default=ModelConfig(type="gradient_boost", retrain_days=30, min_samples=1000)
     )
-    volatility_model: ModelConfig = Field(
-        default=ModelConfig(type="garch", lookback_days=252)
-    )
+    volatility_model: ModelConfig = Field(default=ModelConfig(type="garch", lookback_days=252))
 
 
 class MLConfig(BaseModel):
@@ -314,9 +308,7 @@ class PerformanceConfig(BaseModel):
 
     track_decisions: bool = Field(True, description="Track all decisions")
     track_parameters: bool = Field(True, description="Track parameter usage")
-    export_format: str = Field(
-        "csv", pattern="^(csv|json)$", description="Export format"
-    )
+    export_format: str = Field("csv", pattern="^(csv|json)$", description="Export format")
     export_path: Path = Field(Path("./data/performance/"), description="Export path")
 
 
@@ -331,9 +323,7 @@ class OperationsConfig(BaseModel):
 class SlippageConfig(BaseModel):
     """Slippage model configuration."""
 
-    type: str = Field(
-        "fixed", pattern="^(fixed|proportional)$", description="Slippage type"
-    )
+    type: str = Field("fixed", pattern="^(fixed|proportional)$", description="Slippage type")
     value: float = Field(0.05, ge=0.0, description="Slippage value")
 
 
@@ -410,80 +400,57 @@ class MetadataConfig(BaseModel):
 
 class AuthConfig(BaseModel):
     """Authentication configuration."""
-    
+
     client_id: Optional[SecretStr] = Field(None, description="OAuth client ID")
     client_secret: Optional[SecretStr] = Field(None, description="OAuth client secret")
     redirect_uri: str = Field("http://localhost:8182/callback", description="OAuth callback URL")
     auth_url: str = Field(
-        "https://api.schwabapi.com/v1/oauth/authorize",
-        description="Authorization endpoint"
+        "https://api.schwabapi.com/v1/oauth/authorize", description="Authorization endpoint"
     )
-    token_url: str = Field(
-        "https://api.schwabapi.com/v1/oauth/token",
-        description="Token endpoint"
-    )
-    scope: str = Field(
-        "AccountsRead MarketDataRead",
-        description="OAuth scopes to request"
-    )
-    
+    token_url: str = Field("https://api.schwabapi.com/v1/oauth/token", description="Token endpoint")
+    scope: str = Field("AccountsRead MarketDataRead", description="OAuth scopes to request")
+
     # Token management
     auto_refresh: bool = Field(True, description="Enable automatic token refresh")
     token_refresh_buffer_minutes: int = Field(
         5, ge=1, le=60, description="Minutes before expiry to refresh token"
     )
-    
+
     # Cache settings
     enable_cache: bool = Field(True, description="Enable API response caching")
-    cache_ttl_seconds: int = Field(
-        3600, ge=0, description="Default cache TTL in seconds"
-    )
-    cache_max_size_mb: int = Field(
-        100, ge=1, description="Maximum cache size in MB"
-    )
-    
+    cache_ttl_seconds: int = Field(3600, ge=0, description="Default cache TTL in seconds")
+    cache_max_size_mb: int = Field(100, ge=1, description="Maximum cache size in MB")
+
     # Rate limiting
-    rate_limit_rps: float = Field(
-        10.0, gt=0, description="Requests per second limit"
-    )
-    rate_limit_burst: int = Field(
-        20, ge=1, description="Burst capacity for rate limiter"
-    )
-    enable_circuit_breaker: bool = Field(
-        True, description="Enable circuit breaker pattern"
-    )
-    circuit_breaker_threshold: int = Field(
-        5, ge=1, description="Failures before circuit opens"
-    )
+    rate_limit_rps: float = Field(10.0, gt=0, description="Requests per second limit")
+    rate_limit_burst: int = Field(20, ge=1, description="Burst capacity for rate limiter")
+    enable_circuit_breaker: bool = Field(True, description="Enable circuit breaker pattern")
+    circuit_breaker_threshold: int = Field(5, ge=1, description="Failures before circuit opens")
     circuit_breaker_recovery_seconds: int = Field(
         60, ge=1, description="Recovery timeout in seconds"
     )
-    
+
     # Retry settings
-    max_retry_attempts: int = Field(
-        3, ge=1, le=10, description="Maximum retry attempts"
-    )
-    retry_backoff_factor: float = Field(
-        2.0, ge=1.0, description="Exponential backoff factor"
-    )
-    
+    max_retry_attempts: int = Field(3, ge=1, le=10, description="Maximum retry attempts")
+    retry_backoff_factor: float = Field(2.0, ge=1.0, description="Exponential backoff factor")
+
     @field_validator("client_id", "client_secret")
     @classmethod
     def validate_credentials(cls, v: Optional[SecretStr]) -> Optional[SecretStr]:
         if v and len(v.get_secret_value()) < 10:
             raise ValueError("Credential appears too short to be valid")
         return v
-    
+
     @model_validator(mode="after")
     def validate_auth_config(self) -> "AuthConfig":
         """Validate authentication configuration consistency."""
         # If credentials are provided, they should both be provided
         has_id = self.client_id is not None
         has_secret = self.client_secret is not None
-        
+
         if has_id != has_secret:
             raise ValueError("Both client_id and client_secret must be provided together")
-        
+
         return self
 
 
@@ -508,35 +475,35 @@ class WheelConfig(BaseModel):
         # Ensure strategy delta target is within risk limits
         if self.strategy.delta_target > self.strategy.max_delta_short_put:
             raise ValueError("strategy.delta_target cannot exceed max_delta_short_put")
-        
+
         # Ensure Kelly fraction in risk config matches limits
         if self.risk.kelly_fraction > 1.0:
             raise ValueError("Half-Kelly (0.5) is recommended, Full-Kelly (1.0) is maximum")
-        
+
         # Validate Unity volatility average is within typical range
         unity_vol = self.unity.volatility
         if not (unity_vol.typical_range[0] <= unity_vol.average <= unity_vol.typical_range[1]):
             raise ValueError("Unity average volatility must be within typical range")
-        
+
         return self
 
 
 def load_config(config_path: Union[str, Path]) -> WheelConfig:
     """Load and validate configuration from YAML file."""
     config_path = Path(config_path)
-    
+
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
-    
+
     with open(config_path, "r") as f:
         config_dict = yaml.safe_load(f)
-    
+
     # Add current timestamp if not in metadata
     if "metadata" not in config_dict:
         config_dict["metadata"] = {}
     if "last_updated" not in config_dict["metadata"]:
         config_dict["metadata"]["last_updated"] = datetime.now().strftime("%Y-%m-%d")
-    
+
     return WheelConfig(**config_dict)
 
 
@@ -551,53 +518,41 @@ def validate_config_health(config: WheelConfig) -> Dict[str, Union[bool, str]]:
         "errors": [],
         "recommendations": [],
     }
-    
+
     # Check risk parameter relationships
     if config.risk.max_position_size > 0.25:
-        health["warnings"].append(
-            "max_position_size > 25% may lead to concentrated risk"
-        )
-    
+        health["warnings"].append("max_position_size > 25% may lead to concentrated risk")
+
     if config.risk.kelly_fraction > 0.5:
-        health["warnings"].append(
-            "kelly_fraction > 0.5 (Half-Kelly) increases risk significantly"
-        )
-    
+        health["warnings"].append("kelly_fraction > 0.5 (Half-Kelly) increases risk significantly")
+
     # Check strategy parameters
     if config.strategy.delta_target > 0.35:
-        health["warnings"].append(
-            "delta_target > 0.35 increases assignment probability"
-        )
-    
+        health["warnings"].append("delta_target > 0.35 increases assignment probability")
+
     if config.strategy.days_to_expiry_target < 30:
-        health["warnings"].append(
-            "days_to_expiry_target < 30 may not capture enough premium"
-        )
-    
+        health["warnings"].append("days_to_expiry_target < 30 may not capture enough premium")
+
     # Check data quality thresholds
     if config.data.quality.min_open_interest < 100:
         health["recommendations"].append(
             "Consider increasing min_open_interest to 100+ for better liquidity"
         )
-    
+
     # Check ML configuration
     if config.ml.enabled and not config.ml.model_path.exists():
-        health["errors"].append(
-            f"ML enabled but model_path does not exist: {config.ml.model_path}"
-        )
+        health["errors"].append(f"ML enabled but model_path does not exist: {config.ml.model_path}")
         health["valid"] = False
-    
+
     # Check operational settings
     if config.operations.logging.retention_days > 90:
-        health["recommendations"].append(
-            "Log retention > 90 days may use significant disk space"
-        )
-    
+        health["recommendations"].append("Log retention > 90 days may use significant disk space")
+
     # Add summary
     health["summary"] = (
         f"Configuration health: {len(health['errors'])} errors, "
         f"{len(health['warnings'])} warnings, "
         f"{len(health['recommendations'])} recommendations"
     )
-    
+
     return health

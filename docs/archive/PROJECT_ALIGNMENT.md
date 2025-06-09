@@ -4,7 +4,7 @@
 
 ### 1. **Type Safety & Machine Maintainability** 🔴
 **Current**: Partial type hints, basic logging
-**Required**: 
+**Required**:
 - Exhaustive type hints on ALL functions, including return types
 - Structured logging with JSON output for machine parsing
 - Deterministic outputs (no random seeds, consistent ordering)
@@ -127,18 +127,18 @@ from typing import Final
 
 class UnityConfig:
     TICKER: Final[str] = "U"
-    
+
     # Risk parameters
     CVAR_PERCENTILE: Final[Decimal] = Decimal("0.95")
     OBJECTIVE_RISK_WEIGHT: Final[Decimal] = Decimal("0.20")
-    
+
     # Position sizing
     KELLY_FRACTION: Final[Decimal] = Decimal("0.5")  # Half-Kelly
-    
+
     # Unity-specific
     TYPICAL_IV_RANGE: tuple[Decimal, Decimal] = (Decimal("0.30"), Decimal("0.80"))
     MIN_BID_ASK_SPREAD: Final[Decimal] = Decimal("0.05")
-    
+
     # Market hours (ET)
     MARKET_OPEN: Final[str] = "09:30:00"
     MARKET_CLOSE: Final[str] = "16:00:00"

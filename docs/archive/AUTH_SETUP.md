@@ -63,12 +63,12 @@ from src.unity_wheel.auth.client_v2 import AuthClient
 async def setup_auth():
     # Create client - credentials loaded automatically from SecretManager
     auth_client = AuthClient()
-    
+
     # Initialize and authenticate
     async with auth_client:
         # This will open browser for OAuth flow
         await auth_client.authenticate()
-        
+
         # Check health
         health = await auth_client.health_check()
         print(f"Auth status: {health['status']}")
@@ -108,12 +108,12 @@ auth:
   # Token management
   auto_refresh: true
   token_refresh_buffer_minutes: 5
-  
+
   # Cache settings
   enable_cache: true
   cache_ttl_seconds: 3600
   cache_max_size_mb: 100
-  
+
   # Rate limiting
   rate_limit_rps: 10.0
   rate_limit_burst: 20
@@ -128,7 +128,7 @@ Check authentication health:
 async def check_auth_health():
     async with AuthClient(...) as client:
         health = await client.health_check()
-        
+
         print(f"Status: {health['status']}")
         print(f"Token valid: {health['token_valid']}")
         print(f"Rate limit: {health['rate_limiter']['tokens_available']}")
@@ -234,7 +234,7 @@ from src.config.loader import get_config_loader
 async def run_wheel_bot():
     # Load config
     config = get_config_loader().load()
-    
+
     # Create auth client from config
     auth_client = AuthClient(
         client_id=config.auth.client_id.get_secret_value(),
@@ -243,27 +243,27 @@ async def run_wheel_bot():
         cache_ttl=config.auth.cache_ttl_seconds,
         rate_limit_rps=config.auth.rate_limit_rps
     )
-    
+
     async with auth_client:
         # Check health
         health = await auth_client.health_check()
         if health["status"] != "healthy":
             print(f"Auth not healthy: {health}")
             return
-        
+
         # Get account data
         accounts = await auth_client.make_request(
             "GET",
             "https://api.schwabapi.com/v1/accounts"
         )
-        
+
         # Get market data
         market_data = await auth_client.make_request(
             "GET",
             "https://api.schwabapi.com/v1/marketdata/quotes",
             params={"symbols": "U"}
         )
-        
+
         # Use cached data if available
         option_chain = await auth_client.make_request(
             "GET",
@@ -271,7 +271,7 @@ async def run_wheel_bot():
             params={"symbol": "U"},
             cache_ttl=300  # Cache for 5 minutes
         )
-        
+
         # Process data...
 
 asyncio.run(run_wheel_bot())

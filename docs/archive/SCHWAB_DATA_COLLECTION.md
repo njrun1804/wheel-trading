@@ -73,7 +73,7 @@ CREATE TABLE position_snapshots (
 )
 
 -- Automatic cleanup after 30 days
-DELETE FROM position_snapshots 
+DELETE FROM position_snapshots
 WHERE created_at < CURRENT_TIMESTAMP - INTERVAL '30 days'
 ```
 
@@ -103,20 +103,20 @@ WHERE created_at < CURRENT_TIMESTAMP - INTERVAL '30 days'
 async def get_wheel_recommendation(portfolio_value: float):
     storage = Storage()
     await storage.initialize()
-    
+
     # 1. Get positions (cached if fresh)
     positions = await storage.get_or_fetch_positions(
         account_id="default",
         fetch_func=fetch_schwab_data,
         max_age_minutes=30
     )
-    
+
     # 2. Check existing wheel positions
     short_puts = [
         p for p in positions['positions']
         if p.get('option_type') == 'PUT' and p.get('quantity', 0) < 0
     ]
-    
+
     # 3. Get option chain (from Databento)
     chain = await storage.get_or_fetch_option_chain(
         symbol="U",
@@ -124,7 +124,7 @@ async def get_wheel_recommendation(portfolio_value: float):
         fetch_func=fetch_databento_chain,
         max_age_minutes=15
     )
-    
+
     # 4. Generate recommendation
     return generate_recommendation(positions, chain)
 ```
@@ -264,7 +264,7 @@ data = await storage.get_or_fetch_positions(...)
    ```python
    # Good: One API call
    all_data = await fetcher.fetch_all_data()
-   
+
    # Bad: Multiple API calls
    positions = await fetcher.fetch_positions()
    account = await fetcher.fetch_account()
@@ -314,10 +314,10 @@ gcloud run jobs execute wheel-recommendation \
 
 The pull-when-asked architecture provides:
 
-✅ **Simplicity** - No background processes to manage  
-✅ **Cost Efficiency** - < $1/month for data operations  
-✅ **Reliability** - Fewer moving parts = fewer failures  
-✅ **Performance** - Local cache = instant responses  
-✅ **Scalability** - Stateless jobs scale infinitely  
+✅ **Simplicity** - No background processes to manage
+✅ **Cost Efficiency** - < $1/month for data operations
+✅ **Reliability** - Fewer moving parts = fewer failures
+✅ **Performance** - Local cache = instant responses
+✅ **Scalability** - Stateless jobs scale infinitely
 
 Perfect for a single-user recommendation system that values simplicity and cost-effectiveness over real-time streaming.

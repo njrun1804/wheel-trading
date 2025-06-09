@@ -31,6 +31,7 @@ MIN_COMPATIBLE_VERSIONS = {
     "pydantic": "2.0.0",
 }
 
+
 def get_version_string() -> str:
     """Get formatted version string with all component info."""
     lines = [
@@ -38,8 +39,8 @@ def get_version_string() -> str:
         "",
         "Component Versions:",
     ]
-    
+
     for component, version in sorted(COMPONENT_VERSIONS.items()):
         lines.append(f"  {component:<15} {version}")
-    
+
     return "\n".join(lines)

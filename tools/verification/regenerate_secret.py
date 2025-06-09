@@ -3,10 +3,12 @@
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.unity_wheel.secrets import SecretManager
 import getpass
+
+from src.unity_wheel.secrets import SecretManager
 
 print("\n=== Schwab Secret Regeneration ===\n")
 
@@ -39,14 +41,14 @@ print(f"\nNew secret length: {len(new_secret)} characters")
 print("Does this look correct? (y/n): ", end="")
 confirm = input().lower()
 
-if confirm != 'y':
+if confirm != "y":
     print("Cancelled.")
     sys.exit(0)
 
 # Update the secret
 updated_creds = {
-    "client_id": current_creds['client_id'],  # Keep same client ID
-    "client_secret": new_secret
+    "client_id": current_creds["client_id"],  # Keep same client ID
+    "client_secret": new_secret,
 }
 
 manager.set_credentials("schwab", updated_creds)

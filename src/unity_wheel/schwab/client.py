@@ -1,27 +1,26 @@
 import asyncio
+import json
 import logging
 import re
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Optional, List, Dict, Any, Tuple
-import json
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import aiohttp
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from ..utils.logging import get_logger
-from ..utils.cache import IntelligentCache
 from ..secrets.integration import get_schwab_credentials
+from ..utils.cache import IntelligentCache
+from ..utils.logging import get_logger
 from .exceptions import (
-    SchwabError,
     SchwabAuthError,
     SchwabDataError,
+    SchwabError,
     SchwabNetworkError,
     SchwabRateLimitError,
 )
-from .types import SchwabPosition, SchwabAccount, PositionType
-
+from .types import PositionType, SchwabAccount, SchwabPosition
 
 logger = get_logger(__name__)
 
@@ -50,7 +49,7 @@ class SchwabClient:
             creds = get_schwab_credentials()
             client_id = client_id or creds["client_id"]
             client_secret = client_secret or creds["client_secret"]
-        
+
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri

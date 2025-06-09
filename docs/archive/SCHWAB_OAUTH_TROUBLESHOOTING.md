@@ -37,7 +37,7 @@ In Schwab Developer Portal:
 
 Your app might need:
 - **App Key**: `OB1E7lHclAbxMCFplibjuDvQlOnmwkEN`
-- **App Secret**: `iIO3BpwOwIn9eLtD` 
+- **App Secret**: `iIO3BpwOwIn9eLtD`
 - **App Name**: Should not contain special characters
 - **App Type**: Should be "Personal" or "Individual"
 

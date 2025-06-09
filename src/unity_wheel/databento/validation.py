@@ -9,19 +9,19 @@ Ensures:
 
 import logging
 from datetime import datetime, timedelta
-from typing import List, Dict, Set, Tuple
 from decimal import Decimal
+from typing import Dict, List, Set, Tuple
+
 import pandas as pd
 
-from src.unity_wheel.utils.logging import StructuredLogger
 from src.unity_wheel.databento.types import (
+    DataQuality,
+    InstrumentDefinition,
     OptionChain,
     OptionQuote,
-    InstrumentDefinition,
-    DataQuality,
 )
 from src.unity_wheel.math.options import black_scholes_price_validated
-
+from src.unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -77,7 +77,7 @@ class DataValidator:
                 "start": start_date.isoformat(),
                 "end": end_date.isoformat(),
                 "chain_count": len(chains),
-            }
+            },
         )
 
         # Get all dates with data
@@ -103,7 +103,7 @@ class DataValidator:
                 extra={
                     "count": len(missing_dates),
                     "dates": [d.isoformat() for d in sorted(missing_dates)],
-                }
+                },
             )
 
         return len(missing_dates) == 0, [d.isoformat() for d in sorted(missing_dates)]
@@ -175,7 +175,7 @@ class DataValidator:
                     "timestamp": chain.timestamp.isoformat(),
                     "issues": issues,
                     "confidence": confidence,
-                }
+                },
             )
 
         return quality
@@ -184,7 +184,7 @@ class DataValidator:
         """Detect potential dummy/test data patterns."""
         # Look for suspicious patterns
         all_quotes = chain.calls + chain.puts
-        
+
         if not all_quotes:
             return False
 

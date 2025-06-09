@@ -27,7 +27,7 @@ After reviewing the API inputs from Schwab and Databento against our DuckDB sche
 ```
 API Field           → Storage Location
 symbol              → positions JSON blob
-quantity            → positions JSON blob  
+quantity            → positions JSON blob
 assetType          → positions JSON blob (mapped to position_type)
 marketValue        → positions JSON blob
 averagePrice       → positions JSON blob (used to calculate cost_basis)
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS option_chain_summary (
 ### 2. Add Materialized Views for Common Queries
 ```sql
 CREATE VIEW active_positions AS
-SELECT 
+SELECT
     account_id,
     json_extract(positions, '$[*].symbol') as symbols,
     json_extract(positions, '$[*].market_value') as values
@@ -94,7 +94,7 @@ The current schema successfully captures all required data from both APIs. The r
 ## Best Practices Confirmed
 
 1. ✅ **Decimal Precision**: All monetary values use DECIMAL to avoid rounding errors
-2. ✅ **UTC Timestamps**: All times stored in UTC for consistency  
+2. ✅ **UTC Timestamps**: All times stored in UTC for consistency
 3. ✅ **JSON Flexibility**: Raw API responses preserved for future needs
 4. ✅ **Cache Management**: TTL implemented via created_at timestamps
 5. ✅ **Primary Keys**: Prevent duplicate data entries

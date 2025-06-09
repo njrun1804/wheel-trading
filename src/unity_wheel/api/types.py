@@ -12,6 +12,7 @@ OptionType = Literal["call", "put"]
 
 class RiskMetrics(TypedDict):
     """Risk metrics for recommendation."""
+
     max_loss: float
     probability_assignment: float
     expected_return: float
@@ -22,6 +23,7 @@ class RiskMetrics(TypedDict):
 
 class Recommendation(TypedDict):
     """Trading recommendation with full context."""
+
     action: Action
     rationale: str
     confidence: float
@@ -31,6 +33,7 @@ class Recommendation(TypedDict):
 
 class PositionData(TypedDict):
     """Position data structure."""
+
     symbol: str
     quantity: int
     strike: float
@@ -42,6 +45,7 @@ class PositionData(TypedDict):
 
 class MarketSnapshot(TypedDict):
     """Market data snapshot for decision making."""
+
     timestamp: datetime
     ticker: str
     current_price: float
@@ -55,6 +59,7 @@ class MarketSnapshot(TypedDict):
 
 class OptionData(TypedDict):
     """Option chain data."""
+
     strike: float
     expiration: str
     bid: float

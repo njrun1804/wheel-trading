@@ -8,13 +8,13 @@ Since Schwab OAuth is broken, you can manually enter your positions for recommen
    ```yaml
    account:
      cash: 50000.00  # Your actual cash balance
-   
+
    positions:
      stocks:
        - symbol: "AAPL"
          quantity: 100
          cost_basis: 220.50
-     
+
      options:
        - symbol: "AAPL"
          position_type: "covered_call"
@@ -49,7 +49,7 @@ positions:
     - symbol: "AAPL"
       quantity: 100
       cost_basis: 220.50
-  
+
   options:
     - symbol: "AAPL"
       position_type: "covered_call"

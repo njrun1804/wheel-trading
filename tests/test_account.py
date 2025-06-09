@@ -6,7 +6,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import pytest
-from hypothesis import assume, given, strategies as st
+from hypothesis import assume, given
+from hypothesis import strategies as st
 
 from unity_wheel.models.account import Account
 
@@ -65,7 +66,7 @@ class TestAccountBasic:
         before = datetime.now(timezone.utc)
         account = Account(cash_balance=10000.0, buying_power=10000.0)
         after = datetime.now(timezone.utc)
-        
+
         assert before <= account.timestamp <= after
         assert account.timestamp.tzinfo is not None
 
@@ -95,7 +96,7 @@ class TestAccountBasic:
             Account(
                 cash_balance=10000.0,
                 buying_power=20000.0,  # 10k margin available
-                margin_used=15000.0,    # Exceeds 10k available
+                margin_used=15000.0,  # Exceeds 10k available
             )
 
     def test_timezone_required(self) -> None:
@@ -130,13 +131,13 @@ class TestAccountBasic:
             buying_power=100000.0,
             margin_used=30000.0,
         )
-        
+
         # Can take position requiring 50k
         assert account.validate_position_size(50000.0) is True
-        
+
         # Can take position requiring exactly 70k (remaining buying power)
         assert account.validate_position_size(70000.0) is True
-        
+
         # Cannot take position requiring 80k
         assert account.validate_position_size(80000.0) is False
 
@@ -162,7 +163,7 @@ class TestAccountBasic:
             margin_used=25000.0,
             timestamp=now,
         )
-        
+
         # To dict
         data = account.to_dict()
         assert data["cash_balance"] == 50000.0
@@ -171,7 +172,7 @@ class TestAccountBasic:
         assert data["timestamp"] == now.isoformat()
         assert data["margin_available"] == 25000.0
         assert data["margin_utilization"] == 0.5
-        
+
         # From dict
         account2 = Account.from_dict(data)
         assert account2.cash_balance == account.cash_balance
@@ -198,19 +199,19 @@ class TestAccountPropertyBased:
         buying_power = cash * margin_multiplier
         total_margin = buying_power - cash
         margin_used = total_margin * margin_usage_pct
-        
+
         account = Account(
             cash_balance=cash,
             buying_power=buying_power,
             margin_used=margin_used,
         )
-        
+
         # Properties that must hold
         assert account.cash_balance == cash
         assert account.buying_power == buying_power
         assert account.margin_used == margin_used
         assert account.margin_available == pytest.approx(total_margin - margin_used)
-        
+
         if total_margin > 0:
             assert account.margin_utilization == pytest.approx(margin_usage_pct)
         else:
@@ -237,7 +238,7 @@ class TestAccountPropertyBased:
                     margin_used=0.0,
                 )
             return
-        
+
         # Margin used must not exceed available margin
         total_margin = buying_power - cash
         if margin_used > total_margin:
@@ -248,7 +249,7 @@ class TestAccountPropertyBased:
                     margin_used=margin_used,
                 )
             return
-        
+
         # Should create successfully if all validations pass
         account = Account(
             cash_balance=cash,
@@ -274,11 +275,11 @@ class TestAccountPropertyBased:
             return
         if data["margin_used"] > (data["buying_power"] - data["cash_balance"]):
             return
-        
+
         account = Account.from_dict(data)
         data2 = account.to_dict()
         account2 = Account.from_dict(data2)
-        
+
         assert account.cash_balance == account2.cash_balance
         assert account.buying_power == account2.buying_power
         assert account.margin_used == account2.margin_used
@@ -305,7 +306,7 @@ class TestAccountEdgeCases:
         account = Account(
             cash_balance=50000.0,
             buying_power=150000.0,  # 3x leverage
-            margin_used=100000.0,   # All margin used
+            margin_used=100000.0,  # All margin used
         )
         assert account.margin_available == 0.0
         assert account.margin_utilization == 1.0
@@ -319,7 +320,7 @@ class TestAccountEdgeCases:
             buying_power=25000.0,
         )
         assert cash_account.is_margin_account is False
-        
+
         # PDT margin account (4x intraday)
         pdt_account = Account(
             cash_balance=30000.0,
@@ -328,7 +329,7 @@ class TestAccountEdgeCases:
         )
         assert pdt_account.is_margin_account is True
         assert pdt_account.margin_available == 40000.0
-        
+
         # Portfolio margin account (higher leverage)
         pm_account = Account(
             cash_balance=150000.0,
@@ -344,12 +345,12 @@ class TestAccountEdgeCases:
             "buying_power": 20000.0,
             "margin_used": 0.0,
         }
-        
+
         # ISO format with timezone
         data1 = {**base_data, "timestamp": "2024-01-15T10:30:00+00:00"}
         account1 = Account.from_dict(data1)
         assert account1.timestamp.tzinfo is not None
-        
+
         # Already a datetime object
         now = datetime.now(timezone.utc)
         data2 = {**base_data, "timestamp": now}
@@ -359,11 +360,11 @@ class TestAccountEdgeCases:
     @pytest.mark.parametrize(
         "cash,power,used,expected_util",
         [
-            (100000, 100000, 0, 0.0),       # No margin account
-            (100000, 200000, 0, 0.0),       # Margin not used
-            (100000, 200000, 50000, 0.5),   # Half margin used
+            (100000, 100000, 0, 0.0),  # No margin account
+            (100000, 200000, 0, 0.0),  # Margin not used
+            (100000, 200000, 50000, 0.5),  # Half margin used
             (100000, 200000, 100000, 1.0),  # All margin used
-            (50000, 150000, 75000, 0.75),   # 3/4 margin used
+            (50000, 150000, 75000, 0.75),  # 3/4 margin used
         ],
     )
     def test_margin_utilization_calculations(

@@ -46,7 +46,7 @@ import asyncio
 
 async def setup():
     manager = SecretManager()
-    
+
     # Add your API keys
     await manager.store_secret('databento', {'api_key': 'YOUR_KEY'})
     await manager.store_secret('schwab', {
@@ -116,7 +116,7 @@ async def test_recommendation_flow():
     """Test complete recommendation generation."""
     config = load_test_config()
     recommendation = await generate_recommendation(config)
-    
+
     assert recommendation.confidence >= 0.8
     assert recommendation.position_size > 0
 ```
@@ -156,7 +156,7 @@ def calculate_with_validation(
 ) -> CalculationResult:
     """
     Calculate with built-in validation.
-    
+
     Returns:
         CalculationResult with value and confidence score
     """
@@ -167,13 +167,13 @@ def calculate_with_validation(
             confidence=0.0,
             metadata={'error': 'Invalid input'}
         )
-    
+
     # Perform calculation
     result = complex_calculation(input_value)
-    
+
     # Assess confidence
     confidence = assess_confidence(result, input_value)
-    
+
     return CalculationResult(
         value=result,
         confidence=confidence,
@@ -197,9 +197,9 @@ def your_feature(data: dict) -> dict:
             "timestamp": datetime.utcnow().isoformat()
         }
     )
-    
+
     # Your implementation
-    
+
     logger.info(
         "Calculation complete",
         extra={
@@ -208,7 +208,7 @@ def your_feature(data: dict) -> dict:
             "output_size": len(result)
         }
     )
-    
+
     return result
 ```
 
@@ -217,7 +217,7 @@ def your_feature(data: dict) -> dict:
 # src/config/schema.py
 class YourFeatureConfig(BaseModel):
     """Configuration for your feature."""
-    
+
     enabled: bool = Field(default=True, description="Enable feature")
     threshold: float = Field(
         default=0.8,
@@ -225,7 +225,7 @@ class YourFeatureConfig(BaseModel):
         le=1.0,
         description="Confidence threshold"
     )
-    
+
     class Config:
         frozen = True
 ```

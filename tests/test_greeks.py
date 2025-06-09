@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Any, Optional
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from unity_wheel.models.greeks import Greeks
 
@@ -60,11 +61,11 @@ class TestGreeksBasic:
         """Test delta validation (-1 <= delta <= 1)."""
         # Valid deltas
         Greeks(delta=-1.0)  # Put at extreme
-        Greeks(delta=0.0)   # ATM
-        Greeks(delta=1.0)   # Call at extreme
-        Greeks(delta=0.5)   # Normal call
+        Greeks(delta=0.0)  # ATM
+        Greeks(delta=1.0)  # Call at extreme
+        Greeks(delta=0.5)  # Normal call
         Greeks(delta=-0.3)  # Normal put
-        
+
         # Invalid deltas
         with pytest.raises(ValueError, match="Delta must be between -1 and 1"):
             Greeks(delta=1.1)
@@ -78,7 +79,7 @@ class TestGreeksBasic:
         Greeks(gamma=0.05)
         Greeks(gamma=1.0)
         Greeks(gamma=100.0)  # Extreme but possible
-        
+
         # Invalid gamma
         with pytest.raises(ValueError, match="Gamma must be non-negative"):
             Greeks(gamma=-0.01)
@@ -88,11 +89,11 @@ class TestGreeksBasic:
         # Normal theta (negative)
         greeks1 = Greeks(theta=-0.05)
         assert greeks1.theta == -0.05
-        
+
         # Zero theta
         greeks2 = Greeks(theta=0.0)
         assert greeks2.theta == 0.0
-        
+
         # Positive theta (unusual but possible, should log warning)
         greeks3 = Greeks(theta=0.01)
         assert greeks3.theta == 0.01
@@ -103,7 +104,7 @@ class TestGreeksBasic:
         Greeks(vega=0.0)
         Greeks(vega=0.15)
         Greeks(vega=1.0)
-        
+
         # Invalid vega
         with pytest.raises(ValueError, match="Vega must be non-negative"):
             Greeks(vega=-0.01)
@@ -111,11 +112,11 @@ class TestGreeksBasic:
     def test_rho_validation(self) -> None:
         """Test rho validation (no strict bounds but warning for extreme)."""
         # Normal rhos
-        Greeks(rho=0.05)    # Positive for calls
-        Greeks(rho=-0.03)   # Negative for puts
+        Greeks(rho=0.05)  # Positive for calls
+        Greeks(rho=-0.03)  # Negative for puts
         Greeks(rho=0.0)
-        Greeks(rho=50.0)    # Large but reasonable
-        
+        Greeks(rho=50.0)  # Large but reasonable
+
         # Extreme rho (should log warning but not fail)
         greeks = Greeks(rho=1500.0)
         assert greeks.rho == 1500.0
@@ -130,11 +131,11 @@ class TestGreeksBasic:
         # All Greeks
         greeks1 = Greeks(delta=0.5, gamma=0.02, theta=-0.05, vega=0.15, rho=0.08)
         assert str(greeks1) == "Greeks(Δ=0.500, Γ=0.020, Θ=-0.050, ν=0.150, ρ=0.080)"
-        
+
         # Partial Greeks
         greeks2 = Greeks(delta=0.333, vega=0.123)
         assert str(greeks2) == "Greeks(Δ=0.333, ν=0.123)"
-        
+
         # Empty Greeks
         greeks3 = Greeks()
         assert str(greeks3) == "Greeks(empty)"
@@ -142,7 +143,7 @@ class TestGreeksBasic:
     def test_greeks_serialization(self) -> None:
         """Test converting Greeks to/from dictionary."""
         greeks = Greeks(delta=0.5, gamma=0.02, theta=-0.05, vega=0.15, rho=0.08)
-        
+
         # To dict
         data = greeks.to_dict()
         assert data == {
@@ -152,7 +153,7 @@ class TestGreeksBasic:
             "vega": 0.15,
             "rho": 0.08,
         }
-        
+
         # From dict
         greeks2 = Greeks.from_dict(data)
         assert greeks2.delta == greeks.delta
@@ -204,41 +205,31 @@ class TestGreeksPropertyBased:
             vega=vega,
             rho=rho,
         )
-        
+
         # Properties that must hold
         assert greeks.delta == delta
         assert greeks.gamma == gamma
         assert greeks.theta == theta
         assert greeks.vega == vega
         assert greeks.rho == rho
-        
+
         # Check has_all_greeks
-        all_present = all(
-            v is not None
-            for v in [delta, gamma, theta, vega, rho]
-        )
+        all_present = all(v is not None for v in [delta, gamma, theta, vega, rho])
         assert greeks.has_all_greeks == all_present
 
-    @given(
-        delta=st.floats(allow_nan=False, allow_infinity=False)
-        .filter(lambda x: x < -1 or x > 1)
-    )
+    @given(delta=st.floats(allow_nan=False, allow_infinity=False).filter(lambda x: x < -1 or x > 1))
     def test_invalid_delta_ranges(self, delta: float) -> None:
         """Test that invalid delta values raise errors."""
         with pytest.raises(ValueError, match="Delta must be between -1 and 1"):
             Greeks(delta=delta)
 
-    @given(
-        gamma=st.floats(max_value=-0.001, allow_nan=False, allow_infinity=False)
-    )
+    @given(gamma=st.floats(max_value=-0.001, allow_nan=False, allow_infinity=False))
     def test_invalid_gamma_ranges(self, gamma: float) -> None:
         """Test that negative gamma values raise errors."""
         with pytest.raises(ValueError, match="Gamma must be non-negative"):
             Greeks(gamma=gamma)
 
-    @given(
-        vega=st.floats(max_value=-0.001, allow_nan=False, allow_infinity=False)
-    )
+    @given(vega=st.floats(max_value=-0.001, allow_nan=False, allow_infinity=False))
     def test_invalid_vega_ranges(self, vega: float) -> None:
         """Test that negative vega values raise errors."""
         with pytest.raises(ValueError, match="Vega must be non-negative"):
@@ -260,7 +251,7 @@ class TestGreeksPropertyBased:
         greeks = Greeks.from_dict(data)
         data2 = greeks.to_dict()
         greeks2 = Greeks.from_dict(data2)
-        
+
         # All values should match
         assert greeks.delta == greeks2.delta
         assert greeks.gamma == greeks2.gamma
@@ -283,7 +274,7 @@ class TestGreeksEdgeCases:
             rho=1e-10,
         )
         assert greeks1.delta == 1e-10
-        
+
         # Large but valid values
         greeks2 = Greeks(
             delta=0.9999,
@@ -305,7 +296,7 @@ class TestGreeksEdgeCases:
             rho=0.15,
         )
         assert atm_call.has_all_greeks
-        
+
         # Deep ITM put option
         itm_put = Greeks(
             delta=-0.95,
@@ -315,7 +306,7 @@ class TestGreeksEdgeCases:
             rho=-0.45,
         )
         assert itm_put.delta == -0.95
-        
+
         # Far OTM call option
         otm_call = Greeks(
             delta=0.05,
@@ -340,7 +331,7 @@ class TestGreeksEdgeCases:
         """Test handling of special float values (NaN, inf)."""
         # Most of these should trigger validation errors
         kwargs = {greek_name: value}
-        
+
         if greek_name == "delta":
             # NaN is not between -1 and 1
             with pytest.raises(ValueError):

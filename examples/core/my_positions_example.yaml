@@ -12,7 +12,7 @@ positions:
     - symbol: "XYZ"      # Replace with your stock symbol
       quantity: 100      # Number of shares you own
       cost_basis: 50.00  # Your purchase price per share
-    
+
   options:
     # Your covered call
     - symbol: "XYZ"                # Replace with option symbol

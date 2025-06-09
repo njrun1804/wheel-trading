@@ -14,7 +14,7 @@
 
 **What**: Daily closing prices for underlying stocks
 **How Far Back**: 250 trading days (~1 year)
-**Why**: 
+**Why**:
 - VaR/CVaR risk calculations (min 20, prefer 250 data points)
 - Volatility calculations for risk metrics
 - Sharpe ratio and performance tracking
@@ -45,7 +45,7 @@
 ## What We DON'T Need
 
 ❌ **Historical option prices** - The system doesn't backtest
-❌ **Intraday data** - Daily granularity is sufficient  
+❌ **Intraday data** - Daily granularity is sufficient
 ❌ **Greeks history** - Calculated on demand
 ❌ **Trade/tick data** - Not used by the strategy
 ❌ **Years of history** - Maximum 1 year needed
@@ -73,18 +73,18 @@
 ```python
 async def load_historical_prices(symbol: str):
     """One-time load of historical prices for risk calculations."""
-    
+
     # Fetch 250 days of daily bars
     end = datetime.now()
     start = end - timedelta(days=365)  # Get extra for holidays
-    
+
     bars = await databento_client.get_daily_bars(
         symbol=symbol,
         start=start,
         end=end,
         dataset="XNAS.BASIC"  # Or appropriate dataset
     )
-    
+
     # Store in DuckDB for risk calculations
     await storage.store_price_history(symbol, bars)
 ```
@@ -94,10 +94,10 @@ async def load_historical_prices(symbol: str):
 # Daily cron job to append latest price
 async def update_daily_price(symbol: str):
     """Add today's closing price to history."""
-    
+
     latest = await databento_client.get_daily_bar(symbol)
     await storage.append_price(symbol, latest)
-    
+
     # Trim to keep only 250 days
     await storage.trim_old_prices(symbol, days=250)
 ```
@@ -123,10 +123,10 @@ From the codebase:
 ```python
 # Line 164: Minimum data requirement
 if len(returns_data) < 20:
-    logger.warning("insufficient_data_for_var", 
+    logger.warning("insufficient_data_for_var",
                   data_points=len(returns_data))
 
-# Line 196: Preferred data amount  
+# Line 196: Preferred data amount
 min_data_points = max(250, int(window * 1.5))
 ```
 
@@ -135,7 +135,7 @@ min_data_points = max(250, int(window * 1.5))
 # ML model lookback (optional feature)
 volatility_model:
   lookback_days: 252  # One trading year
-  
+
 # Performance tracking
 history_days: 90  # For decision tracking
 ```

@@ -114,7 +114,7 @@ The system automatically validates:
 
 ### Future Enhancements:
 1. **BigQuery Setup**: For multi-year backtests
-2. **Live WebSocket**: For real-time position monitoring  
+2. **Live WebSocket**: For real-time position monitoring
 3. **Greeks Storage**: Pre-calculate and cache daily
 4. **ML Features**: IV rank, term structure, skew
 

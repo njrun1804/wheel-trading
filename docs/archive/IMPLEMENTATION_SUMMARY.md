@@ -22,7 +22,7 @@ This document summarizes all changes made to implement a sophisticated, autonomo
   ```python
   # Weekend handling for Unity
   trade_date = date - timedelta(days=1) if date.weekday() == 6 else date
-  
+
   # Correct dataset selection
   datasets_to_try = [
       ("XNYS.PILLAR", Schema.OHLCV_1D),   # NYSE Pillar
@@ -57,10 +57,10 @@ This document summarizes all changes made to implement a sophisticated, autonomo
   ```python
   # Volatility adjustment (continuous)
   vol_adjustment = -0.15 * (state.volatility_percentile - 0.5)
-  
+
   # Momentum adjustment (smooth)
   momentum_adjustment = 0.05 * np.tanh(state.price_momentum * 10)
-  
+
   # IV rank adjustment (gradual)
   if state.iv_rank:
       iv_adjustment = 0.03 * ((state.iv_rank - 50) / 50)

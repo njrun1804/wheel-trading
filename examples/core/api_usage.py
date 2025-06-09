@@ -11,13 +11,13 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.api.types import MarketSnapshot
 from src.unity_wheel.api.advisor import advise_position
+from src.unity_wheel.api.types import MarketSnapshot
 
 
 def main() -> None:
     """Demonstrate API usage with Unity options."""
-    
+
     # Example market snapshot for Unity
     market_snapshot: MarketSnapshot = {
         "timestamp": datetime.now(),
@@ -36,7 +36,7 @@ def main() -> None:
                 "gamma": 0.02,
                 "theta": -0.03,
                 "vega": 0.08,
-                "iv": 0.62
+                "iv": 0.62,
             },
             "32.5": {
                 "bid": 0.85,
@@ -48,7 +48,7 @@ def main() -> None:
                 "gamma": 0.04,
                 "theta": -0.04,
                 "vega": 0.12,
-                "iv": 0.64
+                "iv": 0.64,
             },
             "35.0": {
                 "bid": 1.45,
@@ -60,7 +60,7 @@ def main() -> None:
                 "gamma": 0.05,
                 "theta": -0.05,
                 "vega": 0.15,
-                "iv": 0.65
+                "iv": 0.65,
             },
             "37.5": {
                 "bid": 2.35,
@@ -72,7 +72,7 @@ def main() -> None:
                 "gamma": 0.04,
                 "theta": -0.06,
                 "vega": 0.13,
-                "iv": 0.67
+                "iv": 0.67,
             },
             "40.0": {
                 "bid": 3.80,
@@ -84,21 +84,21 @@ def main() -> None:
                 "gamma": 0.03,
                 "theta": -0.07,
                 "vega": 0.10,
-                "iv": 0.70
-            }
+                "iv": 0.70,
+            },
         },
-        "iv": 0.65  # Overall IV for Unity
+        "iv": 0.65,  # Overall IV for Unity
     }
-    
+
     # Get recommendation
     print("🎯 Unity Wheel Trading Advisor")
     print("=" * 50)
     print(f"Current Price: ${market_snapshot['current_price']}")
     print(f"Buying Power: ${market_snapshot['buying_power']:,.0f}")
     print()
-    
+
     recommendation = advise_position(market_snapshot)
-    
+
     print(f"Action: {recommendation['action']}")
     print(f"Rationale: {recommendation['rationale']}")
     print(f"Confidence: {recommendation['confidence']:.1%}")
@@ -108,7 +108,7 @@ def main() -> None:
     print(f"  P(Assignment): {recommendation['risk']['probability_assignment']:.1%}")
     print(f"  Expected Return: {recommendation['risk']['expected_return']:.1%}")
     print(f"  Edge Ratio: {recommendation['risk']['edge_ratio']:.3f}")
-    
+
     # Also show as JSON
     print("\nJSON Output:")
     print(json.dumps(recommendation, indent=2))

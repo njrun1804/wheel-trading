@@ -73,7 +73,7 @@ Total: ~53KB for Unity (0.001% of 5GB limit)
 
 The math shows:
 - **VaR**: Need 12+ observations at 5th percentile ✓
-- **Volatility**: ±8.8% estimation error (good enough) ✓  
+- **Volatility**: ±8.8% estimation error (good enough) ✓
 - **Kelly**: ~12 monthly periods for win rate stats ✓
 
 With less data:

@@ -7,7 +7,8 @@ from datetime import date
 from typing import Any
 
 import pytest
-from hypothesis import assume, given, strategies as st
+from hypothesis import assume, given
+from hypothesis import strategies as st
 
 from unity_wheel.models.position import Position, PositionType
 
@@ -69,10 +70,10 @@ class TestPositionBasic:
         """Test invalid symbol formats raise errors."""
         with pytest.raises(ValueError, match="Invalid symbol format"):
             Position("123ABC", 100)  # Invalid stock ticker
-        
+
         with pytest.raises(ValueError, match="Invalid symbol format"):
             Position("U241220X00080000", 1)  # Invalid option type (X)
-        
+
         with pytest.raises(ValueError, match="Invalid symbol format"):
             Position("", 100)  # Empty symbol
 
@@ -80,7 +81,7 @@ class TestPositionBasic:
         """Test invalid quantities raise errors."""
         with pytest.raises(ValueError, match="Quantity cannot be zero"):
             Position("U", 0)
-        
+
         with pytest.raises(TypeError, match="Quantity must be an integer"):
             Position("U", 10.5)  # type: ignore
 
@@ -89,21 +90,21 @@ class TestPositionBasic:
         # Stock position
         pos1 = Position("U", 100)
         assert str(pos1) == "Long 100 U"
-        
+
         pos2 = Position("AAPL", -500)
         assert str(pos2) == "Short 500 AAPL"
-        
+
         # Option positions
         pos3 = Position("U241220C00080000", -1)
         assert str(pos3) == "Short 1 U $80.00 Call exp 2024-12-20"
-        
+
         pos4 = Position("AAPL250117P00150000", 10)
         assert str(pos4) == "Long 10 AAPL $150.00 Put exp 2025-01-17"
 
     def test_position_serialization(self) -> None:
         """Test converting Position to/from dictionary."""
         pos = Position("U241220C00080000", -5)
-        
+
         # To dict
         data = pos.to_dict()
         assert data["symbol"] == "U241220C00080000"
@@ -112,7 +113,7 @@ class TestPositionBasic:
         assert data["underlying"] == "U"
         assert data["strike"] == 80.0
         assert data["expiration"] == "2024-12-20"
-        
+
         # From dict
         pos2 = Position.from_dict(data)
         assert pos2.symbol == pos.symbol
@@ -123,11 +124,11 @@ class TestPositionBasic:
         # Very high strike
         pos1 = Position("SPY261231C99999999", 1)
         assert pos1.strike == 99999.999
-        
+
         # Very low strike (penny strikes)
         pos2 = Position("U241220P00000500", 1)
         assert pos2.strike == 0.5
-        
+
         # Zero strike (rare but possible)
         pos3 = Position("TEST250101C00000000", 1)
         assert pos3.strike == 0.0
@@ -143,7 +144,7 @@ class TestPositionPropertyBased:
     def test_stock_position_properties(self, ticker: str, quantity: int) -> None:
         """Test stock positions with random valid inputs."""
         pos = Position(ticker, quantity)
-        
+
         # Properties that must hold
         assert pos.symbol == ticker
         assert pos.quantity == quantity
@@ -177,16 +178,16 @@ class TestPositionPropertyBased:
         """Test option positions with random valid inputs."""
         # Construct OCC symbol
         symbol = f"{ticker}{year:02d}{month:02d}{day:02d}{option_type}{strike_cents:08d}"
-        
+
         pos = Position(symbol, quantity)
-        
+
         # Properties that must hold
         assert pos.symbol == symbol
         assert pos.quantity == quantity
         assert pos.underlying == ticker
         assert pos.strike == strike_cents / 1000.0
         assert pos.expiration == date(2000 + year, month, day)
-        
+
         if option_type == "C":
             assert pos.position_type == PositionType.CALL
         else:
@@ -224,7 +225,7 @@ class TestPositionPropertyBased:
             # Should work fine for non-zero
             pos_positive = Position("U", offset)
             assert pos_positive.quantity == offset
-            
+
             pos_negative = Position("U", -offset)
             assert pos_negative.quantity == -offset
 
@@ -235,7 +236,7 @@ class TestPositionEdgeCases:
     def test_maximum_values(self) -> None:
         """Test positions with maximum integer values."""
         import sys
-        
+
         max_int = sys.maxsize
         pos = Position("U", max_int)
         assert pos.quantity == max_int
@@ -246,7 +247,7 @@ class TestPositionEdgeCases:
         # Leap year
         pos1 = Position("U240229C00100000", 1)
         assert pos1.expiration == date(2024, 2, 29)
-        
+
         # End of year
         pos2 = Position("SPY241231P00400000", -1)
         assert pos2.expiration == date(2024, 12, 31)
@@ -255,7 +256,7 @@ class TestPositionEdgeCases:
         """Test that symbols are case-insensitive."""
         pos1 = Position("u", 100)  # lowercase
         assert pos1.underlying == "U"  # Should be uppercase
-        
+
         pos2 = Position("aapl", -50)
         assert pos2.underlying == "AAPL"
 
@@ -264,7 +265,7 @@ class TestPositionEdgeCases:
         # Invalid month
         with pytest.raises(ValueError):
             Position("U241320C00080000", 1)
-        
+
         # Invalid day
         with pytest.raises(ValueError):
             Position("U240232C00080000", 1)
@@ -272,13 +273,13 @@ class TestPositionEdgeCases:
     @pytest.mark.parametrize(
         "bad_symbol",
         [
-            "U24122C00080000",      # Missing digit in date
-            "U2412200C00080000",    # Extra digit in date  
-            "U241220C0008000",      # Missing digit in strike
-            "U241220C000800000",    # Extra digit in strike
+            "U24122C00080000",  # Missing digit in date
+            "U2412200C00080000",  # Extra digit in date
+            "U241220C0008000",  # Missing digit in strike
+            "U241220C000800000",  # Extra digit in strike
             "TOOLONG241220C00080000",  # Ticker too long
-            "241220C00080000",      # Missing ticker
-            "U241220Q00080000",     # Invalid option type
+            "241220C00080000",  # Missing ticker
+            "U241220Q00080000",  # Invalid option type
         ],
     )
     def test_malformed_option_symbols(self, bad_symbol: str) -> None:

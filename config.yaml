@@ -213,29 +213,29 @@ auth:
   # WHEEL_AUTH__CLIENT_ID and WHEEL_AUTH__CLIENT_SECRET
   client_id: null
   client_secret: null
-  
+
   # OAuth endpoints
   redirect_uri: "http://localhost:8182/callback"
   auth_url: "https://api.schwabapi.com/v1/oauth/authorize"
   token_url: "https://api.schwabapi.com/v1/oauth/token"
   scope: "AccountsRead MarketDataRead"
-  
+
   # Token management
   auto_refresh: true
   token_refresh_buffer_minutes: 5
-  
+
   # Cache settings
   enable_cache: true
   cache_ttl_seconds: 3600  # 1 hour
   cache_max_size_mb: 100
-  
+
   # Rate limiting
   rate_limit_rps: 10.0
   rate_limit_burst: 20
   enable_circuit_breaker: true
   circuit_breaker_threshold: 5
   circuit_breaker_recovery_seconds: 60
-  
+
   # Retry settings
   max_retry_attempts: 3
   retry_backoff_factor: 2.0
