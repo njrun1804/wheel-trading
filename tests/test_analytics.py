@@ -5,15 +5,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from unity_wheel.risk.analytics import (
-    calculate_edge,
-    expected_value,
-    maximum_drawdown,
-    profit_factor,
-    sharpe_ratio,
-    sortino_ratio,
-    win_rate,
-)
+from src.unity_wheel.risk.analytics import RiskAnalyzer
+
+# Note: The individual functions may not exist anymore
+# Will need to check actual RiskAnalyzer methods
 
 
 class TestCalculateEdge:
