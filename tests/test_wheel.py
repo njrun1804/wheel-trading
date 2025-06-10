@@ -27,8 +27,9 @@ class TestWheelStrategy:
         )
 
         # Should pick a strike below current price
-        assert optimal < 100
-        assert optimal in strikes
+        assert optimal is not None
+        assert optimal.strike < 100
+        assert optimal.strike in strikes
 
     def test_find_optimal_put_strike_no_strikes(self, wheel):
         """Test handling empty strike list."""
@@ -52,8 +53,9 @@ class TestWheelStrategy:
         )
 
         # Should pick a strike above cost basis
-        assert optimal >= 98
-        assert optimal in strikes
+        assert optimal is not None
+        assert optimal.strike >= 98
+        assert optimal.strike in strikes
 
     def test_find_optimal_call_strike_no_valid_strikes(self, wheel):
         """Test when no strikes are above cost basis."""

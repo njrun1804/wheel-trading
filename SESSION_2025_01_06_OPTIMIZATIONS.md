@@ -31,6 +31,7 @@
 
 ### 5. ✅ Performance Optimization (5x speedup)
 - Created `find_optimal_put_strike_vectorized()` method
+- Added `find_optimal_call_strike_vectorized()` method
 - Processes all strikes at once using numpy arrays
 - Expected performance gains:
   - Strike selection: 100ms → 10ms (10x)

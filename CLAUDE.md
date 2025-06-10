@@ -764,6 +764,7 @@ Market Data → Validation → Risk Analysis → Strategy → Recommendation
 
 ### New Methods
 - `WheelStrategy.find_optimal_put_strike_vectorized()` - 10x faster strike selection
+- `WheelStrategy.find_optimal_call_strike_vectorized()` - vectorized call selection
 - `RiskAnalytics.aggregate_portfolio_greeks()` - Now returns confidence score
 - `PositionSizeResult.confidence` - All position sizing includes confidence
 
