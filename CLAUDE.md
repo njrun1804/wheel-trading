@@ -101,6 +101,8 @@ src/unity_wheel/strategy/wheel.py:626       # WheelStrategy implementation
 src/unity_wheel/risk/analytics.py:798       # Risk calculations (now with confidence)
 src/unity_wheel/math/options.py:746         # Black-Scholes, Greeks
 src/unity_wheel/utils/position_sizing.py:71 # DynamicPositionSizer (unified)
+src/unity_wheel/utils/trading_calendar.py   # Trading day detection & option expiries
+src/unity_wheel/utils/trading_calendar_enhancements.py # Early closes & earnings
 
 # Configuration
 src/config/schema.py:924                    # All config schemas
@@ -144,6 +146,26 @@ API_CALL_SLA = 1000.0             # External API calls
 FAILURE_THRESHOLD = 5             # Consecutive failures before open
 RESET_TIMEOUT = 60                # Seconds before circuit reset
 RATE_LIMIT = 60                   # Requests per minute
+```
+
+### Trading Calendar Usage
+```python
+# Check if market is open
+from src.unity_wheel.utils import is_trading_day
+if not is_trading_day(datetime.now()):
+    print("Market is closed")
+
+# Find next option expiration
+from src.unity_wheel.utils import SimpleTradingCalendar
+calendar = SimpleTradingCalendar()
+next_expiry = calendar.get_next_expiry_friday(datetime.now())
+trading_days = calendar.days_to_next_expiry(datetime.now())
+
+# Check for early close or earnings
+from src.unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
+enhanced = EnhancedTradingCalendar()
+is_early_close = enhanced.is_early_close(datetime.now())
+near_earnings = enhanced.is_near_unity_earnings(datetime.now(), days_buffer=7)
 ```
 
 ### Common Code Patterns

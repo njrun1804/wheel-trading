@@ -18,6 +18,12 @@ from .recovery import (
     recovery_manager,
     with_recovery,
 )
+from .trading_calendar import (
+    SimpleTradingCalendar,
+    days_to_expiry,
+    get_next_expiry_friday,
+    is_trading_day,
+)
 
 __all__ = [
     # Logging
@@ -39,4 +45,9 @@ __all__ = [
     "FeatureFlags",
     "FeatureStatus",
     "get_feature_flags",
+    # Trading Calendar
+    "SimpleTradingCalendar",
+    "is_trading_day",
+    "get_next_expiry_friday",
+    "days_to_expiry",
 ]

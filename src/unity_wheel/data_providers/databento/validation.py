@@ -15,6 +15,7 @@ from typing import Dict, List, Tuple
 import pandas as pd
 
 from ...utils.logging import StructuredLogger
+from ...utils.trading_calendar import SimpleTradingCalendar
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -29,33 +30,10 @@ class DataValidator:
     MAX_PRICE_CHANGE_PCT = 50.0  # Max intraday price change
     MIN_OPTIONS_PER_EXPIRY = 10  # Minimum strikes per expiration
 
-    # Known market holidays (2024-2025)
-    MARKET_HOLIDAYS = {
-        datetime(2024, 1, 1).date(),  # New Year's
-        datetime(2024, 1, 15).date(),  # MLK Day
-        datetime(2024, 2, 19).date(),  # Presidents Day
-        datetime(2024, 3, 29).date(),  # Good Friday
-        datetime(2024, 5, 27).date(),  # Memorial Day
-        datetime(2024, 6, 19).date(),  # Juneteenth
-        datetime(2024, 7, 4).date(),  # Independence Day
-        datetime(2024, 9, 2).date(),  # Labor Day
-        datetime(2024, 11, 28).date(),  # Thanksgiving
-        datetime(2024, 12, 25).date(),  # Christmas
-        datetime(2025, 1, 1).date(),  # New Year's
-        datetime(2025, 1, 20).date(),  # MLK Day
-        datetime(2025, 2, 17).date(),  # Presidents Day
-        datetime(2025, 4, 18).date(),  # Good Friday
-        datetime(2025, 5, 26).date(),  # Memorial Day
-        datetime(2025, 6, 19).date(),  # Juneteenth
-        datetime(2025, 7, 4).date(),  # Independence Day
-        datetime(2025, 9, 1).date(),  # Labor Day
-        datetime(2025, 11, 27).date(),  # Thanksgiving
-        datetime(2025, 12, 25).date(),  # Christmas
-    }
-
     def __init__(self):
         """Initialize validator."""
         self.validation_results: List[Dict] = []
+        self.calendar = SimpleTradingCalendar()
 
     def validate_historical_completeness(
         self, chains: List[OptionChain], start_date: datetime, end_date: datetime
@@ -77,16 +55,9 @@ class DataValidator:
         # Get all dates with data
         data_dates = {chain.timestamp.date() for chain in chains}
 
-        # Generate expected trading days
-        expected_dates = set()
-        current = start_date.date()
-        while current <= end_date.date():
-            # Skip weekends
-            if current.weekday() < 5:  # Monday = 0, Friday = 4
-                # Skip holidays
-                if current not in self.MARKET_HOLIDAYS:
-                    expected_dates.add(current)
-            current += timedelta(days=1)
+        # Generate expected trading days using the trading calendar
+        trading_days = self.calendar.get_trading_days_between(start_date, end_date)
+        expected_dates = set(trading_days)
 
         # Find missing dates
         missing_dates = expected_dates - data_dates
