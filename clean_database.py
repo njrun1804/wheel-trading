@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 """Clean up database - remove empty tables and fix data issues."""
+
 import os
 
+import logging
 import duckdb
+
+from src.unity_wheel.utils.logging import StructuredLogger
+
+logger = StructuredLogger(logging.getLogger(__name__))
 
 db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 conn = duckdb.connect(db_path)
@@ -27,8 +33,8 @@ for table in empty_tables:
         if count == 0:
             print(f"   Dropping empty table: {table}")
             conn.execute(f"DROP TABLE IF EXISTS {table}")
-    except:
-        pass
+    except duckdb.Error as exc:
+        logger.warning("Failed to check or drop table", extra={"table": table, "error": str(exc)})
 
 # Fix inverted spreads in options data
 print("\n🔧 FIXING INVERTED SPREADS:")

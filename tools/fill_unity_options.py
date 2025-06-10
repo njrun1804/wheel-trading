@@ -3,11 +3,16 @@
 Fill remaining Unity options data to reach target of ~13,230 options.
 Simplified version without timezone issues.
 """
+import logging
 import os
 import sys
 from datetime import datetime, timedelta
 
 import duckdb
+
+from src.unity_wheel.utils.logging import StructuredLogger
+
+logger = StructuredLogger(logging.getLogger(__name__))
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -157,8 +162,11 @@ def main():
                         ],
                     )
                     options_added += 1
-                except:
-                    pass  # Skip if already exists
+                except duckdb.Error as exc:
+                    logger.debug(
+                        "Duplicate option",
+                        extra={"expiration": expiration, "strike": strike, "error": str(exc)},
+                    )  # Skip if already exists
 
         if options_added % 100 == 0:
             print(f"\r   Added {options_added:,} options...", end="")
@@ -241,8 +249,11 @@ def main():
                         ],
                     )
                     options_added += 1
-                except:
-                    pass
+                except duckdb.Error as exc:
+                    logger.debug(
+                        "Duplicate option",
+                        extra={"expiration": expiration, "strike": strike, "error": str(exc)},
+                    )
 
     conn.commit()
 

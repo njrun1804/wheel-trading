@@ -3,11 +3,16 @@
 Generate missing Unity options data to complete the dataset.
 This will create synthetic but realistic options data for dates that are missing.
 """
+import logging
 import os
 import sys
 from datetime import datetime, timedelta
 
 import duckdb
+
+from src.unity_wheel.utils.logging import StructuredLogger
+
+logger = StructuredLogger(logging.getLogger(__name__))
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -228,8 +233,15 @@ def main():
                     )
                     inserted += 1
                     options_added += 1
-                except:
-                    pass  # Skip duplicates
+                except duckdb.Error as exc:
+                    logger.debug(
+                        "Duplicate option",
+                        extra={
+                            "expiration": expiration,
+                            "strike": opt.get("strike"),
+                            "error": str(exc),
+                        },
+                    )  # Skip duplicates
 
             if inserted > 0:
                 print(f"   Added {inserted} options for {expiration} expiration")
