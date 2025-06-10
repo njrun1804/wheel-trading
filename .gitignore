@@ -84,4 +84,6 @@ diagnostics_history.json
 __pycache__/
 .env.local
 .codex/
+!.codex/
+!.codex/README.md
 .claude/

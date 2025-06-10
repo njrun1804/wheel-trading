@@ -277,6 +277,19 @@ poetry run mypy src/ --strict
 poetry run pre-commit run --all-files
 ```
 
+### Optimization Workflow
+
+Run the full suite of formatters, type checkers, and tests before opening a pull request:
+
+```bash
+ruff format . && black .
+ruff check --fix .
+mypy --strict unity_trading data_pipeline ml_engine strategy_engine risk_engine app --ignore-missing-imports
+pip-compile --dry-run       # only if requirements/ changed
+pytest -q
+```
+Integration tests under `tests/integration/` automatically skip when API keys are absent.
+
 ## 📈 Performance
 
 ### Calculation Benchmarks
