@@ -79,7 +79,7 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
 
             headers = {
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json"
+                "Accept": "application/json",
             }
 
             print(f"   Using POST body credentials: {client_id}:***")
