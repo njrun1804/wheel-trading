@@ -75,6 +75,7 @@ log "📊 Checking economic data..."
 FRED_AGE=$(python -c "
 import duckdb
 import os
+import sys
 from datetime import datetime, timedelta
 db_path = os.path.expanduser('~/.wheel_trading/cache/wheel_cache.duckdb')
 if os.path.exists(db_path):
@@ -85,7 +86,8 @@ if os.path.exists(db_path):
             FROM fred_observations
         \"\"\").fetchone()
         print(result[0] if result and result[0] else 999)
-    except:
+    except Exception as exc:
+        print(f"Error checking FRED data age: {exc}", file=sys.stderr)
         print(999)
     finally:
         conn.close()

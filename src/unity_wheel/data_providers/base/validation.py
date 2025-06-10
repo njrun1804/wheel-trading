@@ -329,7 +329,11 @@ class MarketDataValidator:
         if isinstance(timestamp, str):
             try:
                 timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-            except:
+            except ValueError as exc:
+                logger.warning(
+                    "invalid_iso_timestamp",
+                    extra={"timestamp": timestamp, "error": str(exc)},
+                )
                 return False
 
         if not isinstance(timestamp, datetime):

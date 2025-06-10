@@ -8,6 +8,9 @@ import sys
 from datetime import datetime, timedelta
 
 import duckdb
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -157,8 +160,8 @@ def main():
                         ],
                     )
                     options_added += 1
-                except:
-                    pass  # Skip if already exists
+                except duckdb.Error as exc:
+                    logger.warning("skip_duplicate_option", extra={"error": str(exc)})
 
         if options_added % 100 == 0:
             print(f"\r   Added {options_added:,} options...", end="")
@@ -241,8 +244,8 @@ def main():
                         ],
                     )
                     options_added += 1
-                except:
-                    pass
+                except duckdb.Error as exc:
+                    logger.warning("insert_failed", extra={"error": str(exc)})
 
     conn.commit()
 

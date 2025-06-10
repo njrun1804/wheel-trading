@@ -97,7 +97,8 @@ for service in required:
             print(f'✅ {service.capitalize()} credentials found')
         else:
             missing.append(service)
-    except:
+    except Exception as exc:
+        print(f'Error retrieving {service} credentials: {exc}')
         missing.append(service)
 
 if missing:

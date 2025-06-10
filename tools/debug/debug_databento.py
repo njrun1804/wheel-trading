@@ -10,6 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.utils import setup_structured_logging
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def debug_databento():
@@ -114,8 +117,8 @@ async def debug_databento():
         try:
             # This would require admin API access
             print("   Note: Full dataset listing requires admin access")
-        except:
-            pass
+        except Exception as exc:
+            logger.error("dataset_listing_failed", exc_info=exc)
 
     finally:
         await client.close()

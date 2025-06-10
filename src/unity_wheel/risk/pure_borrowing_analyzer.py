@@ -138,7 +138,11 @@ class PureBorrowingAnalyzer:
             # Search between -50% and 500% annual return
             daily_irr = brentq(npv_at_rate, -0.5, 5.0, maxiter=100)
             return daily_irr
-        except:
+        except (ValueError, RuntimeError) as exc:
+            logger.warning(
+                "irr_calculation_failed",
+                extra={"error": str(exc), "cash_flows": cash_flows},
+            )
             return None
 
     def analyze_investment(
