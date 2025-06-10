@@ -6,15 +6,14 @@ with borrowed capital considerations.
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from scipy import optimize, stats
-from scipy.stats import norm
 
 from ...config.loader import get_config
 from ..utils.logging import StructuredLogger
+from ..utils.random_utils import set_seed
 from .borrowing_cost_analyzer import BorrowingCostAnalyzer
 from .pure_borrowing_analyzer import PureBorrowingAnalyzer
 
@@ -104,6 +103,7 @@ class AdvancedFinancialModeling:
         borrowed_amount: float = 0,
         n_simulations: int = 10000,
         include_path_dependency: bool = False,
+        random_seed: int | None = None,
     ) -> MonteCarloResult:
         """
         Run Monte Carlo simulation for Unity wheel returns.
@@ -120,6 +120,8 @@ class AdvancedFinancialModeling:
         Returns:
             MonteCarloResult with statistics
         """
+        set_seed(random_seed)
+
         # Convert to daily parameters
         daily_return = expected_return / 252
         daily_vol = volatility / np.sqrt(252)
@@ -449,7 +451,10 @@ class AdvancedFinancialModeling:
         # Leverage constraint for each period
         for i in range(n_periods):
             constraints.append(
-                {"type": "ineq", "fun": lambda x, idx=i: max_leverage * initial_capital - x[idx]}
+                {
+                    "type": "ineq",
+                    "fun": lambda x, idx=i: max_leverage * initial_capital - x[idx],
+                }
             )
 
         # Non-negative borrowing
