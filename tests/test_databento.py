@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from src.unity_wheel.data_providers.databento.client import DatentoClient
+from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.data_providers.databento.types import (
     DataQuality,
     InstrumentDefinition,
@@ -19,7 +19,7 @@ from src.unity_wheel.data_providers.databento.types import (
 from src.unity_wheel.data_providers.databento.validation import DataValidator
 
 
-class TestDatentoTypes:
+class TestDatabentoTypes:
     """Test Databento data types."""
 
     def test_instrument_definition_from_databento(self):

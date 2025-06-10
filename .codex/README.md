@@ -13,9 +13,11 @@ You now have unrestricted access to optimize the Unity Wheel Trading Bot codebas
 ├── find_optimizations.sh    # Script to find opportunities
 └── README.md               # This file
 
-unity_trading/ → src/unity_wheel/    # 123 Python files
-data_pipeline/config/ → src/config/  # Configuration system
+src/unity_wheel/                     # 123 Python files (main codebase)
+src/config/                          # Configuration system
 tests/                               # 106+ passing tests
+
+# Import paths: Use src.unity_wheel.* for all imports
 ```
 
 ## 🚀 **QUICK START**

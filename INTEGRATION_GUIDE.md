@@ -1,5 +1,8 @@
 # Integration Guide
 
+> **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies.
+> For a more conservative approach, see `examples/core/conservative_config.yaml`
+
 This guide consolidates all external service integrations for the Unity Wheel Trading Bot v2.0. The system follows a pull-when-asked architecture for all data sources.
 
 ## Table of Contents
