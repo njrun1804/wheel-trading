@@ -64,7 +64,7 @@ def main() -> None:
             sys.exit(1)
         print("=" * 50 + "\n")
 
-    print(f"\n🎯 Unity Wheel Trading Decision Engine")
+    print("\n🎯 Unity Wheel Trading Decision Engine")
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 50)
 
@@ -118,7 +118,7 @@ def main() -> None:
         if strike_rec:
             print(f"\n⚠️  No recommendation - confidence too low ({strike_rec.confidence:.0%})")
         else:
-            print(f"\n⚠️  No suitable strikes found")
+            print("\n⚠️  No suitable strikes found")
 
     print("\n" + "=" * 50)
     print("Note: Using demo data. Connect broker for live recommendations.\n")

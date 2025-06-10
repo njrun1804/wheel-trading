@@ -14,11 +14,9 @@ import pandas as pd
 from src.unity_wheel.utils import get_logger, timed_operation
 
 from ..fred.fred_models import (
-    FREDDataPoint,
     FREDDataset,
     FREDObservation,
     FREDSeries,
-    UpdateFrequency,
 )
 
 logger = get_logger(__name__)

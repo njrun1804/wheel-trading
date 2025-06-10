@@ -6,13 +6,13 @@ the codebase. Codex should follow these patterns for consistency.
 
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, TypeVar, Union
+from typing import List, Optional, TypeVar, Union
 
 import numpy as np
 from pydantic import BaseModel, Field, validator
 
 from ..utils.logging import get_logger
-from ..utils.validate import die, validate_positive, validate_range
+from ..utils.validate import die, validate_positive
 
 logger = get_logger(__name__)
 
@@ -290,7 +290,7 @@ def validate_option_expiry(
     3. Consider trading calendar
     4. Return standardized datetime
     """
-    from ..utils.trading_calendar import get_next_expiry_friday, is_trading_day
+    from ..utils.trading_calendar import is_trading_day
 
     # Parse expiry date
     if isinstance(expiry, str):

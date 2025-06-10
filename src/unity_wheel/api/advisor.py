@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..analytics import UnityAssignmentModel
-from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits, analyze_borrowing_decision
+from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
@@ -23,7 +21,7 @@ from ..utils import (
     timed_operation,
     with_recovery,
 )
-from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
+from .types import MarketSnapshot, OptionData, Recommendation, RiskMetrics
 
 # Lazy imports to avoid circular dependency
 _market_validator = None

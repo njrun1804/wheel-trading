@@ -3,8 +3,6 @@ DuckDB-based local cache for all market data.
 Provides SQL interface with automatic TTL and LRU eviction.
 """
 
-import asyncio
-import os
 import re
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -29,7 +27,6 @@ except ImportError:
             raise ImportError("DuckDB not available on this platform")
 
 
-import pandas as pd
 
 from ..utils import get_logger
 

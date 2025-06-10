@@ -249,7 +249,6 @@ class UnityAdaptiveSystem:
 
         # Otherwise return the previous stable regime
         # Find the most common regime in history
-        from collections import Counter
 
         regime_counts = Counter(r for dt, r in self._regime_history)
         stable_regime = regime_counts.most_common(1)[0][0]

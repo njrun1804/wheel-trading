@@ -99,7 +99,7 @@ class SingleAccountManager:
         self._calculate_unity_exposure(account)
 
         logger.info(
-            f"Parsed Schwab account",
+            "Parsed Schwab account",
             extra={
                 "account_id": account.account_id,
                 "total_value": account.total_value,

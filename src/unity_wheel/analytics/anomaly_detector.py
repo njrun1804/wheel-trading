@@ -4,8 +4,8 @@ Identifies when current market deviates from historical norms.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from datetime import datetime
+from typing import Dict, List, NamedTuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -14,8 +14,7 @@ from sklearn.ensemble import IsolationForest
 
 from src.config.loader import get_config
 
-from ..utils import get_logger, timed_operation, with_recovery
-from ..utils.recovery import RecoveryStrategy
+from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
 

@@ -1,17 +1,12 @@
 """Comprehensive tests for FRED data integration."""
 
 import asyncio
-import json
 import os
-import sqlite3
 from datetime import date as Date
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import List
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from aiohttp import ClientError
 
 from src.unity_wheel.data_providers.base import (
     FREDClient,

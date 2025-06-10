@@ -15,10 +15,7 @@ from typing import Any, Dict, List, Optional
 import duckdb
 import pandas as pd
 
-from ..data_providers.base import get_anomaly_detector, get_market_validator
-from ..metrics import metrics_collector
-from ..monitoring import get_performance_monitor
-from ..utils import StructuredLogger, get_feature_flags, get_logger
+from ..utils import StructuredLogger, get_logger
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(__name__)

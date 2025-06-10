@@ -5,8 +5,7 @@ from __future__ import annotations
 import json
 import time
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -16,7 +15,7 @@ from unity_wheel.diagnostics import SelfDiagnostics
 from unity_wheel.monitoring import get_performance_monitor
 from unity_wheel.risk import RiskLimits
 from unity_wheel.strategy import WheelParameters
-from unity_wheel.utils import FeatureStatus, get_feature_flags
+from unity_wheel.utils import get_feature_flags
 
 
 @pytest.fixture

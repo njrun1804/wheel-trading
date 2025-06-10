@@ -6,7 +6,7 @@ Now with adaptive limits that adjust to market conditions.
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import Dict, List, NamedTuple, Optional
 
 from src.config.loader import get_config
 

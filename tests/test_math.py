@@ -10,7 +10,6 @@ from src.unity_wheel.math.options import (
     implied_volatility_validated,
     probability_itm_validated,
 )
-from src.unity_wheel.risk.analytics import RiskAnalyzer
 
 
 class TestBlackScholesPrice:

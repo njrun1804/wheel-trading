@@ -6,19 +6,16 @@ New tests should use the pull-when-asked architecture with unified storage.
 See test_storage.py for tests of the new storage system.
 """
 
-import asyncio
-import json
 import sqlite3
 import tempfile
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
 from src.unity_wheel.data_providers.schwab.ingestion import (
-    DataGranularity,
     DataRequirements,
     DataStorage,
     SchwabDataIngestion,

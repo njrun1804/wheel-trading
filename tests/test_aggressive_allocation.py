@@ -9,7 +9,6 @@ from decimal import Decimal
 
 import pytest
 
-from src.config.loader import ConfigurationLoader
 from src.unity_wheel.api.advisor import WheelAdvisor
 from src.unity_wheel.models.account import Account
 from src.unity_wheel.models.position import OptionType, Position, PositionType

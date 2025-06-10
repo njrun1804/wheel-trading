@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import List, NamedTuple, Optional, Tuple
@@ -12,7 +11,6 @@ import numpy as np
 from src.config.loader import get_config
 
 from ..math import (
-    CalculationResult,
     black_scholes_price_validated,
     calculate_all_greeks,
     probability_itm_validated,

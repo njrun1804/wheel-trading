@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
-from typing import Literal, Optional, Union
+from typing import Optional, Union
 
 logger = logging.getLogger(__name__)
 

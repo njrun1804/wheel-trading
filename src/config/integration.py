@@ -6,7 +6,6 @@ Provides compatibility and migration utilities.
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import SecretStr
 
 from .base import Settings
 from .loader import get_config, get_config_loader

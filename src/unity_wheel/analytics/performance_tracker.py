@@ -5,10 +5,10 @@ Tracks Unity-specific patterns and learns from actual results.
 
 import json
 import sqlite3
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from ..utils import get_logger
 

@@ -9,10 +9,9 @@ import socket
 import ssl
 import subprocess
 import webbrowser
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Optional, Tuple
-from urllib.parse import parse_qs, urlencode
+from typing import Dict
+from urllib.parse import urlencode
 
 import aiohttp
 from aiohttp import web
@@ -100,9 +99,6 @@ class OAuth2Handler:
 
     async def _run_callback_server(self, port: int) -> None:
         """Run the callback server to receive auth code."""
-        import os
-        import ssl
-        import tempfile
 
         app = web.Application()
         app.router.add_get("/callback", self._handle_callback)

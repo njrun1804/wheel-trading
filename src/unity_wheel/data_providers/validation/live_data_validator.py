@@ -6,7 +6,7 @@ are based on real market data from Databento, never mock or placeholder values.
 
 import os
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from src.unity_wheel.utils import get_logger
 

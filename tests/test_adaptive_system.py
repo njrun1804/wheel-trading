@@ -5,7 +5,6 @@ Verifies core logic without complex dependencies.
 
 from datetime import datetime
 
-import pytest
 
 
 # Test the core adaptive logic directly

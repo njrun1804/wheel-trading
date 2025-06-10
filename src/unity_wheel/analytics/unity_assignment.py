@@ -7,15 +7,12 @@ Accounts for Unity's unique characteristics:
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple
+from datetime import datetime
+from typing import Dict, Optional
 
-import numpy as np
-from scipy.stats import norm
 
 from src.config.loader import get_config
 
-from ..math.options import CalculationResult, probability_itm_validated
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
 

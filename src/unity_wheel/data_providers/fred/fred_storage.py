@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 from src.unity_wheel.storage.storage import Storage
 from src.unity_wheel.utils import get_logger, timed_operation
 
-from .fred_models import FREDDataset, FREDObservation, FREDSeries, WheelStrategyFREDSeries
+from .fred_models import FREDDataset, FREDObservation, FREDSeries
 
 logger = get_logger(__name__)
 

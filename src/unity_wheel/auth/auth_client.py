@@ -3,8 +3,6 @@ Main authentication client with automatic token management.
 """
 
 import asyncio
-import time
-from datetime import datetime
 from functools import wraps
 from typing import Any, Callable, Dict, Optional
 

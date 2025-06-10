@@ -4,9 +4,9 @@ Response caching for graceful degradation during auth failures.
 
 import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, Dict, Optional, TypeVar
 
 from ..utils.logging import get_logger
 

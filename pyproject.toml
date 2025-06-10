@@ -81,7 +81,7 @@ ensure_newline_before_comments = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
-addopts = "-v"
+addopts = "-v --cov=src/unity_wheel --cov-report=term-missing"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.mypy]
@@ -103,6 +103,15 @@ allow_untyped_calls = true
 allow_untyped_defs = true
 allow_untyped_globals = false
 allow_redefinition = false
+files = [
+    "src/unity_wheel",
+    "unity_trading",
+    "data_pipeline",
+    "ml_engine",
+    "strategy_engine",
+    "risk_engine",
+    "app",
+]
 
 [tool.coverage.run]
 source = ["src/unity_wheel"]
@@ -126,8 +135,6 @@ skips = ["B101", "B601", "B608"]  # B608: Skip SQL injection warnings for valida
 
 [tool.ruff]
 extend-exclude = [
-    "src/*",
-    "tests/*",
     "docs/*",
     "examples/*",
     "tools/*",

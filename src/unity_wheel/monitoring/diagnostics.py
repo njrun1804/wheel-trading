@@ -18,7 +18,6 @@ from src.config.loader import get_config
 from ..math import black_scholes_price_validated, calculate_all_greeks
 from ..models import Account, Greeks, Position
 from ..risk import RiskAnalyzer
-from ..strategy import WheelStrategy
 from ..utils import StructuredLogger, get_logger
 
 logger = get_logger(__name__)
@@ -115,7 +114,7 @@ class SelfDiagnostics:
 
         if critical_passed:
             structured_logger.info(
-                f"Diagnostics passed",
+                "Diagnostics passed",
                 extra={
                     "function": "run_all_checks",
                     "summary": summary,
@@ -125,7 +124,7 @@ class SelfDiagnostics:
             )
         else:
             structured_logger.error(
-                f"Diagnostics failed",
+                "Diagnostics failed",
                 extra={
                     "function": "run_all_checks",
                     "summary": summary,
@@ -175,7 +174,7 @@ class SelfDiagnostics:
                     DiagnosticResult(
                         check_name="math_validation",
                         level="ERROR",
-                        message=f"Black-Scholes calculation outside expected range",
+                        message="Black-Scholes calculation outside expected range",
                         confidence=0.0,
                         details={
                             "calculated": result.value,
@@ -350,7 +349,6 @@ class SelfDiagnostics:
         """Verify type hints are consistent."""
         try:
             # This is a simplified check - in practice would use mypy API
-            import ast
             import inspect
 
             # Check a sample function

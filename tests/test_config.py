@@ -3,12 +3,6 @@ Comprehensive tests for the configuration system.
 Tests schema validation, environment overrides, tracking, and health reporting.
 """
 
-import json
-import os
-import tempfile
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 import yaml
@@ -16,10 +10,7 @@ from pydantic import ValidationError
 
 from src.config.loader import ConfigurationLoader, get_config, get_config_loader
 from src.config.schema import (
-    RiskConfig,
-    StrategyConfig,
     WheelConfig,
-    load_config,
     validate_config_health,
 )
 

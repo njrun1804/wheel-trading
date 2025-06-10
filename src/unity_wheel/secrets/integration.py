@@ -2,7 +2,7 @@
 
 import os
 from functools import lru_cache
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 from ..utils import get_logger
 from .manager import SecretManager

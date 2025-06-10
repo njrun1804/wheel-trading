@@ -6,9 +6,8 @@ import statistics
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
 
 from src.unity_wheel.utils import StructuredLogger, get_logger
 
@@ -289,7 +288,7 @@ class MarketDataValidator:
         # Log validation results
         if is_valid:
             logger.info(
-                f"Data validation passed",
+                "Data validation passed",
                 extra={
                     "function": "validate",
                     "quality_level": quality_level.value,
@@ -300,7 +299,7 @@ class MarketDataValidator:
             )
         else:
             logger.warning(
-                f"Data validation failed",
+                "Data validation failed",
                 extra={
                     "function": "validate",
                     "quality_level": quality_level.value,

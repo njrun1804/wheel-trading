@@ -4,9 +4,8 @@ Handles Databento API limitations and maximizes throughput.
 """
 
 import asyncio
-import os
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import pandas as pd
 from databento_dbn import Schema
@@ -128,7 +127,7 @@ class OptimizedPriceHistoryLoader:
                             await self._store_bars_batch(symbol, all_bars)
                             all_bars = []
                     else:
-                        logger.warning(f"  No data for chunk")
+                        logger.warning("  No data for chunk")
 
                 except Exception as e:
                     errors += 1
@@ -272,7 +271,7 @@ class OptimizedPriceHistoryLoader:
                 conn.execute("COMMIT")
                 logger.info(f"Stored {len(records)} price records")
 
-            except Exception as e:
+            except Exception:
                 conn.execute("ROLLBACK")
                 raise
 

@@ -1,6 +1,5 @@
 """Test data validation with hard failures."""
 
-import sys
 from datetime import datetime
 
 import pytest

@@ -4,7 +4,7 @@ Quantifies historical impact and adjusts strategy parameters.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
@@ -13,8 +13,7 @@ import pandas as pd
 
 from src.config.loader import get_config
 
-from ..utils import get_logger, timed_operation, with_recovery
-from ..utils.recovery import RecoveryStrategy
+from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
 
@@ -137,7 +136,7 @@ class EventImpactAnalyzer:
         # Sort by date
         self.event_calendar.sort(key=lambda x: x.date)
 
-        logger.info(f"Updated event calendar", extra={"n_events": len(self.event_calendar)})
+        logger.info("Updated event calendar", extra={"n_events": len(self.event_calendar)})
 
     def get_next_event(self, event_type: Optional[EventType] = None) -> Optional[UpcomingEvent]:
         """Get next upcoming event of specified type."""

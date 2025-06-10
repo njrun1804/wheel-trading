@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 
 from .logging import get_logger
 
@@ -84,7 +84,7 @@ class CircuitBreaker:
                 if elapsed >= self.recovery_timeout:
                     self._state = "half_open"
                     self._half_open_calls = 0
-                    logger.info(f"Circuit breaker transitioning to half-open")
+                    logger.info("Circuit breaker transitioning to half-open")
         return self._state
 
     def call_succeeded(self) -> None:

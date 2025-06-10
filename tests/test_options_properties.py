@@ -8,9 +8,7 @@ Tests mathematical properties that must hold regardless of inputs:
 """
 
 import math
-from decimal import Decimal
 
-import pytest
 from hypothesis import assume, given, settings, HealthCheck
 from hypothesis import strategies as st
 

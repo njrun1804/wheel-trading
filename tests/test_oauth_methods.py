@@ -28,7 +28,7 @@ async def test_oauth_methods():
     token_url = "https://api.schwabapi.com/v1/oauth/token"
     redirect_uri = "https://127.0.0.1:8182/callback"
 
-    print(f"Testing with:")
+    print("Testing with:")
     print(f"  Client ID: {client_id}")
     print(f"  Secret: {'*' * len(client_secret)} ({len(client_secret)} chars)")
     print(f"  Redirect URI: {redirect_uri}\n")

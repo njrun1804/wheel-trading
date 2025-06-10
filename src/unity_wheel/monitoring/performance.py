@@ -445,7 +445,7 @@ def performance_monitored(operation: Optional[str] = None):
             try:
                 result = func(*args, **kwargs)
                 return result
-            except Exception as e:
+            except Exception:
                 success = False
                 raise
             finally:

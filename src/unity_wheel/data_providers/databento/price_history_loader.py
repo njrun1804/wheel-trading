@@ -3,7 +3,6 @@ Load historical price data for risk calculations.
 Only needs 250 days of daily bars - no options history required.
 """
 
-import asyncio
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 

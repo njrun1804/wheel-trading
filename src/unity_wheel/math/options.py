@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-import warnings
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Literal, NamedTuple, Optional, Tuple, Union, overload

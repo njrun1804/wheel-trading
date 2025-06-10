@@ -97,7 +97,7 @@ async def test_unity_options():
         try:
             chain = await client.get_option_chain("U", expiration)
 
-            print(f"   ✅ Option chain retrieved")
+            print("   ✅ Option chain retrieved")
             print(f"   Spot price: ${chain.spot_price:.2f}")
             print(f"   Calls: {len(chain.calls)}, Puts: {len(chain.puts)}")
 
@@ -108,7 +108,7 @@ async def test_unity_options():
                     chain.puts, key=lambda x: abs(float(x.strike_price) - target_strike)
                 )
 
-                print(f"\n   Example put near 30 delta:")
+                print("\n   Example put near 30 delta:")
                 print(f"   Strike: ${closest_put.strike_price}")
                 print(f"   Bid: ${closest_put.bid_price}, Ask: ${closest_put.ask_price}")
                 print(f"   Spread: {closest_put.spread_pct:.1f}%")

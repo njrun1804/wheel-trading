@@ -3,7 +3,6 @@
 
 import asyncio
 from datetime import date as Date
-from datetime import timedelta
 
 from src.unity_wheel.data_providers.base import FREDDataManager
 from src.unity_wheel.secrets.integration import SecretNotFoundError, get_ofred_api_key

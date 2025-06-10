@@ -1,12 +1,10 @@
-import asyncio
-import json
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from aiohttp import ClientError, ClientResponseError
+from aiohttp import ClientError
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -15,8 +13,6 @@ from src.unity_wheel.schwab import (
     SchwabAccount,
     SchwabAuthError,
     SchwabClient,
-    SchwabDataError,
-    SchwabError,
     SchwabNetworkError,
     SchwabPosition,
 )

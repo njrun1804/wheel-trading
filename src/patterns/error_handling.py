@@ -5,15 +5,12 @@ that should be used throughout the codebase. Codex should reference
 these patterns when generating new code.
 """
 
-import logging
-from dataclasses import dataclass
-from datetime import timedelta
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 
 from ..models.greeks import CalculationResult
-from ..utils.decorators import RecoveryStrategy, cached, timed_operation, with_recovery
+from ..utils.decorators import RecoveryStrategy, timed_operation, with_recovery
 from ..utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -391,7 +388,7 @@ def calculate_with_fallback(
 
         except Exception as fallback_error:
             logger.error(
-                f"Both primary and fallback failed",
+                "Both primary and fallback failed",
                 extra={
                     "primary_error": str(e),
                     "fallback_error": str(fallback_error),

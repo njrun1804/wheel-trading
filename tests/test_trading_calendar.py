@@ -1,6 +1,6 @@
 """Tests for SimpleTradingCalendar."""
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import pytest
 

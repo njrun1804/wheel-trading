@@ -6,17 +6,15 @@ the test suite. Codex should reference these patterns when generating new tests.
 
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import List, Optional
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 
 import numpy as np
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import given, settings
 from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
 from src.unity_wheel.math.options import CalculationResult
-from src.unity_wheel.models.position import Position
 
 # ============================================================================
 # PATTERN 1: Property-based testing for mathematical functions
@@ -480,7 +478,6 @@ class TestConfidencePropagation:
 
     def test_confidence_based_decisions(self):
         """Test decision making based on confidence."""
-        from src.unity_wheel.math.options import CalculationResult
 
         # High confidence - proceed
         high_conf_result = CalculationResult(value=100, confidence=0.95)

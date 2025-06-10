@@ -3,14 +3,11 @@
 from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
-import numpy as np
 import pandas as pd
-import pytest
 
 from src.unity_wheel.data_providers.databento.unity_utils import (
     chain,
     get_equity_bars,
-    get_wheel_candidates,
     spot,
     store_options_in_duckdb,
 )

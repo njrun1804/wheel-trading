@@ -7,7 +7,6 @@ Shows how to use historical data to set optimal parameters.
 import asyncio
 import os
 import sys
-from datetime import datetime
 
 import duckdb
 import numpy as np
@@ -16,7 +15,6 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.unity_wheel.analytics.market_calibrator import MarketCalibrator
-from src.unity_wheel.risk.regime_detector import RegimeDetector
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 
@@ -65,29 +63,29 @@ async def test_calibration():
     print(f"   Confidence: {optimal_params.confidence_score:.1%}")
 
     print("\n🎯 Optimal Parameters:")
-    print(f"\n   Strike Selection:")
+    print("\n   Strike Selection:")
     print(f"   - Put Delta Target: {optimal_params.put_delta_target:.2f}")
     print(
         f"   - Delta Range: {optimal_params.delta_range[0]:.2f} to {optimal_params.delta_range[1]:.2f}"
     )
     print(f"   - Call Delta (if assigned): {optimal_params.call_delta_target:.2f}")
 
-    print(f"\n   Expiration Selection:")
+    print("\n   Expiration Selection:")
     print(f"   - Target DTE: {optimal_params.dte_target} days")
     print(f"   - DTE Range: {optimal_params.dte_range[0]} to {optimal_params.dte_range[1]} days")
 
-    print(f"\n   Position Sizing:")
+    print("\n   Position Sizing:")
     print(
         f"   - Kelly Fraction: {optimal_params.kelly_fraction:.2f} ({optimal_params.kelly_fraction*100:.0f}%)"
     )
     print(f"   - Max Position: {optimal_params.max_position_pct*100:.0f}% of portfolio")
 
-    print(f"\n   Risk Management:")
+    print("\n   Risk Management:")
     print(f"   - Max Daily VaR: {optimal_params.max_var_95*100:.1f}%")
     print(f"   - Profit Target: {optimal_params.profit_target*100:.0f}% of max profit")
     print(f"   - Stop Loss: {optimal_params.stop_loss*100:.0f}% of position")
 
-    print(f"\n   Rolling Rules:")
+    print("\n   Rolling Rules:")
     print(f"   - Roll at {optimal_params.roll_at_dte} DTE")
     print(f"   - Roll at {optimal_params.roll_at_profit_pct*100:.0f}% profit")
     print(f"   - Roll if delta reaches {optimal_params.roll_at_delta:.2f}")

@@ -464,7 +464,7 @@ class SecretManager:
         print("\n✓ All credentials configured successfully!")
         print(f"\nCredentials are stored in: {self.provider.value}")
         if self.provider == SecretProvider.LOCAL:
-            print(f"Location: ~/.wheel_trading/secrets/")
+            print("Location: ~/.wheel_trading/secrets/")
 
     def list_configured_services(self) -> Dict[str, bool]:
         """List which services have been configured.

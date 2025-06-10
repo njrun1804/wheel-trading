@@ -8,7 +8,7 @@ Additional features:
 """
 
 from datetime import date, datetime, time, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 from .trading_calendar import SimpleTradingCalendar
 

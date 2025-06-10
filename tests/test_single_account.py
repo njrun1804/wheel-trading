@@ -1,6 +1,5 @@
 """Test single Schwab account management with hard failures."""
 
-import sys
 
 import pytest
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import numpy as np
 
 from src.unity_wheel.math import (
     black_scholes_price_validated,

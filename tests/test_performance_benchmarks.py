@@ -9,13 +9,11 @@ Ensures that key operations meet performance targets:
 - Memory usage: <100MB for typical portfolio
 """
 
-import os
 import time
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 import numpy as np
-import psutil
 import pytest
 from memory_profiler import memory_usage
 
@@ -25,7 +23,6 @@ from src.unity_wheel.math.options import (
     black_scholes_price_validated,
     calculate_all_greeks,
     implied_volatility_validated,
-    probability_itm_validated,
 )
 from src.unity_wheel.models.account import Account
 from src.unity_wheel.models.position import OptionType, Position, PositionType

@@ -6,7 +6,6 @@ Demonstrates autonomous operation with continuous parameter adjustment.
 
 import os
 import sys
-from datetime import datetime
 
 import duckdb
 import numpy as np
@@ -16,7 +15,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.unity_wheel.analytics.dynamic_optimizer import (
     DynamicOptimizer,
     MarketState,
-    OptimizationResult,
 )
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
@@ -64,7 +62,7 @@ def main():
 
     print("🚀 Unity Dynamic Parameter Optimization")
     print("=" * 60)
-    print(f"Objective: Maximize CAGR - 0.20 × |CVaR₉₅| with ½-Kelly sizing")
+    print("Objective: Maximize CAGR - 0.20 × |CVaR₉₅| with ½-Kelly sizing")
     print("=" * 60)
 
     # Load Unity data
@@ -85,7 +83,7 @@ def main():
     # Calculate current market state
     market_state = calculate_market_state(returns, data)
 
-    print(f"\n📈 Current Market State:")
+    print("\n📈 Current Market State:")
     print(f"   Realized Vol: {market_state.realized_volatility:.1%} annualized")
     print(f"   Vol Percentile: {market_state.volatility_percentile:.1%} (vs history)")
     print(f"   20-day Momentum: {market_state.price_momentum:+.1%}")
@@ -94,17 +92,17 @@ def main():
     optimizer = DynamicOptimizer(symbol="U")
 
     # Run optimization
-    print(f"\n🔧 Running Dynamic Optimization...")
+    print("\n🔧 Running Dynamic Optimization...")
     result = optimizer.optimize_parameters(market_state, returns)
 
     # Display results
-    print(f"\n✅ Optimization Results:")
-    print(f"\n   📊 Optimal Parameters:")
+    print("\n✅ Optimization Results:")
+    print("\n   📊 Optimal Parameters:")
     print(f"   Delta Target: {result.delta_target:.3f}")
     print(f"   DTE Target: {result.dte_target} days")
     print(f"   Kelly Fraction: {result.kelly_fraction:.3f} ({result.kelly_fraction*100:.1f}%)")
 
-    print(f"\n   📈 Expected Outcomes:")
+    print("\n   📈 Expected Outcomes:")
     print(f"   Expected CAGR: {result.expected_cagr:.1%}")
     print(f"   Expected CVaR₉₅: {result.expected_cvar:.1%}")
     print(f"   Objective Value: {result.objective_value:.4f}")
@@ -112,12 +110,12 @@ def main():
     print(f"\n   🎯 Confidence: {result.confidence_score:.1%}")
 
     # Show diagnostics
-    print(f"\n   🔍 Diagnostics:")
+    print("\n   🔍 Diagnostics:")
     for key, value in result.diagnostics.items():
         print(f"   {key}: {value:+.3f}")
 
     # Validate results
-    print(f"\n🔒 Autonomous Validation:")
+    print("\n🔒 Autonomous Validation:")
     validation = optimizer.validate_optimization(result)
     all_passed = all(validation.values())
 
@@ -126,24 +124,24 @@ def main():
         print(f"   {status} {check}")
 
     if all_passed:
-        print(f"\n✅ All validation checks passed!")
+        print("\n✅ All validation checks passed!")
     else:
-        print(f"\n⚠️  Some validation checks failed - review parameters")
+        print("\n⚠️  Some validation checks failed - review parameters")
 
     # Compare with static approach
-    print(f"\n📊 Dynamic vs Static Comparison:")
+    print("\n📊 Dynamic vs Static Comparison:")
 
     # Static parameters
     static_delta = 0.30
     static_dte = 45
     static_kelly = 0.50
 
-    print(f"\n   Static Approach:")
+    print("\n   Static Approach:")
     print(f"   - Delta: {static_delta:.2f} (fixed)")
     print(f"   - DTE: {static_dte} days (fixed)")
     print(f"   - Kelly: {static_kelly:.2f} (fixed)")
 
-    print(f"\n   Dynamic Approach:")
+    print("\n   Dynamic Approach:")
     print(
         f"   - Delta: {result.delta_target:.3f} (adjusted for vol percentile: {market_state.volatility_percentile:.0%})"
     )
@@ -151,8 +149,8 @@ def main():
     print(f"   - Kelly: {result.kelly_fraction:.3f} (reduced for risk management)")
 
     # Show continuous adjustment
-    print(f"\n📉 Continuous Adjustment Example:")
-    print(f"   As volatility percentile changes, parameters adjust smoothly:")
+    print("\n📉 Continuous Adjustment Example:")
+    print("   As volatility percentile changes, parameters adjust smoothly:")
 
     vol_percentiles = [0.1, 0.3, 0.5, 0.7, 0.9]
     for vp in vol_percentiles:
@@ -169,17 +167,17 @@ def main():
         )
 
     # Show how it optimizes objective function
-    print(f"\n🎯 Objective Function Optimization:")
-    print(f"   Formula: CAGR - 0.20 × |CVaR₉₅|")
-    print(f"\n   Current optimization:")
+    print("\n🎯 Objective Function Optimization:")
+    print("   Formula: CAGR - 0.20 × |CVaR₉₅|")
+    print("\n   Current optimization:")
     print(
         f"   {result.expected_cagr:.3f} - 0.20 × |{result.expected_cvar:.3f}| = {result.objective_value:.4f}"
     )
 
     # Integration with system
-    print(f"\n🔗 System Integration:")
+    print("\n🔗 System Integration:")
     print(
-        f"""
+        """
     async def get_wheel_recommendation():
         # 1. Load current market data
         market_state = calculate_market_state(...)

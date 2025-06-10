@@ -4,7 +4,6 @@ Ensures autonomous operation and proper error handling.
 """
 
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock
 
 import numpy as np
 import pandas as pd
@@ -14,7 +13,6 @@ from src.unity_wheel.analytics import (
     AnomalyDetector,
     DynamicOptimizer,
     EventImpactAnalyzer,
-    EventType,
     IntegratedDecisionEngine,
     IVSurfaceAnalyzer,
     MarketState,

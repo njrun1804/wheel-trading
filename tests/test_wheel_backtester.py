@@ -1,7 +1,7 @@
 """Tests for wheel strategy backtester."""
 
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
+from datetime import datetime
+from unittest.mock import AsyncMock, Mock
 
 import numpy as np
 import pandas as pd

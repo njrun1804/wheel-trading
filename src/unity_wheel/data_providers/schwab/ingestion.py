@@ -5,18 +5,14 @@ Implements efficient data pulling with rate limiting, caching, and validation
 for positions, orders, transactions, and account data needed for wheel strategy decisions.
 """
 
-import asyncio
 import json
 import sqlite3
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-import aiohttp
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.unity_wheel.auth.rate_limiter import RateLimiter
 from src.unity_wheel.storage.cache.general_cache import IntelligentCache
@@ -25,7 +21,6 @@ from src.unity_wheel.utils.logging import StructuredLogger, get_logger, timed_op
 from src.unity_wheel.utils.recovery import RecoveryStrategy, with_recovery
 
 from .auth_client import SchwabClient
-from .exceptions import SchwabError, SchwabRateLimitError
 from .types import SchwabAccount, SchwabPosition
 
 logger = get_logger(__name__)

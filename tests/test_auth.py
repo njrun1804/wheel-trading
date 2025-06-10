@@ -3,16 +3,13 @@ Comprehensive tests for authentication system.
 """
 
 import asyncio
-import json
-from datetime import datetime, timedelta
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 import pytest
 from aiohttp import web
 
-from src.unity_wheel.auth import AuthClient, AuthError, RateLimitError, TokenExpiredError
+from src.unity_wheel.auth import AuthClient, RateLimitError
 from src.unity_wheel.auth.rate_limiter import RateLimiter
 from src.unity_wheel.storage.auth_storage import SecureTokenStorage
 from src.unity_wheel.storage.cache.auth_cache import AuthCache

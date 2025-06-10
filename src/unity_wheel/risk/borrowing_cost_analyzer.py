@@ -6,10 +6,8 @@ when considering positions.
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-import numpy as np
 
 from src.config.loader import get_config
 from src.unity_wheel.utils.logging import StructuredLogger

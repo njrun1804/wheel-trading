@@ -10,7 +10,7 @@ from contextvars import ContextVar
 from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, MutableMapping, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, List, MutableMapping, Optional, TypeVar
 
 # Context variables for request tracking
 request_id: ContextVar[Optional[str]] = ContextVar("request_id", default=None)

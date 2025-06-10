@@ -6,10 +6,8 @@ Bridges:
 - Historical data → Backtesting
 """
 
-import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -20,7 +18,7 @@ from src.unity_wheel.models.position import Position
 from src.unity_wheel.utils.logging import StructuredLogger
 
 from .client import DatabentoClient
-from .types import InstrumentDefinition, OptionChain, OptionQuote
+from .types import InstrumentDefinition, OptionQuote
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

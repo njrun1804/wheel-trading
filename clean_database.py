@@ -27,8 +27,8 @@ for table in empty_tables:
         if count == 0:
             print(f"   Dropping empty table: {table}")
             conn.execute(f"DROP TABLE IF EXISTS {table}")
-    except:
-        pass
+    except Exception as exc:  # noqa: BLE001
+        print(f"   ⚠️  Failed to inspect table {table}: {exc}")
 
 # Fix inverted spreads in options data
 print("\n🔧 FIXING INVERTED SPREADS:")

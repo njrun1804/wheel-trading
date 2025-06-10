@@ -5,10 +5,8 @@ This module provides simple functions to fetch data from Schwab API
 on demand. All storage is handled by the unified storage layer.
 """
 
-import json
 from datetime import datetime
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from src.unity_wheel.utils.logging import get_logger
 

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
-from src.unity_wheel.risk.analytics import RiskAnalyzer
 
 # Note: The individual functions may not exist anymore
 # Will need to check actual RiskAnalyzer methods

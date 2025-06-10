@@ -1,10 +1,8 @@
 """Unity-specific fill price modeling with bid-ask spreads and size impact."""
 
-import logging
 import sys
 from dataclasses import dataclass
-from decimal import ROUND_HALF_UP, Decimal
-from typing import NoReturn, Optional, Tuple
+from typing import NoReturn, Tuple
 
 from ..utils.logging import get_logger
 

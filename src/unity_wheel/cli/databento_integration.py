@@ -3,7 +3,6 @@
 import asyncio
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict
 
 from src.config import get_settings
 from src.unity_wheel.api.types import MarketSnapshot, OptionData

@@ -8,12 +8,12 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 import yaml
 from pydantic import ValidationError
 
-from .schema import WheelConfig, load_config, validate_config_health
+from .schema import WheelConfig, validate_config_health
 
 logger = logging.getLogger(__name__)
 

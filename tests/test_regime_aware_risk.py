@@ -6,12 +6,10 @@ Handles volatility regime changes to avoid skewing risk metrics.
 
 import os
 import warnings
-from datetime import datetime, timedelta
 
 import duckdb
 import numpy as np
 import pandas as pd
-from scipy import stats
 from sklearn.mixture import GaussianMixture
 
 warnings.filterwarnings("ignore")
@@ -199,7 +197,7 @@ def main():
     dates = [r[0] for r in returns_data]
     returns = np.array([float(r[1]) for r in returns_data])
 
-    print(f"\n📊 Data Summary:")
+    print("\n📊 Data Summary:")
     print(f"   Total days: {len(returns)}")
     print(f"   Date range: {dates[0]} to {dates[-1]}")
 

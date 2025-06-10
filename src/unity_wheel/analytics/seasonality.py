@@ -6,11 +6,11 @@ Identifies recurring patterns to optimize entry timing.
 import calendar
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import Dict, List, NamedTuple, Optional
 
 import numpy as np
 import pandas as pd
-from scipy import signal, stats
+from scipy import stats
 
 from src.config.loader import get_config
 
@@ -147,7 +147,7 @@ class SeasonalityDetector:
             )
 
             logger.info(
-                f"Day of week pattern detected",
+                "Day of week pattern detected",
                 extra={
                     "best_day": calendar.day_name[best_day],
                     "worst_day": calendar.day_name[worst_day],
@@ -251,7 +251,7 @@ class SeasonalityDetector:
                 )
 
                 logger.info(
-                    f"Earnings cycle pattern detected",
+                    "Earnings cycle pattern detected",
                     extra={
                         "earnings_vol": earnings_vol,
                         "other_vol": other_vol,
@@ -457,7 +457,7 @@ class SeasonalityDetector:
 
         if adjustments_applied:
             logger.info(
-                f"Applied seasonal adjustments",
+                "Applied seasonal adjustments",
                 extra={"patterns": adjustments_applied, "date": current_date.strftime("%Y-%m-%d")},
             )
 

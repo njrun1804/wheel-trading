@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.analytics import EventType, IntegratedDecisionEngine
+from src.unity_wheel.analytics import IntegratedDecisionEngine
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 
@@ -236,7 +236,7 @@ async def main():
         "realized_vol": float(historical_data["returns"].iloc[-20:].std() * np.sqrt(252)),
     }
 
-    print(f"\n📈 Current Market Data:")
+    print("\n📈 Current Market Data:")
     print(f"   Price: ${current_prices['close']:.2f}")
     print(f"   Volume: {current_prices['volume']:,.0f}")
     print(f"   Realized Vol: {current_prices['realized_vol']:.1%}")

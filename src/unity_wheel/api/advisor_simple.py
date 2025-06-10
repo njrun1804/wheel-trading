@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Dict, Optional
 
 from ..execution import UnityFillModel
 from ..portfolio import SingleAccountManager, die
 from ..risk import RiskLimits
 from ..strategy import WheelParameters
-from ..utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
-from ..utils.data_validator import DataValidator, validate_market_data
+from ..utils import get_logger, timed_operation
+from ..utils.data_validator import validate_market_data
 from .advisor import WheelAdvisor
 from .types import MarketSnapshot, Recommendation
 

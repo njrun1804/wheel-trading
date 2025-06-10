@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 from ..data.market_data import MarketDataFetcher, UnityEarningsCalendar
 from ..models import Greeks, Position
 from ..strategy.adaptive_base import OutcomeTracker, UnityAdaptiveSystem, UnityConditions
-from ..strategy.wheel import StrikeRecommendation, WheelParameters, WheelStrategy
+from ..strategy.wheel import WheelParameters, WheelStrategy
 from ..utils import get_logger
 
 logger = get_logger(__name__)

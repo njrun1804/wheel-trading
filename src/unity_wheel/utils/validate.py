@@ -5,9 +5,8 @@ from __future__ import annotations
 import importlib
 import logging
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 from rich.console import Console
@@ -275,7 +274,7 @@ class EnvironmentValidator:
         total_checks = len(self.results)
         passed_checks = sum(1 for passed, _ in self.results.values() if passed)
 
-        console.print(f"\n[bold]Summary:[/bold]")
+        console.print("\n[bold]Summary:[/bold]")
         console.print(f"Total checks: {total_checks}")
         console.print(f"Passed: [green]{passed_checks}[/green]")
         console.print(f"Failed: [red]{total_checks - passed_checks}[/red]")

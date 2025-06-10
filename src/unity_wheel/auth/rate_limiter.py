@@ -6,7 +6,6 @@ import asyncio
 import time
 from collections import deque
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
 from typing import Deque, Dict, Optional
 
 from ..utils.logging import get_logger

@@ -2,7 +2,7 @@
 
 import sys
 from datetime import datetime
-from typing import Any, Dict, List, NoReturn, Optional
+from typing import Any, Dict, List, NoReturn
 
 from .logging import get_logger
 

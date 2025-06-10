@@ -8,8 +8,7 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import databento as db
-from databento_dbn import Schema, SType
+from databento_dbn import Schema
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
 from src.unity_wheel.utils import setup_structured_logging
@@ -57,7 +56,7 @@ async def test_direct_options():
                     print(f"   ✅ Found: {record.raw_symbol}")
 
                 if count == 0:
-                    print(f"   ❌ No results")
+                    print("   ❌ No results")
                 else:
                     print(f"   Total found: {count}")
 

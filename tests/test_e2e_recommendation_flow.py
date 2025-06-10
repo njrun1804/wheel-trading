@@ -4,25 +4,21 @@ Tests the complete flow from data ingestion through recommendation generation,
 simulating real-world usage patterns and failure scenarios.
 """
 
-import os
 import tempfile
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from src.config.loader import ConfigurationLoader, get_config_loader
+from src.config.loader import ConfigurationLoader
 from src.unity_wheel.api.advisor import WheelAdvisor
-from src.unity_wheel.auth.auth_client import AuthClient
 from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
 from src.unity_wheel.models.account import Account
 from src.unity_wheel.models.position import OptionType, Position, PositionType
 from src.unity_wheel.monitoring.diagnostics import SystemDiagnostics
 from src.unity_wheel.schwab.types import AccountData, PositionData
-from src.unity_wheel.storage.cache.general_cache import CacheManager
-from src.unity_wheel.storage.storage import Storage
 
 
 class TestEndToEndRecommendationFlow:

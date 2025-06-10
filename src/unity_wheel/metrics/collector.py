@@ -186,7 +186,7 @@ class MetricsCollector:
                 self.action_metrics[decision.action].append(actual_return)
 
                 logger.info(
-                    f"Updated decision outcome",
+                    "Updated decision outcome",
                     extra={
                         "decision_id": decision_id,
                         "expected": decision.expected_return,
