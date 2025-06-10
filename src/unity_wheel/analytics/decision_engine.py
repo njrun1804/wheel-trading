@@ -3,21 +3,20 @@ Integrated decision engine that combines all analytics components.
 Provides autonomous wheel strategy recommendations.
 """
 
-from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 from src.config.loader import get_config
+from src.unity_wheel.models.position import Position
 
-from ..models.position import Position
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
 from .anomaly_detector import AnomalyDetector, MarketAnomaly
 from .dynamic_optimizer import DynamicOptimizer, MarketState, OptimizationResult
-from .event_analyzer import EventImpactAnalyzer, EventType
+from .event_analyzer import EventImpactAnalyzer
 from .iv_surface import IVMetrics, IVSurfaceAnalyzer
 from .seasonality import SeasonalityDetector
 
