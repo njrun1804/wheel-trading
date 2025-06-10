@@ -154,50 +154,22 @@ class FREDDataManager:
         Dict[str, int]
             Series ID -> new observation count
         """
-        updates = {}
+        updates: Dict[str, int] = {}
 
         async with FREDClient(self.api_key) as client:
-            for series_enum in WheelStrategyFREDSeries:
-                series_id = series_enum.value
+            semaphore = asyncio.Semaphore(4)
 
-                # Get last observation date
-                last_obs = await self.fred_storage.get_latest_observation(series_id)
-                last_date = last_obs[1] if last_obs else None
+            async def wrapper(series_enum):
+                async with semaphore:
+                    return await self._update_series(client, series_enum)
 
-                if last_date:
-                    # Check if updates available
-                    has_updates = await client.check_for_updates(series_id, last_date)
+            results = await asyncio.gather(
+                *(wrapper(series_enum) for series_enum in WheelStrategyFREDSeries)
+            )
 
-                    if has_updates:
-                        # Fetch only new data
-                        start_date = last_date + timedelta(days=1)
-                        dataset = await client.get_dataset(series_id, start_date)
-
-                        if dataset.observations:
-                            # Validate new data
-                            issues = self.anomaly_detector.check_observations(
-                                series_id,
-                                [obs.value for obs in dataset.observations if obs.value],
-                            )
-
-                            if not issues:
-                                count = await self.fred_storage.save_observations(
-                                    series_id, dataset.observations
-                                )
-                                updates[series_id] = count
-
-                                # Recalculate features
-                                await self._calculate_features(series_id, dataset)
-                            else:
-                                logger.warning(
-                                    f"Data quality issues detected for {series_id}",
-                                    extra={"issues": issues},
-                                )
-                else:
-                    # No data exists, fetch all
-                    dataset = await client.get_dataset(series_id)
-                    await self.fred_storage.save_dataset(dataset)
-                    updates[series_id] = len(dataset.observations)
+            for series_id, count in results:
+                if count:
+                    updates[series_id] = count
 
         if updates:
             logger.info(
@@ -211,6 +183,47 @@ class FREDDataManager:
             logger.debug("No new data available")
 
         return updates
+
+    async def _update_series(
+        self, client: FREDClient, series_enum: WheelStrategyFREDSeries
+    ) -> Tuple[str, int]:
+        """Update a single FRED series."""
+
+        series_id = series_enum.value
+
+        last_obs = await self.fred_storage.get_latest_observation(series_id)
+        last_date = last_obs[1] if last_obs else None
+
+        if last_date:
+            has_updates = await client.check_for_updates(series_id, last_date)
+
+            if has_updates:
+                start_date = last_date + timedelta(days=1)
+                dataset = await client.get_dataset(series_id, start_date)
+
+                if dataset.observations:
+                    issues = self.anomaly_detector.check_observations(
+                        series_id,
+                        [obs.value for obs in dataset.observations if obs.value],
+                    )
+
+                    if not issues:
+                        count = await self.fred_storage.save_observations(
+                            series_id, dataset.observations
+                        )
+                        await self._calculate_features(series_id, dataset)
+                        return series_id, count
+                    else:
+                        logger.warning(
+                            f"Data quality issues detected for {series_id}",
+                            extra={"issues": issues},
+                        )
+        else:
+            dataset = await client.get_dataset(series_id)
+            await self.fred_storage.save_dataset(dataset)
+            return series_id, len(dataset.observations)
+
+        return series_id, 0
 
     @timed_operation(threshold_ms=50)
     async def get_latest_values(self) -> Dict[str, Tuple[float, Date]]:

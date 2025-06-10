@@ -93,7 +93,7 @@ class DatabentoIntegration:
             },
         )
 
-        candidates = []
+        candidates: List[Dict] = []
 
         # Get spot price first
         spot_data = await self.client._get_underlying_price(underlying)
@@ -120,57 +120,26 @@ class DatabentoIntegration:
 
         market_timestamp = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
 
-        for expiry in expirations:
+        async def analyze(expiry: datetime) -> List[Dict]:
             try:
-                # Fetch option chain with historical timestamp
-                chain = await self.client.get_option_chain(
-                    underlying=underlying, expiration=expiry, timestamp=market_timestamp
+                return await self._analyze_expiration(
+                    expiry,
+                    underlying,
+                    spot_price,
+                    target_delta,
+                    min_premium_pct,
+                    market_timestamp,
                 )
-
-                # Get definitions
-                definitions = await self.client._get_definitions(underlying, expiry)
-
-                # Create lookup
-                def_map = {d.instrument_id: d for d in definitions}
-
-                # Analyze puts for wheel entry
-                for put_quote in chain.puts:
-                    if put_quote.instrument_id not in def_map:
-                        continue
-
-                    defn = def_map[put_quote.instrument_id]
-
-                    # Calculate Greeks and metrics
-                    metrics = await self._calculate_option_metrics(
-                        quote=put_quote, definition=defn, spot_price=spot_price, option_type="put"
-                    )
-
-                    # Filter by criteria
-                    if (
-                        abs(metrics["delta"] - target_delta) < 0.05
-                        and metrics["premium_pct"] >= min_premium_pct
-                    ):
-
-                        candidates.append(
-                            {
-                                "instrument_id": put_quote.instrument_id,
-                                "symbol": defn.raw_symbol,
-                                "strike": float(defn.strike_price),
-                                "expiration": defn.expiration,
-                                "dte": defn.days_to_expiry,
-                                "bid": float(put_quote.bid_price),
-                                "ask": float(put_quote.ask_price),
-                                "mid": float(put_quote.mid_price),
-                                "spread_pct": float(put_quote.spread_pct),
-                                **metrics,
-                            }
-                        )
-
-            except Exception as e:
+            except Exception as e:  # pragma: no cover - logging only
                 logger.error(
                     "chain_analysis_error",
                     extra={"expiration": expiry.isoformat(), "error": str(e)},
                 )
+                return []
+
+        results = await asyncio.gather(*(analyze(exp) for exp in expirations))
+        for res in results:
+            candidates.extend(res)
 
         # Sort by expected return
         candidates.sort(key=lambda x: x["expected_return"], reverse=True)
@@ -256,6 +225,61 @@ class DatabentoIntegration:
             "expected_return": expected_return,
             "breakeven": breakeven,
         }
+
+    async def _analyze_expiration(
+        self,
+        expiry: datetime,
+        underlying: str,
+        spot_price: float,
+        target_delta: float,
+        min_premium_pct: float,
+        market_timestamp: datetime,
+    ) -> List[Dict]:
+        """Analyze a single expiration and return viable candidates."""
+
+        chain_task = self.client.get_option_chain(
+            underlying=underlying, expiration=expiry, timestamp=market_timestamp
+        )
+        defs_task = self.client._get_definitions(underlying, expiry)
+
+        chain, definitions = await asyncio.gather(chain_task, defs_task)
+
+        def_map = {d.instrument_id: d for d in definitions}
+        result: List[Dict] = []
+
+        for put_quote in chain.puts:
+            if put_quote.instrument_id not in def_map:
+                continue
+
+            defn = def_map[put_quote.instrument_id]
+
+            metrics = await self._calculate_option_metrics(
+                quote=put_quote,
+                definition=defn,
+                spot_price=spot_price,
+                option_type="put",
+            )
+
+            if (
+                abs(metrics["delta"] - target_delta) < 0.05
+                and metrics["premium_pct"] >= min_premium_pct
+            ):
+                result.append(
+                    {
+                        "instrument_id": put_quote.instrument_id,
+                        "symbol": defn.raw_symbol,
+                        "strike": float(defn.strike_price),
+                        "expiration": defn.expiration,
+                        "dte": defn.days_to_expiry,
+                        "bid": float(put_quote.bid_price),
+                        "ask": float(put_quote.ask_price),
+                        "mid": float(put_quote.mid_price),
+                        "spread_pct": float(put_quote.spread_pct),
+                        **metrics,
+                    }
+                )
+
+        return result
 
     def _get_monthly_expirations(self, start_date: datetime, end_date: datetime) -> List[datetime]:
         """Get monthly option expirations (3rd Friday) in date range."""

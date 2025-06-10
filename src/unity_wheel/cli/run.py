@@ -73,7 +73,7 @@ def setup_deterministic_environment() -> None:
 # Removed create_mock_market_snapshot - now using real Databento data only
 
 
-def generate_recommendation(
+async def generate_recommendation(
     portfolio_value: float, output_format: OutputFormat = "text"
 ) -> dict[str, Any]:
     """Generate wheel strategy recommendation for Unity using real market data."""
@@ -97,11 +97,11 @@ def generate_recommendation(
     advisor = WheelAdvisor(wheel_params, risk_limits)
 
     # Import the real data function
-    from .databento_integration import get_market_data_sync
+    from .databento_integration import create_databento_market_snapshot
 
     # Get real market data - fail if not available
     try:
-        market_snapshot, confidence = get_market_data_sync(portfolio_value, TICKER)
+        market_snapshot, confidence = await create_databento_market_snapshot(portfolio_value, TICKER)
         logger.info("Successfully fetched real Unity market data", extra={"confidence": confidence})
         current_price = market_snapshot.current_price
 
@@ -318,7 +318,7 @@ def main(
 
     # Generate recommendation
     try:
-        rec = generate_recommendation(portfolio, output_format)
+        rec = asyncio.run(generate_recommendation(portfolio, output_format))
 
         if output_format == "json":
             print(json.dumps(rec, indent=2))
