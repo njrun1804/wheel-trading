@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
+from ..math import CalculationResult
+
 import numpy as np
 
 from src.config.loader import get_config
@@ -129,7 +131,7 @@ class BorrowingCostAnalyzer:
 
     def calculate_hurdle_rate(
         self, borrowing_source: str, holding_period_days: int = 45, include_tax: bool = True
-    ) -> float:
+    ) -> CalculationResult:
         """
         Calculate the minimum return needed to justify borrowing.
 
@@ -158,8 +160,12 @@ class BorrowingCostAnalyzer:
             },
         )
 
-        # Pure borrowing rate (no adjustments in tax-free environment)
-        return base_rate
+        hurdle = base_rate * self.CONFIDENCE_MULTIPLIER
+
+        if include_tax and self.TAX_ADJUSTMENT != 0:
+            hurdle /= self.TAX_ADJUSTMENT
+
+        return CalculationResult(hurdle, 0.95, [])
 
     def analyze_position_allocation(
         self,
