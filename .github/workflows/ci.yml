@@ -88,9 +88,11 @@ jobs:
 
         # Platform-specific installation approach
         if [[ "${{ runner.os }}" == "macOS" ]]; then
-          echo "Installing on macOS without DuckDB to avoid compilation issues..."
-          poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
-          poetry install --no-interaction --no-ansi
+          echo "Installing on macOS with ML dependencies but without DuckDB to avoid compilation issues..."
+          # Install core ML dependencies first
+          poetry run pip install --only-binary=:all: numpy scipy scikit-learn pandas || true
+          # Install with ML extras but skip DuckDB-related storage
+          poetry install --no-interaction --no-ansi --extras "ml"
         else
           echo "Installing on Ubuntu with full dependencies..."
           poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
@@ -155,7 +157,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Use the same robust installation as the main test - Ubuntu with ML
+        # Use the same robust installation as the main test - Ubuntu with ML and storage
         poetry config installer.max-workers 1
         # Use same binary-first approach as main test
         poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true

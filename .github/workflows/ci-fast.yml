@@ -54,7 +54,8 @@ jobs:
 
     - name: Install minimal deps
       run: |
-        pip install mypy numpy scipy pandas pydantic types-pytz pandas-stubs
+        pip install mypy numpy scipy pandas pydantic types-pytz pandas-stubs types-PyYAML scikit-learn duckdb
+        pip install google-cloud-storage google-cloud-secret-manager || echo "GCP packages failed, continuing"
 
     - name: Type check critical code
       run: |
