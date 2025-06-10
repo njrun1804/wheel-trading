@@ -345,3 +345,8 @@ MIT License - See [LICENSE](LICENSE) for details
 ---
 
 **Remember**: This is a recommendation system only. Always verify recommendations before placing trades.
+
+### Disclaimer
+
+All outputs are for informational purposes only and do not constitute financial advice. Consult a licensed financial professional before making any investment decisions.
+
