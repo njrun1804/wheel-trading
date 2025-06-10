@@ -90,7 +90,7 @@ jobs:
             poetry run pip install aiohttp==3.10.11 cryptography==45.0.4 pyyaml==6.0.2
             poetry run pip install pydantic-settings==2.6.1 duckdb
             # Try scikit-learn with binary-only (optional)
-            poetry run pip install --only-binary=:all: scikit-learn==1.4.0 || echo "Skipping scikit-learn on macOS"
+            poetry run pip install --only-binary=:all: scikit-learn || echo "Skipping scikit-learn on macOS"
             # Install dev dependencies
             poetry run pip install pytest==8.1.1 pytest-cov==4.1.0 pytest-xdist==3.5.0
             poetry run pip install hypothesis==6.98.15 black==24.3.0 flake8==7.0.0 isort==5.13.2
@@ -100,13 +100,11 @@ jobs:
           fi
         else
           echo "Installing on Ubuntu with full dependency resolution including ML..."
-          poetry install --no-interaction --no-ansi --extras "ml" || {
-            echo "First install attempt failed, trying binary-only approach..."
-            poetry run pip install --only-binary=:all: numpy==1.26.4 scipy==1.13.0 scikit-learn==1.4.0
-            poetry install --no-interaction --no-ansi --extras "ml"
-          }
+          # Install ML deps with binary-only first to avoid compilation hanging
+          poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
+          poetry install --no-interaction --no-ansi --extras "ml"
         fi
-      timeout-minutes: 15
+      timeout-minutes: 8
       env:
         # Force use of wheels when available
         PIP_PREFER_BINARY: 1
