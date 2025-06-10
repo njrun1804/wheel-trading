@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict
 
 from src.config import get_settings
+from src.config.loader import get_config
 from src.unity_wheel.api.types import MarketSnapshot, OptionData
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
@@ -20,13 +21,13 @@ logger = logging.getLogger(__name__)
 
 async def create_databento_market_snapshot(
     portfolio_value: float,
-    ticker: str = "U",
+    ticker: str | None = None,
 ) -> MarketSnapshot:
     """Create market snapshot from real Databento data.
 
     Args:
         portfolio_value: Total portfolio value
-        ticker: Stock ticker (default: "U" for Unity)
+        ticker: Stock ticker (defaults to ``config.unity.ticker``)
 
     Returns:
         MarketSnapshot with real Unity options data
@@ -35,6 +36,9 @@ async def create_databento_market_snapshot(
         ValueError: If unable to fetch real Unity options data
     """
     # Load API key via SecretInjector
+    if ticker is None:
+        ticker = get_config().unity.ticker
+
     with SecretInjector(service="databento"):
         client = DatabentoClient()
         integration = DatabentoIntegration(client)
@@ -131,12 +135,12 @@ async def create_databento_market_snapshot(
             await client.close()
 
 
-def get_market_data_sync(portfolio_value: float, ticker: str = "U") -> MarketSnapshot:
+def get_market_data_sync(portfolio_value: float, ticker: str | None = None) -> MarketSnapshot:
     """Synchronous wrapper for getting market data.
 
     Args:
         portfolio_value: Total portfolio value
-        ticker: Stock ticker (default: "U" for Unity)
+        ticker: Stock ticker (defaults to ``config.unity.ticker``)
 
     Returns:
         MarketSnapshot with real Unity options data
@@ -145,6 +149,9 @@ def get_market_data_sync(portfolio_value: float, ticker: str = "U") -> MarketSna
         ValueError: If unable to fetch real Unity options data
     """
     # Create new event loop for synchronous execution
+    if ticker is None:
+        ticker = get_config().unity.ticker
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:

@@ -20,7 +20,8 @@ from rich.table import Table
 
 import src.unity_wheel as unity_wheel
 from src.config import get_settings
-from src.config.unity import COMPANY_NAME, TICKER
+from src.config.loader import get_config
+from src.config.unity import COMPANY_NAME
 from src.unity_wheel import __version__, get_version_string
 from src.unity_wheel.__version__ import API_VERSION
 from src.unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
@@ -99,9 +100,11 @@ def generate_recommendation(
     # Import the real data function
     from .databento_integration import get_market_data_sync
 
+    ticker = get_config().unity.ticker
+
     # Get real market data - fail if not available
     try:
-        market_snapshot = get_market_data_sync(portfolio_value, TICKER)
+        market_snapshot = get_market_data_sync(portfolio_value, ticker)
         logger.info(f"Successfully fetched real Unity market data")
         current_price = market_snapshot.current_price
 
@@ -122,7 +125,7 @@ def generate_recommendation(
         # Convert to legacy format for compatibility
         recommendation = {
             "timestamp": datetime.now().isoformat(),
-            "ticker": TICKER,
+            "ticker": ticker,
             "company": COMPANY_NAME,
             "current_price": current_price,
             "portfolio_value": portfolio_value,
@@ -162,7 +165,8 @@ def generate_recommendation(
 
 def display_recommendation_text(rec: dict[str, Any]) -> None:
     """Display recommendation in human-readable format."""
-    console.print(f"\n[bold blue]🎯 Unity ({TICKER}) Wheel Strategy Recommendation[/bold blue]")
+    ticker = get_config().unity.ticker
+    console.print(f"\n[bold blue]🎯 Unity ({ticker}) Wheel Strategy Recommendation[/bold blue]")
     console.print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     console.print("=" * 60)
 

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.config.unity import TICKER
+from src.config.loader import get_config
 from src.unity_wheel.data_providers.databento import DatabentoClient
 from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,
@@ -49,13 +49,14 @@ async def test_complete_integration():
 
     try:
         # 5. Test basic connectivity
-        print(f"\n5️⃣ Testing {TICKER} Stock Data...")
+        ticker = get_config().unity.ticker
+        print(f"\n5️⃣ Testing {ticker} Stock Data...")
         try:
-            price_data = await client._get_underlying_price(TICKER)
-            print(f"   ✅ {TICKER} price: ${float(price_data.last_price):.2f}")
+            price_data = await client._get_underlying_price(ticker)
+            print(f"   ✅ {ticker} price: ${float(price_data.last_price):.2f}")
             print(f"   Timestamp: {price_data.timestamp}")
         except Exception as e:
-            print(f"   ⚠️  Could not fetch {TICKER} price: {e}")
+            print(f"   ⚠️  Could not fetch {ticker} price: {e}")
 
         # 6. Test storage metrics
         print("\n6️⃣ Storage Metrics...")
@@ -90,13 +91,13 @@ async def test_complete_integration():
         # Test cache miss
         expiry = datetime.now() + timedelta(days=45)
         data1 = await adapter.get_or_fetch_option_chain(
-            TICKER, expiry, mock_fetch, max_age_minutes=15
+            ticker, expiry, mock_fetch, max_age_minutes=15
         )
         print(f"   First call: {'Cached' if data1 and data1.get('cached') else 'Fetched'}")
 
         # Test cache hit
         data2 = await adapter.get_or_fetch_option_chain(
-            TICKER, expiry, mock_fetch, max_age_minutes=15
+            ticker, expiry, mock_fetch, max_age_minutes=15
         )
         print(f"   Second call: {'Cached' if data2 and data2.get('cached') else 'Fetched'}")
 

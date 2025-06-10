@@ -5,9 +5,16 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Final
 
+from .loader import get_config
+
 # Unity Software Inc. specific parameters
-TICKER: Final[str] = "U"
 COMPANY_NAME: Final[str] = "Unity Software Inc."
+
+
+def get_unity_ticker() -> str:
+    """Return the configured Unity ticker symbol."""
+    return get_config().unity.ticker
+
 
 # Risk parameters for objective function: CAGR - 0.20 × |CVaR₉₅|
 CVAR_PERCENTILE: Final[Decimal] = Decimal("0.95")

@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from ...utils import get_logger
+from src.config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -95,8 +96,11 @@ class LiveDataValidator:
                     logger.warning(f"Suspicious environment variable: {key}={value}")
 
     @classmethod
-    def validate_price(cls, price: float, symbol: str = "U") -> None:
+    def validate_price(cls, price: float, symbol: str | None = None) -> None:
         """Validate that a price looks like real market data."""
+        if symbol is None:
+            symbol = get_config().unity.ticker
+
         if price <= 0:
             raise ValueError(f"Invalid price {price} for {symbol} - must be positive")
 
@@ -107,7 +111,7 @@ class LiveDataValidator:
             )
 
         # Unity-specific checks
-        if symbol == "U":
+        if symbol == get_config().unity.ticker:
             if price < 15.0 or price > 60.0:
                 raise ValueError(
                     f"Unity price {price} outside historical range [15-60]. "
@@ -115,8 +119,11 @@ class LiveDataValidator:
                 )
 
     @classmethod
-    def validate_volatility(cls, vol: float, symbol: str = "U") -> None:
+    def validate_volatility(cls, vol: float, symbol: str | None = None) -> None:
         """Validate that volatility looks realistic."""
+        if symbol is None:
+            symbol = get_config().unity.ticker
+
         if vol <= 0 or vol > 5.0:
             raise ValueError(f"Invalid volatility {vol} - must be between 0 and 5.0")
 
@@ -127,7 +134,7 @@ class LiveDataValidator:
             )
 
         # Unity-specific checks
-        if symbol == "U":
+        if symbol == get_config().unity.ticker:
             if vol < 0.30 or vol > 2.0:
                 logger.warning(f"Unity volatility {vol} outside typical range [0.30-2.0]")
 
