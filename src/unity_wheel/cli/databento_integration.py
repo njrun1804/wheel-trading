@@ -3,7 +3,6 @@
 import asyncio
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict
 
 from src.config import get_settings
 from src.unity_wheel.api.types import MarketSnapshot, OptionData
@@ -42,9 +41,6 @@ async def create_databento_market_snapshot(
         try:
             # Get Unity spot price - fail if not available
             try:
-                # Try with a recent timestamp to ensure data availability
-                # Using June 9, 2025 which is a Monday
-                recent_timestamp = datetime(2025, 6, 9, 15, 0, 0, tzinfo=timezone.utc)
                 spot_data = await client._get_underlying_price(ticker)
                 current_price = float(spot_data.last_price)
                 logger.info(f"Unity spot price from Databento: ${current_price:.2f}")
