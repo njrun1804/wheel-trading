@@ -46,7 +46,7 @@ repos:
         entry: pytest tests/test_options_properties.py -v
         language: system
         pass_filenames: false
-        stages: [push]
+        stages: [pre-push]
 
       # Verify configuration is valid
       - id: validate-config
