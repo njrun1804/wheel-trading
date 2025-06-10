@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Clean up database - remove empty tables and fix data issues."""
-import duckdb
 import os
+
+import duckdb
 
 db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 conn = duckdb.connect(db_path)

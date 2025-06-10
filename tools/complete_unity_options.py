@@ -6,6 +6,7 @@ Continues from where previous download stopped.
 import os
 import sys
 from datetime import datetime, timedelta, timezone
+
 import duckdb
 
 # Add project root to path

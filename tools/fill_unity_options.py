@@ -6,6 +6,7 @@ Simplified version without timezone issues.
 import os
 import sys
 from datetime import datetime, timedelta
+
 import duckdb
 
 # Add project root to path

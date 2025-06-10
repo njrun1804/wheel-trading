@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Check what parts of options data are synthetic."""
-import duckdb
 import os
+
+import duckdb
 
 db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 conn = duckdb.connect(db_path, read_only=True)
@@ -10,14 +11,16 @@ print("🔍 ANALYZING OPTIONS DATA SOURCE")
 print("=" * 60)
 
 # Check sample options data
-sample = conn.execute("""
-    SELECT strike, option_type, bid, ask, volume, open_interest, 
+sample = conn.execute(
+    """
+    SELECT strike, option_type, bid, ask, volume, open_interest,
            implied_volatility, delta, gamma, theta, timestamp
     FROM databento_option_chains
     WHERE symbol = 'U'
     ORDER BY timestamp DESC, strike
     LIMIT 10
-""").fetchall()
+"""
+).fetchall()
 
 print("\n📊 Sample Options Data:")
 print("-" * 80)
@@ -29,8 +32,9 @@ for row in sample[:3]:
     print()
 
 # Analyze data patterns
-patterns = conn.execute("""
-    SELECT 
+patterns = conn.execute(
+    """
+    SELECT
         COUNT(DISTINCT volume) as unique_volumes,
         COUNT(DISTINCT open_interest) as unique_oi,
         COUNT(DISTINCT ROUND(implied_volatility, 2)) as unique_ivs,
@@ -39,7 +43,8 @@ patterns = conn.execute("""
         COUNT(DISTINCT ROUND(ask - bid, 2)) as unique_spreads
     FROM databento_option_chains
     WHERE symbol = 'U'
-""").fetchone()
+"""
+).fetchone()
 
 print("📈 Data Pattern Analysis:")
 print(f"  Unique volume values: {patterns[0]} (synthetic if low)")
@@ -53,8 +58,9 @@ print(f"  Unique spread widths: {patterns[5]}")
 print("\n🔬 SYNTHETIC DATA ANALYSIS:")
 
 # Check if Greeks follow exact formulas
-formula_check = conn.execute("""
-    SELECT 
+formula_check = conn.execute(
+    """
+    SELECT
         COUNT(*) as total,
         -- Check if theta is always negative for long options
         SUM(CASE WHEN theta > 0 THEN 1 ELSE 0 END) as positive_thetas,
@@ -65,7 +71,8 @@ formula_check = conn.execute("""
         SUM(CASE WHEN option_type = 'CALL' AND delta < 0 THEN 1 ELSE 0 END) as wrong_call_deltas
     FROM databento_option_chains
     WHERE symbol = 'U'
-""").fetchone()
+"""
+).fetchone()
 
 print("\nGreeks validation:")
 print(f"  Total options: {formula_check[0]:,}")

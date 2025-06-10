@@ -6,6 +6,7 @@ This will create synthetic but realistic options data for dates that are missing
 import os
 import sys
 from datetime import datetime, timedelta
+
 import duckdb
 
 # Add project root to path

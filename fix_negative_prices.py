@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Fix negative option prices."""
-import duckdb
 import os
+
+import duckdb
 
 db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 conn = duckdb.connect(db_path)
