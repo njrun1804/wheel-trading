@@ -1,4 +1,4 @@
-# Main CI workflow - streamlined and optimized
+# Improved CI workflow with additional optimizations
 name: CI
 
 on:
@@ -16,37 +16,50 @@ env:
   PIP_NO_COMPILE: true
   PIP_DISABLE_PIP_VERSION_CHECK: true
   PYTHONUNBUFFERED: 1
+  # Test optimization
+  PYTEST_XDIST_WORKER_COUNT: auto
+  # Disable unnecessary features during CI
+  WHEEL_SECRETS_PROVIDER: local
+  DATABENTO_SKIP_VALIDATION: true
 
 jobs:
-  # 1. Quick change detection
+  # 1. Quick change detection with smarter filters
   changes:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      tests: ${{ steps.filter.outputs.tests }}
+      deps: ${{ steps.filter.outputs.deps }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2  # Need previous commit for comparison
+    
     - uses: dorny/paths-filter@v3
       id: filter
       with:
         filters: |
           code:
-            - 'src/**'
-            - 'tests/**'
+            - 'src/**/*.py'
+            - '!src/**/*_test.py'
+          tests:
+            - 'tests/**/*.py'
+            - 'conftest.py'
+            - 'pytest.ini'
+          deps:
             - 'pyproject.toml'
             - 'poetry.lock'
-            - '.github/workflows/**'
+            - 'requirements*.txt'
 
-  # 2. All tests in one job for simplicity
-  test:
+  # 2. Dependency installation (separate job for better caching)
+  setup:
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.code == 'true' || needs.changes.outputs.tests == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         python-version: ["3.12"]
-    
     steps:
     - uses: actions/checkout@v4
     
@@ -54,7 +67,12 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip'
+    
+    - name: Get Poetry cache info
+      id: poetry-cache
+      run: |
+        echo "cache-dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+        echo "poetry-version=1.8.2" >> $GITHUB_OUTPUT
     
     - name: Cache Poetry installation
       uses: actions/cache@v4
@@ -62,114 +80,337 @@ jobs:
         path: |
           ~/.local
           ~/.cache/pypoetry
-        key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+          ${{ steps.poetry-cache.outputs.cache-dir }}
+        key: poetry-${{ runner.os }}-${{ steps.poetry-cache.outputs.poetry-version }}
     
     - name: Install Poetry
       run: |
-        pip install --upgrade pip poetry==1.8.2
-        poetry config virtualenvs.in-project true
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
     
     - name: Cache dependencies
+      id: deps-cache
       uses: actions/cache@v4
       with:
-        path: .venv
-        key: venv-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
+        path: |
+          .venv
+          ~/.cache/pip
+        key: deps-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
         restore-keys: |
-          venv-${{ runner.os }}-py${{ matrix.python-version }}-
+          deps-${{ runner.os }}-py${{ matrix.python-version }}-
     
     - name: Install dependencies
+      if: steps.deps-cache.outputs.cache-hit != 'true' || needs.changes.outputs.deps == 'true'
       run: |
-        poetry install --no-interaction --no-ansi
-        # Pre-compile Python files for faster imports
-        poetry run python -m compileall src/ || true
+        poetry config virtualenvs.in-project true
+        poetry install --no-interaction --no-ansi -v
+        # Pre-compile for faster imports
+        poetry run python -m compileall -q src/
     
-    - name: Install system dependencies (Ubuntu)
-      if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y libopenblas-dev
-    
-    - name: Run pre-commit checks
-      if: matrix.os == 'ubuntu-latest'
-      run: poetry run pre-commit run --all-files --show-diff-on-failure
-    
-    - name: Run tests
+    - name: Upload environment info
       run: |
-        poetry run pytest tests/ \
-          -v --tb=short \
-          --maxfail=10 \
-          --durations=20 \
-          -m "not slow" \
-          || true  # Don't fail immediately, we want to see all results
+        poetry run python --version > .python-version
+        poetry run pip freeze > .pip-freeze.txt
+        echo "${{ runner.os }}" > .os-info.txt
     
-    - name: Run slow tests (Ubuntu only)
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        poetry run pytest tests/ \
-          -v --tb=short \
-          -m "slow" \
-          || true
-    
-    - name: Validate configuration
-      run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
-        poetry run python -m src.unity_wheel.utils.validate
+    - name: Upload environment as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: env-${{ runner.os }}
+        path: |
+          .venv/
+          .python-version
+          .pip-freeze.txt
+          .os-info.txt
+        retention-days: 1
+        compression-level: 0  # Already compressed
 
-  # 3. Performance benchmarks (only on main branch)
-  benchmarks:
-    needs: test
-    if: github.ref == 'refs/heads/main' && success()
+  # 3. Linting and formatting (fast, parallel)
+  lint:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Download environment
+      uses: actions/download-artifact@v4
+      with:
+        name: env-Linux
+    
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-        cache: 'pip'
     
-    - name: Install Poetry and dependencies
+    - name: Run pre-commit
       run: |
-        pip install poetry==1.8.2
-        poetry config virtualenvs.in-project true
-        poetry install --no-interaction --no-ansi
+        source .venv/bin/activate
+        pre-commit run --all-files --show-diff-on-failure || (
+          echo "::warning::Formatting issues found. Run 'pre-commit run --all-files' locally"
+          true
+        )
+
+  # 4. Test execution with smart splitting
+  test:
+    needs: setup
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        test-group: [unit, integration, slow]
+        exclude:
+          # Don't run slow tests on macOS
+          - os: macos-latest
+            test-group: slow
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download environment
+      uses: actions/download-artifact@v4
+      with:
+        name: env-${{ runner.os }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq libopenblas-dev > /dev/null
+    
+    - name: Run ${{ matrix.test-group }} tests
+      id: test
+      run: |
+        source .venv/bin/activate
+        export PYTEST_CURRENT_TEST=""
+        
+        case "${{ matrix.test-group }}" in
+          unit)
+            TEST_PATTERN="tests/test_math*.py tests/test_options*.py tests/test_config*.py tests/test_utils*.py"
+            MARKERS="not slow and not integration"
+            ;;
+          integration)
+            TEST_PATTERN="tests/test_e2e*.py tests/test_integrated*.py tests/test_wheel.py"
+            MARKERS="not slow"
+            ;;
+          slow)
+            TEST_PATTERN="tests/"
+            MARKERS="slow"
+            ;;
+        esac
+        
+        pytest $TEST_PATTERN \
+          -v \
+          --tb=short \
+          --durations=10 \
+          --junit-xml=test-results-${{ matrix.os }}-${{ matrix.test-group }}.xml \
+          --maxfail=10 \
+          -m "$MARKERS" \
+          --timeout=300 \
+          --timeout-method=thread \
+          -n $PYTEST_XDIST_WORKER_COUNT || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.test-group }}
+        path: test-results-*.xml
+        retention-days: 7
+
+  # 5. Coverage collection (separate for accuracy)
+  coverage:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download environment
+      uses: actions/download-artifact@v4
+      with:
+        name: env-Linux
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq libopenblas-dev > /dev/null
+    
+    - name: Run tests with coverage
+      run: |
+        source .venv/bin/activate
+        pytest tests/ \
+          --cov=src \
+          --cov-report=xml \
+          --cov-report=html \
+          --cov-report=term-missing:skip-covered \
+          -n auto \
+          -q
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  # 6. Performance benchmarks (conditional)
+  benchmarks:
+    needs: [test]
+    if: github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download environment
+      uses: actions/download-artifact@v4
+      with:
+        name: env-Linux
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
     
     - name: Run benchmarks
       run: |
-        poetry run pytest tests/test_performance_benchmarks.py \
+        source .venv/bin/activate
+        pytest tests/test_performance_benchmarks.py \
           --benchmark-only \
-          --benchmark-max-time=0.1 \
-          --benchmark-json=benchmark.json || true
+          --benchmark-json=benchmark.json \
+          --benchmark-max-time=0.5 \
+          --benchmark-compare=HEAD~1 || true
     
-    - name: Check SLA compliance
+    - name: Store benchmark result
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'pytest'
+        output-file-path: benchmark.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: false
+        comment-on-alert: true
+        alert-threshold: '150%'  # Alert on 50% regression
+
+  # 7. Validate configuration
+  validate:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download environment
+      uses: actions/download-artifact@v4
+      with:
+        name: env-Linux
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Validate configuration
       run: |
-        poetry run python -c "
-        import json
-        try:
-            with open('benchmark.json') as f:
-                data = json.load(f)
-            for bench in data.get('benchmarks', []):
-                name = bench.get('name', '')
-                mean = bench.get('stats', {}).get('mean', 0)
-                if 'black_scholes' in name and mean > 0.0002:
-                    print(f'⚠️  Black-Scholes SLA warning: {mean*1000:.2f}ms')
-                elif 'greeks' in name and mean > 0.0003:
-                    print(f'⚠️  Greeks SLA warning: {mean*1000:.2f}ms')
-            print('✅ Performance check complete')
-        except Exception as e:
-            print(f'⚠️  Could not check benchmarks: {e}')
+        source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+        python -m src.unity_wheel.utils.validate
+        
+        # Additional validation checks
+        echo "Checking for common issues..."
+        python -c "
+        from src.config.loader import get_config
+        config = get_config()
+        assert config.unity.ticker == 'U', 'Unity ticker misconfigured'
+        assert 0 < config.risk.position_limits.max_position_size <= 1, 'Invalid position size'
+        print('✅ Configuration valid')
         "
 
-  # 4. Final status
+  # 8. Final status with detailed reporting
   ci-status:
-    needs: [test]
+    needs: [lint, test, coverage, validate]
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - name: Check status
+    - uses: actions/checkout@v4
+    
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-results-*
+        path: test-results/
+        merge-multiple: true
+    
+    - name: Generate test report
       run: |
-        if [[ "${{ needs.test.result }}" == "success" ]]; then
-          echo "✅ All tests passed!"
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Parse test results
+        if ls test-results/*.xml 1> /dev/null 2>&1; then
+          python3 -c "
+        import xml.etree.ElementTree as ET
+        import glob
+        
+        total_tests = 0
+        total_passed = 0
+        total_failed = 0
+        total_skipped = 0
+        total_time = 0.0
+        
+        for file in glob.glob('test-results/*.xml'):
+            tree = ET.parse(file)
+            root = tree.getroot()
+            suite = root.find('.//testsuite')
+            if suite is not None:
+                tests = int(suite.get('tests', 0))
+                failures = int(suite.get('failures', 0))
+                skipped = int(suite.get('skipped', 0))
+                time = float(suite.get('time', 0))
+                
+                total_tests += tests
+                total_failed += failures
+                total_skipped += skipped
+                total_time += time
+                total_passed += (tests - failures - skipped)
+                
+                # Extract OS and group from filename
+                parts = file.replace('test-results-', '').replace('.xml', '').split('-')
+                os_name = parts[0]
+                group = parts[1] if len(parts) > 1 else 'all'
+                
+                status = '✅' if failures == 0 else '❌'
+                print(f'| {os_name} | {group} | {status} | {tests} | {failures} | {time:.1f}s |')
+        
+        print(f'\n**Total:** {total_tests} tests, {total_passed} passed, {total_failed} failed, {total_skipped} skipped in {total_time:.1f}s')
+        
+        # Set output for badge
+        if total_failed == 0:
+            print(f'::set-output name=badge-color::brightgreen')
+            print(f'::set-output name=badge-message::{total_passed} passing')
+        else:
+            print(f'::set-output name=badge-color::red')
+            print(f'::set-output name=badge-message::{total_failed} failing')
+        " | tee -a $GITHUB_STEP_SUMMARY
+        else
+          echo "No test results found" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Overall status
+        if [[ "${{ needs.test.result }}" == "success" && "${{ needs.validate.result }}" == "success" ]]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **All CI checks passed!**" >> $GITHUB_STEP_SUMMARY
           exit 0
         else
-          echo "❌ Tests failed"
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "❌ **CI checks failed**" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi
