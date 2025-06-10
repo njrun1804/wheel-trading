@@ -12,9 +12,9 @@ import pandas as pd
 
 from ...utils import get_logger, timed_operation, with_recovery
 from ...storage.storage import Storage
-from .fred_client import FREDClient
-from .fred_models import FREDDataset, WheelStrategyFREDSeries
-from .fred_storage import FREDStorage
+from ..fred.fred_client import FREDClient
+from ..fred.fred_models import FREDDataset, WheelStrategyFREDSeries
+from ..fred.fred_storage import FREDStorage
 from .validation import DataAnomalyDetector, get_anomaly_detector
 
 logger = get_logger(__name__)

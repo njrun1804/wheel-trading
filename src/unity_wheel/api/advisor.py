@@ -87,11 +87,7 @@ class WheelAdvisor:
     ):
         """Initialize advisor with strategy and risk components."""
         self.constraints = TradingConstraints()
-        self.wheel_params = wheel_params or WheelParameters(
-            target_delta=0.30,
-            target_dte=45,
-            max_position_size=0.20,
-        )
+        self.wheel_params = wheel_params or WheelParameters()
         self.risk_limits = risk_limits or RiskLimits()
 
         # Initialize components

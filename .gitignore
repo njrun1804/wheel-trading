@@ -68,3 +68,4 @@ build/
 .env.local
 .env.*.local
 *.env
+diagnostics_history.json

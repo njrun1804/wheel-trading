@@ -18,6 +18,7 @@ from ..models import Account, Greeks, Position
 from ..risk import RiskAnalyzer
 from ..strategy import WheelStrategy
 from ..utils import StructuredLogger, get_logger
+from ...config.loader import get_config
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(logger)
@@ -238,16 +239,21 @@ class SelfDiagnostics:
     def _check_model_integrity(self) -> None:
         """Verify data models function correctly."""
         try:
+            # Get Unity ticker from config
+            config = get_config()
+            ticker = config.unity.ticker
+
             # Test Position model
-            stock_pos = Position("U", 100)
-            assert stock_pos.symbol == "U"
+            stock_pos = Position(ticker, 100)
+            assert stock_pos.symbol == ticker
             assert stock_pos.quantity == 100
             assert stock_pos.position_type.value == "stock"
 
             # Test option position
-            opt_pos = Position("U241220C00080000", -1)
+            opt_symbol = f"{ticker}241220C00080000"
+            opt_pos = Position(opt_symbol, -1)
             assert opt_pos.strike == 80.0
-            assert opt_pos.underlying == "U"
+            assert opt_pos.underlying == ticker
 
             # Test Greeks model
             greeks = Greeks(delta=0.5, gamma=0.02, theta=-0.05, vega=0.15)

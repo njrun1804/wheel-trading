@@ -13,6 +13,7 @@ from databento_dbn import Schema
 from ...storage import Storage
 from ...utils import get_logger, with_recovery
 from .auth_client import DatabentoClient
+from ....config.loader import get_config
 
 logger = get_logger(__name__)
 
@@ -216,10 +217,12 @@ class PriceHistoryLoader:
 
     def _get_dataset_for_symbol(self, symbol: str) -> str:
         """Determine appropriate Databento dataset for symbol."""
+        config = get_config()
+        unity_ticker = config.unity.ticker
 
         # This is simplified - in production would have proper mapping
         # Unity trades on NYSE American
-        if symbol in ["U", "UNIT"]:
+        if symbol == unity_ticker or symbol == "UNIT":
             return "XASE.BASIC"  # NYSE American
         elif symbol in ["SPY", "QQQ", "IWM"]:
             return "ARCX.BASIC"  # NYSE Arca for ETFs

@@ -45,7 +45,7 @@ def get_databento_api_key() -> str:
     return manager.get_secret("databento_api_key")
 
 
-def get_ofred_api_key() -> str:
+def get_fred_api_key() -> str:
     """Get FRED API key from SecretManager.
 
     Returns:
@@ -132,7 +132,7 @@ class SecretInjector:
                 )
             elif self.service == "databento":
                 self.secrets["DATABENTO_API_KEY"] = manager.get_secret("databento_api_key")
-            elif self.service == "ofred":
+            elif self.service == "fred":
                 self.secrets["FRED_API_KEY"] = manager.get_secret("ofred_api_key")
 
         # Inject all secrets

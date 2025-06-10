@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 from rich.console import Console
 from rich.table import Table
+from ...config.loader import get_config
 
 # Set up logging
 logging.basicConfig(
@@ -104,17 +105,22 @@ class EnvironmentValidator:
         """Check model functionality."""
         try:
             from .models import Account, Greeks, Position
+            
+            # Get Unity ticker from config
+            config = get_config()
+            ticker = config.unity.ticker
 
             # Test Position
-            pos = Position("U", 100)
-            assert pos.symbol == "U"
+            pos = Position(ticker, 100)
+            assert pos.symbol == ticker
             assert pos.quantity == 100
             assert pos.position_type.value == "stock"
 
             # Test option position
-            opt = Position("U241220C00080000", -1)
+            opt_symbol = f"{ticker}241220C00080000"
+            opt = Position(opt_symbol, -1)
             assert opt.strike == 80.0
-            assert opt.underlying == "U"
+            assert opt.underlying == ticker
 
             self.results["Position Model"] = (True, "✓ All tests passed")
 

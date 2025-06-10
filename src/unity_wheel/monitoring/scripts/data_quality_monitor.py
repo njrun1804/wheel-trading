@@ -7,7 +7,11 @@ import time
 import sys
 from datetime import datetime, timedelta
 from typing import Dict, Tuple
+from ....config.loader import get_config
 
+# Get Unity ticker once
+_config = get_config()
+UNITY_TICKER = _config.unity.ticker
 
 # Colors for terminal output
 class Colors:
@@ -44,11 +48,11 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
     # Unity prices
     try:
         result = conn.execute(
-            """
+            f"""
             SELECT MAX(date) as latest,
                    CURRENT_DATE - MAX(date) as days_old,
                    COUNT(*) as records
-            FROM price_history WHERE symbol = 'U'
+            FROM price_history WHERE symbol = '{UNITY_TICKER}'
         """
         ).fetchone()
 
@@ -66,11 +70,11 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
     try:
         # Check if table exists by trying to query it
         result = conn.execute(
-            """
+            f"""
             SELECT MAX(timestamp) as latest,
                    COUNT(*) as records,
                    COUNT(DISTINCT DATE(timestamp)) as days_with_data
-            FROM options_data WHERE underlying = 'U'
+            FROM options_data WHERE underlying = '{UNITY_TICKER}'
         """
         ).fetchone()
 
@@ -122,10 +126,10 @@ def check_data_quality(conn) -> Dict[str, any]:
     # Check for data gaps in Unity prices
     try:
         gaps = conn.execute(
-            """
+            f"""
             WITH date_series AS (
                 SELECT date, LAG(date) OVER (ORDER BY date) as prev_date
-                FROM price_history WHERE symbol = 'U'
+                FROM price_history WHERE symbol = '{UNITY_TICKER}'
             )
             SELECT COUNT(*) as total_gaps,
                    COUNT(CASE WHEN date - prev_date > 10 THEN 1 END) as large_gaps
@@ -144,11 +148,11 @@ def check_data_quality(conn) -> Dict[str, any]:
     # Check Unity volatility
     try:
         vol = conn.execute(
-            """
+            f"""
             SELECT STDDEV(returns) * SQRT(252) as annual_vol,
                    MAX(ABS(returns)) as max_move
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = '{UNITY_TICKER}'
                 AND date >= CURRENT_DATE - 30
                 AND returns IS NOT NULL
         """
@@ -166,12 +170,12 @@ def check_data_quality(conn) -> Dict[str, any]:
     # Check options bid-ask spreads
     try:
         spreads = conn.execute(
-            """
+            f"""
             SELECT AVG((ask - bid) / bid) as avg_spread,
                    MAX((ask - bid) / bid) as max_spread,
                    COUNT(CASE WHEN (ask - bid) / bid > 0.5 THEN 1 END) as wide_spreads
             FROM options_data
-            WHERE underlying = 'U'
+            WHERE underlying = '{UNITY_TICKER}'
                 AND bid > 0
                 AND ask > 0
                 AND timestamp >= CURRENT_TIMESTAMP - INTERVAL '24 hours'
