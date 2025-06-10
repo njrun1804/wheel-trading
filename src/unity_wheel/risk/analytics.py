@@ -15,9 +15,9 @@ import pandas as pd
 from scipy import stats
 
 from src.config.loader import get_config
+from unity_wheel.models.position import Position
 
 from ..models.greeks import Greeks
-from ..models.position import Position
 from ..storage.cache.general_cache import cached
 from ..utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
 

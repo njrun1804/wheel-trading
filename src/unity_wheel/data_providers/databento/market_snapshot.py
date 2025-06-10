@@ -4,9 +4,9 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
-from src.unity_wheel.models.position import Position
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.utils.logging import StructuredLogger
+from unity_wheel.models.position import Position
 
 from ..api.types import MarketSnapshot, OptionData
 from ..math.options import implied_volatility_validated

@@ -11,11 +11,13 @@ import pytest
 
 from src.config.loader import ConfigurationLoader
 from src.unity_wheel.api.advisor import WheelAdvisor
-from src.unity_wheel.models.account import Account
-from src.unity_wheel.models.position import OptionType, Position, PositionType
-from src.unity_wheel.risk.analytics import RiskAnalytics
-from src.unity_wheel.risk.limits import TradingLimits
-from src.unity_wheel.strategy.wheel import WheelStrategy
+from unity_wheel.data_providers.databento.types import OptionType
+from unity_wheel.models.account import Account
+from unity_wheel.models.position import Position
+from unity_wheel.risk.analytics import RiskAnalytics
+from unity_wheel.risk.limits import TradingLimits
+from unity_wheel.schwab.types import PositionType
+from unity_wheel.strategy.wheel import WheelStrategy
 
 
 class TestAggressiveAllocation:

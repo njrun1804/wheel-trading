@@ -16,7 +16,7 @@ from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
 from src.unity_wheel.math.options import CalculationResult
-from src.unity_wheel.models.position import Position
+from unity_wheel.models.position import Position
 
 # ============================================================================
 # PATTERN 1: Property-based testing for mathematical functions

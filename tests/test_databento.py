@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from src.unity_wheel.data_providers.databento.client import DatentoClient
-from src.unity_wheel.data_providers.databento.types import (
+from unity_wheel.data_providers.databento.types import (
     DataQuality,
     InstrumentDefinition,
     OptionChain,
@@ -16,7 +16,7 @@ from src.unity_wheel.data_providers.databento.types import (
     OptionType,
     UnderlyingPrice,
 )
-from src.unity_wheel.data_providers.databento.validation import DataValidator
+from unity_wheel.data_providers.databento.validation import DataValidator
 
 
 class TestDatentoTypes:

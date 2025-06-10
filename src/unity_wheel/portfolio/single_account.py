@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import Dict, List, NoReturn
 
 from src.config.loader import get_config
+from unity_wheel.models.position import Position, PositionType
 
-from ..models.position import Position, PositionType
 from ..utils.logging import get_logger
 
 logger = get_logger(__name__)

@@ -11,8 +11,8 @@ import numpy as np
 import pandas as pd
 
 from src.config.loader import get_config
+from unity_wheel.models.position import Position
 
-from ..models.position import Position
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
 from .anomaly_detector import AnomalyDetector, MarketAnomaly
