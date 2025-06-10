@@ -35,7 +35,7 @@ jobs:
     - name: Install all dependencies with extras
       run: |
         # Install with all extras to test complete system
-        poetry install --no-interaction --no-ansi --extras "ml,storage,gcp"
+        poetry install --no-interaction --no-ansi --extras=ml --extras=storage --extras=gcp
 
     - name: Validate Python syntax
       run: python -m py_compile src/unity_wheel/**/*.py
@@ -174,15 +174,21 @@ jobs:
       with:
         python-version: "3.12"
 
-    - name: Quick install
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.8.2
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Install all dependencies
       run: |
-        pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn
-        pip install aiohttp pyyaml pydantic-settings
-        # Try to install DuckDB, but don't fail if it doesn't work
-        pip install duckdb || echo "DuckDB installation failed, continuing without it"
+        # Install all dependencies to avoid import errors
+        poetry install --no-interaction --no-ansi --extras=ml --extras=storage --extras=gcp
 
     - name: Validate configuration
       run: |
+        source .venv/bin/activate
         export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
         python -m src.unity_wheel.utils.validate
 
