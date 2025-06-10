@@ -1,5 +1,5 @@
-from .client import SchwabClient
-from .data_fetcher import SchwabDataFetcher, fetch_schwab_data
+from .auth_client import SchwabClient
+from .fetcher import SchwabDataFetcher, fetch_schwab_data
 from .exceptions import (
     SchwabAuthError,
     SchwabDataError,

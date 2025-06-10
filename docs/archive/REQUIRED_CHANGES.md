@@ -7,7 +7,7 @@ Based on your refined requirements, here's what needs to be adjusted in the curr
 ### ✅ Created Examples
 1. **`src/diagnostics.py`** - Self-diagnosis system for autonomous operation
 2. **`src/config/unity.py`** - Unity-specific configuration with risk parameters
-3. **`run_aligned.py`** - Example of properly typed, deterministic CLI
+3. **`run.py`** - Example of properly typed, deterministic CLI
 4. **Updated `requirements.txt`** - Added mypy, hypothesis, pytz, click, rich
 
 ### 🔴 Critical Changes Still Needed
@@ -133,7 +133,7 @@ pytest tests/ --randomly-seed=1234  # Should be identical
 
 Before considering aligned:
 - [ ] All functions have complete type hints
-- [ ] Self-diagnostics pass (`python run_aligned.py --diagnose`)
+- [ ] Self-diagnostics pass (`python run.py --diagnose`)
 - [ ] All examples use Unity (U)
 - [ ] CVaR objective function implemented
 - [ ] Property-based tests added

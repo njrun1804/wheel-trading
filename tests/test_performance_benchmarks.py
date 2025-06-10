@@ -28,7 +28,7 @@ from src.unity_wheel.risk.analytics import RiskAnalytics
 from src.unity_wheel.api.advisor import WheelAdvisor
 from src.unity_wheel.models.account import AccountInfo
 from src.unity_wheel.models.position import Position, PositionType, OptionType
-from src.unity_wheel.databento.types import OptionChain, OptionQuote
+from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
 
 
 class TestMathPerformance:

@@ -18,11 +18,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import aiohttp
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ..auth.rate_limiter import RateLimiter
-from ..utils.cache import IntelligentCache
-from ..utils.logging import StructuredLogger, get_logger, timed_operation
-from ..utils.recovery import RecoveryStrategy, with_recovery
-from .client import SchwabClient
+from ...auth.rate_limiter import RateLimiter
+from ..storage.cache.general_cache import IntelligentCache
+from ...utils.logging import StructuredLogger, get_logger, timed_operation
+from ...utils.recovery import RecoveryStrategy, with_recovery
+from .auth_client import SchwabClient
 from .exceptions import SchwabError, SchwabRateLimitError
 from .types import SchwabAccount, SchwabPosition
 

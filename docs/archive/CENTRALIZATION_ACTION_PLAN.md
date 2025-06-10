@@ -93,7 +93,7 @@ adaptive:
 ```
 
 **Code Changes Required**:
-1. Update `src/unity_wheel/adaptive.py` to use config
+1. Update `src/unity_wheel/strategy/adaptive_base.py` to use config
 2. Remove hardcoded regime parameters
 3. Make position sizing use config factors
 
@@ -215,7 +215,7 @@ def __post_init__(self):
 
 ### Step 3: Update Adaptive System (2 hours)
 
-1. Modify `src/unity_wheel/adaptive.py`:
+1. Modify `src/unity_wheel/strategy/adaptive_base.py`:
 ```python
 # Before
 self.base_position_pct = 0.20

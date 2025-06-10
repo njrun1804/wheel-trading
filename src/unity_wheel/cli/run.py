@@ -23,7 +23,7 @@ from src.config.unity import COMPANY_NAME, TICKER
 from src.unity_wheel import __version__, get_version_string
 from src.unity_wheel.__version__ import API_VERSION
 from src.unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
-from src.unity_wheel.diagnostics import SelfDiagnostics
+from src.unity_wheel.monitoring.diagnostics import SelfDiagnostics
 from src.unity_wheel.monitoring import get_performance_monitor
 from src.unity_wheel.observability import get_observability_exporter
 from src.unity_wheel.risk import RiskLimits

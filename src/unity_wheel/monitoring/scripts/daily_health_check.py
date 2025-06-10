@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from src.unity_wheel.analytics import IntegratedDecisionEngine
 from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
-from src.unity_wheel.databento import DatabentoClient
+from src.unity_wheel.data_providers.databento import DatabentoClient
 from src.unity_wheel.secrets import SecretManager
 from src.unity_wheel.storage import UnifiedStorage
 from src.unity_wheel.utils import get_logger
@@ -203,7 +203,7 @@ async def main():
 
     print("\n📋 Next Steps:")
     print("   1. Fix any issues above")
-    print("   2. Run: python run_aligned.py --portfolio 100000")
+    print("   2. Run: python run.py --portfolio 100000")
     print("   3. Review recommendation carefully")
     print()
 

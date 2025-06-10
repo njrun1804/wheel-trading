@@ -66,7 +66,7 @@
 1. `src/unity_wheel/strategy/wheel.py` - Added vectorized strike selection
 2. `src/unity_wheel/risk/analytics.py` - Added confidence to calculations
 3. `src/unity_wheel/utils/position_sizing.py` - Enhanced with confidence
-4. `src/unity_wheel/databento/` - Removed hardcoded tickers
+4. `src/unity_wheel/data_providers/databento/` - Removed hardcoded tickers
 5. `src/unity_wheel/analytics/` - All modules use config ticker
 
 ### New Files Created
@@ -104,7 +104,7 @@ python -c "from src.unity_wheel.strategy.wheel import WheelStrategy; ws = WheelS
 python -c "from src.config.loader import get_config; print(f'Ticker: {get_config().unity.ticker}')"
 
 # Quick performance test
-time python run_aligned.py -p 100000 --dry-run
+time python run.py -p 100000 --dry-run
 ```
 
 ## ✅ Session Complete

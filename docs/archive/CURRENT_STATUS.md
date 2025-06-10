@@ -57,7 +57,7 @@ python get_recommendation.py
 3. **Other Tools Still Available**
    ```bash
    # Calculate option Greeks
-   python run_aligned.py --calculate-greeks AAPL 225 230 30 0.25
+   python run.py --calculate-greeks AAPL 225 230 30 0.25
 
    # Risk analytics examples
    python example_risk_analytics.py

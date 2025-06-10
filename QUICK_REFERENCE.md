@@ -7,13 +7,13 @@
 ./daily_health_check.py
 
 # Get trading recommendation
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 
 # Quick system check
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # View performance
-python run_aligned.py --performance
+python run.py --performance
 
 # Live monitoring dashboard
 ./monitor_live.py
@@ -36,10 +36,10 @@ python run_aligned.py --performance
 
 ```bash
 # Check version
-python run_aligned.py --version
+python run.py --version
 
 # Export metrics for analysis
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 
 # View configuration health
 python -c "from src.config.loader import get_config_loader; print(get_config_loader().generate_health_report())"
@@ -73,7 +73,7 @@ export EXPORT_METRICS=true
 ### "System diagnostics failed"
 ```bash
 # Check specific failures
-python run_aligned.py --diagnose --verbose
+python run.py --diagnose --verbose
 
 # Reset feature flags
 rm feature_flags.json
@@ -82,7 +82,7 @@ rm feature_flags.json
 ### "Performance degraded"
 ```bash
 # View slow operations
-python run_aligned.py --performance
+python run.py --performance
 
 # Clear cache
 find . -name "*.cache" -delete
@@ -101,7 +101,7 @@ env | grep WHEEL_
 
 ```bash
 # Export latest metrics
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 
 # Files created:
 # - exports/dashboard_YYYYMMDD_HHMMSS.json
@@ -125,10 +125,10 @@ git commit --no-verify
 
 ## 📞 Support
 
-1. Run diagnostics first: `python run_aligned.py --diagnose`
+1. Run diagnostics first: `python run.py --diagnose`
 2. Check logs: `tail -f logs/monitor.log`
 3. Review alerts in monitoring output
-4. Check version: `python run_aligned.py --version`
+4. Check version: `python run.py --version`
 
 ---
 *Remember: This is a recommendation system only - no broker integration!*

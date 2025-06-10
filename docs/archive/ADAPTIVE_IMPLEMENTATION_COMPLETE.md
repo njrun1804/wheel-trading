@@ -6,7 +6,7 @@ The Unity wheel trading adaptive system has been successfully implemented with a
 
 ## What Was Implemented
 
-### 1. Simplified Adaptive System (`src/unity_wheel/adaptive.py`)
+### 1. Simplified Adaptive System (`src/unity_wheel/strategy/adaptive_base.py`)
 - **UnityConditions**: Only tracks essential metrics
   - Unity price and volatility
   - IV rank

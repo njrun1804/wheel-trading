@@ -178,8 +178,8 @@ Add performance monitoring to critical paths:
 
 ```python
 # Command line
-python run_aligned.py --performance  # View performance metrics
-python run_aligned.py --export-metrics  # Export for dashboards
+python run.py --performance  # View performance metrics
+python run.py --export-metrics  # Export for dashboards
 
 # In code
 from unity_wheel.monitoring import get_performance_monitor
@@ -258,7 +258,7 @@ if rec["action"] == "ADJUST":
 ## Support
 
 For questions or issues during migration:
-1. Check the diagnostic output: `python run_aligned.py --diagnose`
+1. Check the diagnostic output: `python run.py --diagnose`
 2. Review the logs for detailed error information
 3. Consult the API documentation in the docstrings
-4. File an issue with version information: `python run_aligned.py --version`
+4. File an issue with version information: `python run.py --version`

@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.databento import DataStorage, DatentoClient
-from src.unity_wheel.databento.integration import DatentoIntegration
+from src.unity_wheel.data_providers.databento import DataStorage, DatentoClient
+from src.unity_wheel.data_providers.databento.integration import DatentoIntegration
 from src.unity_wheel.utils import setup_structured_logging
 
 

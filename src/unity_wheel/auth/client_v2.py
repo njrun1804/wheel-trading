@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional
 
 from ..secrets.integration import SecretInjector, get_schwab_credentials
 from ..utils.logging import get_logger
-from .client import AuthClient as BaseAuthClient
+from .auth_client import AuthClient as BaseAuthClient
 
 logger = get_logger(__name__)
 

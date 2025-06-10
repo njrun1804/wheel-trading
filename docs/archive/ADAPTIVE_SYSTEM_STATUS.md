@@ -2,7 +2,7 @@
 
 ## What Is Actually Implemented
 
-### Core Adaptive System (`src/unity_wheel/adaptive.py`)
+### Core Adaptive System (`src/unity_wheel/strategy/adaptive_base.py`)
 - ✅ Unity volatility-based position sizing
 - ✅ Portfolio drawdown scaling
 - ✅ Earnings awareness (skip <7 days)

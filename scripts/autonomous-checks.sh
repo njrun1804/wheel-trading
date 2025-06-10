@@ -14,7 +14,7 @@ echo "=============================================="
 # 1. Run diagnostics
 echo ""
 echo "📊 Running system diagnostics..."
-python run_aligned.py --diagnose --format json > /tmp/diagnostics.json
+python run.py --diagnose --format json > /tmp/diagnostics.json
 if [ $? -eq 0 ]; then
     echo "✅ Diagnostics passed"
 else
@@ -25,7 +25,7 @@ fi
 # 2. Check performance metrics
 echo ""
 echo "⏱️  Checking performance metrics..."
-python run_aligned.py --performance --format json > /tmp/performance.json
+python run.py --performance --format json > /tmp/performance.json
 # Extract key metrics
 if command -v jq &> /dev/null; then
     SLOW_OPS=$(jq '.slow_operations | length' /tmp/performance.json)
@@ -63,7 +63,7 @@ else:
 # 5. Export metrics for monitoring
 echo ""
 echo "📈 Exporting metrics..."
-python run_aligned.py --export-metrics --format json > /tmp/export_result.json
+python run.py --export-metrics --format json > /tmp/export_result.json
 echo "✅ Metrics exported to exports/"
 
 # 6. Check for stale cache

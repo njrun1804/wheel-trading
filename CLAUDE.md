@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Get trading recommendation
-python run_aligned.py -p 100000
+python run.py -p 100000
 
 # If errors, run diagnostics
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # Quick commit
 ./scripts/commit-workflow.sh -y
@@ -18,7 +18,7 @@ python run_aligned.py --diagnose
 pytest tests/test_databento_unity.py tests/test_position_sizing.py -v
 ```
 
-**Key Files:** `run_aligned.py:112` (main), `api/advisor.py:106` (logic), `config.yaml` (settings)
+**Key Files:** `run.py` (entry), `src/unity_wheel/cli/run.py:112` (main), `api/advisor.py:106` (logic), `config.yaml` (settings)
 
 **Common Errors:**
 - "Invalid credentials" → `python scripts/setup-secrets.py`
@@ -45,7 +45,7 @@ Unity Wheel Trading Bot v2.2 - An autonomous options wheel strategy recommendati
 ### One-Liner Cheat Sheet
 ```bash
 # Get recommendation
-python run_aligned.py -p 100000
+python run.py -p 100000
 
 # Quick health check
 ./scripts/housekeeping.sh -q
@@ -60,20 +60,20 @@ python -c "from src.config.loader import get_config as gc; print(gc().strategy.g
 python -c "from src.unity_wheel.metrics import metrics_collector as mc; print(mc.get_performance_stats())"
 
 # Validate environment
-python -m unity_wheel.validate
+python -m src.unity_wheel.utils.validate
 
 # Quick commit
 git add -A && git commit -m "msg" && git push
 
 # Export metrics
-python run_aligned.py --export-metrics > metrics.json
+python run.py --export-metrics > metrics.json
 ```
 
 ### Most Used Commands
 ```bash
 # Primary operations
-python run_aligned.py --portfolio 100000      # Get recommendation
-python run_aligned.py --diagnose             # System health
+python run.py --portfolio 100000      # Get recommendation
+python run.py --diagnose             # System health
 pre-commit run --all-files                   # Run all checks
 ./scripts/commit-workflow.sh -y              # Auto-commit
 
@@ -82,15 +82,16 @@ pytest tests/test_autonomous_flow.py -v      # Integration test
 pytest tests/test_math.py::test_black_scholes_edge_cases -v  # Specific test
 
 # Monitoring
-./monitor_live.py                            # Real-time dashboard
-./daily_health_check.py                      # Morning checks
+python src/unity_wheel/monitoring/scripts/live_monitor.py      # Real-time dashboard
+python src/unity_wheel/monitoring/scripts/daily_health_check.py  # Morning checks
 ```
 
 ### Key File Locations
 ```python
 # Entry Points
-run_aligned.py:264       # main() function
-run_aligned.py:112       # generate_recommendation()
+run.py                   # Simple wrapper script
+src/unity_wheel/cli/run.py:264       # main() function
+src/unity_wheel/cli/run.py:112       # generate_recommendation()
 
 # Core Components
 src/unity_wheel/api/advisor.py:74           # WheelAdvisor class
@@ -107,8 +108,10 @@ src/config/loader.py                        # Config loading & tracking
 config.yaml                                  # Main config file
 
 # Data Integration
-src/unity_wheel/schwab/client.py            # Schwab API client
-src/unity_wheel/databento/client.py         # Databento client
+src/unity_wheel/schwab/client.py                       # Schwab API client
+src/unity_wheel/data_providers/databento/client.py     # Databento client
+src/unity_wheel/data_providers/fred/                   # FRED data
+src/unity_wheel/data_providers/schwab/                 # Schwab data modules
 ```
 
 ### Critical Constants & Performance SLAs
@@ -174,8 +177,8 @@ logger.info("Operation completed", extra={
 ### Quick Debugging Actions
 ```python
 # When recommendation fails
-python run_aligned.py --diagnose  # Check system health
-python -c "from src.unity_wheel.databento import validate_connection; validate_connection()"  # Check data
+python run.py --diagnose  # Check system health
+python -c "from src.unity_wheel.data_providers.databento import validate_connection; validate_connection()"  # Check data
 python -c "from src.unity_wheel.schwab import test_auth; test_auth()"  # Check auth
 
 # When performance is slow
@@ -184,7 +187,7 @@ python -c "from src.unity_wheel.metrics import metrics_collector as mc; print(mc
 
 # When getting unexpected results
 python -c "from src.config.loader import get_config_loader as gcl; print(gcl().get_unused_parameters())"  # Unused config
-python -c "from src.unity_wheel.diagnostics import run_diagnostics; run_diagnostics(verbose=True)"  # Full diagnostics
+python -c "from src.unity_wheel.monitoring.diagnostics import run_diagnostics; run_diagnostics(verbose=True)"  # Full diagnostics
 ```
 
 ### Common Gotchas
@@ -241,10 +244,10 @@ python tools/verification/schwab_oauth_fixed.py
 ```bash
 # "Insufficient data for reliable VaR calculation"
 # Need 20+ data points, check:
-python -c "from src.unity_wheel.databento import get_historical_data; print(len(get_historical_data('U', days=30)))"
+python -c "from src.unity_wheel.data_providers.databento import get_historical_data; print(len(get_historical_data('U', days=30)))"
 
 # "Data quality issues: X errors found"
-python run_aligned.py --diagnose  # See specific issues
+python run.py --diagnose  # See specific issues
 
 # "No liquid strikes available"
 # Check liquidity thresholds:
@@ -256,7 +259,7 @@ python run_aligned.py --diagnose  # See specific issues
 # "SLA violation: operation took Xms (threshold: Yms)"
 # Enable profiling to identify bottleneck:
 python -c "from src.unity_wheel.utils import enable_profiling; enable_profiling()"
-python run_aligned.py --portfolio 100000  # Run with profiling
+python run.py --portfolio 100000  # Run with profiling
 
 # View performance stats:
 python -c "from src.unity_wheel.metrics import metrics_collector; print(metrics_collector.get_sla_report())"
@@ -456,7 +459,7 @@ operations:
 
 ### Unity Adaptive System (Key Feature)
 
-The project includes a Unity-specific adaptive system at `src/unity_wheel/adaptive.py:221` that adjusts position sizing based on market conditions.
+The project includes a Unity-specific adaptive system at `src/unity_wheel/strategy/adaptive_base.py:221` that adjusts position sizing based on market conditions.
 
 #### Quick Usage:
 ```python
@@ -641,7 +644,7 @@ def new_calculation_validated(
 grep -E "ERROR|CRITICAL" logs/wheel.log | tail -50 | grep -E "function|message"
 
 # 2. Run diagnostics
-python run_aligned.py --diagnose > diagnostics.txt
+python run.py --diagnose > diagnostics.txt
 
 # 3. Check specific subsystem
 python -c "
@@ -654,7 +657,7 @@ print('Token expires:', auth.token_expires_at)
 
 # 4. Enable debug logging
 export LOG_LEVEL=DEBUG
-python run_aligned.py --portfolio 100000 2>&1 | tee debug.log
+python run.py --portfolio 100000 2>&1 | tee debug.log
 
 # 5. Check metrics database
 sqlite3 exports/metrics.db "
@@ -679,11 +682,11 @@ python -c "from src.unity_wheel.metrics import metrics_collector; print(metrics_
 ### Databento (Options Data)
 ```python
 # Quick setup
-from src.unity_wheel.databento import DatentoClient
-client = DatentoClient(api_key="xxx")  # Or use DATABENTO_API_KEY env
+from src.unity_wheel.data_providers.databento import DatabentoClient
+client = DatabentoClient(api_key="xxx")  # Or use DATABENTO_API_KEY env
 
 # Get Unity options
-from src.unity_wheel.databento.integration import get_wheel_candidates
+from src.unity_wheel.data_providers.databento.integration import get_wheel_candidates
 candidates = await get_wheel_candidates("U", target_delta=0.30)
 
 # Debug connection
@@ -797,7 +800,7 @@ Pre-commit hooks run automatically:
 
 #### Daily Health Check
 ```bash
-./daily_health_check.py  # Run every morning
+python src/unity_wheel/monitoring/scripts/daily_health_check.py  # Run every morning
 # Checks:
 # - Data freshness (<5min stale)
 # - Config validation
@@ -808,7 +811,7 @@ Pre-commit hooks run automatically:
 
 #### Live Monitor
 ```bash
-./monitor_live.py  # Real-time dashboard
+python src/unity_wheel/monitoring/scripts/live_monitor.py  # Real-time dashboard
 # Updates every 10 seconds:
 # - Current positions & P&L
 # - Risk metrics (VaR, Greeks)
@@ -820,7 +823,7 @@ Pre-commit hooks run automatically:
 #### Quick Validation
 ```bash
 ./scripts/housekeeping.sh --quick  # <30 second check
-python -m unity_wheel.validate     # Full environment validation
+python -m src.unity_wheel.utils.validate     # Full environment validation
 ```
 
 ## Environment Variables
@@ -890,7 +893,7 @@ from src.unity_wheel.schwab import monitor_connection
 monitor_connection(interval=60)  # Check every 60s
 
 # Monitor Databento data quality
-from src.unity_wheel.databento import monitor_data_quality
+from src.unity_wheel.data_providers.databento import monitor_data_quality
 monitor_data_quality(symbol="U", interval=300)  # Every 5 min
 
 # Monitor risk limits

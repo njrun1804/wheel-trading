@@ -89,7 +89,7 @@ All scripts are executable and ready for use:
 
 ### Metrics Export
 ```bash
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 ```
 - JSON format for custom dashboards
 - InfluxDB line protocol
@@ -107,19 +107,19 @@ python run_aligned.py --export-metrics
 ### Basic Operations
 ```bash
 # Get recommendation
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 
 # Run diagnostics
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # View performance
-python run_aligned.py --performance
+python run.py --performance
 
 # Export metrics
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 
 # Show version
-python run_aligned.py --version
+python run.py --version
 ```
 
 ### Autonomous Operations

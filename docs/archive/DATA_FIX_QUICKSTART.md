@@ -42,7 +42,7 @@ python tools/data/fetch_unity_options.py
 ### Step 6: Monitor Data Quality (ongoing)
 ```bash
 # In a new terminal
-python monitor_data_quality.py
+python src/unity_wheel/monitoring/scripts/data_quality_monitor.py
 ```
 
 ## Verification Checklist
@@ -58,8 +58,8 @@ After running the above steps, verify:
 
 ### Morning Routine (6:30 AM)
 1. Run data refresh: `./scripts/refresh_data.sh`
-2. Check diagnostics: `python run_aligned.py --diagnose`
-3. Review recommendations: `python run_aligned.py --portfolio 100000`
+2. Check diagnostics: `python run.py --diagnose`
+3. Review recommendations: `python run.py --portfolio 100000`
 
 ### Set Up Automation (Optional)
 ```bash
@@ -103,14 +103,14 @@ After successful setup:
 ## Next Steps
 
 Once data is flowing:
-1. Test wheel recommendations: `python run_aligned.py --portfolio 100000`
-2. Review adaptive system: `python run_aligned.py --adaptive`
-3. Export metrics: `python run_aligned.py --export-metrics`
+1. Test wheel recommendations: `python run.py --portfolio 100000`
+2. Review adaptive system: `python run.py --adaptive`
+3. Export metrics: `python run.py --export-metrics`
 4. Set up performance tracking
 
 ## Support
 
-- Check system status: `python run_aligned.py --diagnose`
+- Check system status: `python run.py --diagnose`
 - View logs: `ls -la logs/`
-- Monitor live: `python monitor_data_quality.py`
+- Monitor live: `python src/unity_wheel/monitoring/scripts/data_quality_monitor.py`
 - Full documentation: See `DATA_REMEDIATION_PLAN.md`

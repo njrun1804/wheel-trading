@@ -178,5 +178,5 @@ async with FREDClient() as client:
 ## Next Steps
 
 1. Complete Schwab OAuth flow if needed
-2. Run the main trading bot: `python run_aligned.py --portfolio 100000`
+2. Run the main trading bot: `python run.py --portfolio 100000`
 3. Monitor with: `./scripts/monitor.sh`

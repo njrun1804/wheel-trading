@@ -20,7 +20,7 @@ from .types import (
     OptionChain,
     OptionQuote,
 )
-from ..utils.logging import StructuredLogger
+from ...utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

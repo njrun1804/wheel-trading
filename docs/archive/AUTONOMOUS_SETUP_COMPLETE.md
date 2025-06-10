@@ -34,7 +34,7 @@ Several import issues were resolved:
 ## 🚧 Known Issues
 
 1. **MetricsCollector.get_statistics()** - Method not implemented
-   - Affects: `python run_aligned.py --export-metrics`
+   - Affects: `python run.py --export-metrics`
    - Workaround: Other autonomous features work correctly
 
 2. **StructuredLogger Initialization** - Some modules still have incorrect initialization
@@ -47,10 +47,10 @@ Run these commands to verify the setup:
 
 ```bash
 # Check diagnostics work
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # Check version
-python run_aligned.py --version
+python run.py --version
 
 # Test autonomous checks (partial - will error on metrics export)
 ./scripts/autonomous-checks.sh

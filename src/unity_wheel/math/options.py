@@ -14,12 +14,12 @@ from scipy.stats import norm
 
 from ..utils import (
     RecoveryStrategy,
-    cached,
     get_feature_flags,
     get_logger,
     timed_operation,
     with_recovery,
 )
+from ..storage.cache.general_cache import cached
 
 logger = get_logger(__name__)
 

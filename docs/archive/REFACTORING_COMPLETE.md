@@ -98,22 +98,22 @@ All 10 refactoring tasks have been successfully completed, transforming the code
 
 ### Basic Recommendation
 ```bash
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 ```
 
 ### With Full Monitoring
 ```bash
 # Run diagnostics
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # View performance
-python run_aligned.py --performance
+python run.py --performance
 
 # Export metrics
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 
 # Check version
-python run_aligned.py --version
+python run.py --version
 ```
 
 ### In Production

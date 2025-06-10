@@ -38,7 +38,7 @@ Task 4: Data Pipeline ───────────────────�
 ### Key Commands During Development
 ```bash
 # Check system health
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # Run unit tests for current work
 pytest tests/test_<module>.py -v
@@ -50,7 +50,7 @@ pre-commit run --all-files
 python -c "from src.config.loader import get_config_loader; print(get_config_loader().generate_health_report())"
 
 # Run with mock data for testing
-python run_aligned.py --portfolio 100000 --use-mock  # After Task 4
+python run.py --portfolio 100000 --use-mock  # After Task 4
 ```
 
 ## Data Requirements & Costs
@@ -209,13 +209,13 @@ Wire together all data sources to feed real information into the decision engine
    - Use Databento for real-time option chains
    - Add circuit breakers for data quality
 
-2. Create src/unity_wheel/data/pipeline.py:
+2. Create src/unity_wheel/data_providers/base/pipeline.py:
    - DataPipeline class that orchestrates all sources
    - Automatic fallback to cached data if sources fail
    - Data quality validation
    - Staleness detection and warnings
 
-3. Update run_aligned.py:
+3. Update run.py:
    - Use real data pipeline
    - Add --use-mock flag for testing only
    - Show data source status in output
@@ -230,10 +230,10 @@ Test with real market data during market hours. Ensure graceful degradation when
 ```
 
 ### Validation Steps:
-1. Test during market hours: `python run_aligned.py --portfolio 100000`
+1. Test during market hours: `python run.py --portfolio 100000`
 2. Verify data sources: Check logs show "Schwab: CONNECTED", "Databento: CONNECTED"
 3. Test failover: Disconnect network, should use cached data with warning
-4. Monitor latency: `python run_aligned.py --portfolio 100000 --timing`
+4. Monitor latency: `python run.py --portfolio 100000 --timing`
 5. Validate data quality: No stale prices (>15 min old during market hours)
 
 ---
@@ -272,7 +272,7 @@ Every recommendation must show its effect on the overall objective function (CAG
 ```
 
 ### Validation Steps:
-1. Test full recommendation: `python run_aligned.py --portfolio 200000 --verbose`
+1. Test full recommendation: `python run.py --portfolio 200000 --verbose`
 2. Verify output includes: loan decisions, margin usage, position sizing
 3. Check objective function: Each action shows impact on CAGR - 0.20×|CVaR₉₅|
 4. Test edge case: When loan paydown beats investing (high market vol)
@@ -567,14 +567,14 @@ pytest tests/test_end_to_end_production.py -v
 ### Debug Commands
 ```bash
 # Check system health
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # Verbose logging
 export LOG_LEVEL=DEBUG
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 
 # Profile performance
-python -m cProfile -o profile.stats run_aligned.py --portfolio 100000
+python -m cProfile -o profile.stats run.py --portfolio 100000
 python -m pstats profile.stats
 
 # Check configuration

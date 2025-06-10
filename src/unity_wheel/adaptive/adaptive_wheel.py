@@ -6,7 +6,7 @@ Replaces static parameters with dynamic ones based on market conditions.
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from ..adaptive import UnityConditions, UnityAdaptiveSystem, OutcomeTracker
+from ..strategy.adaptive_base import UnityConditions, UnityAdaptiveSystem, OutcomeTracker
 from ..data.market_data import MarketDataFetcher, UnityEarningsCalendar
 from ..models import Greeks, Position
 from ..strategy.wheel import WheelStrategy, WheelParameters, StrikeRecommendation

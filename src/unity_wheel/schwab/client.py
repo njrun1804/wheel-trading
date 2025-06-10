@@ -11,7 +11,7 @@ import aiohttp
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from ..secrets.integration import get_schwab_credentials
-from ..utils.cache import IntelligentCache
+from ..storage.cache.general_cache import IntelligentCache
 from ..utils.logging import get_logger
 from .exceptions import (
     SchwabAuthError,

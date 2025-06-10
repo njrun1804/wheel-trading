@@ -59,7 +59,7 @@ Can you please:
 
 ### Option C: Use Alternative Features
 While waiting for OAuth to work, you can still use:
-- `python run_aligned.py --calculate-greeks AAPL 100 95 30 0.20`
+- `python run.py --calculate-greeks AAPL 100 95 30 0.20`
 - `python example_risk_analytics.py`
 - FRED economic data analysis
 - Options math calculations

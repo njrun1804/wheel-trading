@@ -10,9 +10,9 @@ from typing import Dict, List, Optional
 import pandas as pd
 from databento_dbn import Schema
 
-from ..storage import Storage
-from ..utils import get_logger, with_recovery
-from .client import DatabentoClient
+from ...storage import Storage
+from ...utils import get_logger, with_recovery
+from .auth_client import DatabentoClient
 
 logger = get_logger(__name__)
 

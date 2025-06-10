@@ -23,7 +23,7 @@ from .exceptions import (
 )
 from .oauth import OAuth2Handler
 from .rate_limiter import RateLimiter
-from .storage import SecureTokenStorage
+from ..storage.auth_storage import SecureTokenStorage
 
 logger = get_logger(__name__)
 

@@ -13,8 +13,8 @@ import pandas as pd
 import duckdb
 from typing import Optional, List, Dict, Any
 
-from ..utils.logging import get_logger
-from ...config.loader import get_config
+from ...utils.logging import get_logger
+from ....config.loader import get_config
 
 logger = get_logger(__name__)
 

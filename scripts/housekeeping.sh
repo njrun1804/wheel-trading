@@ -10,7 +10,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Required Unity Wheel Bot structure
 readonly REQUIRED_DIRS="src/unity_wheel src/unity_wheel/strategy src/unity_wheel/risk tests"
-readonly REQUIRED_FILES="config.yaml run_aligned.py HOUSEKEEPING_GUIDE.md"
+readonly REQUIRED_FILES="config.yaml run.py HOUSEKEEPING_GUIDE.md"
 
 # Pattern definitions
 readonly PAT_EXEC="execute_trade|place_order|submit_order|broker\.execute|broker\.place"
@@ -150,9 +150,9 @@ preflight_check() {
     local errors=0
 
     # Verify we're in Unity Wheel Bot repo
-    if [[ ! -f "config.yaml" || ! -f "run_aligned.py" ]]; then
+    if [[ ! -f "config.yaml" || ! -f "run.py" ]]; then
         echo "Error: Not in Unity Wheel Bot root directory" >&2
-        echo "Expected files: config.yaml, run_aligned.py" >&2
+        echo "Expected files: config.yaml, run.py" >&2
         ((errors++))
     fi
 
@@ -202,7 +202,7 @@ unity_quick_check() {
     local errors=0
 
     # Check for execution code in key files
-    for file in run_aligned.py src/unity_wheel/strategy/*.py; do
+    for file in run.py src/unity_wheel/strategy/*.py; do
         if [[ -f "$file" ]] && grep -E "$PAT_EXEC" "$file" >/dev/null 2>&1; then
             echo "❌ CRITICAL: Execution code in $file"
             ((errors++))
@@ -210,7 +210,7 @@ unity_quick_check() {
     done
 
     # Verify adaptive system exists
-    if [[ ! -f "src/unity_wheel/adaptive.py" && ! -d "src/unity_wheel/adaptive" ]]; then
+    if [[ ! -f "src/unity_wheel/strategy/adaptive_base.py" && ! -d "src/unity_wheel/adaptive" ]]; then
         echo "❌ Missing adaptive system (neither adaptive.py nor adaptive/ directory found)"
         ((errors++))
     fi
@@ -221,8 +221,8 @@ unity_quick_check() {
     fi
 
     # Quick confidence check on main entry
-    if grep -q "def.*recommend" run_aligned.py 2>/dev/null; then
-        if ! grep -A5 "def.*recommend" run_aligned.py | grep -q "return.*," 2>/dev/null; then
+    if grep -q "def.*recommend" run.py 2>/dev/null; then
+        if ! grep -A5 "def.*recommend" run.py | grep -q "return.*," 2>/dev/null; then
             echo "⚠️  Main recommendation function may lack confidence score"
         fi
     fi

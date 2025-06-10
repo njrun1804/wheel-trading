@@ -18,7 +18,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from src.unity_wheel.schwab.client import SchwabClient
-from src.unity_wheel.schwab.data_ingestion import (
+from src.unity_wheel.data_providers.schwab.ingestion import (
     DataGranularity,
     DataRequirements,
     DataStorage,

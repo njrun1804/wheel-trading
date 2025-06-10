@@ -68,7 +68,7 @@ python -m unity_wheel.validate
 pytest tests/ -v
 
 # Get first recommendation
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 ```
 
 ## Development Workflow
@@ -235,7 +235,7 @@ class YourFeatureConfig(BaseModel):
 1. **Enable debug logging:**
 ```bash
 export WHEEL_LOG_LEVEL=DEBUG
-python run_aligned.py --diagnose
+python run.py --diagnose
 ```
 
 2. **Performance profiling:**
@@ -255,7 +255,7 @@ def slow_function():
 ./scripts/monitor.sh
 
 # Export metrics
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 ```
 
 ## Environment Setup
@@ -337,7 +337,7 @@ export WHEEL_DATABENTO__CACHE_TTL=7200
 ./scripts/autonomous-checks.sh
 
 # One-time check
-python run_aligned.py --diagnose
+python run.py --diagnose
 ```
 
 ## Common Tasks
@@ -392,11 +392,11 @@ Default setup for single-user workstation:
 
 ```bash
 # Development mode
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 
 # Production mode
 export WHEEL_MODE=production
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 ```
 
 ### Docker Container
@@ -411,7 +411,7 @@ RUN pip install -r requirements.txt
 COPY . .
 
 ENV WHEEL_MODE=production
-CMD ["python", "run_aligned.py"]
+CMD ["python", "run.py"]
 ```
 
 Build and run:
@@ -460,7 +460,7 @@ export WHEEL_CACHE__MAX_MEMORY_MB=500
 4. **Slow performance:**
 ```python
 # Enable profiling
-python run_aligned.py --performance
+python run.py --performance
 ```
 
 ### Debug Commands

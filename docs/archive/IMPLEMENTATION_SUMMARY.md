@@ -138,7 +138,7 @@ This document summarizes all changes made to implement a sophisticated, autonomo
 - Daily P&L tracking
 - Time-based restrictions
 
-### Daily Health Check (`daily_health_check.py`)
+### Daily Health Check (`src/unity_wheel/monitoring/scripts/daily_health_check.py`)
 - Morning system verification:
   - Data freshness check
   - Configuration validation
@@ -146,7 +146,7 @@ This document summarizes all changes made to implement a sophisticated, autonomo
   - Performance review
   - Component testing
 
-### Live Monitor (`monitor_live.py`)
+### Live Monitor (`src/unity_wheel/monitoring/scripts/live_monitor.py`)
 - Real-time dashboard
 - Updates every 10 seconds
 - Shows:
@@ -195,8 +195,8 @@ wheel-trading/
 ├── test_regime_aware_risk.py     # Regime detection demo
 ├── test_dynamic_optimization.py  # Optimizer validation
 ├── test_integrated_system.py     # Full system test
-├── daily_health_check.py         # Morning verification
-├── monitor_live.py               # Real-time dashboard
+├── src/unity_wheel/monitoring/scripts/daily_health_check.py         # Morning verification
+├── src/unity_wheel/monitoring/scripts/live_monitor.py               # Real-time dashboard
 └── HISTORICAL_DATA_UTILIZATION_PLAN.md  # Analytics roadmap
 ```
 

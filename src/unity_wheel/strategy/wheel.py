@@ -20,11 +20,11 @@ from ..risk import RiskAnalyzer
 from ..utils import (
     RecoveryStrategy,
     StructuredLogger,
-    cached,
     get_logger,
     timed_operation,
     with_recovery,
 )
+from ..storage.cache.general_cache import cached
 from ..utils.position_sizing import DynamicPositionSizer
 from ...config.loader import get_config
 

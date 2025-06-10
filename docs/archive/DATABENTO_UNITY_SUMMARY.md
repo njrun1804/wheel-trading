@@ -53,7 +53,7 @@ python pull_unity_options_databento.py
 ### 3. Run Wheel Strategy
 ```bash
 # Generate recommendations
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 ```
 
 ## 💰 Cost Optimization

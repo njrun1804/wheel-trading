@@ -14,7 +14,7 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 
 from ...config.loader import get_config
-from ..utils.logging import StructuredLogger
+from .logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

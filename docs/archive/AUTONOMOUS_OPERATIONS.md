@@ -160,7 +160,7 @@ Parameters automatically adjust based on:
 Export metrics for external dashboards:
 
 ```bash
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 ```
 
 Formats supported:
@@ -234,13 +234,13 @@ rm metrics.db
 ## Troubleshooting
 
 ### System Not Healthy
-1. Run diagnostics: `python run_aligned.py --diagnose`
+1. Run diagnostics: `python run.py --diagnose`
 2. Check logs in `logs/monitor.log`
 3. Review feature flag status
 4. Validate configuration
 
 ### Performance Issues
-1. Check metrics: `python run_aligned.py --performance`
+1. Check metrics: `python run.py --performance`
 2. Look for SLA violations
 3. Review cache hit rates
 4. Check for degraded features

@@ -23,7 +23,7 @@ All housekeeping tasks have been successfully completed. The project is now full
 
 ### Script Consolidation
 - **Removed 5 duplicate data fetching scripts** (kept optimized versions)
-- **Removed 5 redundant recommendation scripts** (all functionality in `run_aligned.py`)
+- **Removed 5 redundant recommendation scripts** (all functionality in `run.py`)
 - **Removed `paper_trading_mode.py`** (violates v2.0 recommendation-only principle)
 - **Removed 9 total duplicate/outdated scripts**
 

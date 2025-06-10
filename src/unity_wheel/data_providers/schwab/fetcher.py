@@ -10,8 +10,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
-from ..utils.logging import get_logger
-from .client import SchwabClient
+from ...utils.logging import get_logger
+from .auth_client import SchwabClient
 from .types import SchwabAccount, SchwabPosition
 
 logger = get_logger(__name__)

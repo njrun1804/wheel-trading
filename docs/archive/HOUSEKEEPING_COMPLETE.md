@@ -20,7 +20,7 @@ wheel-trading/
 ├── INTEGRATION_GUIDE.md         # All integrations (NEW)
 ├── DEVELOPMENT_GUIDE.md         # Setup & development (NEW)
 ├── config.yaml                  # Main configuration
-├── run_aligned.py               # PRIMARY entry point
+├── run.py               # PRIMARY entry point
 ├── src/unity_wheel/             # Core implementation
 ├── tests/                       # All tests (6 moved here)
 ├── examples/                    # Organized examples (NEW)

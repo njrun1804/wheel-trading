@@ -31,7 +31,7 @@ def _get_market_validator():
     """Lazy import market validator."""
     global _market_validator
     if _market_validator is None:
-        from ..data import get_market_validator
+        from ..data_providers.base import get_market_validator
 
         _market_validator = get_market_validator()
     return _market_validator
@@ -41,7 +41,7 @@ def _get_anomaly_detector():
     """Lazy import anomaly detector."""
     global _anomaly_detector
     if _anomaly_detector is None:
-        from ..data import get_anomaly_detector
+        from ..data_providers.base import get_anomaly_detector
 
         _anomaly_detector = get_anomaly_detector()
     return _anomaly_detector

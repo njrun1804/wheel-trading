@@ -113,7 +113,7 @@ check_status $? "Cache cleanup"
 
 # 7. Run diagnostics
 log "🏥 Running health check..."
-python run_aligned.py --diagnose >> "$LOG_FILE" 2>&1
+python run.py --diagnose >> "$LOG_FILE" 2>&1
 check_status $? "Health check"
 
 # 8. Generate summary

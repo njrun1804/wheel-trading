@@ -21,8 +21,8 @@ Cleaned up new files from the recent implementation of dynamic optimization, reg
   - `HISTORICAL_DATA_UTILIZATION_PLAN.md`
 
 ### 3. Operational Scripts Kept in Root
-- **`daily_health_check.py`** - Morning system verification (user-facing)
-- **`monitor_live.py`** - Real-time dashboard (user-facing)
+- **`src/unity_wheel/monitoring/scripts/daily_health_check.py`** - Morning system verification (user-facing)
+- **`src/unity_wheel/monitoring/scripts/live_monitor.py`** - Real-time dashboard (user-facing)
 - Decision: These are primary operational tools, not debug utilities
 
 ### 4. New Source Modules Verified
@@ -72,7 +72,7 @@ run_aligned.py            # PRIMARY v2.0 entry point
 
 3. **Operational Workflow**: The new scripts create a daily workflow:
    - Morning: `./daily_health_check.py`
-   - Trading: `python run_aligned.py --portfolio 100000`
+   - Trading: `python run.py --portfolio 100000`
    - Monitoring: `./monitor_live.py`
 
 The project maintains its clean structure while incorporating sophisticated new analytics and safety features.

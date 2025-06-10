@@ -260,13 +260,13 @@ Built-in observability for all integrations:
 
 ```python
 # Check integration health
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # View performance metrics
-python run_aligned.py --performance
+python run.py --performance
 
 # Export metrics
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 ```
 
 ### Testing
@@ -302,4 +302,4 @@ pytest tests/test_autonomous_flow.py -v
 ### General Issues
 - **Check logs**: `~/.wheel/logs/wheel-bot.log`
 - **Verify setup**: `python -m unity_wheel.validate`
-- **Run diagnostics**: `python run_aligned.py --diagnose`
+- **Run diagnostics**: `python run.py --diagnose`

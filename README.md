@@ -10,13 +10,13 @@ A sophisticated options wheel strategy recommendation system for Unity Software 
 
 ```bash
 # Get a wheel strategy recommendation
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 
 # Run system diagnostics
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # View performance metrics
-python run_aligned.py --performance
+python run.py --performance
 
 # Continuous monitoring
 ./scripts/monitor.sh
@@ -67,7 +67,7 @@ wheel-trading/
 ├── INTEGRATION_GUIDE.md         # All external integrations
 ├── DEVELOPMENT_GUIDE.md         # Setup and development
 ├── config.yaml                  # Main configuration
-├── run_aligned.py               # PRIMARY entry point (v2.0)
+├── run.py               # PRIMARY entry point (v2.0)
 ├── src/unity_wheel/             # Core implementation
 ├── tests/                       # All tests
 ├── examples/                    # Organized examples
@@ -137,7 +137,7 @@ export WHEEL_ML__ENABLED=true
 
 ```bash
 # Get recommendation with current market data
-python run_aligned.py --portfolio 100000
+python run.py --portfolio 100000
 
 # Output:
 # 🎯 WHEEL STRATEGY RECOMMENDATION
@@ -156,13 +156,13 @@ python run_aligned.py --portfolio 100000
 
 ```bash
 # Run system diagnostics
-python run_aligned.py --diagnose
+python run.py --diagnose
 
 # View performance metrics
-python run_aligned.py --performance
+python run.py --performance
 
 # Export metrics dashboard
-python run_aligned.py --export-metrics
+python run.py --export-metrics
 
 # Continuous monitoring
 ./scripts/monitor.sh

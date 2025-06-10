@@ -16,7 +16,8 @@ from scipy import stats
 
 from ..models.greeks import Greeks
 from ..models.position import Position
-from ..utils import RecoveryStrategy, cached, get_logger, timed_operation, with_recovery
+from ..utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
+from ..storage.cache.general_cache import cached
 from ...config.loader import get_config
 
 logger = get_logger(__name__)
