@@ -11,7 +11,7 @@ import math
 from decimal import Decimal
 
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import assume, given, settings, HealthCheck
 from hypothesis import strategies as st
 
 from src.unity_wheel.math.options import (
@@ -207,7 +207,7 @@ class TestImpliedVolatility:
         rate=risk_free_rate,
         vol=volatility,
     )
-    @settings(max_examples=50, deadline=None)  # IV solver can be slow
+    @settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.filter_too_much])  # IV solver can be slow
     def test_iv_round_trip(self, spot, strike, time, rate, vol):
         """Test that we can recover volatility from option price."""
         # Filter out extreme cases that cause numerical precision issues
