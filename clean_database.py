@@ -3,6 +3,11 @@
 import os
 
 import duckdb
+import logging
+
+from src.unity_wheel.utils.logging import StructuredLogger
+
+logger = StructuredLogger(logging.getLogger(__name__))
 
 db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 conn = duckdb.connect(db_path)
@@ -27,8 +32,8 @@ for table in empty_tables:
         if count == 0:
             print(f"   Dropping empty table: {table}")
             conn.execute(f"DROP TABLE IF EXISTS {table}")
-    except:
-        pass
+    except duckdb.Error as exc:
+        logger.exception("Failed to drop table", exc_info=exc)
 
 # Fix inverted spreads in options data
 print("\n🔧 FIXING INVERTED SPREADS:")
