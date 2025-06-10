@@ -8,8 +8,9 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.data_providers.databento import DataStorage, DatentoClient
-from src.unity_wheel.data_providers.databento.integration import DatentoIntegration
+from src.unity_wheel.data_providers.base.storage import DataStorage
+from src.unity_wheel.data_providers.databento import DatabentoClient
+from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
 from src.unity_wheel.utils import setup_structured_logging
 
 
@@ -21,7 +22,7 @@ async def test_spy_options():
 
     client = DatabentoClient()
     storage = DataStorage(local_dir="data/databento")
-    integration = DatentoIntegration(client, storage)
+    integration = DatabentoIntegration(client, storage)
 
     try:
         # First, test basic SPY trades to confirm connectivity

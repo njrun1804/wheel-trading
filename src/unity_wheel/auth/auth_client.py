@@ -11,10 +11,10 @@ from typing import Any, Callable, Dict, Optional
 import aiohttp
 
 from ..storage.auth_storage import SecureTokenStorage
-from ..utils.logging import get_logger
 
 # Cache functionality handled by AuthCache, not general cache
-from .cache import AuthCache
+from ..storage.cache.auth_cache import AuthCache
+from ..utils.logging import get_logger
 from .exceptions import (
     AuthError,
     InvalidCredentialsError,

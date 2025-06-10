@@ -13,7 +13,7 @@ from src.unity_wheel.data_providers.databento import DatabentoClient
 from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,
 )
-from src.unity_wheel.data_providers.databento.integration import DatentoIntegration
+from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
 from src.unity_wheel.storage import Storage, StorageConfig
 from src.unity_wheel.utils import setup_structured_logging
 
@@ -44,7 +44,7 @@ async def test_complete_integration():
 
     # 4. Initialize integration
     print("\n4️⃣ Initializing Integration Layer...")
-    integration = DatentoIntegration(client, adapter)
+    integration = DatabentoIntegration(client, adapter)
     print("   ✅ Ready for wheel strategy analysis")
 
     try:

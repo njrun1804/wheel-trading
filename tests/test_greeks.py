@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from unity_wheel.models.greeks import Greeks
+from src.unity_wheel.models.greeks import Greeks
 
 
 class TestGreeksBasic:

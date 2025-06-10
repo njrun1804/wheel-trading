@@ -9,7 +9,7 @@ import pytest
 from hypothesis import assume, given
 from hypothesis import strategies as st
 
-from unity_wheel.models.account import Account
+from src.unity_wheel.models.account import Account
 
 
 class TestAccountBasic:
