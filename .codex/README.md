@@ -14,7 +14,7 @@ You now have unrestricted access to optimize the Unity Wheel Trading Bot codebas
 └── README.md               # This file
 
 src/unity_wheel/                     # 123 Python files (main codebase)
-src/config/                          # Configuration system  
+src/config/                          # Configuration system
 tests/                               # 106+ passing tests
 
 # Import paths: Use src.unity_wheel.* for all imports

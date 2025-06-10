@@ -1,6 +1,6 @@
 # Development Guide
 
-> **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies. 
+> **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies.
 > For a more conservative approach, see `examples/core/conservative_config.yaml`
 
 This guide covers setup, development workflow, and deployment for the Unity Wheel Trading Bot v2.0.

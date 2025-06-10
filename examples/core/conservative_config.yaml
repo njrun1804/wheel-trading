@@ -10,17 +10,17 @@ risk:
   position_limits:
     max_position_size: 0.10  # Only 10% per position (vs default 20%)
     max_concurrent_puts: 2   # Fewer concurrent positions (vs default 3)
-  
+
   circuit_breakers:
     max_volatility: 1.00     # Stop at 100% volatility (vs default 150%)
     max_drawdown: -0.10      # Stop at -10% drawdown (vs default -20%)
     consecutive_loss_limit: 2 # Stop after 2 losses (vs default 3)
 
-# Trading Strategy - Conservative parameters  
+# Trading Strategy - Conservative parameters
 strategy:
   greeks:
     delta_target: 0.20       # Lower delta for more OTM puts (vs default 0.30)
-  
+
   expiration:
     days_to_expiry_target: 60 # Longer expiration (vs default 45)
 

@@ -45,7 +45,7 @@ Tables:
 ```
 Date: 2025-06-03
 - U 250606P00022500: $22.50 PUT, last=$0.04, volume=1,030
-- U 250718P00020000: $20.00 PUT, last=$0.44, volume=575  
+- U 250718P00020000: $20.00 PUT, last=$0.44, volume=575
 - U 250613C00038000: $38.00 CALL, last=$0.03, volume=420
 - U 250606C00025500: $25.50 CALL, last=$0.08, volume=188
 ```
@@ -69,7 +69,7 @@ python tools/verify_unity_data.py
 # Query in DuckDB
 duckdb ~/.wheel_trading/cache/wheel_cache.duckdb
 
-SELECT COUNT(*) as options, 
+SELECT COUNT(*) as options,
        MIN(date) as first_date,
        MAX(date) as last_date,
        SUM(volume) as total_volume

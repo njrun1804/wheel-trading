@@ -9,7 +9,7 @@
    - Updated all imports from `unity_trading.*` to `src.unity_wheel.*`
    - Improved module discovery and error reporting
 
-2. **test_config.py** 
+2. **test_config.py**
    - Updated all imports to use `src.unity_wheel.*`
    - Changed position sizing import to use `DynamicPositionSizer`
    - Maintained backward compatibility with environment variables
@@ -80,7 +80,7 @@ from src.unity_wheel.strategy.wheel import WheelStrategy
 
 The container environment now handles:
 - ✅ Missing numpy/pandas/scipy
-- ✅ Missing sklearn for ML features  
+- ✅ Missing sklearn for ML features
 - ✅ Missing hypothesis for property testing
 - ✅ Missing poetry for dependency management
 - ✅ Correct import paths throughout
