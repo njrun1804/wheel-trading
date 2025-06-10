@@ -24,6 +24,7 @@ from .trading_calendar import (
     get_next_expiry_friday,
     is_trading_day,
 )
+from .random_utils import set_seed
 
 __all__ = [
     # Logging
@@ -50,4 +51,5 @@ __all__ = [
     "is_trading_day",
     "get_next_expiry_friday",
     "days_to_expiry",
+    "set_seed",
 ]

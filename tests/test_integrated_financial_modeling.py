@@ -5,8 +5,12 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 
-from src.unity_wheel.api import MarketSnapshot, WheelAdvisor
-from src.unity_wheel.risk import AdvancedFinancialModeling, BorrowingCostAnalyzer, RiskLimits
+from src.unity_wheel.api import WheelAdvisor
+from src.unity_wheel.risk import (
+    AdvancedFinancialModeling,
+    BorrowingCostAnalyzer,
+    RiskLimits,
+)
 from src.unity_wheel.strategy import WheelParameters
 
 
@@ -193,6 +197,7 @@ class TestAdvancedFinancialModeling:
             position_size=35000,
             borrowed_amount=0,
             n_simulations=1000,
+            random_seed=42,
         )
 
         # Check result structure
@@ -217,6 +222,7 @@ class TestAdvancedFinancialModeling:
             position_size=35000,
             borrowed_amount=0,
             n_simulations=1000,
+            random_seed=42,
         )
 
         # With leverage
@@ -227,6 +233,7 @@ class TestAdvancedFinancialModeling:
             position_size=35000,
             borrowed_amount=25000,
             n_simulations=1000,
+            random_seed=42,
         )
 
         # Leverage should reduce mean return (due to borrowing cost)
@@ -239,7 +246,10 @@ class TestAdvancedFinancialModeling:
         returns = np.random.normal(0.001, 0.02, 252)
 
         metrics = modeler.calculate_risk_adjusted_metrics(
-            returns=returns, borrowed_capital=20000, total_capital=50000, risk_free_rate=0.05
+            returns=returns,
+            borrowed_capital=20000,
+            total_capital=50000,
+            risk_free_rate=0.05,
         )
 
         # Check all metrics exist

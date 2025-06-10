@@ -54,6 +54,10 @@ data/
 output/
 temp/
 
+# Local sensitive files
+my_positions.yaml
+exports/*.db
+
 # Build artifacts
 dist/
 build/
