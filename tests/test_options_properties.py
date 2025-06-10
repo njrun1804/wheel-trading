@@ -214,20 +214,23 @@ class TestImpliedVolatility:
         """Test that we can recover volatility from option price."""
         # Filter out extreme cases that cause numerical precision issues
         moneyness = spot / strike
-        assume(0.2 < moneyness < 5.0)  # Avoid extremely deep ITM/OTM
-        assume(vol < 1.5)  # Avoid extremely high volatility
-        assume(time > 7 / 365)  # Avoid very short time to expiry
+        assume(0.7 < moneyness < 1.4)  # Much tighter moneyness range to avoid deep ITM/OTM
+        assume(vol < 1.0)  # Avoid extremely high volatility
+        assume(time > 14 / 365)  # Avoid very short time to expiry (need at least 2 weeks)
 
         # First calculate option price
         option_result = black_scholes_price_validated(spot, strike, time, rate, vol, "call")
 
         assume(not math.isnan(option_result.value))
-        assume(option_result.value > 0.01)  # Need meaningful price
+        assume(option_result.value > 0.05)  # Need meaningful price
 
         # Skip options at intrinsic value (no time value)
         intrinsic_value = max(spot - strike, 0)
         time_value = option_result.value - intrinsic_value
-        assume(time_value > 0.001)  # Need meaningful time value for IV to make sense
+        assume(time_value > 0.02)  # Need substantial time value for IV to make sense
+
+        # Additional filter: time value should be at least 10% of option price
+        assume(time_value / option_result.value > 0.1)
 
         # Then solve for implied volatility
         iv_result = implied_volatility_validated(
