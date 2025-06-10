@@ -67,6 +67,10 @@ export EXPORT_METRICS=true
 - `feature_flags.json` - Feature states
 - `metrics.db` - Performance history
 - `config.yaml` - Main configuration
+- `examples/core/conservative_config.yaml` - Safer starting point
+
+> **Note:** The default `config.yaml` allows 100% allocation and 85% margin.
+> Use the conservative example for lower risk.
 
 ## 🚨 Common Issues
 

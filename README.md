@@ -124,6 +124,12 @@ The project uses an intelligent YAML-based configuration with:
 - Parameter usage tracking and health reporting
 - Self-tuning based on outcome tracking
 
+> **Aggressive Defaults**
+> The provided `config.yaml` is tuned for high-risk trading. It permits up to
+> **100%** allocation per position and up to **85%** margin utilization. New
+> users should start with safer limits—see
+> `examples/core/conservative_config.yaml` for a conservative template.
+
 ```bash
 # Example overrides
 export WHEEL_STRATEGY__DELTA_TARGET=0.30

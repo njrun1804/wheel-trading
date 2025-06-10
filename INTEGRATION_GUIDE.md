@@ -87,6 +87,11 @@ databento:
     delta_range: [0.15, 0.50]  # Wheel-relevant deltas
 ```
 
+> **Aggressive Defaults Warning**
+> The project’s main `config.yaml` enables high-risk settings (100% allocation,
+> 85% margin). For a safer setup use
+> `examples/core/conservative_config.yaml` or override the risk values.
+
 ### Usage
 
 ```python

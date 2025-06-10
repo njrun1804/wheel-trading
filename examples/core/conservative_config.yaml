@@ -1,0 +1,14 @@
+# Conservative configuration example
+# Provides safer defaults compared to the main config.yaml
+
+risk:
+  # Limit each position to 20% of the portfolio
+  max_position_size: 0.20
+  # Limit overall margin utilization to 50%
+  max_margin_percent: 0.50
+  limits:
+    max_var_95: 0.05  # VaR at 95% confidence
+    max_cvar_95: 0.10 # CVaR at 95% confidence
+  margin:
+    max_utilization: 0.50
+    safety_factor: 0.70

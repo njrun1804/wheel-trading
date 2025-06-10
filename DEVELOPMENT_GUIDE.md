@@ -302,6 +302,11 @@ fred:
   fallback_rate: 0.05
 ```
 
+> **Aggressive Defaults**
+> The default `config.yaml` allows up to **100%** allocation per trade and uses
+> **85%** of available margin. For a gentler starting point, copy
+> `examples/core/conservative_config.yaml` and adjust the risk settings.
+
 2. **Environment overrides:**
 ```bash
 # Override any config value
