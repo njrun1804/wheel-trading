@@ -30,6 +30,7 @@ from src.unity_wheel.data_providers.validation import validate_market_data
 from src.unity_wheel.monitoring import get_performance_monitor
 from src.unity_wheel.monitoring.diagnostics import SelfDiagnostics
 from src.unity_wheel.observability import get_observability_exporter
+from src.unity_wheel.metrics import metrics_collector
 from src.unity_wheel.risk import RiskLimits
 from src.unity_wheel.secrets.integration import SecretInjector
 from src.unity_wheel.strategy import WheelParameters
@@ -265,7 +266,22 @@ def main(
     # Show performance metrics if requested
     if performance:
         monitor = get_performance_monitor()
-        print(monitor.generate_report(format=output_format))
+        perf_report = monitor.generate_report(format=output_format)
+        metrics_report = metrics_collector.generate_report()
+        if output_format == "json":
+            print(
+                json.dumps(
+                    {
+                        "performance": json.loads(perf_report),
+                        "decision_metrics": metrics_report,
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            print(perf_report)
+            print("")
+            print(metrics_report)
         return 0
 
     # Export metrics for dashboards if requested
