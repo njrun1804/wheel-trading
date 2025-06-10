@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unity-wheel-bot"
-version = "0.1.0"
+version = "2.0.0"
 description = "Sophisticated options wheel trading system optimized for autonomous operation"
 authors = ["Claude Code <noreply@anthropic.com>"]
 readme = "README.md"
