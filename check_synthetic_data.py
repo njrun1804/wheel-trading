@@ -28,7 +28,10 @@ for row in sample[:3]:
     print(f"Strike ${row[0]} {row[1]} @ {row[9]}")
     print(f"  Prices: Bid=${row[2]:.2f} Ask=${row[3]:.2f} Spread=${row[3]-row[2]:.2f}")
     print(f"  Volume={row[4]:,} OI={row[5]:,}")
-    print(f"  Greeks: IV={row[6]:.3f} Delta={row[7]:.3f} Gamma={row[8]:.3f} Theta={row[9]:.3f}")
+    print(
+        f"  Greeks: IV={row[6]:.3f} Delta={row[7]:.3f} "
+        f"Gamma={row[8]:.3f} Theta={row[9]:.3f}"
+    )
     print()
 
 # Analyze data patterns
@@ -67,8 +70,12 @@ formula_check = conn.execute(
         -- Check if all gammas are positive
         SUM(CASE WHEN gamma < 0 THEN 1 ELSE 0 END) as negative_gammas,
         -- Check delta ranges
-        SUM(CASE WHEN option_type = 'PUT' AND delta > 0 THEN 1 ELSE 0 END) as wrong_put_deltas,
-        SUM(CASE WHEN option_type = 'CALL' AND delta < 0 THEN 1 ELSE 0 END) as wrong_call_deltas
+        SUM(
+            CASE WHEN option_type = 'PUT' AND delta > 0 THEN 1 ELSE 0 END
+        ) as wrong_put_deltas,
+        SUM(
+            CASE WHEN option_type = 'CALL' AND delta < 0 THEN 1 ELSE 0 END
+        ) as wrong_call_deltas
     FROM databento_option_chains
     WHERE symbol = 'U'
 """

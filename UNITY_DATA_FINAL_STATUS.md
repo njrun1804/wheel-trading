@@ -3,7 +3,7 @@
 ## Date: January 6, 2025
 
 ### Executive Summary
-All Unity stock and options data has been successfully downloaded according to the specifications in `DATA_COLLECTION_SPECIFICATION.md`.
+All Unity stock and options data has been successfully downloaded according to the specifications in `DATA_COLLECTION_SPECIFICATION 2.md`.
 
 ### Stock Data ✅
 - **Total Records**: 861 trading days

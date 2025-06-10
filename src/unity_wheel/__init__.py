@@ -1,9 +1,8 @@
 """Unity Wheel Bot - Sophisticated options wheel trading system."""
 
 from .__version__ import API_VERSION, __version__, __version_info__, get_version_string
-from .api import MarketSnapshot, Recommendation
+from .api import MarketSnapshot, Recommendation, WheelAdvisor
 from .api import RiskMetrics as ApiRiskMetrics
-from .api import WheelAdvisor
 from .math import (
     CalculationResult,
     black_scholes_price_validated,
