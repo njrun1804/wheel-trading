@@ -49,11 +49,11 @@ def generate_auth_url():
 
     full_auth_url = f"{auth_url}?{urlencode(auth_params)}"
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔗 AUTHORIZATION URL")
-    print("="*80)
+    print("=" * 80)
     print(full_auth_url)
-    print("="*80)
+    print("=" * 80)
 
     print("\n📋 Instructions:")
     print("1. Copy the URL above and paste it in your browser")

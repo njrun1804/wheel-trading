@@ -27,7 +27,7 @@ def debug_schwab_setup():
         print(f"   Client Secret: {'*' * len(client_secret)} ({len(client_secret)} chars)")
 
         # Check format
-        if not client_id.startswith('OB'):
+        if not client_id.startswith("OB"):
             print("⚠️  WARNING: Client ID should start with 'OB' for Schwab")
 
         if len(client_id) != 32:
@@ -58,7 +58,8 @@ def debug_schwab_setup():
 
     print("\n3. **Test with curl**:")
     print("   Try this command to test token exchange directly:")
-    print(f"""
+    print(
+        f"""
    curl -X POST https://api.schwabapi.com/v1/oauth/token \\
      -H "Content-Type: application/x-www-form-urlencoded" \\
      -d "grant_type=authorization_code" \\
@@ -66,7 +67,8 @@ def debug_schwab_setup():
      -d "redirect_uri=https://127.0.0.1:8182/callback" \\
      -d "client_id={client_id}" \\
      -d "client_secret=YOUR_SECRET"
-   """)
+   """
+    )
 
     print("\n4. **Common fixes**:")
     print("   - Wait 24-48 hours after app approval")

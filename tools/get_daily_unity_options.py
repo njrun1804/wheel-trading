@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
 
+
 def test_daily_options_schemas():
     """Test different schemas to get daily Unity options data."""
     client = DatabentoClient()
@@ -32,16 +33,16 @@ def test_daily_options_schemas():
     ]
 
     print("Testing different Databento schemas for daily Unity options data...")
-    print("="*70)
+    print("=" * 70)
 
     schemas_to_test = [
-        ('cmbp-1', 'Consolidated Market by Price - End of day snapshots'),
-        ('mbp-1', 'Market by Price - Best bid/ask throughout day'),
-        ('trades', 'All trades - can aggregate to daily'),
-        ('statistics', 'Daily statistics'),
-        ('ohlcv-1s', 'Second-level OHLCV'),
-        ('ohlcv-1m', 'Minute-level OHLCV'),
-        ('ohlcv-1h', 'Hourly OHLCV')
+        ("cmbp-1", "Consolidated Market by Price - End of day snapshots"),
+        ("mbp-1", "Market by Price - Best bid/ask throughout day"),
+        ("trades", "All trades - can aggregate to daily"),
+        ("statistics", "Daily statistics"),
+        ("ohlcv-1s", "Second-level OHLCV"),
+        ("ohlcv-1m", "Minute-level OHLCV"),
+        ("ohlcv-1h", "Hourly OHLCV"),
     ]
 
     for schema, description in schemas_to_test:
@@ -52,13 +53,13 @@ def test_daily_options_schemas():
 
         for test_date in test_dates:
             # Convert to market hours
-            if schema in ['mbp-1', 'trades']:
+            if schema in ["mbp-1", "trades"]:
                 # Use full trading day for tick data
                 start = datetime.combine(test_date, datetime.min.time()).replace(
-                    hour=9, minute=30, tzinfo=pytz.timezone('US/Eastern')
+                    hour=9, minute=30, tzinfo=pytz.timezone("US/Eastern")
                 )
                 end = datetime.combine(test_date, datetime.min.time()).replace(
-                    hour=16, minute=0, tzinfo=pytz.timezone('US/Eastern')
+                    hour=16, minute=0, tzinfo=pytz.timezone("US/Eastern")
                 )
             else:
                 # Use UTC midnight for bar data
@@ -67,23 +68,23 @@ def test_daily_options_schemas():
 
             try:
                 data = client.client.timeseries.get_range(
-                    dataset='OPRA.PILLAR',
+                    dataset="OPRA.PILLAR",
                     schema=schema,
-                    symbols=['U.OPT'],
-                    stype_in='parent',
+                    symbols=["U.OPT"],
+                    stype_in="parent",
                     start=start,
                     end=end,
-                    limit=1000  # Limit to avoid huge downloads
+                    limit=1000,  # Limit to avoid huge downloads
                 )
 
                 df = data.to_df()
 
                 if not df.empty:
                     # Count Unity options
-                    if 'symbol' in df.columns:
-                        unity_count = len(df[df['symbol'].str.startswith('U')])
-                    elif 'raw_symbol' in df.columns:
-                        unity_count = len(df[df['raw_symbol'].str.startswith('U')])
+                    if "symbol" in df.columns:
+                        unity_count = len(df[df["symbol"].str.startswith("U")])
+                    elif "raw_symbol" in df.columns:
+                        unity_count = len(df[df["raw_symbol"].str.startswith("U")])
                     else:
                         unity_count = len(df)
 
@@ -110,7 +111,9 @@ def test_daily_options_schemas():
         if daily_results:
             total_days = len(daily_results)
             avg_options = sum(count for _, count in daily_results) / total_days
-            print(f"\n  📊 Summary: {total_days}/5 days with data, avg {avg_options:.0f} options per day")
+            print(
+                f"\n  📊 Summary: {total_days}/5 days with data, avg {avg_options:.0f} options per day"
+            )
 
             if total_days >= 4:  # Good coverage
                 print(f"  ✅ This schema provides good daily coverage!")
@@ -123,6 +126,7 @@ def test_daily_options_schemas():
 
     conn.close()
 
+
 def test_longer_range(client, schema):
     """Test a schema with a longer date range."""
     # Test last 2 weeks
@@ -130,38 +134,40 @@ def test_longer_range(client, schema):
     start_date = end_date - timedelta(days=14)
 
     # Convert to appropriate time range
-    if schema in ['mbp-1', 'trades']:
+    if schema in ["mbp-1", "trades"]:
         start = datetime.combine(start_date, datetime.min.time()).replace(
-            hour=9, minute=30, tzinfo=pytz.timezone('US/Eastern')
+            hour=9, minute=30, tzinfo=pytz.timezone("US/Eastern")
         )
         end = datetime.combine(end_date, datetime.min.time()).replace(
-            hour=16, minute=0, tzinfo=pytz.timezone('US/Eastern')
+            hour=16, minute=0, tzinfo=pytz.timezone("US/Eastern")
         )
     else:
         start = datetime.combine(start_date, datetime.min.time()).replace(tzinfo=pytz.UTC)
-        end = datetime.combine(end_date + timedelta(days=1), datetime.min.time()).replace(tzinfo=pytz.UTC)
+        end = datetime.combine(end_date + timedelta(days=1), datetime.min.time()).replace(
+            tzinfo=pytz.UTC
+        )
 
     try:
         data = client.client.timeseries.get_range(
-            dataset='OPRA.PILLAR',
+            dataset="OPRA.PILLAR",
             schema=schema,
-            symbols=['U.OPT'],
-            stype_in='parent',
+            symbols=["U.OPT"],
+            stype_in="parent",
             start=start,
             end=end,
-            limit=10000
+            limit=10000,
         )
 
         df = data.to_df()
 
         if not df.empty:
             # Analyze by date
-            if 'ts_event' in df.columns:
-                df['date'] = df['ts_event'].dt.date
+            if "ts_event" in df.columns:
+                df["date"] = df["ts_event"].dt.date
             else:
-                df['date'] = start_date
+                df["date"] = start_date
 
-            daily_counts = df['date'].value_counts().sort_index()
+            daily_counts = df["date"].value_counts().sort_index()
             trading_days = len(daily_counts)
 
             print(f"    📅 {trading_days} trading days with data over 2 weeks")
@@ -178,6 +184,7 @@ def test_longer_range(client, schema):
         print(f"    ❌ Error in longer range: {str(e)[:50]}")
 
     return False
+
 
 if __name__ == "__main__":
     test_daily_options_schemas()

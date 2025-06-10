@@ -75,15 +75,10 @@ async def exchange_callback_for_tokens(callback_url: str):
                 "client_secret": client_secret,
             }
 
-            headers = {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
             async with session.post(
-                token_url,
-                data=token_data,
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=30)
+                token_url, data=token_data, headers=headers, timeout=aiohttp.ClientTimeout(total=30)
             ) as response:
 
                 if response.status == 200:
@@ -102,7 +97,9 @@ async def exchange_callback_for_tokens(callback_url: str):
                     token_data = {
                         "access_token": tokens["access_token"],
                         "refresh_token": tokens["refresh_token"],
-                        "expires_at": (datetime.now() + timedelta(seconds=tokens["expires_in"])).isoformat(),
+                        "expires_at": (
+                            datetime.now() + timedelta(seconds=tokens["expires_in"])
+                        ).isoformat(),
                         "scope": tokens.get("scope", ""),
                         "token_type": tokens.get("token_type", "Bearer"),
                     }
@@ -113,9 +110,9 @@ async def exchange_callback_for_tokens(callback_url: str):
 
                     print(f"\n💾 Tokens saved to: {token_file}")
 
-                    print("\n" + "="*60)
+                    print("\n" + "=" * 60)
                     print("🎉 OAUTH SETUP COMPLETE!")
-                    print("="*60)
+                    print("=" * 60)
                     print("\nYou can now run:")
                     print("  python run.py --portfolio 100000")
                     print("  python scripts/test-secrets.py")
@@ -139,6 +136,7 @@ async def exchange_callback_for_tokens(callback_url: str):
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -148,7 +146,9 @@ def main():
     if len(sys.argv) != 2:
         print("Usage: python schwab_token_exchange.py 'CALLBACK_URL'")
         print("\nExample:")
-        print("  python schwab_token_exchange.py 'https://127.0.0.1:8182/callback?code=ABC123&state=XYZ'")
+        print(
+            "  python schwab_token_exchange.py 'https://127.0.0.1:8182/callback?code=ABC123&state=XYZ'"
+        )
         sys.exit(1)
 
     callback_url = sys.argv[1]

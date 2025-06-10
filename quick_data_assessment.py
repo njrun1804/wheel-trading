@@ -3,26 +3,29 @@
 Quick data quality assessment for wheel trading database.
 """
 
-import duckdb
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import duckdb
+
 
 def quick_assessment():
     """Run quick data quality assessment."""
     db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
     conn = duckdb.connect(str(db_path))
 
-    print("="*70)
+    print("=" * 70)
     print("WHEEL TRADING DATABASE - DATA QUALITY ASSESSMENT")
     print(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    print("="*70)
+    print("=" * 70)
 
     # 1. STOCK DATA
     print("\n1. STOCK DATA ANALYSIS")
-    print("-"*30)
+    print("-" * 30)
 
     # Main price_history table
-    stock_data = conn.execute("""
+    stock_data = conn.execute(
+        """
         SELECT
             COUNT(*) as records,
             COUNT(DISTINCT symbol) as symbols,
@@ -33,7 +36,8 @@ def quick_assessment():
             MAX(close) as max_price,
             COUNT(CASE WHEN close IS NULL THEN 1 END) as null_prices
         FROM price_history
-    """).fetchone()
+    """
+    ).fetchone()
 
     print(f"price_history table:")
     print(f"  ✅ Records: {stock_data[0]:,}")
@@ -45,7 +49,8 @@ def quick_assessment():
         print(f"  ⚠️  Null prices: {stock_data[7]}")
 
     # Check for data gaps
-    gaps = conn.execute("""
+    gaps = conn.execute(
+        """
         WITH date_diff AS (
             SELECT date,
                    LAG(date) OVER (ORDER BY date) as prev_date,
@@ -54,7 +59,8 @@ def quick_assessment():
             ORDER BY date
         )
         SELECT COUNT(*) FROM date_diff WHERE gap_days > 4  -- More than weekend gap
-    """).fetchone()[0]
+    """
+    ).fetchone()[0]
 
     if gaps > 0:
         print(f"  ⚠️  Trading day gaps: {gaps} (possible missing data)")
@@ -62,10 +68,12 @@ def quick_assessment():
         print(f"  ✅ No significant data gaps")
 
     # Unity minute data
-    minute_data = conn.execute("""
+    minute_data = conn.execute(
+        """
         SELECT COUNT(*) as records, COUNT(DISTINCT date) as days
         FROM unity_stock_1min
-    """).fetchone()
+    """
+    ).fetchone()
 
     print(f"\nunity_stock_1min table:")
     print(f"  Records: {minute_data[0]:,}")
@@ -73,10 +81,11 @@ def quick_assessment():
 
     # 2. OPTIONS DATA
     print("\n\n2. OPTIONS DATA ANALYSIS")
-    print("-"*30)
+    print("-" * 30)
 
     # Main options table
-    options_data = conn.execute("""
+    options_data = conn.execute(
+        """
         SELECT
             COUNT(*) as records,
             COUNT(DISTINCT date) as trading_days,
@@ -87,7 +96,8 @@ def quick_assessment():
             COUNT(DISTINCT strike) as unique_strikes,
             COUNT(DISTINCT expiration) as unique_expirations
         FROM unity_options_daily
-    """).fetchone()
+    """
+    ).fetchone()
 
     print(f"unity_options_daily table (PRIMARY OPTIONS DATA):")
     print(f"  ✅ Records: {options_data[0]:,}")
@@ -100,11 +110,11 @@ def quick_assessment():
 
     # Check old options tables
     old_tables = [
-        'unity_options_ticks',
-        'unity_options_raw',
-        'unity_options_processed',
-        'unity_daily_options',
-        'options_ticks'
+        "unity_options_ticks",
+        "unity_options_raw",
+        "unity_options_processed",
+        "unity_daily_options",
+        "options_ticks",
     ]
 
     print(f"\nRedundant options tables:")
@@ -120,17 +130,19 @@ def quick_assessment():
 
     # 3. FRED DATA
     print("\n\n3. FRED ECONOMIC DATA ANALYSIS")
-    print("-"*35)
+    print("-" * 35)
 
     # FRED series
-    fred_data = conn.execute("""
+    fred_data = conn.execute(
+        """
         SELECT
             COUNT(*) as series_count,
             COUNT(DISTINCT frequency) as frequencies,
             MIN(observation_start) as earliest,
             MAX(observation_end) as latest
         FROM fred_series
-    """).fetchone()
+    """
+    ).fetchone()
 
     print(f"fred_series table:")
     print(f"  ✅ Economic indicators: {fred_data[0]}")
@@ -138,7 +150,8 @@ def quick_assessment():
     print(f"  ✅ Data coverage: {fred_data[2]} to {fred_data[3]}")
 
     # FRED observations
-    fred_obs = conn.execute("""
+    fred_obs = conn.execute(
+        """
         SELECT
             COUNT(*) as observations,
             COUNT(DISTINCT series_id) as series,
@@ -146,7 +159,8 @@ def quick_assessment():
             MAX(observation_date) as latest,
             COUNT(CASE WHEN value IS NULL THEN 1 END) as null_values
         FROM fred_observations
-    """).fetchone()
+    """
+    ).fetchone()
 
     print(f"\nfred_observations table:")
     print(f"  ✅ Observations: {fred_obs[0]:,}")
@@ -157,22 +171,25 @@ def quick_assessment():
 
     # Sample indicators
     print(f"\n  Key economic indicators:")
-    indicators = conn.execute("""
+    indicators = conn.execute(
+        """
         SELECT series_id, title, frequency, observation_end
         FROM fred_series
         ORDER BY series_id
         LIMIT 5
-    """).fetchall()
+    """
+    ).fetchall()
 
     for series_id, title, freq, end_date in indicators:
         print(f"    {series_id}: {title[:35]}... ({freq}, through {end_date})")
 
     # 4. REDUNDANCY ANALYSIS
     print("\n\n4. REDUNDANCY & CLEANUP RECOMMENDATIONS")
-    print("-"*42)
+    print("-" * 42)
 
     # Unity stock redundancy
-    redundant_stock = conn.execute("""
+    redundant_stock = conn.execute(
+        """
         SELECT
             'unity_price_history' as table_name,
             (SELECT COUNT(*) FROM unity_price_history) as record_count
@@ -188,7 +205,8 @@ def quick_assessment():
         SELECT
             'unity_daily_summary_real' as table_name,
             (SELECT COUNT(*) FROM unity_daily_summary_real) as record_count
-    """).fetchall()
+    """
+    ).fetchall()
 
     print("Unity stock table redundancy:")
     for table, count in redundant_stock:
@@ -199,7 +217,7 @@ def quick_assessment():
 
     # 5. FINAL RECOMMENDATIONS
     print("\n\n5. FINAL RECOMMENDATIONS")
-    print("-"*25)
+    print("-" * 25)
 
     print("\n✅ TABLES TO KEEP:")
     print("  • price_history - Primary stock data (861 Unity records)")
@@ -210,15 +228,15 @@ def quick_assessment():
 
     print("\n❌ TABLES TO REMOVE (Empty or Redundant):")
     tables_to_remove = [
-        'unity_price_history',
-        'unity_daily_stock',
-        'unity_daily_summary',
-        'unity_daily_summary_real',
-        'unity_options_ticks',
-        'unity_options_raw',
-        'unity_options_processed',
-        'unity_daily_options',
-        'options_ticks'
+        "unity_price_history",
+        "unity_daily_stock",
+        "unity_daily_summary",
+        "unity_daily_summary_real",
+        "unity_options_ticks",
+        "unity_options_raw",
+        "unity_options_processed",
+        "unity_daily_options",
+        "options_ticks",
     ]
 
     for table in tables_to_remove:
@@ -240,15 +258,21 @@ def quick_assessment():
 
     # Calculate database size reduction
     print(f"\n💾 CLEANUP IMPACT:")
-    total_records = sum([
-        conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-        for table in tables_to_remove
-        if conn.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table}'").fetchone()[0] > 0
-    ])
+    total_records = sum(
+        [
+            conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in tables_to_remove
+            if conn.execute(
+                f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table}'"
+            ).fetchone()[0]
+            > 0
+        ]
+    )
     print(f"  Removing ~{total_records:,} redundant records")
     print(f"  Keeping essential data in core tables")
 
     conn.close()
+
 
 if __name__ == "__main__":
     quick_assessment()

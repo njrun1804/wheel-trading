@@ -63,31 +63,29 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
 
         # Create Basic Auth header
         auth_string = f"{client_id}:{client_secret}"
-        auth_bytes = auth_string.encode('utf-8')
-        auth_b64 = base64.b64encode(auth_bytes).decode('utf-8')
+        auth_bytes = auth_string.encode("utf-8")
+        auth_b64 = base64.b64encode(auth_bytes).decode("utf-8")
 
         # Exchange code for tokens
         async with aiohttp.ClientSession() as session:
-            # Use Basic Auth for client credentials (not in POST body)
+            # For authorization_code grant, use credentials in POST body (not Basic Auth)
             token_data = {
                 "grant_type": "authorization_code",
                 "code": code,
                 "redirect_uri": redirect_uri,
+                "client_id": client_id,
+                "client_secret": client_secret,
             }
 
             headers = {
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json",
-                "Authorization": f"Basic {auth_b64}"
+                "Accept": "application/json"
             }
 
-            print(f"   Using Basic Auth: {client_id}:***")
+            print(f"   Using POST body credentials: {client_id}:***")
 
             async with session.post(
-                token_url,
-                data=token_data,
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=30)
+                token_url, data=token_data, headers=headers, timeout=aiohttp.ClientTimeout(total=30)
             ) as response:
 
                 if response.status == 200:
@@ -106,7 +104,9 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
                     token_data = {
                         "access_token": tokens["access_token"],
                         "refresh_token": tokens["refresh_token"],
-                        "expires_at": (datetime.now() + timedelta(seconds=tokens["expires_in"])).isoformat(),
+                        "expires_at": (
+                            datetime.now() + timedelta(seconds=tokens["expires_in"])
+                        ).isoformat(),
                         "scope": tokens.get("scope", ""),
                         "token_type": tokens.get("token_type", "Bearer"),
                     }
@@ -117,9 +117,9 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
 
                     print(f"\n💾 Tokens saved to: {token_file}")
 
-                    print("\n" + "="*60)
+                    print("\n" + "=" * 60)
                     print("🎉 OAUTH SETUP COMPLETE!")
-                    print("="*60)
+                    print("=" * 60)
                     print("\nYou can now run:")
                     print("  python run.py --portfolio 100000")
                     print("  python scripts/test-secrets.py")
@@ -136,7 +136,9 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
                         try:
                             error_data = json.loads(response_text)
                             if error_data.get("error") == "invalid_grant":
-                                print("\n💡 The authorization code has expired (codes expire in 5-10 minutes)")
+                                print(
+                                    "\n💡 The authorization code has expired (codes expire in 5-10 minutes)"
+                                )
                                 print("   Get a fresh code: python tools/schwab_auth_url.py")
                         except:
                             pass
@@ -146,6 +148,7 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 

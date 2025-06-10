@@ -6,7 +6,7 @@ import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse, unquote
+from urllib.parse import parse_qs, unquote, urlparse
 
 import aiohttp
 
@@ -43,7 +43,7 @@ async def exchange_callback_for_tokens_debug(callback_url: str):
 
         print(f"\n📊 Parsed parameters:")
         for key, value in params.items():
-            if key == 'code':
+            if key == "code":
                 print(f"   {key}: {value[0][:30]}... (length: {len(value[0])})")
             else:
                 print(f"   {key}: {value[0]}")
@@ -65,7 +65,7 @@ async def exchange_callback_for_tokens_debug(callback_url: str):
         print(f"   Code ends with: ...{code[-10:]}")
 
         # Check if code looks valid
-        if not code.startswith('C0.'):
+        if not code.startswith("C0."):
             print("⚠️  WARNING: Code doesn't start with 'C0.' - might be invalid")
 
         # OAuth configuration
@@ -90,17 +90,14 @@ async def exchange_callback_for_tokens_debug(callback_url: str):
 
             headers = {
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json"
+                "Accept": "application/json",
             }
 
             print(f"\n📤 Sending request...")
             print(f"   Data keys: {list(token_data.keys())}")
 
             async with session.post(
-                token_url,
-                data=token_data,
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=30)
+                token_url, data=token_data, headers=headers, timeout=aiohttp.ClientTimeout(total=30)
             ) as response:
 
                 response_text = await response.text()
@@ -125,7 +122,9 @@ async def exchange_callback_for_tokens_debug(callback_url: str):
                     token_data = {
                         "access_token": tokens["access_token"],
                         "refresh_token": tokens["refresh_token"],
-                        "expires_at": (datetime.now() + timedelta(seconds=tokens["expires_in"])).isoformat(),
+                        "expires_at": (
+                            datetime.now() + timedelta(seconds=tokens["expires_in"])
+                        ).isoformat(),
                         "scope": tokens.get("scope", ""),
                         "token_type": tokens.get("token_type", "Bearer"),
                     }
@@ -157,6 +156,7 @@ async def exchange_callback_for_tokens_debug(callback_url: str):
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
