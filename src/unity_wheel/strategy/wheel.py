@@ -9,7 +9,8 @@ from typing import List, NamedTuple, Optional, Tuple
 
 import numpy as np
 
-from ...config.loader import get_config
+from src.config.loader import get_config
+
 from ..math import (
     CalculationResult,
     black_scholes_price_validated,

@@ -12,7 +12,8 @@ import pandas as pd
 import scipy.stats as stats
 from scipy.interpolate import interp1d
 
-from ..config.loader import get_config
+from src.config.loader import get_config
+
 from ..models.position import PositionType
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy

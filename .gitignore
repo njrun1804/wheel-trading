@@ -69,3 +69,6 @@ build/
 .env.*.local
 *.env
 diagnostics_history.json
+
+# macOS duplicate files
+* [0-9].py

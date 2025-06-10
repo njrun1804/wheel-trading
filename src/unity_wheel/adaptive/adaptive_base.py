@@ -13,7 +13,8 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy.stats import norm
 
-from ..config.loader import get_config
+from src.config.loader import get_config
+
 from .utils import get_logger
 
 

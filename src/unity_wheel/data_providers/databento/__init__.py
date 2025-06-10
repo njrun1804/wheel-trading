@@ -3,7 +3,7 @@
 Provides efficient data ingestion from OPRA options feed and US equities data.
 """
 
-from .auth_client import DatabentoClient
+from .client import DatabentoClient
 from .types import (
     DataQuality,
     InstrumentDefinition,

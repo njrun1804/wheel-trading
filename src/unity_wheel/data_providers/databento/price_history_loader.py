@@ -10,7 +10,8 @@ from typing import Dict, List, Optional
 import pandas as pd
 from databento_dbn import Schema
 
-from ....config.loader import get_config
+from src.config.loader import get_config
+
 from ...storage import Storage
 from ...utils import get_logger, with_recovery
 from .auth_client import DatabentoClient

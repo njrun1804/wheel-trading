@@ -37,12 +37,14 @@ fi
 
 # Scoring weights
 readonly WEIGHT_execution_code=100
+readonly WEIGHT_data_validation=50
 readonly WEIGHT_test_files=5
 readonly WEIGHT_adaptive_files=5
 readonly WEIGHT_fetch_files=3
 readonly WEIGHT_hardcoded_ticker=3
 readonly WEIGHT_static_positions=2
 readonly WEIGHT_missing_confidence=2
+readonly WEIGHT_data_sources=8
 
 # Usage
 usage() {
@@ -138,12 +140,14 @@ fi
 
 # State tracking
 violation_execution_code=0
+violation_data_validation=0
 violation_test_files=0
 violation_adaptive_files=0
 violation_fetch_files=0
 violation_hardcoded_ticker=0
 violation_static_positions=0
 violation_missing_confidence=0
+violation_data_sources=0
 violation_details=()
 total_violations=0
 critical_failures=0
@@ -258,6 +262,93 @@ check_execution_code() {
         critical_failures=1
         [[ "$MODE" == "check" && "$QUIET" != "true" ]] && \
             echo -e "${RED}❌ CRITICAL: Trading execution code found in $count files!${NC}"
+    fi
+
+    return $count
+}
+
+# Critical check: data validation
+check_data_validation() {
+    local validation_script="$SCRIPT_DIR/check-data-validation.sh"
+
+    if [[ ! -f "$validation_script" ]]; then
+        [[ "$MODE" == "check" && "$QUIET" != "true" ]] && \
+            echo -e "${YELLOW}⚠️  Data validation script not found${NC}"
+        return 0
+    fi
+
+    # Run the validation check
+    if ! "$validation_script" >/dev/null 2>&1; then
+        violation_data_validation=1
+        critical_failures=1
+        [[ "$MODE" == "check" && "$QUIET" != "true" ]] && \
+            echo -e "${RED}❌ CRITICAL: Data validation not properly implemented!${NC}"
+        [[ "$EXPLAIN" == "true" ]] && \
+            echo -e "${YELLOW}   Run ./scripts/check-data-validation.sh for details${NC}"
+        return 1
+    fi
+
+    return 0
+}
+
+# Check for improper data sources
+check_data_sources() {
+    local count=0
+    local issues=""
+
+    # Pattern for yfinance or other external data libraries
+    local PAT_YFINANCE="yfinance|yahoo_fin|yahoofinancials|alpha_vantage|quandl|polygon"
+
+    # Pattern for hardcoded prices/volatility (excluding test files)
+    local PAT_HARDCODED="(price|volatility|realized_vol)\s*[:=]\s*[0-9]+\.[0-9]+"
+
+    # Pattern for mock/dummy data outside of tests
+    local PAT_MOCK="mock.*data|dummy.*data|fake.*data|create_mock|mock_prices"
+
+    while IFS= read -r file; do
+        # Skip test files and docs
+        if [[ "$file" =~ (test_|_test\.py|/tests/|/docs/|\.md$) ]]; then
+            continue
+        fi
+
+        # Check for yfinance or other external data sources
+        if $GREP_CMD -E "$PAT_YFINANCE" "$file" >/dev/null 2>&1; then
+            ((count++))
+            issues="${issues}\n  - $file: External data library usage"
+            if [[ "$EXPLAIN" == "true" ]]; then
+                violation_details+=("external_data:$file")
+            fi
+        fi
+
+        # Check for hardcoded prices/volatility
+        if $GREP_CMD -E "$PAT_HARDCODED" "$file" >/dev/null 2>&1; then
+            # Exclude config files and fallback values
+            if ! $GREP_CMD -E "(fallback|default|typical|example)" "$file" >/dev/null 2>&1; then
+                ((count++))
+                issues="${issues}\n  - $file: Hardcoded price/volatility values"
+                if [[ "$EXPLAIN" == "true" ]]; then
+                    violation_details+=("hardcoded_data:$file")
+                fi
+            fi
+        fi
+
+        # Check for mock data usage outside tests
+        if $GREP_CMD -E "$PAT_MOCK" "$file" >/dev/null 2>&1; then
+            ((count++))
+            issues="${issues}\n  - $file: Mock data usage in production code"
+            if [[ "$EXPLAIN" == "true" ]]; then
+                violation_details+=("mock_data:$file")
+            fi
+        fi
+    done < <(collect_files | grep -E '\.py$')
+
+    if [[ $count -gt 0 ]]; then
+        violation_data_sources=$count
+        [[ "$MODE" == "check" && "$QUIET" != "true" ]] && {
+            echo -e "${YELLOW}⚠️  Data source issues found in $count files:${NC}"
+            echo -e "$issues"
+            echo -e "${CYAN}→ All Unity data should come from Databento via Google Secrets${NC}"
+        }
     fi
 
     return $count
@@ -496,6 +587,7 @@ calculate_score() {
     deductions=$((deductions + violation_hardcoded_ticker * WEIGHT_hardcoded_ticker))
     deductions=$((deductions + violation_static_positions * WEIGHT_static_positions))
     deductions=$((deductions + violation_missing_confidence * WEIGHT_missing_confidence))
+    deductions=$((deductions + violation_data_sources * WEIGHT_data_sources))
 
     local score=$((max_score - deductions))
     [[ $score -lt 0 ]] && score=0
@@ -521,7 +613,8 @@ output_json() {
     "fetch_files": $violation_fetch_files,
     "hardcoded_ticker": $violation_hardcoded_ticker,
     "static_positions": $violation_static_positions,
-    "missing_confidence": $violation_missing_confidence
+    "missing_confidence": $violation_missing_confidence,
+    "data_sources": $violation_data_sources
   }
 }
 EOF
@@ -554,6 +647,8 @@ main() {
     check_file_placement || true
     check_unity_compliance || true
     check_execution_code || true
+    check_data_validation || true
+    check_data_sources || true
     check_confidence_scores || true
 
     # Calculate score

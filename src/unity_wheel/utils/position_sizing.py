@@ -13,7 +13,9 @@ from typing import Dict, Optional, Tuple
 
 import numpy as np
 
-from ...config.loader import get_config
+from src.config.loader import get_config
+
+from ..risk.unity_margin import UnityMarginCalculator
 from .logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -43,6 +45,7 @@ class DynamicPositionSizer:
     def __init__(self):
         """Initialize with configuration."""
         self.config = get_config()
+        self.margin_calculator = UnityMarginCalculator()
         self._load_limits()
 
     def _load_limits(self) -> None:
@@ -79,6 +82,8 @@ class DynamicPositionSizer:
         volatility_factor: float = 1.0,
         confidence: float = 1.0,
         existing_exposure: float = 0.0,
+        account_type: str = "margin",
+        current_price: Optional[float] = None,
     ) -> PositionSizeResult:
         """
         Calculate optimal position size in contracts.
@@ -92,6 +97,8 @@ class DynamicPositionSizer:
             volatility_factor: Volatility adjustment factor (0.1-3.0)
             confidence: Confidence in the trade (0-1)
             existing_exposure: Current portfolio exposure in dollars
+            account_type: Account type ('ira', 'cash', 'margin', 'portfolio')
+            current_price: Current stock price (defaults to strike if not provided)
 
         Returns:
             PositionSizeResult with calculated contracts and diagnostics
@@ -104,12 +111,20 @@ class DynamicPositionSizer:
         # 2. Calculate notional value per contract
         notional_per_contract = strike_price * 100  # 100 shares per contract
 
-        # 3. Estimate margin requirement per contract
-        # Simplified calculation: 20% of notional minus premium received
-        margin_per_contract = max(
-            notional_per_contract * 0.20 - option_premium,
-            notional_per_contract * 0.10,  # Minimum 10%
+        # 3. Calculate margin requirement using Unity-specific calculator
+        # Use current price if provided, otherwise assume ATM
+        if current_price is None:
+            current_price = strike_price
+
+        margin_result = self.margin_calculator.calculate_unity_margin(
+            contracts=1,  # Calculate per contract first
+            strike=strike_price,
+            current_price=current_price,
+            premium_received=option_premium,
+            account_type=account_type,
+            option_type="put",  # Wheel strategy uses puts
         )
+        margin_per_contract = margin_result.margin_required
 
         # 4. Calculate max contracts based on different constraints
 
@@ -254,6 +269,7 @@ class DynamicPositionSizer:
         portfolio_value: float,
         buying_power: float,
         recommendation: Dict,
+        account_type: str = "margin",
     ) -> PositionSizeResult:
         """
         Calculate position size from a recommendation dict.
@@ -266,6 +282,7 @@ class DynamicPositionSizer:
         kelly = recommendation.get("kelly_fraction", 0.25)
         vol_factor = recommendation.get("volatility_factor", 1.0)
         confidence = recommendation.get("confidence", 0.8)
+        current_price = recommendation.get("current_price", strike)
 
         # Check for small accounts
         max_for_account, warning = self.adjust_for_small_account(portfolio_value)
@@ -278,6 +295,8 @@ class DynamicPositionSizer:
             kelly_fraction=kelly,
             volatility_factor=vol_factor,
             confidence=confidence,
+            account_type=account_type,
+            current_price=current_price,
         )
 
         # Apply small account limits
@@ -288,7 +307,16 @@ class DynamicPositionSizer:
 
             # Recalculate values
             result.notional_value = result.contracts * strike * 100
-            result.margin_required = result.contracts * (strike * 100 * 0.20 - premium * 100)
+            # Use Unity margin calculator for accurate margin
+            margin_recalc = self.margin_calculator.calculate_unity_margin(
+                contracts=result.contracts,
+                strike=strike,
+                current_price=strike,  # Assume ATM if not provided
+                premium_received=premium * 100,
+                account_type="margin",  # Default to margin for recommendation
+                option_type="put",
+            )
+            result.margin_required = margin_recalc.margin_required
             result.position_pct = result.notional_value / portfolio_value
 
         return result
@@ -300,6 +328,8 @@ def calculate_dynamic_contracts(
     strike_price: float,
     option_premium: float,
     kelly_fraction: float = 0.25,
+    account_type: str = "margin",
+    current_price: Optional[float] = None,
     **kwargs,
 ) -> int:
     """
@@ -314,6 +344,8 @@ def calculate_dynamic_contracts(
         strike_price=strike_price,
         option_premium=option_premium,
         kelly_fraction=kelly_fraction,
+        account_type=account_type,
+        current_price=current_price,
         **kwargs,
     )
     return result.contracts

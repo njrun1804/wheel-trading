@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Simple CLI runner for wheel trading decisions using unity_wheel."""
+"""DEPRECATED: Legacy CLI runner for wheel trading decisions.
+
+WARNING: This file is deprecated and uses hardcoded demo values.
+         Use run.py instead, which fetches real market data from Databento.
+"""
 
 from __future__ import annotations
 
@@ -79,8 +83,9 @@ def main() -> None:
     print(f"🎯 Target Delta: {wheel_params.target_delta}")
     print(f"📆 Target DTE: {wheel_params.target_dte} days")
 
-    # Example strikes for Unity (will come from broker API)
-    current_price = 35.50
+    # DEPRECATED: Hardcoded demo values - production code uses Databento API
+    # This file is kept for backwards compatibility only
+    current_price = 35.50  # Legacy demo value - use run.py for real data
     strikes = [30.0, 32.5, 35.0, 37.5, 40.0, 42.5, 45.0]
 
     print(f"\n💹 Current Price: ${current_price}")

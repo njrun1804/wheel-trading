@@ -110,18 +110,22 @@ async def test_decision_engine() -> dict:
         config = get_config()
         engine = IntegratedDecisionEngine(config.unity.ticker, 100000)
 
-        # Mock minimal data for testing
-        mock_prices = {
-            "close": 25.0,
-            "open": 24.5,
-            "prev_close": 24.0,
-            "volume": 2000000,
-            "realized_vol": 0.77,
-        }
+        # Try to fetch real Unity data from Databento
+        try:
+            from ...cli.databento_integration import get_market_data_sync
+            from ...data_providers.databento import DatabentoClient
 
-        # Simple test - just verify it doesn't crash
-        # In production, this would use real data
-        results["issues"].append("Decision engine initialized successfully")
+            # Get real market data
+            market_data = get_market_data_sync(100000, config.unity.ticker)
+            logger.info(f"Decision engine check using real {config.unity.ticker} data")
+            results["issues"].append("Decision engine initialized with real market data")
+
+        except Exception as e:
+            # FAIL if real data is not available - no fallbacks allowed
+            results["status"] = "❌"
+            results["issues"].append(f"CRITICAL: Cannot get real market data: {e}")
+            logger.error(f"Decision engine check failed - no real data available: {e}")
+            return results
 
     except Exception as e:
         results["status"] = "❌"

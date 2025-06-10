@@ -3,11 +3,12 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Final, Literal
 
 # Add project root to path
@@ -23,17 +24,20 @@ from src.config.unity import COMPANY_NAME, TICKER
 from src.unity_wheel import __version__, get_version_string
 from src.unity_wheel.__version__ import API_VERSION
 from src.unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
+from src.unity_wheel.data_providers.databento.client import DatabentoClient
+from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
+from src.unity_wheel.data_providers.validation import validate_market_data
 from src.unity_wheel.monitoring import get_performance_monitor
 from src.unity_wheel.monitoring.diagnostics import SelfDiagnostics
 from src.unity_wheel.observability import get_observability_exporter
 from src.unity_wheel.risk import RiskLimits
+from src.unity_wheel.secrets.integration import SecretInjector
 from src.unity_wheel.strategy import WheelParameters
 
-# Configure structured logging
+# Configure simple logging to avoid conflicts with StructuredLogger
 logging.basicConfig(
     level=logging.INFO,
-    format='{"time": "%(asctime)s", "level": "%(levelname)s", "module": "%(name)s", "message": "%(message)s"}',
-    datefmt="%Y-%m-%dT%H:%M:%S",
+    format="%(message)s",  # Just the message, since StructuredLogger already formats as JSON
 )
 logger = logging.getLogger(__name__)
 
@@ -66,53 +70,13 @@ def setup_deterministic_environment() -> None:
     )
 
 
-def create_mock_market_snapshot(
-    current_price: float,
-    portfolio_value: float,
-    ticker: str = TICKER,
-) -> MarketSnapshot:
-    """Create mock market snapshot for demo purposes."""
-    strikes = [30.0, 32.5, 35.0, 37.5, 40.0, 42.5, 45.0]
-
-    # Create mock option chain
-    option_chain = {}
-    for strike in strikes:
-        # Calculate mock option prices
-        distance = abs(current_price - strike) / current_price
-        base_premium = 2.0 * (1 - distance)  # Simple approximation
-
-        option_chain[str(strike)] = OptionData(
-            strike=strike,
-            expiration="2024-01-15",  # Mock date
-            bid=max(0.10, base_premium - 0.05),
-            ask=base_premium + 0.05,
-            mid=base_premium,
-            volume=100 + int(50 / (1 + distance)),
-            open_interest=500 + int(200 / (1 + distance)),
-            delta=-0.3 * (1 - distance),  # Approximate delta
-            gamma=0.02,
-            theta=-0.05,
-            vega=0.15,
-            implied_volatility=0.65,  # Unity typical IV
-        )
-
-    return MarketSnapshot(
-        timestamp=datetime.now(),
-        ticker=ticker,
-        current_price=current_price,
-        buying_power=portfolio_value,
-        margin_used=0.0,
-        positions=[],
-        option_chain=option_chain,
-        implied_volatility=0.65,
-        risk_free_rate=0.05,
-    )
+# Removed create_mock_market_snapshot - now using real Databento data only
 
 
 def generate_recommendation(
-    portfolio_value: float, current_price: float | None = None, output_format: OutputFormat = "text"
+    portfolio_value: float, output_format: OutputFormat = "text"
 ) -> dict[str, Any]:
-    """Generate wheel strategy recommendation for Unity using new API."""
+    """Generate wheel strategy recommendation for Unity using real market data."""
     settings = get_settings()
 
     # Create wheel parameters from settings
@@ -132,12 +96,24 @@ def generate_recommendation(
     # Initialize advisor
     advisor = WheelAdvisor(wheel_params, risk_limits)
 
-    # Use mock data for demo
-    if current_price is None:
-        current_price = 35.50  # Unity typical price range
+    # Import the real data function
+    from .databento_integration import get_market_data_sync
 
-    # Create market snapshot
-    market_snapshot = create_mock_market_snapshot(current_price, portfolio_value)
+    # Get real market data - fail if not available
+    try:
+        market_snapshot = get_market_data_sync(portfolio_value, TICKER)
+        logger.info(f"Successfully fetched real Unity market data")
+        current_price = market_snapshot.current_price
+
+        # CRITICAL: Validate this is real market data, not mock/dummy data
+        validate_market_data(market_snapshot)
+        logger.info("Market data validation passed - using real data")
+
+    except Exception as e:
+        error_msg = f"Unable to fetch real Unity market data: {e}"
+        logger.error(error_msg)
+        # Re-raise to fail the program as requested
+        raise
 
     try:
         # Get recommendation from advisor
@@ -178,27 +154,8 @@ def generate_recommendation(
 
     except Exception as e:
         logger.error(f"Recommendation generation failed: {e}", exc_info=True)
-        recommendation = {
-            "timestamp": datetime.now().isoformat(),
-            "ticker": TICKER,
-            "company": COMPANY_NAME,
-            "current_price": current_price,
-            "portfolio_value": portfolio_value,
-            "error": str(e),
-            "recommendation": {
-                "action": "ERROR",
-                "rationale": f"Calculation failed: {str(e)}",
-                "confidence": 0.0,
-                "risk_metrics": {
-                    "max_loss": 0.0,
-                    "probability_assignment": 0.0,
-                    "expected_return": 0.0,
-                    "edge_ratio": 0.0,
-                    "var_95": 0.0,
-                    "margin_required": 0.0,
-                },
-            },
-        }
+        # Re-raise to fail the program
+        raise
 
     return recommendation
 
@@ -248,7 +205,11 @@ def display_recommendation_text(rec: dict[str, Any]) -> None:
 
 @click.command()
 @click.option("--portfolio", type=float, default=100000, help="Portfolio value")
-@click.option("--price", type=float, help="Current Unity price (uses mock data if not specified)")
+@click.option(
+    "--price",
+    type=float,
+    help="[DEPRECATED] Current Unity price - now fetched from real market data",
+)
 @click.option(
     "--format",
     "output_format",
@@ -357,7 +318,7 @@ def main(
 
     # Generate recommendation
     try:
-        rec = generate_recommendation(portfolio, price, output_format)
+        rec = generate_recommendation(portfolio, output_format)
 
         if output_format == "json":
             print(json.dumps(rec, indent=2))

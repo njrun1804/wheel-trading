@@ -19,6 +19,7 @@ import aiohttp
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ...auth.rate_limiter import RateLimiter
+from ...utils.data_validator import die
 from ...utils.logging import StructuredLogger, get_logger, timed_operation
 from ...utils.recovery import RecoveryStrategy, with_recovery
 from ..storage.cache.general_cache import IntelligentCache
@@ -531,6 +532,10 @@ class SchwabDataIngestion:
 
             # Update to_date for next page
             if order_list:
+                # Validate order has enteredTime field
+                if "enteredTime" not in order_list[-1]:
+                    die(f"Missing 'enteredTime' in order data for account {account_number}")
+
                 last_order_time = order_list[-1]["enteredTime"]
                 to_date = datetime.fromisoformat(last_order_time.replace("Z", "+00:00"))
 

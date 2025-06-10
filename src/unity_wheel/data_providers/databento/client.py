@@ -23,8 +23,10 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from src.config.loader import get_config
 
 from ...secrets.integration import get_databento_api_key
+from ...utils.data_validator import die
 from ...utils.logging import StructuredLogger
 from ...utils.recovery import RecoveryContext
+from ..audit_logger import get_audit_logger
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -75,6 +77,9 @@ class DatabentoClient:
 
         # Instrument mapping cache
         self._instrument_map: Optional[db.common.symbology.InstrumentMap] = None
+
+        # Initialize audit logger for data tracking
+        self.audit_logger = get_audit_logger()
         self._definitions_cache: Dict[str, InstrumentDefinition] = {}
 
         # Cache successful symbol formats for Unity
@@ -257,14 +262,9 @@ class DatabentoClient:
                             "Databento subscription error",
                             extra={"underlying": underlying, "error": str(e)},
                         )
-                        if os.getenv("DATABENTO_SKIP_VALIDATION", "false").lower() == "true":
-                            logger.warning(
-                                "Skipping Databento validation due to DATABENTO_SKIP_VALIDATION=true"
-                            )
-                            return []
                         raise ValueError(
-                            f"Databento subscription does not include options data for {underlying}. "
-                            f"Please check your subscription or use DATABENTO_SKIP_VALIDATION=true"
+                            f"CRITICAL: Databento subscription does not include options data for {underlying}. "
+                            f"Cannot proceed without real market data. Please check your subscription."
                         )
                     logger.debug(
                         "Symbol format failed", extra={"symbols": symbols, "error": str(e)}
@@ -274,14 +274,9 @@ class DatabentoClient:
             if response is None:
                 # All formats failed
                 if last_error:
-                    if os.getenv("DATABENTO_SKIP_VALIDATION", "false").lower() == "true":
-                        logger.warning(
-                            f"Could not retrieve options for {underlying}, skipping due to DATABENTO_SKIP_VALIDATION=true"
-                        )
-                        return []
                     raise ValueError(
-                        f"Could not retrieve options for {underlying}. "
-                        f"Last error: {last_error}. "
+                        f"CRITICAL: Could not retrieve real options data for {underlying}. "
+                        f"Cannot proceed without market data. Last error: {last_error}. "
                         f"Try setting DATABENTO_SKIP_VALIDATION=true to skip data validation."
                     )
 
@@ -347,9 +342,10 @@ class DatabentoClient:
             start = timestamp - timedelta(minutes=1)
             end = timestamp + timedelta(minutes=1)
 
+            # Use TRADES schema instead of deprecated MBP_1 for OPRA
             response = self.client.timeseries.get_range(
                 dataset="OPRA.PILLAR",
-                schema=Schema.MBP_1,  # Top of book
+                schema=Schema.TRADES,  # Use trades instead of deprecated mbp-1
                 start=start,
                 end=end,
                 symbols=None,  # Use instrument IDs instead
@@ -401,36 +397,20 @@ class DatabentoClient:
                     # Use previous day for weekdays
                     last_trading_day = today - timedelta(days=1)
 
-                end = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
-                start = end - timedelta(days=1)
+                # Use a wider date range to ensure we get data
+                end = last_trading_day.replace(hour=23, minute=59, second=59, microsecond=0)
+                start = last_trading_day.replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                ) - timedelta(days=5)
 
-            # Unity trades on NYSE American, not NASDAQ
-            dataset = "XAMER.BASIC" if symbol == "U" else "XNAS.BASIC"
-
-            try:
-                response = self.client.timeseries.get_range(
-                    dataset=dataset,
-                    schema=Schema.TRADES,
-                    start=start,
-                    end=end,
-                    symbols=[symbol],
-                )
-            except Exception as e:
-                # If NYSE American fails, try composite dataset
-                if symbol == "U" and "dataset" in str(e).lower():
-                    logger.warning(
-                        "NYSE American dataset failed for Unity, trying composite",
-                        extra={"error": str(e)},
-                    )
-                    response = self.client.timeseries.get_range(
-                        dataset="EQUS.MINI",  # Composite mini NBBO
-                        schema=Schema.MBP_1,  # Use MBP-1 for quotes
-                        start=start,
-                        end=end,
-                        symbols=[symbol],
-                    )
-                else:
-                    raise
+            # Unity trades on NASDAQ - use XNAS.BASIC
+            response = self.client.timeseries.get_range(
+                dataset="XNAS.BASIC",
+                schema=Schema.TRADES,
+                start=start,
+                end=end,
+                symbols=[symbol],
+            )
 
             # Get last trade or quote
             last_record = None
@@ -440,6 +420,14 @@ class DatabentoClient:
             if last_record:
                 # Check if we got MBP-1 data (from EQUS.MINI fallback)
                 if hasattr(last_record, "bid_px") and hasattr(last_record, "ask_px"):
+                    # Validate required attributes before accessing
+                    if not hasattr(last_record, "ts_event"):
+                        die(f"Missing ts_event in databento MBP-1 record for {symbol}")
+                    if not hasattr(last_record, "bid_px"):
+                        die(f"Missing bid_px in databento MBP-1 record for {symbol}")
+                    if not hasattr(last_record, "ask_px"):
+                        die(f"Missing ask_px in databento MBP-1 record for {symbol}")
+
                     # Convert MBP-1 record to UnderlyingPrice
                     from decimal import Decimal
 
@@ -447,20 +435,65 @@ class DatabentoClient:
                     ask = Decimal(str(last_record.ask_px / 1e9))
                     mid = (bid + ask) / 2
 
-                    return UnderlyingPrice(
+                    price = UnderlyingPrice(
                         symbol=symbol,
                         last_price=mid,
-                        bid=bid,
-                        ask=ask,
+                        bid_price=bid,
+                        ask_price=ask,
                         timestamp=datetime.fromtimestamp(
                             last_record.ts_event / 1e9, tz=timezone.utc
                         ),
                     )
+
+                    # Audit log the quote data fetch
+                    self.audit_logger.log_data_fetch(
+                        source="databento",
+                        symbol=symbol,
+                        data_type="underlying_quote",
+                        data={
+                            "bid": float(bid),
+                            "ask": float(ask),
+                            "mid": float(mid),
+                            "timestamp": price.timestamp.isoformat(),
+                        },
+                        request_params={
+                            "dataset": "XNAS.BASIC",
+                            "schema": "TRADES",
+                            "start": start.isoformat(),
+                            "end": end.isoformat(),
+                        },
+                    )
+
+                    return price
                 else:
-                    # Standard trade record
-                    return UnderlyingPrice.from_databento_trade(last_record, symbol)
+                    # Standard trade record - validate required attributes
+                    if not hasattr(last_record, "ts_event"):
+                        die(f"Missing ts_event in databento trade record for {symbol}")
+                    if not hasattr(last_record, "price"):
+                        die(f"Missing price in databento trade record for {symbol}")
+
+                    price = UnderlyingPrice.from_databento_trade(last_record, symbol)
+
+                    # Audit log the data fetch
+                    self.audit_logger.log_data_fetch(
+                        source="databento",
+                        symbol=symbol,
+                        data_type="underlying_price",
+                        data={
+                            "last_price": float(price.last_price),
+                            "timestamp": price.timestamp.isoformat(),
+                        },
+                        request_params={
+                            "dataset": "XNAS.BASIC",
+                            "schema": "TRADES",
+                            "start": start.isoformat(),
+                            "end": end.isoformat(),
+                        },
+                    )
+
+                    return price
             else:
-                raise ValueError(f"No trades found for {symbol}")
+                die(f"No trades found for {symbol} in databento data")
 
     async def _rate_limit(self):
         """Enforce rate limiting for historical API."""

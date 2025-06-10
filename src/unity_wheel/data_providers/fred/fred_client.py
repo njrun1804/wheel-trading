@@ -16,6 +16,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from ...secrets.integration import get_fred_api_key
 from ...storage.cache.general_cache import cached
 from ...utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
+from ...utils.data_validator import die
 from .fred_models import (
     FREDDataset,
     FREDObservation,
@@ -245,6 +246,12 @@ class FREDClient:
                 break
 
             for obs in obs_data:
+                # Validate observation has required fields
+                if "date" not in obs:
+                    die(f"Missing 'date' in FRED observation for series {series_id}")
+                if "value" not in obs:
+                    die(f"Missing 'value' in FRED observation for series {series_id}")
+
                 observations.append(
                     FREDObservation(
                         date=obs["date"],

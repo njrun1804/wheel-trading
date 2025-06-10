@@ -11,9 +11,10 @@ from typing import Dict, List, Optional
 import pandas as pd
 from databento_dbn import Schema
 
+from src.config.loader import get_config
+
 from ...storage import Storage
 from ...utils import get_logger
-from ..config.loader import get_config
 from .auth_client import DatabentoClient
 
 logger = get_logger(__name__)

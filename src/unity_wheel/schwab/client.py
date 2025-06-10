@@ -90,7 +90,7 @@ class SchwabClient:
     async def connect(self):
         """Initialize session and authenticate."""
         if not self.session:
-            from ..config.loader import get_config
+            from src.config.loader import get_config
 
             config = get_config()
             timeout = aiohttp.ClientTimeout(

@@ -11,7 +11,8 @@ from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import RiskAnalyzer, RiskLimits
+from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits, analyze_borrowing_decision
+from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
     DecisionLogger,
@@ -96,6 +97,8 @@ class WheelAdvisor:
         self.strategy = WheelStrategy(self.wheel_params)
         self.risk_analyzer = RiskAnalyzer(self.risk_limits)
         self.assignment_model = UnityAssignmentModel()
+        self.borrowing_analyzer = BorrowingCostAnalyzer()
+        self.financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
 
         logger.info(
             "WheelAdvisor initialized",
@@ -210,10 +213,47 @@ class WheelAdvisor:
                 margin_used=market_snapshot.get("margin_used", 0.0),
             )
 
+            # Analyze borrowing costs before position sizing
+            available_cash = market_snapshot.get("available_cash", 0)  # Cash without borrowing
+            initial_position_value = strike_rec.strike * 100 * 10  # Start with 10 contracts
+
+            # Calculate expected return for borrowing analysis
+            expected_return_pct = (strike_rec.premium / strike_rec.strike) * (
+                365 / self.wheel_params.target_dte
+            )
+
+            borrowing_analysis = self.borrowing_analyzer.analyze_position_allocation(
+                position_size=initial_position_value,
+                expected_annual_return=expected_return_pct,
+                holding_period_days=self.wheel_params.target_dte,
+                available_cash=available_cash,
+                confidence=strike_rec.confidence,
+            )
+
+            # If borrowing not recommended, reduce position size
+            if borrowing_analysis.action == "paydown_debt":
+                logger.info(
+                    "Borrowing not recommended",
+                    extra={
+                        "reason": borrowing_analysis.reasoning,
+                        "hurdle_rate": f"{borrowing_analysis.hurdle_rate:.1%}",
+                        "expected_return": f"{borrowing_analysis.expected_return:.1%}",
+                    },
+                )
+                # Limit to available cash only
+                max_contracts = int(
+                    available_cash / (strike_rec.strike * 100 * 0.2)
+                )  # Assume 20% margin
+            else:
+                max_contracts = None  # No borrowing-based limit
+
+            # CRITICAL: Pass real option premium, no placeholders
             contracts, size_confidence = self.strategy.calculate_position_size(
                 strike_price=strike_rec.strike,
+                option_price=strike_rec.premium,  # Real market premium from strike selection
                 portfolio_value=account.cash_balance,
                 current_margin_used=account.margin_used,
+                max_contracts=max_contracts,  # Pass borrowing limit if applicable
             )
 
             # Validate position size
@@ -303,6 +343,33 @@ class WheelAdvisor:
                     },
                 )
 
+            # Add borrowing metrics to risk metrics
+            risk_metrics["borrowing_analysis"] = {
+                "action": borrowing_analysis.action,
+                "hurdle_rate": borrowing_analysis.hurdle_rate,
+                "expected_return": borrowing_analysis.expected_return,
+                "borrowing_cost": borrowing_analysis.borrowing_cost,
+                "net_benefit": borrowing_analysis.net_benefit,
+                "source": borrowing_analysis.source_to_use,
+            }
+
+            # Run Monte Carlo simulation for advanced risk metrics
+            mc_result = self.financial_modeler.monte_carlo_simulation(
+                expected_return=expected_return_pct,
+                volatility=volatility,
+                time_horizon=self.wheel_params.target_dte,
+                position_size=strike_rec.strike * 100 * contracts,
+                borrowed_amount=max(0, strike_rec.strike * 100 * contracts - available_cash),
+                n_simulations=1000,  # Quick simulation
+            )
+
+            risk_metrics["monte_carlo"] = {
+                "mean_return": mc_result.mean_return,
+                "probability_profit": mc_result.probability_profit,
+                "var_95_mc": mc_result.percentiles[5],  # 5th percentile is 95% VaR
+                "expected_shortfall": mc_result.expected_shortfall,
+            }
+
             # Generate recommendation
             expiry_str = f"{self.wheel_params.target_dte}DTE"
 
@@ -319,6 +386,10 @@ class WheelAdvisor:
                     "edge": edge,
                     "decision_time": elapsed,
                     "strike_reason": strike_rec.reason,
+                    "borrowing_recommended": borrowing_analysis.action == "invest",
+                    "borrowing_amount": max(
+                        0, strike_rec.strike * 100 * contracts - available_cash
+                    ),
                 },
             )
 

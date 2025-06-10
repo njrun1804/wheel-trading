@@ -8,6 +8,7 @@ from .iv_surface import IVMetrics, IVSurfaceAnalyzer, SkewMetrics
 from .market_calibrator import MarketCalibrator, OptimalParameters
 from .performance_tracker import PerformanceTracker, TradeOutcome
 from .seasonality import PatternMetrics, SeasonalityDetector, SeasonalPattern
+from .unity_assignment import AssignmentProbability, UnityAssignmentModel
 
 __all__ = [
     # Dynamic Optimization
@@ -37,4 +38,7 @@ __all__ = [
     # Decision Engine
     "IntegratedDecisionEngine",
     "WheelRecommendation",
+    # Unity Assignment Model
+    "UnityAssignmentModel",
+    "AssignmentProbability",
 ]

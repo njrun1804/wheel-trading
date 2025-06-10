@@ -27,6 +27,43 @@ logger = get_logger(__name__)
 running = True
 
 
+async def get_realized_volatility_from_databento(ticker: str) -> float:
+    """Fetch realized volatility from Databento or calculate from historical data."""
+    try:
+        from src.unity_wheel.data_providers.databento import DatabentoClient
+        from src.unity_wheel.data_providers.databento.price_history_loader import (
+            OptimizedPriceHistoryLoader,
+        )
+
+        client = DatabentoClient()
+        loader = OptimizedPriceHistoryLoader(client)
+
+        # Get 30 days of historical data for volatility calculation
+        historical_data = await loader.load_price_history(ticker, days=30)
+
+        if historical_data and len(historical_data) > 1:
+            # Calculate realized volatility from returns
+            import numpy as np
+
+            closes = [float(d["close"]) for d in historical_data]
+            returns = np.diff(np.log(closes))
+
+            # Annualized volatility
+            daily_vol = np.std(returns)
+            annual_vol = daily_vol * np.sqrt(252)  # 252 trading days
+
+            logger.info(f"Calculated {ticker} realized volatility: {annual_vol:.2f}")
+            return annual_vol
+        else:
+            raise ValueError(
+                f"CRITICAL: Insufficient data for {ticker} volatility calculation - cannot proceed without real data"
+            )
+
+    except Exception as e:
+        logger.error(f"CRITICAL: Failed to fetch volatility from Databento: {e}")
+        raise ValueError(f"Cannot calculate volatility without real market data: {e}")
+
+
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully."""
     global running
@@ -156,7 +193,7 @@ async def check_for_opportunities(
                 historical[-2]["close"] if len(historical) > 1 else latest["close"]
             ),
             "volume": float(latest.get("volume", 0)),
-            "realized_vol": 0.77,  # Default
+            "realized_vol": await get_realized_volatility_from_databento(config.unity.ticker),
         }
 
         # Mock option chain for monitoring

@@ -54,3 +54,11 @@ repos:
         entry: python -c "import yaml; yaml.safe_load(open('config.yaml')); print('✓ Config valid')"
         language: system
         pass_filenames: false
+
+      # Check data validation implementation
+      - id: check-data-validation
+        name: Check data validation
+        entry: ./scripts/check-data-validation.sh
+        language: system
+        pass_filenames: false
+        verbose: true

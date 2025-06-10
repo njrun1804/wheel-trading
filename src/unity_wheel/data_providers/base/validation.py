@@ -335,7 +335,17 @@ class MarketDataValidator:
         if not isinstance(timestamp, datetime):
             return False
 
-        age = datetime.now(timezone.utc) - timestamp
+        # Ensure both timestamps are timezone-aware for comparison
+        now = datetime.now(timezone.utc)
+
+        # If timestamp is timezone-naive, assume UTC
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
+        # If timestamp has timezone, convert to UTC
+        elif timestamp.tzinfo != timezone.utc:
+            timestamp = timestamp.astimezone(timezone.utc)
+
+        age = now - timestamp
         return age < timedelta(minutes=minutes)
 
     def _validate_option_chain_consistency(self, data: Dict[str, Any]) -> bool:

@@ -9,7 +9,7 @@ from typing import Dict, Tuple
 
 import duckdb
 
-from ....config.loader import get_config
+from src.config.loader import get_config
 
 # Get Unity ticker once
 _config = get_config()

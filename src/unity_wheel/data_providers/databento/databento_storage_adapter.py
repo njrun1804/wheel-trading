@@ -9,9 +9,10 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
 
+from src.config.loader import get_config
+
 from ...storage import Storage
 from ...utils import get_logger
-from ..config.loader import get_config
 from .types import InstrumentDefinition, OptionChain, OptionQuote
 from .validation import DataValidator
 

@@ -11,7 +11,8 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from ..config.loader import get_config
+from src.config.loader import get_config
+
 from ..risk.regime_detector import RegimeDetector, RegimeInfo
 from ..utils import get_logger
 
