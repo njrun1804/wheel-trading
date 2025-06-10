@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import pickle
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -350,8 +349,9 @@ class IntelligentCache:
                 },
             }
 
-            with open(self.persistence_path, "wb") as f:
-                pickle.dump(cache_data, f)
+            # Use JSON instead of pickle for security
+            with open(self.persistence_path, "w") as f:
+                json.dump(cache_data, f, default=str)
 
             logger.info(f"Saved {len(cache_data['entries'])} cache entries to disk")
 
@@ -364,8 +364,9 @@ class IntelligentCache:
             return
 
         try:
-            with open(self.persistence_path, "rb") as f:
-                cache_data = pickle.load(f)
+            # Use JSON instead of pickle for security
+            with open(self.persistence_path, "r") as f:
+                cache_data = json.load(f)
 
             loaded = 0
             for key, data in cache_data.get("entries", {}).items():

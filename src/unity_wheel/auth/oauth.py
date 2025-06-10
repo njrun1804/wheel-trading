@@ -3,8 +3,11 @@ OAuth2 flow implementation with automatic browser handling.
 """
 
 import asyncio
+import os
 import secrets
 import socket
+import ssl
+import subprocess
 import webbrowser
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -119,8 +122,25 @@ class OAuth2Handler:
             if not cert_path.exists() or not key_path.exists():
                 # Generate self-signed certificate
                 os.makedirs(cert_path.parent, exist_ok=True)
-                os.system(
-                    f'openssl req -x509 -newkey rsa:4096 -nodes -out {cert_path} -keyout {key_path} -days 365 -subj "/CN=127.0.0.1" 2>/dev/null'
+                subprocess.run(
+                    [
+                        "openssl",
+                        "req",
+                        "-x509",
+                        "-newkey",
+                        "rsa:4096",
+                        "-nodes",
+                        "-out",
+                        str(cert_path),
+                        "-keyout",
+                        str(key_path),
+                        "-days",
+                        "365",
+                        "-subj",
+                        "/CN=127.0.0.1",
+                    ],
+                    capture_output=True,
+                    check=False,
                 )
 
             ssl_context.load_cert_chain(str(cert_path), str(key_path))

@@ -182,6 +182,11 @@ class Storage:
 
         # First check local cache
         async with self.cache.connection() as conn:
+            # Validate dataset name to prevent SQL injection
+            valid_datasets = {"price_history", "option_chains", "fred_data"}
+            if dataset not in valid_datasets:
+                raise ValueError(f"Invalid dataset: {dataset}")
+
             query = f"""
                 SELECT * FROM {dataset}
                 WHERE timestamp >= ? AND timestamp <= ?

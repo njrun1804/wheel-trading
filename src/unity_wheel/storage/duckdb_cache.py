@@ -5,6 +5,7 @@ Provides SQL interface with automatic TTL and LRU eviction.
 
 import asyncio
 import os
+import re
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -17,6 +18,20 @@ import pandas as pd
 from ..utils import get_logger
 
 logger = get_logger(__name__)
+
+# Valid table names for security
+VALID_TABLES = {"price_history", "options_data", "fred_data", "trades", "metrics"}
+
+
+def validate_table_name(table: str) -> str:
+    """Validate table name to prevent SQL injection."""
+    # Only allow alphanumeric and underscore
+    if not re.match(r"^[a-zA-Z0-9_]+$", table):
+        raise ValueError(f"Invalid table name: {table}")
+    # Check against whitelist
+    if table not in VALID_TABLES:
+        raise ValueError(f"Unknown table: {table}")
+    return table
 
 
 @dataclass
@@ -217,6 +232,7 @@ class DuckDBCache:
 
     async def export_to_parquet(self, table: str, output_dir: Path):
         """Export table to Parquet for GCS backup."""
+        table = validate_table_name(table)
         async with self.connection() as conn:
             df = conn.execute(f"SELECT * FROM {table}").df()
 
@@ -229,12 +245,15 @@ class DuckDBCache:
 
     async def import_from_parquet(self, parquet_file: Path, table: str):
         """Import data from Parquet file."""
+        table = validate_table_name(table)
         async with self.connection() as conn:
+            # Use parameterized query for file path
             conn.execute(
                 f"""
                 INSERT INTO {table}
-                SELECT * FROM read_parquet('{parquet_file}')
-            """
+                SELECT * FROM read_parquet(?)
+            """,
+                [str(parquet_file)],
             )
 
     async def get_storage_stats(self) -> Dict[str, Any]:
@@ -245,7 +264,8 @@ class DuckDBCache:
             # Get table sizes
             tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
             for table in tables:
-                count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+                safe_table = validate_table_name(table)
+                count = conn.execute(f"SELECT COUNT(*) FROM {safe_table}").fetchone()[0]
                 stats[f"{table}_count"] = count
 
             # Get database file size
@@ -254,7 +274,8 @@ class DuckDBCache:
 
             # Get age of oldest records
             for table in tables:
-                oldest = conn.execute(f"SELECT MIN(created_at) FROM {table}").fetchone()[0]
+                safe_table = validate_table_name(table)
+                oldest = conn.execute(f"SELECT MIN(created_at) FROM {safe_table}").fetchone()[0]
                 if oldest:
                     age_days = (datetime.utcnow() - oldest).days
                     stats[f"{table}_oldest_days"] = age_days
@@ -276,8 +297,9 @@ class DuckDBCache:
             # Delete old records
             tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
             for table in tables:
+                safe_table = validate_table_name(table)
                 deleted = conn.execute(
-                    f"DELETE FROM {table} WHERE created_at < ?", [cutoff]
+                    f"DELETE FROM {safe_table} WHERE created_at < ?", [cutoff]
                 ).rowcount
 
                 if deleted > 0:
@@ -293,6 +315,7 @@ class DuckDBCache:
         async with self.connection() as conn:
             tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
             for table in tables:
-                conn.execute(f"DELETE FROM {table}")
+                safe_table = validate_table_name(table)
+                conn.execute(f"DELETE FROM {safe_table}")
 
         logger.warning("cache_cleared_all")

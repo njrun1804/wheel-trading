@@ -31,7 +31,9 @@ class Colors:
 
 def clear_screen():
     """Clear terminal screen."""
-    os.system("clear" if os.name == "posix" else "cls")
+    import subprocess
+
+    subprocess.run(["clear" if os.name == "posix" else "cls"], shell=False, check=False)
 
 
 def get_status_icon(is_good: bool, is_warning: bool = False) -> str:
@@ -129,15 +131,16 @@ def check_data_quality(conn) -> Dict[str, any]:
     # Check for data gaps in Unity prices
     try:
         gaps = conn.execute(
-            f"""
+            """
             WITH date_series AS (
                 SELECT date, LAG(date) OVER (ORDER BY date) as prev_date
-                FROM price_history WHERE symbol = '{UNITY_TICKER}'
+                FROM price_history WHERE symbol = ?
             )
             SELECT COUNT(*) as total_gaps,
                    COUNT(CASE WHEN date - prev_date > 10 THEN 1 END) as large_gaps
             FROM date_series WHERE date - prev_date > 1
-        """
+        """,
+            (UNITY_TICKER,),
         ).fetchone()
 
         quality["price_gaps"] = {
@@ -151,14 +154,15 @@ def check_data_quality(conn) -> Dict[str, any]:
     # Check Unity volatility
     try:
         vol = conn.execute(
-            f"""
+            """
             SELECT STDDEV(returns) * SQRT(252) as annual_vol,
                    MAX(ABS(returns)) as max_move
             FROM price_history
-            WHERE symbol = '{UNITY_TICKER}'
+            WHERE symbol = ?
                 AND date >= CURRENT_DATE - 30
                 AND returns IS NOT NULL
-        """
+        """,
+            (UNITY_TICKER,),
         ).fetchone()
 
         if vol[0]:
@@ -173,16 +177,17 @@ def check_data_quality(conn) -> Dict[str, any]:
     # Check options bid-ask spreads
     try:
         spreads = conn.execute(
-            f"""
+            """
             SELECT AVG((ask - bid) / bid) as avg_spread,
                    MAX((ask - bid) / bid) as max_spread,
                    COUNT(CASE WHEN (ask - bid) / bid > 0.5 THEN 1 END) as wide_spreads
             FROM options_data
-            WHERE underlying = '{UNITY_TICKER}'
+            WHERE underlying = ?
                 AND bid > 0
                 AND ask > 0
                 AND timestamp >= CURRENT_TIMESTAMP - INTERVAL '24 hours'
-        """
+        """,
+            (UNITY_TICKER,),
         ).fetchone()
 
         if spreads[0]:

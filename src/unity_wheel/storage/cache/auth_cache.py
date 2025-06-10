@@ -4,7 +4,6 @@ Response caching for graceful degradation during auth failures.
 
 import hashlib
 import json
-import pickle
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional, TypeVar, Union
@@ -84,8 +83,9 @@ class AuthCache:
         cache_path = self._get_cache_path(cache_key)
         if cache_path.exists():
             try:
-                with open(cache_path, "rb") as f:
-                    cached = pickle.load(f)
+                # Use JSON instead of pickle for security
+                with open(cache_path, "r") as f:
+                    cached = json.load(f)
 
                 if self._is_fresh(cached, max_age):
                     # Promote to memory cache
@@ -133,8 +133,9 @@ class AuthCache:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            with open(cache_path, "wb") as f:
-                pickle.dump(cached, f)
+            # Use JSON instead of pickle for security
+            with open(cache_path, "w") as f:
+                json.dump(cached, f, default=str)
 
             logger.debug("set", endpoint=endpoint, ttl=ttl, size_bytes=cache_path.stat().st_size)
 
@@ -210,8 +211,9 @@ class AuthCache:
         cache_path = self._get_cache_path(cache_key)
         if cache_path.exists():
             try:
-                with open(cache_path, "rb") as f:
-                    cached = pickle.load(f)
+                # Use JSON instead of pickle for security
+                with open(cache_path, "r") as f:
+                    cached = json.load(f)
 
                 logger.warning(
                     "get_fallback",

@@ -289,10 +289,9 @@ class PerformanceTracker:
                 """
                 SELECT * FROM trades
                 WHERE actual_return IS NOT NULL
-                AND timestamp > datetime('now', '-{} days')
-            """.format(
-                    days
-                )
+                AND timestamp > datetime('now', '-' || ? || ' days')
+            """,
+                (days,),
             ).fetchall()
 
         if not completed:

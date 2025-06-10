@@ -79,7 +79,9 @@ async def display_dashboard(
 ):
     """Display live monitoring dashboard."""
     # Clear screen (works on most terminals)
-    os.system("clear" if os.name == "posix" else "cls")
+    import subprocess
+
+    subprocess.run(["clear" if os.name == "posix" else "cls"], shell=False, check=False)
 
     print("🎯 Unity Wheel Strategy Monitor")
     print("=" * 60)
