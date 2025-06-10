@@ -1,5 +1,8 @@
 # Unity Wheel Bot v2.0 - Quick Reference
 
+> **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies. 
+> For a more conservative approach, see `examples/core/conservative_config.yaml`
+
 ## 🚀 Daily Commands
 
 ```bash

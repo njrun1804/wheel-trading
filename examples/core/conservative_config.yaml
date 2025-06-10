@@ -1,0 +1,36 @@
+# Conservative Configuration Example for Unity Wheel Trading Bot
+# This configuration prioritizes capital preservation over returns
+
+# Unity-specific settings (symbol ticker)
+unity:
+  ticker: "U"  # Unity Software Inc.
+
+# Risk Management - Conservative settings
+risk:
+  position_limits:
+    max_position_size: 0.10  # Only 10% per position (vs default 20%)
+    max_concurrent_puts: 2   # Fewer concurrent positions (vs default 3)
+  
+  circuit_breakers:
+    max_volatility: 1.00     # Stop at 100% volatility (vs default 150%)
+    max_drawdown: -0.10      # Stop at -10% drawdown (vs default -20%)
+    consecutive_loss_limit: 2 # Stop after 2 losses (vs default 3)
+
+# Trading Strategy - Conservative parameters  
+strategy:
+  greeks:
+    delta_target: 0.20       # Lower delta for more OTM puts (vs default 0.30)
+  
+  expiration:
+    days_to_expiry_target: 60 # Longer expiration (vs default 45)
+
+# Operations - Require higher confidence
+operations:
+  api:
+    min_confidence: 0.50     # Higher confidence threshold (vs default 0.30)
+
+# Machine Learning - More conservative
+ml:
+  enabled: true
+  min_training_samples: 200  # Require more data (vs default 100)
+  prediction_threshold: 0.70 # Higher prediction confidence (vs default 0.60)

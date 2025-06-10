@@ -1,5 +1,8 @@
 # Unity Wheel Trading Bot v2.0 - Autonomous Edition
 
+> **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies. 
+> For a more conservative approach, see `examples/core/conservative_config.yaml`
+
 A sophisticated options wheel strategy recommendation system for Unity Software Inc. (U). Features autonomous operation with self-monitoring, auto-tuning, and enterprise-grade reliability. Designed for single-user local operation with recommendations only (no broker trading integration).
 
 ## 🎯 Core Philosophy
