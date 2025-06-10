@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -15,9 +14,9 @@ import pandas as pd
 from scipy import stats
 
 from src.config.loader import get_config
+from src.unity_wheel.models.position import Position
 
 from ..models.greeks import Greeks
-from src.unity_wheel.models.position import Position
 from ..storage.cache.general_cache import cached
 from ..utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
 
