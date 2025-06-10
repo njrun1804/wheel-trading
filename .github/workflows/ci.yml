@@ -33,7 +33,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 2
-    
+
     - uses: dorny/paths-filter@v3
       id: filter
       with:
@@ -52,12 +52,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    
+
     - name: Run pre-commit
       uses: pre-commit/action@v3.0.1
       with:
@@ -77,21 +77,21 @@ jobs:
           # Skip integration tests on macOS to save time
           - os: macos-latest
             test-group: integration
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
         cache: 'pip'
-    
+
     - name: Get Poetry cache dir
       id: poetry-cache
       run: |
         echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-    
+
     - name: Cache Poetry and dependencies
       uses: actions/cache@v4
       with:
@@ -103,23 +103,23 @@ jobs:
         key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
         restore-keys: |
           ${{ runner.os }}-poetry-
-    
+
     - name: Install Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-    
+
     - name: Install dependencies
       run: |
         poetry config virtualenvs.in-project true
         poetry install --no-interaction --no-ansi
-    
+
     - name: Install system dependencies (Ubuntu)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y -qq libopenblas-dev > /dev/null
-    
+
     - name: Run ${{ matrix.test-group }} tests
       run: |
         case "${{ matrix.test-group }}" in
@@ -130,7 +130,7 @@ jobs:
             TEST_FILES="tests/test_e2e*.py tests/test_integrated*.py tests/test_wheel*.py"
             ;;
         esac
-        
+
         poetry run pytest $TEST_FILES \
           -v \
           --tb=short \
@@ -139,7 +139,7 @@ jobs:
           --maxfail=5 \
           --timeout=300 \
           -n $PYTEST_XDIST_WORKER_COUNT || true
-    
+
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
@@ -155,25 +155,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
         cache: 'pip'
-    
+
     - name: Install Poetry and dependencies
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         poetry config virtualenvs.in-project true
         poetry install --no-interaction --no-ansi
-    
+
     - name: Install system dependencies
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y -qq libopenblas-dev > /dev/null
-    
+
     - name: Run tests with coverage
       run: |
         poetry run pytest tests/ \
@@ -183,7 +183,7 @@ jobs:
           --no-cov-on-fail \
           -n auto \
           -q || true
-    
+
     - name: Upload coverage
       uses: codecov/codecov-action@v4
       with:
@@ -200,24 +200,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
         cache: 'pip'
-    
+
     - name: Install dependencies
       run: |
         pip install poetry
         poetry config virtualenvs.in-project true
         poetry install --no-interaction --no-ansi
-    
+
     - name: Validate configuration
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
         poetry run python -m src.unity_wheel.utils.validate
-        
+
         # Additional checks
         poetry run python -c "
         from src.config.loader import get_config
@@ -234,26 +234,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
         cache: 'pip'
-    
+
     - name: Install dependencies
       run: |
         pip install poetry
         poetry config virtualenvs.in-project true
         poetry install --no-interaction --no-ansi
-    
+
     - name: Run benchmarks
       run: |
         poetry run pytest tests/test_performance_benchmarks.py \
           --benchmark-only \
           --benchmark-json=benchmark.json \
           --benchmark-max-time=0.5 || true
-    
+
     - name: Check performance
       run: |
         if [ -f benchmark.json ]; then
@@ -285,39 +285,39 @@ jobs:
         path: test-results/
         merge-multiple: true
       continue-on-error: true
-    
+
     - name: Generate summary
       run: |
         echo "## CI Results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        
+
         # Job statuses
         echo "### Job Status" >> $GITHUB_STEP_SUMMARY
         echo "- Lint: ${{ needs.lint.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- Test: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- Coverage: ${{ needs.coverage.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- Validate: ${{ needs.validate.result }}" >> $GITHUB_STEP_SUMMARY
-        
+
         # Parse test results if available
         if ls test-results/*.xml 1> /dev/null 2>&1; then
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Test Results" >> $GITHUB_STEP_SUMMARY
           echo "| OS | Group | Tests | Time |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
-          
+
           for file in test-results/*.xml; do
             # Extract info from filename
             filename=$(basename "$file")
             os=$(echo "$filename" | cut -d'-' -f3)
             group=$(echo "$filename" | cut -d'-' -f4 | cut -d'.' -f1)
-            
+
             # Try to get test count (simple approach)
             tests=$(grep -c '<testcase' "$file" 2>/dev/null || echo "?")
-            
+
             echo "| $os | $group | $tests | - |" >> $GITHUB_STEP_SUMMARY
           done
         fi
-        
+
         # Overall status
         if [[ "${{ needs.lint.result }}" == "success" && \
               "${{ needs.test.result }}" == "success" && \
