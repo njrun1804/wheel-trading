@@ -8,12 +8,16 @@ import sys
 from datetime import datetime, timedelta
 
 import duckdb
+import logging
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def get_monthly_expirations(year, month):
@@ -228,8 +232,8 @@ def main():
                     )
                     inserted += 1
                     options_added += 1
-                except:
-                    pass  # Skip duplicates
+                except duckdb.ConstraintException as exc:
+                    logger.warning("Duplicate option for %s: %s", expiration, exc)
 
             if inserted > 0:
                 print(f"   Added {inserted} options for {expiration} expiration")

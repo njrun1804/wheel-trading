@@ -8,12 +8,16 @@ import sys
 from datetime import datetime, timedelta
 
 import duckdb
+import logging
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -157,8 +161,14 @@ def main():
                         ],
                     )
                     options_added += 1
-                except:
-                    pass  # Skip if already exists
+                except duckdb.ConstraintException as exc:
+                    logger.warning(
+                        "Duplicate option for %s %s %.2f: %s",
+                        min_exp,
+                        opt_type,
+                        strike,
+                        exc,
+                    )
 
         if options_added % 100 == 0:
             print(f"\r   Added {options_added:,} options...", end="")
@@ -241,8 +251,14 @@ def main():
                         ],
                     )
                     options_added += 1
-                except:
-                    pass
+                except duckdb.ConstraintException as exc:
+                    logger.warning(
+                        "Duplicate weekly option for %s %s %.2f: %s",
+                        weekly_exp,
+                        opt_type,
+                        atm_strike,
+                        exc,
+                    )
 
     conn.commit()
 

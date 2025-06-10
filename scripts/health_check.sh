@@ -97,8 +97,11 @@ for service in required:
             print(f'✅ {service.capitalize()} credentials found')
         else:
             missing.append(service)
-    except:
+    except Exception as exc:
         missing.append(service)
+        import logging
+        logging.basicConfig(level=logging.ERROR)
+        logging.error("Credential check failed for %s: %s", service, exc)
 
 if missing:
     print(f'❌ Missing credentials: {\", \".join(missing)}')

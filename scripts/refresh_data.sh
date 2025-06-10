@@ -85,7 +85,10 @@ if os.path.exists(db_path):
             FROM fred_observations
         \"\"\").fetchone()
         print(result[0] if result and result[0] else 999)
-    except:
+    except duckdb.Error as exc:
+        import logging
+        logging.basicConfig(level=logging.ERROR)
+        logging.error("Failed to check FRED age: %s", exc)
         print(999)
     finally:
         conn.close()
