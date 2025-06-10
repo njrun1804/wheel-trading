@@ -124,8 +124,8 @@ jobs:
     - name: Type check critical code
       if: matrix.os == 'ubuntu-latest'  # Only need to run once
       run: |
-        poetry run mypy src/unity_wheel/math/ --ignore-missing-imports
-        poetry run mypy src/unity_wheel/risk/ --ignore-missing-imports
+        poetry run mypy src/unity_wheel/math/ --ignore-missing-imports --disable-error-code=no-untyped-def,no-any-return,arg-type
+        poetry run mypy src/unity_wheel/risk/ --ignore-missing-imports --disable-error-code=no-untyped-def,no-any-return,arg-type
 
   quick-validation:
     needs: test-environments

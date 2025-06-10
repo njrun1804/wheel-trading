@@ -10,7 +10,7 @@ from contextvars import ContextVar
 from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, List, MutableMapping, Optional, TypeVar, Union
 
 # Context variables for request tracking
 request_id: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
@@ -19,13 +19,15 @@ execution_context: ContextVar[Dict[str, Any]] = ContextVar("execution_context", 
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-class StructuredLogger(logging.LoggerAdapter):
+class StructuredLogger(logging.LoggerAdapter[logging.Logger]):
     """Logger adapter that adds structured context to all log messages."""
 
     def __init__(self, logger: logging.Logger, extra: Optional[Dict[str, Any]] = None):
         super().__init__(logger, extra or {})
 
-    def process(self, msg: str, kwargs: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
+    def process(
+        self, msg: Any, kwargs: MutableMapping[str, Any]
+    ) -> tuple[Any, MutableMapping[str, Any]]:
         """Process log message to add structured context."""
         # Get execution context
         ctx = execution_context.get()
@@ -83,7 +85,10 @@ class PerformanceLogger:
         self.metadata.update(kwargs)
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        duration_ms = (time.time() - self.start_time) * 1000
+        if self.start_time is None:
+            duration_ms = 0.0
+        else:
+            duration_ms = (time.time() - self.start_time) * 1000
 
         extra_data = {
             "operation": self.operation,

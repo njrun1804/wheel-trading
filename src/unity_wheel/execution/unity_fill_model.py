@@ -44,7 +44,7 @@ class UnityFillModel:
     OPENING_FILL_POSITION = 0.1  # Selling puts: 10% from bid
     CLOSING_FILL_POSITION = 0.9  # Buying back: 90% from bid (10% from ask)
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = logger
 
     def estimate_fill_price(

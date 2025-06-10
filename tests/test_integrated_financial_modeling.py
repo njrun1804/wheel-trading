@@ -6,11 +6,7 @@ import numpy as np
 import pytest
 
 from src.unity_wheel.api import WheelAdvisor
-from src.unity_wheel.risk import (
-    AdvancedFinancialModeling,
-    BorrowingCostAnalyzer,
-    RiskLimits,
-)
+from src.unity_wheel.risk import AdvancedFinancialModeling, BorrowingCostAnalyzer, RiskLimits
 from src.unity_wheel.strategy import WheelParameters
 
 

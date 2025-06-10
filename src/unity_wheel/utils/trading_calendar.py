@@ -6,7 +6,7 @@ No external dependencies required.
 
 import calendar
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Union
 
 
 class SimpleTradingCalendar:
@@ -46,7 +46,7 @@ class SimpleTradingCalendar:
     # Juneteenth National Independence Day (since 2021)
     JUNETEENTH = (6, 19)
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the trading calendar."""
         self._holiday_cache: Dict[int, Set[date]] = {}
 
@@ -131,7 +131,7 @@ class SimpleTradingCalendar:
         self._holiday_cache[year] = holidays
         return holidays
 
-    def is_trading_day(self, check_date: datetime) -> bool:
+    def is_trading_day(self, check_date: Union[datetime, date]) -> bool:
         """Check if a given date is a trading day.
 
         Args:

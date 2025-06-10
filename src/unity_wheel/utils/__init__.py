@@ -9,6 +9,7 @@ from .logging import (
     setup_structured_logging,
     timed_operation,
 )
+from .random_utils import set_seed
 from .recovery import (
     CircuitBreaker,
     GracefulDegradation,
@@ -24,7 +25,6 @@ from .trading_calendar import (
     get_next_expiry_friday,
     is_trading_day,
 )
-from .random_utils import set_seed
 
 __all__ = [
     # Logging
