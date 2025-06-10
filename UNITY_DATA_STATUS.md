@@ -1,8 +1,8 @@
-# Unity Data Download - Final Status Report
+# Unity Data Status - Consolidated Report
 
 ## ✅ MISSION ACCOMPLISHED
 
-Successfully downloaded **REAL Unity options data** from Databento - NO SYNTHETIC DATA\!
+Successfully downloaded **REAL Unity options data** from Databento - NO SYNTHETIC DATA!
 
 ## Summary
 
@@ -36,7 +36,9 @@ All data stored in DuckDB at:
 ~/.wheel_trading/cache/wheel_cache.duckdb
 ```
 
-Table: `unity_options_daily`
+Tables:
+- `price_history` - Unity stock data
+- `unity_options_daily` - Unity options data
 
 ## Sample Data (Most Recent)
 
@@ -55,20 +57,6 @@ Date: 2025-06-03
 2. **Data Starts March 28, 2023**: This is when Unity options became available in the OPRA.PILLAR dataset on Databento.
 
 3. **Real Market Data**: The varying bid-ask spreads, different volumes, and price movements confirm this is real market data, not synthetic.
-
-## Files Created/Deleted
-
-### Created
-- `tools/download_unity_options_3years.py` - Main download script
-- `tools/download_unity_options_simple.py` - Test script
-- `tools/download_unity_options_eod.py` - EOD download attempt
-- `tools/verify_unity_data.py` - Verification tool
-
-### Deleted (Synthetic Data Generators)
-- ❌ `tools/generate_missing_unity_options.py`
-- ❌ `tools/fill_unity_options.py`
-- ❌ `tools/complete_unity_options.py`
-- ❌ `check_synthetic_data.py`
 
 ## Verification
 
@@ -120,4 +108,3 @@ All requirements met:
 - ✅ No synthetic data in the system
 - ✅ Data covers from March 2023 (when available) through today
 - ✅ Stored alongside existing stock and FRED data in DuckDB
-EOF < /dev/null
