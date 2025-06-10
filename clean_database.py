@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Clean up database - remove empty tables and fix data issues."""
+
 import os
 
 import duckdb
@@ -27,7 +28,7 @@ for table in empty_tables:
         if count == 0:
             print(f"   Dropping empty table: {table}")
             conn.execute(f"DROP TABLE IF EXISTS {table}")
-    except:
+    except Exception:
         pass
 
 # Fix inverted spreads in options data
