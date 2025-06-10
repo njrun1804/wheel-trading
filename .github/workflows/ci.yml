@@ -13,7 +13,7 @@ jobs:
   test-environments:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true  # Fail fast to surface issues quickly
       matrix:
         include:
           - os: ubuntu-latest
@@ -78,66 +78,35 @@ jobs:
         # Configure pip to prefer binary packages
         poetry config installer.max-workers 1
 
-        # Use different strategies for macOS vs Ubuntu
+        # Unified binary-first approach for both platforms
+        echo "Installing with binary-first approach..."
+        poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
+
         if [[ "${{ runner.os }}" == "macOS" ]]; then
-          echo "Installing on macOS with fallback for problematic packages..."
-          # Try normal install first
-          if ! poetry install --no-interaction --no-ansi; then
-            echo "Normal install failed, trying without scikit-learn..."
-            # Install everything except scikit-learn
-            poetry run pip install numpy==1.26.4 scipy==1.13.0 pandas==2.2.1 pydantic==2.7.0
-            poetry run pip install python-dotenv==1.0.1 pytz==2024.1 click==8.1.7 rich==13.7.1
-            poetry run pip install aiohttp==3.10.11 cryptography==45.0.4 pyyaml==6.0.2
-            poetry run pip install pydantic-settings==2.6.1 duckdb
-            # Try scikit-learn with binary-only (optional)
-            poetry run pip install --only-binary=:all: scikit-learn || echo "Skipping scikit-learn on macOS"
-            # Install dev dependencies
-            poetry run pip install pytest==8.1.1 pytest-cov==4.1.0 pytest-xdist==3.5.0
-            poetry run pip install hypothesis==6.98.15 black==24.3.0 flake8==7.0.0 isort==5.13.2
-            poetry run pip install mypy==1.9.0 bandit==1.7.7 pre-commit==3.6.2
-            poetry run pip install types-pytz==2024.1.0.20240203 pandas-stubs==2.2.0.240218
-            poetry run pip install memory-profiler==0.61.0
-          fi
+          poetry install --no-interaction --no-ansi
         else
-          echo "Installing on Ubuntu with full dependency resolution including ML..."
-          # Install ML deps with binary-only first to avoid compilation hanging
-          poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
           poetry install --no-interaction --no-ansi --extras "ml"
         fi
-      timeout-minutes: 8
+      timeout-minutes: 5
       env:
         # Force use of wheels when available
         PIP_PREFER_BINARY: 1
         PIP_ONLY_BINARY: ":all:"
 
-    # Core functionality tests only - disable pytest-cov plugin completely
-    - name: Test options mathematics
+    # Run all tests in parallel using pytest-xdist
+    - name: Run tests
       run: |
         source .venv/bin/activate
-        python -m pytest tests/test_math.py -v --tb=short -p no:cov
-        python -m pytest tests/test_options_properties.py -v --tb=short -p no:cov
-      continue-on-error: false
 
-    - name: Test risk calculations
-      run: |
-        source .venv/bin/activate
-        # Test basic risk calculations (may skip ML-dependent tests on failure)
-        python -m pytest tests/test_regime_aware_risk.py -v --tb=short -p no:cov || {
-          echo "Risk tests failed, checking if it's an ML dependency issue..."
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            echo "Skipping ML-dependent tests on macOS due to scikit-learn issues"
-            exit 0
-          else
-            exit 1
-          fi
-        }
-      continue-on-error: ${{ runner.os == 'macOS' }}
-
-    - name: Test recommendation flow
-      run: |
-        source .venv/bin/activate
-        python -m pytest tests/test_e2e_recommendation_flow.py -v --tb=short -p no:cov
-      continue-on-error: ${{ runner.os == 'macOS' }}
+        if [[ "${{ runner.os }}" == "macOS" ]]; then
+          # Skip ML-dependent tests on macOS
+          python -m pytest tests/test_math.py tests/test_options_properties.py tests/test_e2e_recommendation_flow.py \
+            -v --tb=short -p no:cov -n auto
+        else
+          # Run all tests on Ubuntu
+          python -m pytest tests/test_math.py tests/test_options_properties.py tests/test_regime_aware_risk.py tests/test_e2e_recommendation_flow.py \
+            -v --tb=short -p no:cov -n auto
+        fi
 
     - name: Validate configuration
       run: poetry run python -m src.unity_wheel.utils.validate
@@ -179,11 +148,9 @@ jobs:
       run: |
         # Use the same robust installation as the main test - Ubuntu with ML
         poetry config installer.max-workers 1
-        poetry install --no-interaction --no-ansi --extras "ml" || {
-          echo "Installing with binary-only approach..."
-          poetry run pip install --only-binary=:all: numpy==1.26.4 scipy==1.13.0 scikit-learn==1.4.0
-          poetry install --no-interaction --no-ansi --extras "ml"
-        }
+        # Use same binary-first approach as main test
+        poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
+        poetry install --no-interaction --no-ansi --extras "ml"
       env:
         PIP_PREFER_BINARY: 1
         PIP_ONLY_BINARY: ":all:"

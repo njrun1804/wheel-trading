@@ -1,0 +1,75 @@
+# Fast-fail CI checks that run in parallel
+# Surfaces common failures quickly before running expensive tests
+
+name: Fast Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint & Format"
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Cache pre-commit
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+    - name: Install pre-commit
+      run: pip install pre-commit
+
+    - name: Run pre-commit
+      run: pre-commit run --all-files --show-diff-on-failure
+
+  type-check:
+    runs-on: ubuntu-latest
+    name: "Type Check"
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install minimal deps
+      run: |
+        pip install mypy numpy scipy pandas pydantic types-pytz pandas-stubs
+
+    - name: Type check critical code
+      run: |
+        mypy src/unity_wheel/math/ --ignore-missing-imports
+        mypy src/unity_wheel/risk/ --ignore-missing-imports
+        mypy src/unity_wheel/api/ --ignore-missing-imports
+
+  security:
+    runs-on: ubuntu-latest
+    name: "Security Scan"
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install bandit
+      run: pip install bandit
+
+    - name: Security scan
+      run: bandit -r src/ -ll -i -x tests/
