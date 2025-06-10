@@ -78,28 +78,39 @@ jobs:
         # Configure pip to prefer binary packages
         poetry config installer.max-workers 1
 
-        # Try to install with multiple fallback strategies
-        if ! poetry install --no-interaction --no-ansi; then
-          echo "First install attempt failed, trying binary-only approach..."
-
-          # Install problematic packages with binary-only
-          poetry run pip install --only-binary=:all: numpy==1.26.4 scipy==1.13.0 scikit-learn==1.4.0 || {
-            echo "Binary install failed, trying with conda-forge wheels..."
-            poetry run pip install --index-url https://pypi.org/simple/ --extra-index-url https://conda.org/pypi/simple/ scikit-learn==1.4.0
+        # Use different strategies for macOS vs Ubuntu
+        if [[ "${{ runner.os }}" == "macOS" ]]; then
+          echo "Installing on macOS with fallback for problematic packages..."
+          # Try normal install first
+          if ! poetry install --no-interaction --no-ansi; then
+            echo "Normal install failed, trying without scikit-learn..."
+            # Install everything except scikit-learn
+            poetry run pip install numpy==1.26.4 scipy==1.13.0 pandas==2.2.1 pydantic==2.7.0
+            poetry run pip install python-dotenv==1.0.1 pytz==2024.1 click==8.1.7 rich==13.7.1
+            poetry run pip install aiohttp==3.10.11 cryptography==45.0.4 pyyaml==6.0.2
+            poetry run pip install pydantic-settings==2.6.1 duckdb
+            # Try scikit-learn with binary-only (optional)
+            poetry run pip install --only-binary=:all: scikit-learn==1.4.0 || echo "Skipping scikit-learn on macOS"
+            # Install dev dependencies
+            poetry run pip install pytest==8.1.1 pytest-cov==4.1.0 pytest-xdist==3.5.0
+            poetry run pip install hypothesis==6.98.15 black==24.3.0 flake8==7.0.0 isort==5.13.2
+            poetry run pip install mypy==1.9.0 bandit==1.7.7 pre-commit==3.6.2
+            poetry run pip install types-pytz==2024.1.0.20240203 pandas-stubs==2.2.0.240218
+            poetry run pip install memory-profiler==0.61.0
+          fi
+        else
+          echo "Installing on Ubuntu with full dependency resolution including ML..."
+          poetry install --no-interaction --no-ansi --extras "ml" || {
+            echo "First install attempt failed, trying binary-only approach..."
+            poetry run pip install --only-binary=:all: numpy==1.26.4 scipy==1.13.0 scikit-learn==1.4.0
+            poetry install --no-interaction --no-ansi --extras "ml"
           }
-
-          # Then install the rest
-          poetry install --no-interaction --no-ansi
         fi
-      timeout-minutes: 20
+      timeout-minutes: 15
       env:
         # Force use of wheels when available
         PIP_PREFER_BINARY: 1
         PIP_ONLY_BINARY: ":all:"
-        # Increase timeout for slow compilation
-        PIP_TIMEOUT: 1000
-        # Use conda-forge as backup
-        PIP_EXTRA_INDEX_URL: "https://conda.org/pypi/simple/"
 
     # Core functionality tests only
     - name: Test options mathematics
@@ -165,12 +176,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Use the same robust installation as the main test
+        # Use the same robust installation as the main test - Ubuntu with ML
         poetry config installer.max-workers 1
-        poetry install --no-interaction --no-ansi || {
+        poetry install --no-interaction --no-ansi --extras "ml" || {
           echo "Installing with binary-only approach..."
           poetry run pip install --only-binary=:all: numpy==1.26.4 scipy==1.13.0 scikit-learn==1.4.0
-          poetry install --no-interaction --no-ansi
+          poetry install --no-interaction --no-ansi --extras "ml"
         }
       env:
         PIP_PREFER_BINARY: 1
