@@ -10,6 +10,7 @@ import pytest
 from src.unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.strategy.wheel import WheelParameters
+from src.unity_wheel.utils.random_utils import set_seed
 
 
 class TestWheelBacktester:
@@ -31,6 +32,7 @@ class TestWheelBacktester:
     @pytest.fixture
     def sample_price_data(self):
         """Create sample price data for testing."""
+        set_seed(42)
         dates = pd.date_range("2024-01-01", "2024-03-31", freq="D")
         prices = 35 + np.sin(np.arange(len(dates)) * 0.1) * 5  # Oscillating around $35
 

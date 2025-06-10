@@ -117,6 +117,7 @@ class AdvancedFinancialModeling:
             borrowed_amount: Amount borrowed
             n_simulations: Number of simulation paths
             include_path_dependency: Model path-dependent features
+            random_seed: Seed for deterministic simulation results
 
         Returns:
             MonteCarloResult with statistics
