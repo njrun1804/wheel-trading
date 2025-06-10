@@ -25,13 +25,17 @@ jobs:
       with:
         python-version: "3.12"
 
+    - name: Install minimal dependencies
+      run: pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn duckdb aiohttp pyyaml pydantic-settings
+
     - name: Validate Python syntax
       run: python -m py_compile src/unity_wheel/**/*.py
 
     - name: Check imports
       run: |
-        python -c "import sys; sys.path.insert(0, 'src'); from unity_wheel.api import WheelAdvisor"
-        python -c "import sys; sys.path.insert(0, 'src'); from unity_wheel.math.options import black_scholes_price_validated"
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+        python -c "from unity_wheel.api import WheelAdvisor"
+        python -c "from unity_wheel.math.options import black_scholes_price_validated"
 
   test-matrix:
     needs: smoke-test
@@ -155,7 +159,7 @@ jobs:
 
     - name: Quick install
       run: |
-        pip install numpy scipy pandas pydantic python-dotenv pytz click rich
+        pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn duckdb
         pip install aiohttp pyyaml pydantic-settings
 
     - name: Validate configuration
