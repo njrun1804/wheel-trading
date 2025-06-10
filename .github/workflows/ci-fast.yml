@@ -58,9 +58,9 @@ jobs:
 
     - name: Type check critical code
       run: |
-        mypy src/unity_wheel/math/ --ignore-missing-imports --disable-error-code=no-untyped-def,no-any-return,arg-type
-        mypy src/unity_wheel/risk/ --ignore-missing-imports --disable-error-code=no-untyped-def,no-any-return,arg-type
-        mypy src/unity_wheel/api/ --ignore-missing-imports --disable-error-code=no-untyped-def,no-any-return,arg-type
+        mypy src/unity_wheel/math/ --ignore-missing-imports --disable-error-code=no-untyped-def --disable-error-code=no-any-return --disable-error-code=arg-type
+        mypy src/unity_wheel/risk/ --ignore-missing-imports --disable-error-code=no-untyped-def --disable-error-code=no-any-return --disable-error-code=arg-type
+        mypy src/unity_wheel/api/ --ignore-missing-imports --disable-error-code=no-untyped-def --disable-error-code=no-any-return --disable-error-code=arg-type
 
   security:
     runs-on: ubuntu-latest  # Fallback from larger runners
