@@ -48,11 +48,11 @@ python -c "from unity_trading import __version__; print(f'✅ Unity Wheel v{__ve
 ### Environment Setup Files
 - **`.codex/ENVIRONMENT_SETUP.md`** - Complete setup guide with all options
 - **`.codex/setup_offline.sh`** - Automated setup script (executable)
-- **`.codex/check_environment.py`** - Environment validation tool  
+- **`.codex/check_environment.py`** - Environment validation tool
 - **`.codex/test_config.py`** - Configuration test script
 - **`.codex/activate.sh`** - Environment activation script
 
-### Access Solution Files  
+### Access Solution Files
 - **`.codex/ACCESS_FIXED.md`** - Documents the access solution
 - **`.codex/CODEX_GUIDE.md`** - Comprehensive optimization guide
 - **`.codex/CURRENT_STATE.md`** - Track what's already done
@@ -79,7 +79,7 @@ export USE_PURE_PYTHON=true
 python -c "from unity_trading.strategy.wheel import WheelStrategy; print('Limited mode')"
 ```
 
-### Mode 3: Offline Environment  
+### Mode 3: Offline Environment
 ```bash
 # No internet access
 export OFFLINE_MODE=true
@@ -172,7 +172,7 @@ python -c "from unity_trading.math.options import black_scholes_price_validated 
 
 ### If Data Access Fails
 ```bash
-# Enable mock data mode  
+# Enable mock data mode
 export USE_MOCK_DATA=true
 export DATABENTO_SKIP_VALIDATION=true
 
@@ -186,7 +186,7 @@ python -c "from unity_trading.api.advisor import WheelAdvisor; print('Mock data 
 
 ### You'll Know Setup is Complete When:
 - ✅ `python .codex/check_environment.py` shows all green checkmarks
-- ✅ `python .codex/test_config.py` reports "CONFIGURATION PERFECT"  
+- ✅ `python .codex/test_config.py` reports "CONFIGURATION PERFECT"
 - ✅ `python -c "from unity_trading import __version__; print(__version__)"` works
 - ✅ Basic math calculation succeeds: `bs(100, 100, 1, 0.05, 0.2, 'call')`
 
@@ -200,8 +200,8 @@ python -c "from unity_trading.api.advisor import WheelAdvisor; print('Mock data 
 
 ## 🎉 **READY TO OPTIMIZE!**
 
-**ENVIRONMENT STATUS**: ✅ **COMPLETE**  
-**ACCESS STATUS**: ✅ **UNRESTRICTED**  
+**ENVIRONMENT STATUS**: ✅ **COMPLETE**
+**ACCESS STATUS**: ✅ **UNRESTRICTED**
 **CODEX STATUS**: ✅ **READY TO OPTIMIZE**
 
 You now have:

@@ -99,7 +99,7 @@ for pkg in required:
     except ImportError:
         print(f"❌ {pkg} - CRITICAL!")
 
-# Check optional packages  
+# Check optional packages
 optional = ['numpy', 'pandas', 'scipy', 'pydantic', 'requests']
 for pkg in optional:
     try:
@@ -179,7 +179,7 @@ export USE_PURE_PYTHON=true
 # For pydantic
 export SKIP_VALIDATION=true
 
-# For requests/http libraries  
+# For requests/http libraries
 export USE_MOCK_DATA=true
 
 # For google-cloud
@@ -213,7 +213,7 @@ export DATABENTO_SKIP_VALIDATION=true
 python run.py --portfolio 100000
 ```
 
-### Profile 2: Limited Environment  
+### Profile 2: Limited Environment
 ```bash
 # Basic packages only
 export USE_PURE_PYTHON=true
@@ -237,7 +237,7 @@ python -c "from unity_trading.strategy.wheel import WheelStrategy; print('Offlin
 ```bash
 # Add these to your shell session
 export USE_PURE_PYTHON=true
-export USE_MOCK_DATA=true  
+export USE_MOCK_DATA=true
 export DATABENTO_SKIP_VALIDATION=true
 export SKIP_VALIDATION=true
 export OFFLINE_MODE=true
@@ -264,7 +264,7 @@ python -c "from unity_trading.strategy.wheel import WheelStrategy; w = WheelStra
 - [ ] Python 3.8+ available
 - [ ] Standard library imports work
 - [ ] Math module imports successfully
-- [ ] Strategy module imports successfully  
+- [ ] Strategy module imports successfully
 - [ ] Fallback environment variables set
 - [ ] Test commands execute without errors
 - [ ] Mock data mode enabled if needed
