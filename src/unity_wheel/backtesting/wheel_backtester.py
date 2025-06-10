@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
@@ -15,12 +14,11 @@ from src.config.loader import get_config
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader
 from ..math.options import (
     black_scholes_price_validated,
-    calculate_all_greeks,
-    implied_volatility_validated,
 )
 from ..storage import Storage
 from ..strategy.wheel import WheelParameters, WheelStrategy
 from ..utils import get_logger, timed_operation
+from ..utils.position_sizing import DynamicPositionSizer
 
 logger = get_logger(__name__)
 
@@ -93,6 +91,7 @@ class WheelBacktester:
         self.price_loader = price_loader
         self.config = get_config()
         self.strategy = WheelStrategy()
+        self.position_sizer = DynamicPositionSizer()
 
     @timed_operation(threshold_ms=5000.0)
     async def backtest_strategy(
@@ -101,7 +100,7 @@ class WheelBacktester:
         start_date: datetime,
         end_date: datetime,
         initial_capital: float = 100000,
-        contracts_per_trade: int = 1,
+        contracts_per_trade: Optional[int] = None,
         parameters: Optional[WheelParameters] = None,
     ) -> BacktestResults:
         """
@@ -117,8 +116,9 @@ class WheelBacktester:
             End date for backtest
         initial_capital : float
             Starting portfolio value
-        contracts_per_trade : int
-            Number of contracts per trade
+        contracts_per_trade : Optional[int]
+            Fixed contracts per trade. If ``None``, size dynamically based on
+            portfolio value and risk limits.
         parameters : Optional[WheelParameters]
             Strategy parameters to test
 
@@ -189,6 +189,16 @@ class WheelBacktester:
                 # Calculate realistic premium
                 premium = self._calculate_backtest_premium(current_price, strike, params.target_dte)
 
+                if contracts_per_trade is None:
+                    contracts = self.position_sizer.contracts_for_trade(
+                        portfolio_value=capital,
+                        buying_power=capital,
+                        strike_price=strike,
+                        option_premium=premium * 100,
+                    )
+                else:
+                    contracts = contracts_per_trade
+
                 # Enter short put position
                 active_position = BacktestPosition(
                     symbol=symbol,
@@ -197,8 +207,8 @@ class WheelBacktester:
                     expiration=date + timedelta(days=params.target_dte),
                     entry_date=date,
                     entry_price=current_price,
-                    contracts=contracts_per_trade,
-                    premium_collected=premium * 100 * contracts_per_trade,
+                    contracts=contracts,
+                    premium_collected=premium * 100 * contracts,
                 )
 
                 capital += active_position.premium_collected
