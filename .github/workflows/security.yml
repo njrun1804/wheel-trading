@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 10  # Prevent hanging
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
@@ -28,10 +28,10 @@ jobs:
         config-file: ./.github/codeql/codeql-config.yml
         # Use pre-compiled queries for speed
         queries: security-and-quality
-        
+
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
-      
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
@@ -45,21 +45,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
         cache: 'pip'
-    
+
     - name: Install tools
       run: pip install safety bandit
-    
+
     - name: Run Safety check
       run: |
         pip install poetry
         poetry export -f requirements.txt | safety check --stdin --json > safety-report.json || true
-        
+
         # Parse results
         python -c "
         import json
@@ -73,12 +73,12 @@ jobs:
         else:
             print('✅ No known vulnerabilities')
         "
-    
+
     - name: Run Bandit
       run: |
         bandit -r src/ -f json -o bandit-report.json || true
-        
-        # Parse results  
+
+        # Parse results
         python -c "
         import json
         with open('bandit-report.json') as f:
@@ -92,7 +92,7 @@ jobs:
         else:
             print('✅ No high severity issues')
         "
-    
+
     - name: Upload security reports
       if: always()
       uses: actions/upload-artifact@v4
@@ -102,14 +102,14 @@ jobs:
           safety-report.json
           bandit-report.json
 
-  # Secret scanning  
+  # Secret scanning
   secret-scan:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Full history for secret scanning
-        
+
     - name: TruffleHog OSS
       uses: trufflesecurity/trufflehog@v3.63.2
       with:

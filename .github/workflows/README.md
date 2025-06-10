@@ -136,7 +136,7 @@ Larger runners are billed per-minute, so we:
 To use the new optimized workflows:
 
 1. **For new PRs**: Workflows run automatically
-2. **To disable old workflows**: 
+2. **To disable old workflows**:
    ```bash
    gh workflow disable "CI"
    gh workflow disable "CI Optimized"

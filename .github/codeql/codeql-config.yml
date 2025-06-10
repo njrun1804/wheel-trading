@@ -28,7 +28,7 @@ queries:
 # Limit analysis scope for speed
 query-filters:
   - include:
-      severity: 
+      severity:
         - error
         - warning
       tags:

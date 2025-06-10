@@ -67,7 +67,7 @@ jobs:
       with:
         python-version: "3.12"
         cache: 'pip'
-    
+
     - name: Cache Poetry installation
       uses: actions/cache@v4
       with:
@@ -75,12 +75,12 @@ jobs:
           ~/.local
           ~/.cache/pypoetry
         key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-    
+
     - name: Install Poetry
       run: |
         pip install --upgrade pip poetry==1.8.2
         poetry config virtualenvs.in-project true
-    
+
     - name: Cache dependencies
       uses: actions/cache@v4
       with:
@@ -88,13 +88,13 @@ jobs:
         key: venv-${{ runner.os }}-py3.12-${{ hashFiles('poetry.lock') }}
         restore-keys: |
           venv-${{ runner.os }}-py3.12-
-    
+
     - name: Install dependencies
       run: |
         poetry install --no-interaction --no-ansi
         # Pre-compile Python files for faster test runs
         poetry run python -m compileall src/
-    
+
     - name: Upload venv as artifact
       uses: actions/upload-artifact@v4
       with:
@@ -118,25 +118,25 @@ jobs:
           # Add one macOS test for cross-platform validation
           - os: macos-latest
             test-suite: "unit-fast"
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    
+
     - name: Download venv
       uses: actions/download-artifact@v4
       with:
         name: venv-${{ runner.os }}
         path: .venv
-    
+
     - name: Install system dependencies
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y libopenblas-dev
-    
+
     - name: Run ${{ matrix.test-suite }} tests
       run: |
         source .venv/bin/activate
@@ -154,7 +154,7 @@ jobs:
               -v --tb=short --maxfail=1
             ;;
         esac
-    
+
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v4
@@ -164,7 +164,8 @@ jobs:
 
   # 5. Validate configuration (30 seconds)
   validate:
-    needs: build
+    needs: [build, fast-checks]
+    if: success()
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -181,8 +182,8 @@ jobs:
 
   # 6. Performance benchmarks (1 minute, only on main)
   benchmarks:
-    needs: build
-    if: github.ref == 'refs/heads/main'
+    needs: [build, fast-checks]
+    if: github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
