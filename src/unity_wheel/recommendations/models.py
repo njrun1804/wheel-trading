@@ -2,19 +2,10 @@
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
-
-
-class PositionType(str, Enum):
-    """Valid position types in wheel strategy."""
-
-    STOCK = "stock"
-    COVERED_CALL = "covered_call"
-    CASH_SECURED_PUT = "cash_secured_put"
 
 
 class RecommendationAction(str, Enum):
@@ -26,68 +17,6 @@ class RecommendationAction(str, Enum):
     OPEN_CSP = "open_csp"
     OPEN_CC = "open_cc"
     ADJUST_SIZE = "adjust_size"
-
-
-@dataclass(frozen=True)
-class Greeks:
-    """Option Greeks with validation."""
-
-    delta: float
-    gamma: float
-    theta: float
-    vega: float
-    rho: float
-
-    def __post_init__(self) -> None:
-        """Validate Greeks are within reasonable ranges."""
-        if not -1 <= self.delta <= 1:
-            logger.warning(f"Delta {self.delta} outside valid range [-1, 1]")
-        if self.gamma < 0:
-            logger.warning(f"Gamma {self.gamma} should be non-negative")
-
-
-@dataclass(frozen=True)
-class Position:
-    """Immutable position representation with validation."""
-
-    symbol: str
-    position_type: PositionType
-    quantity: int
-    cost_basis: float
-    current_price: float
-    strike: Optional[float] = None
-    expiry: Optional[datetime] = None
-    premium_collected: Optional[float] = None
-    greeks: Optional[Greeks] = None
-
-    def __post_init__(self) -> None:
-        """Validate position consistency."""
-        if self.position_type in (PositionType.COVERED_CALL, PositionType.CASH_SECURED_PUT):
-            if not self.strike:
-                raise ValueError(f"Options position {self.position_type} requires strike price")
-            if not self.expiry:
-                raise ValueError(f"Options position {self.position_type} requires expiry date")
-
-        logger.debug(f"Created position: {self.symbol} {self.position_type} qty={self.quantity}")
-
-    @property
-    def days_to_expiry(self) -> Optional[int]:
-        """Calculate days to expiry for options."""
-        if self.expiry:
-            return max(0, (self.expiry - datetime.now()).days)
-        return None
-
-    @property
-    def intrinsic_value(self) -> float:
-        """Calculate intrinsic value for options."""
-        if not self.strike:
-            return 0.0
-
-        if self.position_type == PositionType.COVERED_CALL:
-            return max(0, self.current_price - self.strike)
-        elif self.position_type == PositionType.CASH_SECURED_PUT:
-            return max(0, self.strike - self.current_price)
-        return 0.0
 
 
 @dataclass(frozen=True)
@@ -106,10 +35,16 @@ class AccountState:
             logger.warning(f"Negative cash balance: {self.cash}")
         if self.margin_used > self.margin_available:
             logger.error(
-                f"Margin used ({self.margin_used}) exceeds available ({self.margin_available})"
+                "Margin used (%s) exceeds available (%s)",
+                self.margin_used,
+                self.margin_available,
             )
 
-        logger.debug(f"Account state: value=${self.total_value:,.2f}, cash=${self.cash:,.2f}")
+        logger.debug(
+            "Account state: value=$%.2f, cash=$%.2f",
+            self.total_value,
+            self.cash,
+        )
 
     @property
     def buying_power(self) -> float:
