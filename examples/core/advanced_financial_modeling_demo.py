@@ -241,7 +241,7 @@ def demo_var_with_leverage():
     borrowed_amount = 60000
 
     # Calculate VaR
-    var_metrics = modeler.calculate_var_with_leverage(
+    var_metrics, conf = modeler.calculate_var_with_leverage(
         position_size=position_size,
         borrowed_amount=borrowed_amount,
         returns_distribution=returns,

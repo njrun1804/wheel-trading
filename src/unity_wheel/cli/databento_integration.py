@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 async def create_databento_market_snapshot(
     portfolio_value: float,
     ticker: str = "U",
-) -> MarketSnapshot:
+) -> tuple[MarketSnapshot, float]:
     """Create market snapshot from real Databento data.
 
     Args:
@@ -124,14 +124,16 @@ async def create_databento_market_snapshot(
                 implied_volatility=0.45,  # Unity typical IV
                 risk_free_rate=0.05,
             )
+            # Confidence based on number of option candidates
+            confidence = 1.0 if len(option_chain) > 10 else 0.8
 
-            return market_snapshot
+            return market_snapshot, confidence
 
         finally:
             await client.close()
 
 
-def get_market_data_sync(portfolio_value: float, ticker: str = "U") -> MarketSnapshot:
+def get_market_data_sync(portfolio_value: float, ticker: str = "U") -> tuple[MarketSnapshot, float]:
     """Synchronous wrapper for getting market data.
 
     Args:

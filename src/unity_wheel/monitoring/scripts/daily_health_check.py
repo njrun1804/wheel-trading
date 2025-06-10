@@ -116,8 +116,11 @@ async def test_decision_engine() -> dict:
             from src.unity_wheel.data_providers.databento import DatabentoClient
 
             # Get real market data
-            market_data = get_market_data_sync(100000, config.unity.ticker)
-            logger.info(f"Decision engine check using real {config.unity.ticker} data")
+            market_data, confidence = get_market_data_sync(100000, config.unity.ticker)
+            logger.info(
+                f"Decision engine check using real {config.unity.ticker} data",
+                extra={"confidence": confidence},
+            )
             results["issues"].append("Decision engine initialized with real market data")
 
         except Exception as e:
