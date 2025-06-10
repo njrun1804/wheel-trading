@@ -10,13 +10,11 @@ Implements:
 
 import asyncio
 import logging
-import os
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing import AsyncIterator, Dict, List, Optional, Set
+from typing import Dict, List, Optional, Tuple
 
 import databento as db
-import pandas as pd
 from databento_dbn import Schema, SType
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -24,7 +22,6 @@ from src.config.loader import get_config
 from src.unity_wheel.secrets.integration import get_databento_api_key
 from src.unity_wheel.utils.data_validator import die
 from src.unity_wheel.utils.logging import StructuredLogger
-from src.unity_wheel.utils.recovery import RecoveryContext
 
 from ..audit_logger import get_audit_logger
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
@@ -517,8 +514,6 @@ class DatabentoClient:
             max_spread_pct = config.data.quality.max_spread_pct
         if min_size is None:
             min_size = config.data.quality.min_quote_size
-
-        issues = []
 
         # Check spreads
         wide_spreads = 0

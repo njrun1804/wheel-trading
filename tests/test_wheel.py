@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from src.unity_wheel.models.position import Position
-from src.unity_wheel.strategy.wheel import WheelStrategy
 from src.config.loader import get_config
+from src.unity_wheel.models.position import Position
+from src.unity_wheel.strategy.wheel import WheelPosition, WheelStrategy
 
 UNITY = get_config().unity.ticker
 

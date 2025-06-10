@@ -3,23 +3,22 @@
 import asyncio
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
-from src.unity_wheel.data_providers.databento.client import DatentoClient
 from src.config.loader import get_config
-
-UNITY = get_config().unity.ticker
+from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.data_providers.databento.types import (
     DataQuality,
     InstrumentDefinition,
     OptionChain,
     OptionQuote,
     OptionType,
-    UnderlyingPrice,
 )
 from src.unity_wheel.data_providers.databento.validation import DataValidator
+
+UNITY = get_config().unity.ticker
 
 
 class TestDatentoTypes:
