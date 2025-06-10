@@ -160,6 +160,11 @@ class RiskAnalyzer:
         self.accuracy_tracker = AccuracyTracker(self.history_file)
         self._recalibration_needed = False
 
+    # === BEGIN var_calculation ===
+    # PURPOSE: Calculate Value at Risk with multiple methods
+    # INPUTS: Historical returns array, confidence level
+    # OUTPUTS: (VaR value, confidence score)
+    # METHODS: parametric, historical, cornish-fisher
     @timed_operation(threshold_ms=10.0)
     @cached(ttl=timedelta(minutes=15))
     @with_recovery(strategy=RecoveryStrategy.FALLBACK)
@@ -264,6 +269,13 @@ class RiskAnalyzer:
 
         return var, confidence
 
+    # === END var_calculation ===
+
+    # === BEGIN cvar_calculation ===
+    # PURPOSE: Calculate Conditional Value at Risk (Expected Shortfall)
+    # INPUTS: Returns array, confidence level, optional pre-calculated VaR
+    # OUTPUTS: (CVaR value, confidence score)
+    # NOTE: CVaR represents average loss beyond VaR threshold
     @timed_operation(threshold_ms=10.0)
     @cached(ttl=timedelta(minutes=15))
     @with_recovery(strategy=RecoveryStrategy.FALLBACK)
@@ -344,6 +356,13 @@ class RiskAnalyzer:
 
         return cvar, confidence
 
+    # === END cvar_calculation ===
+
+    # === BEGIN kelly_criterion ===
+    # PURPOSE: Calculate optimal position size using Kelly Criterion
+    # INPUTS: Win rate, average win/loss amounts, safety factor
+    # OUTPUTS: (Kelly fraction, confidence score)
+    # SAFETY: Always apply safety_factor (typically 0.5) to avoid overbetting
     @timed_operation(threshold_ms=1.0)
     @cached(ttl=timedelta(hours=1))
     def calculate_kelly_criterion(
@@ -415,6 +434,13 @@ class RiskAnalyzer:
 
         return kelly, confidence
 
+    # === END kelly_criterion ===
+
+    # === BEGIN portfolio_greeks_aggregation ===
+    # PURPOSE: Aggregate Greeks across all positions
+    # INPUTS: List of (Position, Greeks, confidence) tuples
+    # OUTPUTS: (Dict of aggregated Greeks, overall confidence)
+    # TODO(codex): Consider position correlations for more accurate aggregation
     @timed_operation(threshold_ms=5.0)
     def aggregate_portfolio_greeks(
         self,
@@ -449,6 +475,8 @@ class RiskAnalyzer:
 
             if greeks.gamma is not None:
                 # Gamma in shares per $1 move
+                # TODO(codex): Consider position correlations - same underlying positions have correlated gamma risk
+                # CODEX-ENHANCEMENT: Could weight by correlation matrix for multi-asset portfolios
                 total_gamma += qty * multiplier * greeks.gamma
 
             if greeks.vega is not None:
@@ -490,6 +518,8 @@ class RiskAnalyzer:
             confidence *= 1.0 - missing_greeks / len(positions) * 0.2
 
         return aggregated, confidence
+
+    # === END portfolio_greeks_aggregation ===
 
     def estimate_margin_requirement(
         self,

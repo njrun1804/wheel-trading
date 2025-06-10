@@ -1,0 +1,100 @@
+# Codex Configuration for Unity Wheel Trading Bot
+# This file guides AI code generation to match project conventions
+
+language: python
+version: "3.12"
+
+style:
+  temperature: 0.1  # Deterministic for financial calculations
+  max_tokens: 4000
+
+patterns:
+  imports: "absolute only (src.unity_wheel.module)"
+  errors: "specific exceptions with context and recovery"
+  validation: "die() for required data, validate_x() for optional"
+  logging: "structured with extra={} dict containing metrics"
+  returns: "CalculationResult or (value, confidence) tuples"
+
+conventions:
+  - "Every calculation returns confidence scores"
+  - "Risk checks before any trade action"
+  - "Performance tracking on hot paths with @timed_operation"
+  - "Validation with Pydantic models everywhere"
+  - "No bare except clauses - catch specific exceptions"
+  - "Unity ticker from config, never hardcoded"
+  - "Position sizing via DynamicPositionSizer only"
+
+critical_files:
+  - src/unity_wheel/api/advisor.py            # Main recommendation engine
+  - src/unity_wheel/strategy/wheel.py         # Core trading strategy
+  - src/unity_wheel/math/options.py           # Options pricing
+  - src/unity_wheel/risk/analytics.py         # Risk calculations
+  - src/unity_wheel/utils/position_sizing.py  # Position sizing logic
+  - src/config/schema.py                      # Configuration schemas
+  - src/config/loader.py                      # Config loading
+
+testing:
+  framework: pytest
+  strategies:
+    - "Property-based with Hypothesis for math"
+    - "Mocked integration tests for workflows"
+    - "Benchmark tests for performance SLAs"
+  coverage_target: 90%
+
+performance_slas:
+  black_scholes: 0.2ms
+  greeks_calculation: 0.3ms
+  var_calculation: 10ms
+  strike_selection: 100ms
+  full_recommendation: 200ms
+
+architecture_principles:
+  - "Never crash - use @with_recovery decorators"
+  - "Observable - structured logging everywhere"
+  - "Type safe - 100% type hints with mypy strict"
+  - "Cached - expensive calculations cached 5min"
+  - "Validated - all inputs validated before use"
+
+code_generation_examples:
+  error_handling: |
+    try:
+        result = risky_operation()
+    except (ValueError, KeyError) as e:
+        logger.error(f"Operation failed: {e}", extra={"context": locals()})
+        return CalculationResult(np.nan, 0.0, [str(e)])
+
+  validation_pattern: |
+    # For required data
+    market_data = die(get_market_data(), "Market data required")
+
+    # For optional data with fallback
+    config_value = validate_config(raw_value) or default_value
+
+  calculation_pattern: |
+    @timed_operation(threshold_ms=10.0)
+    @cached(ttl=timedelta(minutes=5))
+    @with_recovery(strategy=RecoveryStrategy.FALLBACK)
+    def calculate_metric(inputs: InputModel) -> CalculationResult:
+        # Validate
+        if not inputs.is_valid():
+            return CalculationResult(np.nan, 0.0, ["Invalid inputs"])
+
+        # Calculate
+        value = complex_math(inputs)
+
+        # Score confidence
+        confidence = score_confidence(value, inputs)
+
+        return CalculationResult(value, confidence, [])
+
+  test_pattern: |
+    @given(
+        price=st.floats(min_value=0.01, max_value=1000),
+        strike=st.floats(min_value=0.01, max_value=1000),
+    )
+    def test_calculation_properties(price, strike):
+        result = calculate_metric(price, strike)
+        assert result.confidence >= 0
+        assert result.confidence <= 1
+        if result.confidence > 0.5:
+            assert not np.isnan(result.value)

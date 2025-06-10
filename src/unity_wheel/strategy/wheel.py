@@ -217,10 +217,14 @@ class WheelStrategy:
         prob_itms = prob_result.value
 
         # Calculate scores for all strikes at once
+        # TODO(codex): Should we use squared error for delta distance instead of absolute?
+        # CODEX-PATTERN: Lower scores are better (minimize delta distance, maximize premium)
         delta_scores = np.abs(deltas - target_delta)
         premium_ratios = premiums / strikes
 
         # Combined scoring
+        # CODEX-NOTE: The 0.1 weight prioritizes delta match over premium
+        # CODEX-EXAMPLE: For deeper analysis, see examples/architecture_examples/strike_scoring_tuning.py
         scores = delta_scores + 0.1 * (1 - premium_ratios)
 
         # Apply confidence filtering

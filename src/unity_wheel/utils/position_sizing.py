@@ -85,23 +85,76 @@ class DynamicPositionSizer:
         account_type: str = "margin",
         current_price: Optional[float] = None,
     ) -> PositionSizeResult:
-        """
-        Calculate optimal position size in contracts.
+        """Calculate optimal position size with risk constraints.
 
-        Args:
-            portfolio_value: Total portfolio value
-            buying_power: Available buying power
-            strike_price: Strike price of the option
-            option_premium: Premium per contract (in dollars)
-            kelly_fraction: Kelly criterion fraction (0-1)
-            volatility_factor: Volatility adjustment factor (0.1-3.0)
-            confidence: Confidence in the trade (0-1)
-            existing_exposure: Current portfolio exposure in dollars
-            account_type: Account type ('ira', 'cash', 'margin', 'portfolio')
-            current_price: Current stock price (defaults to strike if not provided)
+        CODEX GUIDANCE:
+        - Always validate inputs with die() for required data
+        - Return PositionSizeResult with confidence score
+        - Log all decisions with structured logging
+        - Check against MAX_POSITION_SIZE constant (20%)
+        - Enforce Unity-specific MAX_CONCURRENT_PUTS (3)
 
-        Returns:
-            PositionSizeResult with calculated contracts and diagnostics
+        Parameters
+        ----------
+        portfolio_value : float
+            Total portfolio value (must be positive)
+        buying_power : float
+            Available buying power (cash + margin available)
+        strike_price : float
+            Strike price of the option (must be positive)
+        option_premium : float
+            Premium per contract in dollars (must be positive)
+        kelly_fraction : float
+            Kelly criterion fraction (0-1, typically 0.25-0.5)
+        volatility_factor : float, optional
+            Volatility adjustment factor (0.1-3.0, default 1.0)
+        confidence : float, optional
+            Confidence in the trade (0-1, default 1.0)
+        existing_exposure : float, optional
+            Current portfolio exposure in dollars (default 0)
+        account_type : str, optional
+            Account type: 'ira', 'cash', 'margin', 'portfolio' (default 'margin')
+        current_price : float, optional
+            Current stock price (defaults to strike if not provided)
+
+        Returns
+        -------
+        PositionSizeResult
+            Contains:
+            - contracts: Number of contracts to trade
+            - position_value: Total position value in dollars
+            - margin_required: Margin requirement
+            - confidence: Confidence in the sizing (0-1)
+            - warnings: List of any warnings
+            - constraints_applied: Dict of which limits were hit
+
+        Examples
+        --------
+        >>> sizer = DynamicPositionSizer(config)
+        >>> result = sizer.calculate_position_size(
+        ...     portfolio_value=100000,
+        ...     buying_power=200000,
+        ...     strike_price=45.0,
+        ...     option_premium=1.50,
+        ...     kelly_fraction=0.25
+        ... )
+        >>> if result.confidence > 0.7:
+        ...     print(f"Trade {result.contracts} contracts")
+
+        See Also
+        --------
+        - patterns/position_sizing_examples.py for more examples
+        - tests/test_position_sizing.py for property tests
+        - RiskAnalytics.calculate_kelly_criterion() for Kelly calculation
+
+        Notes
+        -----
+        The position sizing algorithm applies multiple constraints:
+        1. Kelly criterion with safety factor
+        2. Maximum position size (20% of portfolio)
+        3. Unity-specific limit (3 concurrent puts)
+        4. Account type restrictions (IRA: cash-secured only)
+        5. Margin availability checks
         """
         warnings = []
 
