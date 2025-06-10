@@ -20,7 +20,7 @@ This project uses an automated housekeeping script to enforce file placement and
    ```bash
    ruff format . && black .
    ruff check --fix .
-   mypy --strict unity_trading data_pipeline app --ignore-missing-imports
+   mypy --strict src.unity_wheel data_pipeline app --ignore-missing-imports
    pytest -q
    ```
 4. Commit your changes once all checks pass.
@@ -29,4 +29,4 @@ Refer to `HOUSEKEEPING_GUIDE.md` for full details on the import fix pattern and 
 
 ### Package Structure
 Legacy directories `ml_engine`, `strategy_engine`, and `risk_engine` were removed.
-Use the `unity_trading` package for all imports.
+Use the `src.unity_wheel` package for all imports.

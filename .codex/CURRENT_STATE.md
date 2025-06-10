@@ -25,28 +25,28 @@
 ### 1. Exception Handling
 ```bash
 # Find remaining bare exceptions (if any)
-rg "except\s*:" unity_trading/ data_pipeline/ --type py
-rg "except\s+Exception\s*:" unity_trading/ data_pipeline/ --type py
+rg "except\s*:" src/unity_wheel/ data_pipeline/ --type py
+rg "except\s+Exception\s*:" src/unity_wheel/ data_pipeline/ --type py
 ```
 
 ### 2. Performance Bottlenecks
 ```bash
 # Find non-vectorized loops that could be optimized
-rg "for.*in.*range" unity_trading/ --type py | grep -v test
-rg "for.*strike.*in" unity_trading/ --type py
+rg "for.*in.*range" src/unity_wheel/ --type py | grep -v test
+rg "for.*strike.*in" src/unity_wheel/ --type py
 ```
 
 ### 3. Missing Confidence Scores
 ```bash
 # Check if any calculation functions still lack confidence scores
-rg "def (calculate_|black_scholes)" unity_trading/ --type py -A 5 | grep -v confidence
+rg "def (calculate_|black_scholes)" src/unity_wheel/ --type py -A 5 | grep -v confidence
 ```
 
 ### 4. Hardcoded Values
 ```bash
 # Check for remaining hardcoded values
-rg "(position_size|num_contracts|contract_count)\s*=\s*[0-9]+" unity_trading/ --type py
-rg "volatility.*[<>].*[0-9]" unity_trading/ --type py
+rg "(position_size|num_contracts|contract_count)\s*=\s*[0-9]+" src/unity_wheel/ --type py
+rg "volatility.*[<>].*[0-9]" src/unity_wheel/ --type py
 ```
 
 ## 📊 **CURRENT METRICS**
@@ -62,7 +62,7 @@ rg "volatility.*[<>].*[0-9]" unity_trading/ --type py
 
 | Directory | Symlinks To | Status |
 |-----------|-------------|--------|
-| `unity_trading/` | `src/unity_wheel/` | ✅ 20 modules linked |
+| `src/unity_wheel/` | `src/unity_wheel/` | ✅ 20 modules linked |
 | `data_pipeline/config/` | `src/config/` | ✅ Config access |
 | `data_pipeline/patterns/` | `src/patterns/` | ✅ Pattern access |
 | `tests/` | `tests/` | ✅ Direct access |
@@ -100,7 +100,7 @@ pytest tests/test_wheel.py tests/test_math.py -v
 ./scripts/housekeeping.sh --explain
 
 # Performance test
-python -c "from unity_trading.strategy.wheel import WheelStrategy; w=WheelStrategy(); print('Vectorized methods available')"
+python -c "from src.unity_wheel.strategy.wheel import WheelStrategy; w=WheelStrategy(); print('Vectorized methods available')"
 ```
 
 Your focus should be on finding and optimizing any remaining inefficiencies, not re-implementing what's already been done!

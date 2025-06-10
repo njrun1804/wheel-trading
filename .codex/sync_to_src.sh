@@ -12,8 +12,8 @@ echo "✅ Backup created"
 # Copy optimized code back to src/
 echo "📥 Copying optimized code to src/..."
 
-# Copy main codebase (use unity_trading as the primary)
-cp -r unity_trading/* src/unity_wheel/
+# Copy main codebase
+cp -r src/unity_wheel/* src/unity_wheel/
 
 # Copy config and patterns
 cp -r data_pipeline/config/* src/config/

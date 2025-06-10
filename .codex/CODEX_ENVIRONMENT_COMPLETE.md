@@ -27,7 +27,7 @@ python .codex/test_config.py
 source .codex/activate.sh
 
 # Verify Unity Wheel is ready
-python -c "from unity_trading import __version__; print(f'✅ Unity Wheel v{__version__} ready!')"
+python -c "from src.unity_wheel import __version__; print(f'✅ Unity Wheel v{__version__} ready!')"
 ```
 
 ### Step 3: Start Optimizing! 🎯
@@ -36,9 +36,9 @@ python -c "from unity_trading import __version__; print(f'✅ Unity Wheel v{__ve
 ./.codex/find_optimizations.sh
 
 # Or go straight to the priorities:
-# 1. Replace bare except: handlers → unity_trading/data_providers/
-# 2. Add confidence scores → unity_trading/math/ and unity_trading/risk/
-# 3. Optimize loops → unity_trading/strategy/wheel.py
+# 1. Replace bare except: handlers → src/unity_wheel/data_providers/
+# 2. Add confidence scores → src/unity_wheel/math/ and src/unity_wheel/risk/
+# 3. Optimize loops → src/unity_wheel/strategy/wheel.py
 ```
 
 ---
@@ -69,14 +69,14 @@ python -c "from unity_trading import __version__; print(f'✅ Unity Wheel v{__ve
 ### Mode 1: Full Environment (Preferred)
 ```bash
 # All dependencies available
-python -c "from unity_trading.api.advisor import WheelAdvisor; print('Full mode')"
+python -c "from src.unity_wheel.api.advisor import WheelAdvisor; print('Full mode')"
 ```
 
 ### Mode 2: Limited Environment
 ```bash
 # Some packages missing, using fallbacks
 export USE_PURE_PYTHON=true
-python -c "from unity_trading.strategy.wheel import WheelStrategy; print('Limited mode')"
+python -c "from src.unity_wheel.strategy.wheel import WheelStrategy; print('Limited mode')"
 ```
 
 ### Mode 3: Offline Environment
@@ -84,7 +84,7 @@ python -c "from unity_trading.strategy.wheel import WheelStrategy; print('Limite
 # No internet access
 export OFFLINE_MODE=true
 export USE_MOCK_DATA=true
-python -c "from unity_trading.math.options import black_scholes_price_validated; print('Offline mode')"
+python -c "from src.unity_wheel.math.options import black_scholes_price_validated; print('Offline mode')"
 ```
 
 ### Mode 4: Emergency Mode
@@ -99,18 +99,18 @@ python .codex/minimal_trader.py
 
 ### **HIGH PRIORITY** (Fix These First)
 1. **Exception Handling** - Replace bare `except:` with specific exceptions
-   - `unity_trading/data_providers/` - 8 files need fixing
-   - `unity_trading/auth/` - 3 files need fixing
+   - `src/unity_wheel/data_providers/` - 8 files need fixing
+   - `src/unity_wheel/auth/` - 3 files need fixing
    - Pattern: `except:` → `except (ValueError, KeyError) as e:`
 
 2. **Confidence Scoring** - Add confidence to missing functions
-   - `unity_trading/risk/analytics.py` - Portfolio aggregation functions
-   - `unity_trading/math/options.py` - Any missing calculations
+   - `src/unity_wheel/risk/analytics.py` - Portfolio aggregation functions
+   - `src/unity_wheel/math/options.py` - Any missing calculations
    - Pattern: Return `CalculationResult(value, confidence)` tuples
 
 3. **Performance Optimization** - Vectorize remaining loops
-   - `unity_trading/strategy/wheel.py` - Strike selection loops
-   - `unity_trading/risk/analytics.py` - Portfolio calculations
+   - `src/unity_wheel/strategy/wheel.py` - Strike selection loops
+   - `src/unity_wheel/risk/analytics.py` - Portfolio calculations
    - Pattern: Replace `for` loops with numpy operations
 
 ### **MEDIUM PRIORITY** (Nice to Have)
@@ -125,10 +125,10 @@ python .codex/minimal_trader.py
 ### Quick Validation
 ```bash
 # After making changes, test them
-python -c "from unity_trading.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
+python -c "from src.unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
 
 # Check specific module
-python -c "from unity_trading.risk.analytics import RiskAnalyzer; print('Risk module works')"
+python -c "from src.unity_wheel.risk.analytics import RiskAnalyzer; print('Risk module works')"
 
 # Run targeted test
 pytest tests/test_wheel.py::test_find_optimal_put_strike -v
@@ -139,7 +139,7 @@ pytest tests/test_wheel.py::test_find_optimal_put_strike -v
 # When ready to commit your optimizations
 ./.codex/sync_to_src.sh
 
-# This copies your changes from unity_trading/ back to src/
+# This copies your changes from src/unity_wheel/ back to src/
 # Then commit as normal
 git add src/
 git commit -m "Codex optimizations: [describe your changes]"
@@ -158,7 +158,7 @@ echo $PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
 # Test import
-python -c "from unity_trading import __version__; print(__version__)"
+python -c "from src.unity_wheel import __version__; print(__version__)"
 ```
 
 ### If Math Functions Fail
@@ -167,7 +167,7 @@ python -c "from unity_trading import __version__; print(__version__)"
 export USE_PURE_PYTHON=true
 
 # Test basic calculation
-python -c "from unity_trading.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
+python -c "from src.unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
 ```
 
 ### If Data Access Fails
@@ -177,7 +177,7 @@ export USE_MOCK_DATA=true
 export DATABENTO_SKIP_VALIDATION=true
 
 # Test advisor
-python -c "from unity_trading.api.advisor import WheelAdvisor; print('Mock data mode')"
+python -c "from src.unity_wheel.api.advisor import WheelAdvisor; print('Mock data mode')"
 ```
 
 ---
@@ -187,7 +187,7 @@ python -c "from unity_trading.api.advisor import WheelAdvisor; print('Mock data 
 ### You'll Know Setup is Complete When:
 - ✅ `python .codex/check_environment.py` shows all green checkmarks
 - ✅ `python .codex/test_config.py` reports "CONFIGURATION PERFECT"
-- ✅ `python -c "from unity_trading import __version__; print(__version__)"` works
+- ✅ `python -c "from src.unity_wheel import __version__; print(__version__)"` works
 - ✅ Basic math calculation succeeds: `bs(100, 100, 1, 0.05, 0.2, 'call')`
 
 ### You'll Know Optimizations Are Working When:
@@ -214,7 +214,7 @@ You now have:
 
 **Start optimizing now!** 🚀
 
-Focus on **unity_trading/** directory - you have full write access to all 123 Python files. Make the Unity Wheel Trading Bot even better!
+Focus on **src/unity_wheel/** directory - you have full write access to all 123 Python files. Make the Unity Wheel Trading Bot even better!
 
 ---
 
