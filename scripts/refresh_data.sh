@@ -85,8 +85,9 @@ if os.path.exists(db_path):
             FROM fred_observations
         \"\"\").fetchone()
         print(result[0] if result and result[0] else 999)
-    except:
+    except Exception as exc:
         print(999)
+        print(f'Error checking FRED data: {exc}')
     finally:
         conn.close()
 else:
