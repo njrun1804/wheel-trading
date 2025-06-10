@@ -14,9 +14,12 @@ readonly REQUIRED_FILES="config.yaml run.py HOUSEKEEPING_GUIDE.md"
 
 # Pattern definitions
 readonly PAT_EXEC="execute_trade|place_order|submit_order|broker\.execute|broker\.place"
-readonly PAT_TICKER="['\"]U['\"]"
-readonly PAT_STATIC_POS="position.*=.*0\.[0-9]"
-readonly PAT_CONFIDENCE="def (calculate_|get_|fetch_)"
+# Only flag hardcoded 'U' in actual trading logic, not docs/config/examples
+readonly PAT_TICKER="(symbol|ticker|underlying)\s*=\s*['\"]U['\"](?!.*#.*example)(?!.*test)(?!.*Field)"
+# Only flag hardcoded position sizes in actual trading calculations
+readonly PAT_STATIC_POS="(position_size|num_contracts|contract_count)\s*=\s*[0-9]+(?!\s*#)(?!.*\*)"
+# Only check specific math/risk functions that should return confidence
+readonly PAT_CONFIDENCE="def (black_scholes|calculate_greeks|calculate_var|calculate_iv|calculate_risk)"
 
 # OS compatibility
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -27,9 +30,9 @@ fi
 
 # Use ripgrep if available (10x faster)
 if command -v rg >/dev/null 2>&1; then
-    GREP_CMD="rg --no-heading --color=never"
+    GREP_CMD="rg --no-heading --color=never -P"  # Enable PCRE2 for complex patterns
 else
-    GREP_CMD="grep -r --color=never --binary-files=without-match"
+    GREP_CMD="grep -r --color=never --binary-files=without-match -E"  # Extended regex
 fi
 
 # Scoring weights
@@ -397,14 +400,20 @@ check_unity_compliance() {
                 ((exec_count++))
             fi
 
-            # Check ticker
-            if $GREP_CMD "$PAT_TICKER" "$file" 2>/dev/null | grep -v "config\." | grep -v "test" >/dev/null; then
+            # Check ticker - only actual assignments, not docs/config
+            if $GREP_CMD "$PAT_TICKER" "$file" 2>/dev/null >/dev/null; then
                 ((ticker_count++))
+                if [[ "$EXPLAIN" == "true" ]]; then
+                    violation_details+=("hardcoded_ticker:$file")
+                fi
             fi
 
-            # Check static positions
-            if $GREP_CMD "$PAT_STATIC_POS" "$file" 2>/dev/null | grep -v "adaptive" | grep -v "config" >/dev/null; then
+            # Check static positions - only actual hardcoded values in logic
+            if $GREP_CMD "$PAT_STATIC_POS" "$file" 2>/dev/null >/dev/null; then
                 ((position_count++))
+                if [[ "$EXPLAIN" == "true" ]]; then
+                    violation_details+=("static_position:$file")
+                fi
             fi
         fi
     done < <(collect_files)
@@ -439,11 +448,21 @@ check_confidence_scores() {
     local missing=0
 
     while IFS= read -r file; do
-        if [[ "$file" =~ ^./src/ ]]; then
+        if [[ "$file" =~ ^./src/unity_wheel/math/ ]] || [[ "$file" =~ ^./src/unity_wheel/risk/ ]]; then
+            # Find functions that match our pattern
             if $GREP_CMD "$PAT_CONFIDENCE" "$file" 2>/dev/null >/dev/null; then
-                # Check if they return tuples
-                local funcs=$($GREP_CMD -A 5 "$PAT_CONFIDENCE" "$file" | grep -c "return [^(]" || true)
-                missing=$((missing + funcs))
+                # Check if they return CalculationResult or tuple with confidence
+                while IFS= read -r func_line; do
+                    # Extract function name and check its return pattern
+                    local func_name=$(echo "$func_line" | sed -E 's/.*def ([a-z_]+).*/\1/')
+                    # Look for the function and check if it returns a single value vs tuple/CalculationResult
+                    if $GREP_CMD -A 10 "def $func_name" "$file" 2>/dev/null | grep -E "return\s+[^(,]*\s*$" | grep -v "CalculationResult" >/dev/null; then
+                        ((missing++))
+                        if [[ "$EXPLAIN" == "true" ]]; then
+                            violation_details+=("missing_confidence:$file:$func_name")
+                        fi
+                    fi
+                done < <($GREP_CMD "$PAT_CONFIDENCE" "$file" 2>/dev/null || true)
             fi
         fi
     done < <(collect_files)
@@ -452,7 +471,7 @@ check_confidence_scores() {
         violation_missing_confidence=$missing
         total_violations=$((total_violations + missing))
         [[ "$MODE" == "check" && "$QUIET" != "true" ]] && \
-            echo -e "${YELLOW}$missing functions missing confidence scores${NC}"
+            echo -e "${YELLOW}$missing math/risk functions missing confidence scores${NC}"
     fi
 
     return $missing

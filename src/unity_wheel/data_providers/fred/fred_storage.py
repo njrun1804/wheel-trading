@@ -2,18 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import date as Date, datetime, timedelta
-from typing import Dict, List, Optional, Any
 import json
+from datetime import date as Date
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 from ...storage.storage import Storage
 from ...utils import get_logger, timed_operation
-from .fred_models import (
-    FREDDataset,
-    FREDObservation,
-    FREDSeries,
-    WheelStrategyFREDSeries,
-)
+from .fred_models import FREDDataset, FREDObservation, FREDSeries, WheelStrategyFREDSeries
 
 logger = get_logger(__name__)
 

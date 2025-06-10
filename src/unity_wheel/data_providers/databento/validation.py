@@ -14,13 +14,8 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from .types import (
-    DataQuality,
-    InstrumentDefinition,
-    OptionChain,
-    OptionQuote,
-)
 from ...utils.logging import StructuredLogger
+from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

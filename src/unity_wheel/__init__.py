@@ -4,7 +4,6 @@ from .__version__ import API_VERSION, __version__, __version_info__, get_version
 from .api import MarketSnapshot, Recommendation
 from .api import RiskMetrics as ApiRiskMetrics
 from .api import WheelAdvisor
-from .monitoring.diagnostics import SelfDiagnostics
 from .math import (
     CalculationResult,
     black_scholes_price_validated,
@@ -13,6 +12,7 @@ from .math import (
     probability_itm_validated,
 )
 from .models import Account, Greeks, Position, PositionType
+from .monitoring.diagnostics import SelfDiagnostics
 from .risk import RiskAnalyzer, RiskLevel, RiskLimitBreach, RiskLimits, RiskMetrics
 from .strategy import StrikeRecommendation, WheelParameters, WheelStrategy
 

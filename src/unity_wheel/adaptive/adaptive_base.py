@@ -8,13 +8,13 @@ from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from scipy.stats import norm
 
-from .utils import get_logger
 from ..config.loader import get_config
+from .utils import get_logger
 
 
 class MarketRegime(str, Enum):

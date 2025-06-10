@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 from rich.console import Console
 from rich.table import Table
+
 from ...config.loader import get_config
 
 # Set up logging
@@ -105,7 +106,7 @@ class EnvironmentValidator:
         """Check model functionality."""
         try:
             from .models import Account, Greeks, Position
-            
+
             # Get Unity ticker from config
             config = get_config()
             ticker = config.unity.ticker

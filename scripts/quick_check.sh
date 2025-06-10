@@ -68,13 +68,13 @@ echo ""
 echo "💡 Testing recommendations..."
 python -c "
 from src.unity_wheel.api.advisor import WheelAdvisor
-from src.unity_wheel.models.account import AccountInfo
+from src.unity_wheel.models.account import Account
 from decimal import Decimal
 
 advisor = WheelAdvisor()
 
 # Test small account
-small = AccountInfo(
+small = Account(
     total_value=Decimal('10000'),
     cash_balance=Decimal('10000'),
     buying_power=Decimal('10000')
@@ -83,7 +83,7 @@ r1 = advisor.advise_position(small, [], {})
 print(f'   ✓ Small account: {r1.primary_action.action_type} ({r1.confidence:.0%} confidence)')
 
 # Test margin account
-margin = AccountInfo(
+margin = Account(
     total_value=Decimal('100000'),
     cash_balance=Decimal('20000'),
     buying_power=Decimal('200000')

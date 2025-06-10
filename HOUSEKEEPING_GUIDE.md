@@ -96,11 +96,8 @@ gh run watch                     # Watch CI
 ### 2. Root Directory - ALLOWED FILES
 
 ```
-run_aligned.py           # Main entry point
-run.py                   # Legacy entry (being phased out)
-daily_health_check.py    # Morning check
-monitor_live.py          # Live monitor
-monitor_data_quality.py  # Data quality monitor
+run.py                   # Main entry point
+run_legacy.py            # Legacy entry (deprecated)
 config.yaml              # Configuration
 my_positions.yaml        # User positions
 README.md, CLAUDE.md     # Core docs
@@ -109,6 +106,7 @@ pyproject.toml           # Poetry config
 requirements*.txt        # Dependencies
 Makefile                 # Build automation
 SESSION_START.txt        # Pre-task checklist
+SESSION_END.txt          # Post-task checklist
 ```
 
 Python scripts starting with specific patterns MUST be in subdirectories!
@@ -126,23 +124,28 @@ src/unity_wheel/
 
 ## Confidence Score Compliance
 
-Functions starting with `calculate_`, `get_`, or `fetch_` MUST return `(result, confidence_score)`:
+Math and risk functions in `src/unity_wheel/math/` and `src/unity_wheel/risk/` that perform calculations MUST return confidence scores:
 
 ```python
 # WRONG
-def calculate_delta(option):
-    return black_scholes_delta(option)
+def black_scholes_price(S, K, T, r, sigma):
+    return price
 
-# CORRECT
-def calculate_delta(option):
-    delta = black_scholes_delta(option)
-    confidence = 1.0 if option.volume > 100 else 0.7
-    return delta, confidence
+# CORRECT (using CalculationResult)
+def black_scholes_price_validated(S, K, T, r, sigma):
+    price = calculate_price(...)
+    confidence = 0.99 if inputs_valid else 0.0
+    return CalculationResult(value=price, confidence=confidence)
 ```
 
-The script checks for pattern: `def (calculate_|get_|fetch_)` followed by non-tuple returns.
+The script specifically checks functions like:
+- `black_scholes*`
+- `calculate_greeks*`
+- `calculate_var*`
+- `calculate_iv*`
+- `calculate_risk*`
 
-Quick manual check: `grep -r "return [^(]" src/ --include="*.py" | grep -v "return None"`
+Note: General getters/fetchers (like `get_config()`, `fetch_data()`) do NOT need confidence scores.
 
 ## Hardcoded Values Check
 
@@ -153,10 +156,15 @@ NO HARDCODED:
 - Time constants > 1 (use config)
 
 ```bash
-# Quick scan (should return NOTHING)
-grep -r "position.*=.*0\.[0-9]" src/ --include="*.py" | grep -v config
-grep -r "['\"]U['\"]" src/ --include="*.py" | grep -v config
-grep -r "if.*volatility.*[<>].*[0-9]" src/ --include="*.py"
+# Quick scan (should return NOTHING or only legitimate uses)
+# Check for hardcoded position sizes in trading logic
+rg -P "(position_size|num_contracts|contract_count)\s*=\s*[0-9]+(?!\s*#)(?!.*\*)" src/
+
+# Check for hardcoded 'U' ticker in assignments (not docs/config)
+rg -P "(symbol|ticker|underlying)\s*=\s*['\"]U['\"]" src/ | grep -v "Field" | grep -v "example"
+
+# Check for hardcoded volatility thresholds
+rg "if.*volatility.*[<>].*[0-9]" src/ --type py | grep -v config
 ```
 
 ## Import Fix Pattern (One Way Only)

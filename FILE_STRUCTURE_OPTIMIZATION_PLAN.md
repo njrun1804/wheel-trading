@@ -89,12 +89,12 @@ from datetime import datetime
 
 class DataProvider(ABC):
     """Common interface for all data providers."""
-    
+
     @abstractmethod
     async def get_price_history(self, symbol: str, start: datetime, end: datetime) -> pd.DataFrame:
         """Get historical price data."""
         pass
-    
+
     @abstractmethod
     async def get_option_chain(self, symbol: str, expiration: datetime) -> Dict:
         """Get option chain data."""
@@ -245,10 +245,10 @@ def update_imports(file_path):
     """Update imports in a single file."""
     with open(file_path, 'r') as f:
         content = f.read()
-    
+
     for old, new in IMPORT_MAPPINGS.items():
         content = re.sub(old, new, content)
-    
+
     with open(file_path, 'w') as f:
         f.write(content)
 

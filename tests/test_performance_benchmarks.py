@@ -9,26 +9,27 @@ Ensures that key operations meet performance targets:
 - Memory usage: <100MB for typical portfolio
 """
 
-import time
-import pytest
-import numpy as np
-from decimal import Decimal
-from datetime import datetime, timedelta
-import psutil
 import os
+import time
+from datetime import datetime, timedelta
+from decimal import Decimal
+
+import numpy as np
+import psutil
+import pytest
 from memory_profiler import memory_usage
 
+from src.unity_wheel.api.advisor import WheelAdvisor
+from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
 from src.unity_wheel.math.options import (
     black_scholes_price_validated,
     calculate_all_greeks,
     implied_volatility_validated,
     probability_itm_validated,
 )
+from src.unity_wheel.models.account import Account
+from src.unity_wheel.models.position import OptionType, Position, PositionType
 from src.unity_wheel.risk.analytics import RiskAnalytics
-from src.unity_wheel.api.advisor import WheelAdvisor
-from src.unity_wheel.models.account import AccountInfo
-from src.unity_wheel.models.position import Position, PositionType, OptionType
-from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
 
 
 class TestMathPerformance:
@@ -188,7 +189,7 @@ class TestRecommendationPerformance:
 
     def test_full_recommendation_performance(self):
         """Test complete recommendation generation speed."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("100000"),
             cash_balance=Decimal("50000"),
             buying_power=Decimal("150000"),
@@ -325,7 +326,7 @@ class TestMemoryUsage:
 
             # Get recommendations
             advisor = WheelAdvisor()
-            account = AccountInfo(
+            account = Account(
                 total_value=Decimal("1000000"),
                 cash_balance=Decimal("500000"),
                 buying_power=Decimal("1500000"),

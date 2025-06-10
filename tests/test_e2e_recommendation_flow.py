@@ -5,23 +5,24 @@ simulating real-world usage patterns and failure scenarios.
 """
 
 import os
-import pytest
-from decimal import Decimal
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
 import tempfile
-from unittest.mock import Mock, AsyncMock, patch
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal
+from pathlib import Path
+from unittest.mock import AsyncMock, Mock, patch
 
-from src.unity_wheel.api.advisor import WheelAdvisor
-from src.unity_wheel.models.position import Position, PositionType, OptionType
-from src.unity_wheel.models.account import AccountInfo
-from src.unity_wheel.schwab.types import AccountData, PositionData
-from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
-from src.unity_wheel.storage.storage import Storage
-from src.unity_wheel.auth.auth_client import AuthClient
-from src.unity_wheel.storage.cache.general_cache import CacheManager
+import pytest
+
 from src.config.loader import ConfigurationLoader, get_config_loader
+from src.unity_wheel.api.advisor import WheelAdvisor
+from src.unity_wheel.auth.auth_client import AuthClient
+from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
+from src.unity_wheel.models.account import Account
+from src.unity_wheel.models.position import OptionType, Position, PositionType
 from src.unity_wheel.monitoring.diagnostics import SystemDiagnostics
+from src.unity_wheel.schwab.types import AccountData, PositionData
+from src.unity_wheel.storage.cache.general_cache import CacheManager
+from src.unity_wheel.storage.storage import Storage
 
 
 class TestEndToEndRecommendationFlow:
@@ -193,7 +194,7 @@ class TestEndToEndRecommendationFlow:
             advisor = WheelAdvisor()
 
             # Convert Schwab data to internal models
-            account = AccountInfo(
+            account = Account(
                 total_value=Decimal(
                     str(account_data.total_cash + 40 * 100 * 5 * 1.20)
                 ),  # Cash + position value
@@ -259,7 +260,7 @@ class TestEndToEndRecommendationFlow:
 
             # Should return degraded recommendation
             result = advisor.advise_position(
-                account=AccountInfo(
+                account=Account(
                     total_value=Decimal("100000"),
                     cash_balance=Decimal("100000"),
                     buying_power=Decimal("100000"),
@@ -277,7 +278,7 @@ class TestEndToEndRecommendationFlow:
     @pytest.mark.asyncio
     async def test_margin_call_scenario(self, mock_config, temp_cache_dir):
         """Test recommendations during margin call."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("50000"),
             cash_balance=Decimal("-5000"),  # Negative cash
             buying_power=Decimal("0"),
@@ -315,7 +316,7 @@ class TestEndToEndRecommendationFlow:
     @pytest.mark.asyncio
     async def test_max_position_sizing(self, mock_config, mock_market_data, temp_cache_dir):
         """Test position sizing with 100% capital allocation allowed."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("100000"),
             cash_balance=Decimal("100000"),
             buying_power=Decimal("200000"),  # 2x margin
@@ -367,7 +368,7 @@ class TestEndToEndRecommendationFlow:
             # First call - should hit APIs
             advisor1 = WheelAdvisor()
             result1 = advisor.advise_position(
-                account=AccountInfo(total_value=Decimal("100000")),
+                account=Account(total_value=Decimal("100000")),
                 positions=[],
                 market_data={"U": mock_market_data},
                 config=mock_config.config,
@@ -376,7 +377,7 @@ class TestEndToEndRecommendationFlow:
             # Second call within cache TTL - should use cache
             advisor2 = WheelAdvisor()
             result2 = advisor.advise_position(
-                account=AccountInfo(total_value=Decimal("100000")),
+                account=Account(total_value=Decimal("100000")),
                 positions=[],
                 market_data={"U": mock_market_data},
                 config=mock_config.config,

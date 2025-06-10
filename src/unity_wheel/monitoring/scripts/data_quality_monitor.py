@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Real-time data quality monitoring dashboard."""
 
-import duckdb
 import os
-import time
 import sys
+import time
 from datetime import datetime, timedelta
 from typing import Dict, Tuple
+
+import duckdb
+
 from ....config.loader import get_config
 
 # Get Unity ticker once
 _config = get_config()
 UNITY_TICKER = _config.unity.ticker
+
 
 # Colors for terminal output
 class Colors:

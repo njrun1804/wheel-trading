@@ -122,24 +122,28 @@ python -c "
 import duckdb
 import os
 from datetime import datetime
+from src.config.loader import get_config
+config = get_config()
+ticker = config.unity.ticker
+
 db_path = os.path.expanduser('~/.wheel_trading/cache/wheel_cache.duckdb')
 if os.path.exists(db_path):
     conn = duckdb.connect(db_path, read_only=True)
     try:
         # Get data counts
-        unity_prices = conn.execute('SELECT COUNT(*) FROM price_history WHERE symbol = \"U\"').fetchone()[0]
+        unity_prices = conn.execute(f'SELECT COUNT(*) FROM price_history WHERE symbol = \"{ticker}\"').fetchone()[0]
         options = conn.execute('SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \"options_data\"').fetchone()[0]
         if options > 0:
-            options_count = conn.execute('SELECT COUNT(*) FROM options_data WHERE underlying = \"U\"').fetchone()[0]
+            options_count = conn.execute(f'SELECT COUNT(*) FROM options_data WHERE underlying = \"{ticker}\"').fetchone()[0]
         else:
             options_count = 0
 
         # Get latest dates
-        latest_price = conn.execute('SELECT MAX(date) FROM price_history WHERE symbol = \"U\"').fetchone()[0]
+        latest_price = conn.execute(f'SELECT MAX(date) FROM price_history WHERE symbol = \"{ticker}\"').fetchone()[0]
 
         print(f'Data Summary:')
-        print(f'  Unity prices: {unity_prices} records')
-        print(f'  Unity options: {options_count} contracts')
+        print(f'  {ticker} prices: {unity_prices} records')
+        print(f'  {ticker} options: {options_count} contracts')
         print(f'  Latest price date: {latest_price}')
     finally:
         conn.close()
@@ -164,35 +168,39 @@ python -c "
 import duckdb
 import os
 from datetime import datetime
+from src.config.loader import get_config
+config = get_config()
+ticker = config.unity.ticker
+
 db_path = os.path.expanduser('~/.wheel_trading/cache/wheel_cache.duckdb')
 if os.path.exists(db_path):
     conn = duckdb.connect(db_path, read_only=True)
     try:
         # Unity prices
-        result = conn.execute(\"\"\"
+        result = conn.execute(f\"\"\"
             SELECT MAX(date) as latest,
                    CURRENT_DATE - MAX(date) as days_old,
                    COUNT(*) as records
-            FROM price_history WHERE symbol = 'U'
+            FROM price_history WHERE symbol = '{ticker}'
         \"\"\").fetchone()
         if result[0]:
             status = '✅' if result[1] <= 1 else '⚠️'
-            print(f'{status} Unity prices: {result[0]} ({result[1]} days old, {result[2]} records)')
+            print(f'{status} {ticker} prices: {result[0]} ({result[1]} days old, {result[2]} records)')
 
         # Options data
         if conn.execute('SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \"options_data\"').fetchone()[0] > 0:
-            result = conn.execute(\"\"\"
+            result = conn.execute(f\"\"\"
                 SELECT MAX(timestamp) as latest,
                        COUNT(*) as records
-                FROM options_data WHERE underlying = 'U'
+                FROM options_data WHERE underlying = '{ticker}'
             \"\"\").fetchone()
             if result[0]:
                 latest = datetime.fromisoformat(str(result[0]))
                 days_old = (datetime.now() - latest).days
                 status = '✅' if days_old <= 1 else '⚠️'
-                print(f'{status} Unity options: {latest.strftime(\"%Y-%m-%d %H:%M\")} ({days_old} days old, {result[1]} records)')
+                print(f'{status} {ticker} options: {latest.strftime(\"%Y-%m-%d %H:%M\")} ({days_old} days old, {result[1]} records)')
             else:
-                print('❌ Unity options: No data')
+                print(f'❌ {ticker} options: No data')
 
         # FRED data
         result = conn.execute(\"\"\"

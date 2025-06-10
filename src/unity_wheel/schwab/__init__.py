@@ -1,5 +1,4 @@
 from .auth_client import SchwabClient
-from .fetcher import SchwabDataFetcher, fetch_schwab_data
 from .exceptions import (
     SchwabAuthError,
     SchwabDataError,
@@ -7,6 +6,7 @@ from .exceptions import (
     SchwabNetworkError,
     SchwabRateLimitError,
 )
+from .fetcher import SchwabDataFetcher, fetch_schwab_data
 from .types import PositionType, SchwabAccount, SchwabPosition
 
 __all__ = [

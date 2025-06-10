@@ -4,17 +4,18 @@ User preference: 100% capital allocation with margin usage up to broker limits.
 No cash reserve requirements.
 """
 
-import pytest
-from decimal import Decimal
 from datetime import datetime, timedelta
+from decimal import Decimal
 
-from src.unity_wheel.risk.limits import TradingLimits
-from src.unity_wheel.risk.analytics import RiskAnalytics
-from src.unity_wheel.api.advisor import WheelAdvisor
-from src.unity_wheel.models.account import AccountInfo
-from src.unity_wheel.models.position import Position, PositionType, OptionType
-from src.unity_wheel.strategy.wheel import WheelStrategy
+import pytest
+
 from src.config.loader import ConfigurationLoader
+from src.unity_wheel.api.advisor import WheelAdvisor
+from src.unity_wheel.models.account import Account
+from src.unity_wheel.models.position import OptionType, Position, PositionType
+from src.unity_wheel.risk.analytics import RiskAnalytics
+from src.unity_wheel.risk.limits import TradingLimits
+from src.unity_wheel.strategy.wheel import WheelStrategy
 
 
 class TestAggressiveAllocation:
@@ -44,7 +45,7 @@ class TestAggressiveAllocation:
 
     def test_full_capital_deployment(self, aggressive_config):
         """Test that strategy can deploy 100% of capital."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("100000"),
             cash_balance=Decimal("100000"),
             buying_power=Decimal("200000"),  # 2x margin
@@ -73,7 +74,7 @@ class TestAggressiveAllocation:
 
     def test_margin_utilization(self, aggressive_config):
         """Test margin usage up to 95% of available."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("100000"),
             cash_balance=Decimal("20000"),
             buying_power=Decimal("150000"),
@@ -113,7 +114,7 @@ class TestAggressiveAllocation:
 
     def test_no_cash_reserve_requirement(self, aggressive_config):
         """Test that no cash reserve is required."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("100000"),
             cash_balance=Decimal("0"),  # All capital deployed
             buying_power=Decimal("100000"),  # Margin available
@@ -229,7 +230,7 @@ class TestAggressiveAllocation:
 
     def test_max_contracts_per_trade(self, aggressive_config):
         """Test no artificial limit on contracts per trade."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("1000000"),  # $1M account
             cash_balance=Decimal("500000"),
             buying_power=Decimal("2000000"),  # 2x margin
@@ -253,7 +254,7 @@ class TestAggressiveAllocation:
 
     def test_portfolio_concentration(self, aggressive_config):
         """Test that portfolio can be concentrated in single position."""
-        account = AccountInfo(
+        account = Account(
             total_value=Decimal("100000"),
             cash_balance=Decimal("5000"),
             buying_power=Decimal("150000"),

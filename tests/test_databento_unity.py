@@ -1,17 +1,18 @@
 """Tests for databento_unity utility module."""
 
-import pytest
-from unittest.mock import Mock, patch
-import pandas as pd
-import numpy as np
 from datetime import datetime, timezone
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pandas as pd
+import pytest
 
 from src.unity_wheel.data_providers.databento.unity_utils import (
     chain,
-    spot,
-    get_wheel_candidates,
-    store_options_in_duckdb,
     get_equity_bars,
+    get_wheel_candidates,
+    spot,
+    store_options_in_duckdb,
 )
 
 

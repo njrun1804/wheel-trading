@@ -9,8 +9,10 @@ Tests mathematical properties that must hold regardless of inputs:
 
 import math
 from decimal import Decimal
-from hypothesis import given, strategies as st, assume, settings
+
 import pytest
+from hypothesis import assume, given, settings
+from hypothesis import strategies as st
 
 from src.unity_wheel.math.options import (
     black_scholes_price_validated,
@@ -18,7 +20,6 @@ from src.unity_wheel.math.options import (
     implied_volatility_validated,
     probability_itm_validated,
 )
-
 
 # Custom strategies for reasonable financial values
 spot_price = st.floats(min_value=1.0, max_value=10000.0)

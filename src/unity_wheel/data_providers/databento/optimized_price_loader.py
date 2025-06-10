@@ -13,8 +13,8 @@ from databento_dbn import Schema
 
 from ...storage import Storage
 from ...utils import get_logger
-from .auth_client import DatabentoClient
 from ..config.loader import get_config
+from .auth_client import DatabentoClient
 
 logger = get_logger(__name__)
 

@@ -1,12 +1,10 @@
 """Tests for dynamic position sizing utilities."""
 
-import pytest
 from unittest.mock import Mock, patch
 
-from src.unity_wheel.utils.position_sizing import (
-    DynamicPositionSizer,
-    PositionSizeResult,
-)
+import pytest
+
+from src.unity_wheel.utils.position_sizing import DynamicPositionSizer, PositionSizeResult
 
 
 class TestDynamicPositionSizer:

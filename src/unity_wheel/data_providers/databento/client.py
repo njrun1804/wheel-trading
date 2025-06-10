@@ -20,17 +20,11 @@ import pandas as pd
 from databento_dbn import Schema, SType
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from .types import (
-    DataQuality,
-    InstrumentDefinition,
-    OptionChain,
-    OptionQuote,
-    UnderlyingPrice,
-)
-from ..secrets.integration import get_databento_api_key
+from ....config.loader import get_config
 from ...utils.logging import StructuredLogger
 from ...utils.recovery import RecoveryContext
-from ....config.loader import get_config
+from ..secrets.integration import get_databento_api_key
+from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

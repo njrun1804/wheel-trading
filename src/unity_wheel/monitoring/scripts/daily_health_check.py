@@ -12,13 +12,13 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
+from src.config.loader import get_config
 from src.unity_wheel.analytics import IntegratedDecisionEngine
 from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
 from src.unity_wheel.data_providers.databento import DatabentoClient
 from src.unity_wheel.secrets import SecretManager
 from src.unity_wheel.storage import UnifiedStorage
 from src.unity_wheel.utils import get_logger
-from src.config.loader import get_config
 
 logger = get_logger(__name__)
 

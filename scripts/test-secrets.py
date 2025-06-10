@@ -9,8 +9,8 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.unity_wheel.data_providers.fred.fred_client import FREDClient
 from src.unity_wheel.data_providers.databento.client import DatentoClient
+from src.unity_wheel.data_providers.fred.fred_client import FREDClient
 from src.unity_wheel.schwab.client import SchwabClient
 from src.unity_wheel.secrets import SecretManager
 

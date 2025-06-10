@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, Optional
 
 import aiohttp
 
+from ..storage.auth_storage import SecureTokenStorage
 from ..utils.logging import get_logger
 
 # Cache functionality handled by AuthCache, not general cache
@@ -23,7 +24,6 @@ from .exceptions import (
 )
 from .oauth import OAuth2Handler
 from .rate_limiter import RateLimiter
-from ..storage.auth_storage import SecureTokenStorage
 
 logger = get_logger(__name__)
 

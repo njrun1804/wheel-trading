@@ -10,7 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config.unity import TICKER
 from src.unity_wheel.data_providers.databento import DatabentoClient
-from src.unity_wheel.data_providers.databento.databento_storage_adapter import DatabentoStorageAdapter
+from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
+    DatabentoStorageAdapter,
+)
 from src.unity_wheel.data_providers.databento.integration import DatentoIntegration
 from src.unity_wheel.storage import Storage, StorageConfig
 from src.unity_wheel.utils import setup_structured_logging

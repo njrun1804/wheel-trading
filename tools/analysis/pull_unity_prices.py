@@ -14,9 +14,9 @@ import pandas as pd
 # Add src to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from src.config.loader import get_config
 from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.secrets import SecretManager
-from src.config.loader import get_config
 
 # Constants
 config = get_config()

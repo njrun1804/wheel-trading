@@ -4,12 +4,12 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
-from ..api.types import MarketSnapshot, OptionData
-from .types import InstrumentDefinition, OptionChain
-from ..math.options import implied_volatility_validated
 from ...models.position import Position
 from ...storage import Storage
 from ...utils.logging import StructuredLogger
+from ..api.types import MarketSnapshot, OptionData
+from ..math.options import implied_volatility_validated
+from .types import InstrumentDefinition, OptionChain
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

@@ -12,13 +12,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 
 from ...utils import get_logger, timed_operation
-from .fred_models import (
-    FREDDataPoint,
-    FREDDataset,
-    FREDObservation,
-    FREDSeries,
-    UpdateFrequency,
-)
+from .fred_models import FREDDataPoint, FREDDataset, FREDObservation, FREDSeries, UpdateFrequency
 
 logger = get_logger(__name__)
 

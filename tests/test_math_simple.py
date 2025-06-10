@@ -20,7 +20,7 @@ def test_black_scholes_call():
 
 
 def test_black_scholes_put():
-    """Test Black-Scholes put pricing."""  
+    """Test Black-Scholes put pricing."""
     result = black_scholes_price_validated(S=100, K=100, T=1, r=0.05, sigma=0.2, option_type="put")
     assert abs(result.value - 5.5735) < 0.001
     assert result.confidence > 0.9
@@ -28,7 +28,9 @@ def test_black_scholes_put():
 
 def test_greeks():
     """Test Greeks calculation."""
-    greeks, confidence = calculate_all_greeks(S=100, K=100, T=1, r=0.05, sigma=0.2, option_type="call")
+    greeks, confidence = calculate_all_greeks(
+        S=100, K=100, T=1, r=0.05, sigma=0.2, option_type="call"
+    )
     assert 0.5 < greeks["delta"] < 0.7
     assert greeks["gamma"] > 0
     assert greeks["theta"] < 0
@@ -46,16 +48,13 @@ def test_probability_itm():
 def test_implied_volatility():
     """Test implied volatility calculation."""
     # First calculate a price with known vol
-    price_result = black_scholes_price_validated(S=100, K=100, T=1, r=0.05, sigma=0.2, option_type="call")
-    
+    price_result = black_scholes_price_validated(
+        S=100, K=100, T=1, r=0.05, sigma=0.2, option_type="call"
+    )
+
     # Then recover the vol
     iv_result = implied_volatility_validated(
-        option_price=price_result.value, 
-        S=100, 
-        K=100, 
-        T=1, 
-        r=0.05, 
-        option_type="call"
+        option_price=price_result.value, S=100, K=100, T=1, r=0.05, option_type="call"
     )
     assert abs(iv_result.value - 0.2) < 0.001
     assert iv_result.confidence > 0.9

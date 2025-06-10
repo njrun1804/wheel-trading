@@ -11,9 +11,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ...storage import Storage
 from ...utils import get_logger
+from ..config.loader import get_config
 from .types import InstrumentDefinition, OptionChain, OptionQuote
 from .validation import DataValidator
-from ..config.loader import get_config
 
 logger = get_logger(__name__)
 

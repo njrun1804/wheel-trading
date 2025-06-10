@@ -3,8 +3,9 @@ Simple tests for the Unity adaptive system.
 Verifies core logic without complex dependencies.
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
 
 
 # Test the core adaptive logic directly

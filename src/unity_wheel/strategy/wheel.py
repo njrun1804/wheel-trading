@@ -9,6 +9,7 @@ from typing import List, NamedTuple, Optional, Tuple
 
 import numpy as np
 
+from ...config.loader import get_config
 from ..math import (
     CalculationResult,
     black_scholes_price_validated,
@@ -17,16 +18,9 @@ from ..math import (
 )
 from ..models import Position, PositionType
 from ..risk import RiskAnalyzer
-from ..utils import (
-    RecoveryStrategy,
-    StructuredLogger,
-    get_logger,
-    timed_operation,
-    with_recovery,
-)
 from ..storage.cache.general_cache import cached
+from ..utils import RecoveryStrategy, StructuredLogger, get_logger, timed_operation, with_recovery
 from ..utils.position_sizing import DynamicPositionSizer
-from ...config.loader import get_config
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(__name__)
