@@ -176,6 +176,12 @@ class RiskConfig(BaseModel):
         0.20, ge=0.0, description="Risk weight in objective function"
     )
     kelly_fraction: float = Field(0.50, ge=0.0, le=1.0, description="Kelly criterion fraction")
+    default_kelly_fraction: float = Field(
+        0.25,
+        ge=0.0,
+        le=1.0,
+        description="Default Kelly fraction when not provided",
+    )
     limits: RiskLimits = Field(default_factory=RiskLimits)
     greeks: GreekLimits = Field(default_factory=GreekLimits)
     margin: MarginConfig = Field(default_factory=MarginConfig)
@@ -188,6 +194,8 @@ class RiskConfig(BaseModel):
             raise ValueError("max_position_size cannot exceed max_notional_percent")
         if self.kelly_fraction > 1.0:
             raise ValueError("kelly_fraction should not exceed 1.0 (full Kelly)")
+        if self.default_kelly_fraction > 1.0:
+            raise ValueError("default_kelly_fraction should not exceed 1.0 (full Kelly)")
         return self
 
 
@@ -904,6 +912,8 @@ def validate_config_health(config: WheelConfig) -> Dict[str, Union[bool, str]]:
 
     if config.risk.kelly_fraction > 0.5:
         health["warnings"].append("kelly_fraction > 0.5 (Half-Kelly) increases risk significantly")
+    if config.risk.default_kelly_fraction > 0.5:
+        health["warnings"].append("default_kelly_fraction > 0.5 increases risk significantly")
 
     # Check strategy parameters
     if config.strategy.delta_target > 0.35:

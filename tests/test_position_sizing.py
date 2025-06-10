@@ -1,10 +1,15 @@
 """Tests for dynamic position sizing utilities."""
 
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import pytest
 
-from src.unity_wheel.utils.position_sizing import DynamicPositionSizer, PositionSizeResult
+from src.unity_wheel.utils.position_sizing import (
+    DynamicPositionSizer,
+    PositionSizeResult,
+    calculate_dynamic_contracts,
+)
 
 
 class TestDynamicPositionSizer:
@@ -157,3 +162,54 @@ class TestDynamicPositionSizer:
         # Should have reduced confidence
         assert result.confidence < 0.85
         assert result.contracts < 3  # Very conservative
+
+    def test_calculate_dynamic_contracts_uses_config_default(self, monkeypatch):
+        """Ensure calculate_dynamic_contracts falls back to config value."""
+
+        class DummyRisk:
+            kelly_fraction = 0.5
+            default_kelly_fraction = 0.33
+
+        dummy_config = SimpleNamespace(risk=DummyRisk())
+
+        monkeypatch.setattr(
+            "src.unity_wheel.utils.position_sizing.get_config", lambda: dummy_config
+        )
+
+        captured: dict[str, float] = {}
+
+        def fake_calc(
+            self,
+            portfolio_value: float,
+            buying_power: float,
+            strike_price: float,
+            option_premium: float,
+            kelly_fraction: float,
+            **kwargs,
+        ) -> PositionSizeResult:
+            captured["kelly"] = kelly_fraction
+            return PositionSizeResult(
+                contracts=1,
+                notional_value=100.0,
+                margin_required=50.0,
+                position_pct=0.01,
+                warnings=[],
+                sizing_method="kelly",
+            )
+
+        monkeypatch.setattr(
+            DynamicPositionSizer,
+            "calculate_position_size",
+            fake_calc,
+        )
+
+        contracts = calculate_dynamic_contracts(
+            portfolio_value=10000,
+            buying_power=10000,
+            strike_price=50,
+            option_premium=1.0,
+            kelly_fraction=None,
+        )
+
+        assert contracts == 1
+        assert captured["kelly"] == 0.33

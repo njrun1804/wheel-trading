@@ -79,6 +79,8 @@ risk:
   objective_risk_weight: 0.20
   # Kelly criterion fraction (0.5 = Half-Kelly)
   kelly_fraction: 0.50
+  # Default Kelly fraction used when not specified elsewhere
+  default_kelly_fraction: 0.25
   # Value at Risk limits - aggressive settings for Unity
   limits:
     max_var_95: 0.15  # 15% VaR limit - Unity can move 10%+ daily

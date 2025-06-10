@@ -398,7 +398,7 @@ def calculate_dynamic_contracts(
     buying_power: float,
     strike_price: float,
     option_premium: float,
-    kelly_fraction: float = 0.25,
+    kelly_fraction: Optional[float] = None,
     account_type: str = "margin",
     current_price: Optional[float] = None,
     **kwargs,
@@ -409,6 +409,8 @@ def calculate_dynamic_contracts(
     Returns just the number of contracts.
     """
     sizer = DynamicPositionSizer()
+    if kelly_fraction is None:
+        kelly_fraction = get_config().risk.default_kelly_fraction
     result = sizer.calculate_position_size(
         portfolio_value=portfolio_value,
         buying_power=buying_power,
