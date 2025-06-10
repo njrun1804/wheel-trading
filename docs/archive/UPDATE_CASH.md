@@ -1,3 +1,6 @@
+> **Disclaimer**
+> This is a recommendation system only. No automated trading execution (recommendations only). Always verify recommendations before placing trades. All outputs are for informational purposes only and do not constitute financial advice.
+
 # Update Your Cash Balance
 
 The recommendation shows you have 25.7% cash allocation, but I used a placeholder of $50,000.

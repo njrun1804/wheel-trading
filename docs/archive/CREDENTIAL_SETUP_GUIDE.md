@@ -1,3 +1,6 @@
+> **Disclaimer**
+> This is a recommendation system only. No automated trading execution (recommendations only). Always verify recommendations before placing trades. All outputs are for informational purposes only and do not constitute financial advice.
+
 # Interactive Credential Setup Guide
 
 This guide shows you how to set up and test your API credentials for the Unity Wheel Trading Bot.

@@ -1,3 +1,6 @@
+> **Disclaimer**
+> This is a recommendation system only. No automated trading execution (recommendations only). Always verify recommendations before placing trades. All outputs are for informational purposes only and do not constitute financial advice.
+
 # Secret Management Setup Guide
 
 This guide explains how to set up and use the Unity Wheel Trading Bot's secret management system, which supports both local encrypted storage and Google Cloud Secret Manager.

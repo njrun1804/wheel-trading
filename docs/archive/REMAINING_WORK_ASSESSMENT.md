@@ -1,3 +1,6 @@
+> **Disclaimer**
+> This is a recommendation system only. No automated trading execution (recommendations only). Always verify recommendations before placing trades. All outputs are for informational purposes only and do not constitute financial advice.
+
 # Unity Wheel Trading Bot - Remaining Work Assessment
 
 > **Note**: For detailed implementation steps and exact prompts for each task, see [SEQUENTIAL_IMPLEMENTATION_GUIDE.md](./SEQUENTIAL_IMPLEMENTATION_GUIDE.md)

@@ -1,3 +1,6 @@
+> **Disclaimer**
+> This is a recommendation system only. No automated trading execution (recommendations only). Always verify recommendations before placing trades. All outputs are for informational purposes only and do not constitute financial advice.
+
 # Live Data Safeguards
 
 This document describes all the safeguards in place to ensure the Unity Wheel Trading Bot ONLY uses real market data from Databento, never mock or placeholder values.

@@ -1,3 +1,6 @@
+> **Disclaimer**
+> This is a recommendation system only. No automated trading execution (recommendations only). Always verify recommendations before placing trades. All outputs are for informational purposes only and do not constitute financial advice.
+
 # Authentication Setup Guide
 
 This guide covers setting up authentication for the Unity Wheel Trading Bot with Schwab API integration.
