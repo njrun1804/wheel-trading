@@ -41,14 +41,14 @@ jobs:
       max-parallel: 40  # Utilize high concurrency limit
       matrix:
         include:
-          # Ubuntu with larger runners for faster execution
-          - runner: ubuntu-latest-4-cores
+          # Ubuntu with fallback to standard runners
+          - runner: ubuntu-latest  # Fallback from larger runners
             os: ubuntu-latest
             test-group: math
-          - runner: ubuntu-latest-8-cores
+          - runner: ubuntu-latest  # Fallback from larger runners
             os: ubuntu-latest
             test-group: risk
-          - runner: ubuntu-latest-8-cores
+          - runner: ubuntu-latest  # Fallback from larger runners
             os: ubuntu-latest
             test-group: integration
           # macOS with standard runners
@@ -109,8 +109,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Binary-first for all platforms
-        poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
+        # Binary-first for all platforms including DuckDB
+        poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
         if [[ "${{ matrix.test-group }}" == "risk" ]]; then
           poetry install --no-interaction --extras "ml"
         else
@@ -142,7 +142,7 @@ jobs:
 
   # Quick validation runs in parallel
   validate:
-    runs-on: ubuntu-latest-4-cores  # Use medium runner for faster validation
+    runs-on: ubuntu-latest  # Fallback from larger runners
     name: "Validate Core"
 
     steps:

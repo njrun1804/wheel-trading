@@ -22,7 +22,7 @@ jobs:
       max-parallel: 40  # Utilize high concurrency limit
       matrix:
         include:
-          - runner: ubuntu-latest-8-cores  # Use larger runner for faster builds
+          - runner: ubuntu-latest  # Fall back to standard runner if larger not available
             os: ubuntu-latest
             name: "Development Environment (Claude Code)"
             python-version: "3.12"
@@ -88,14 +88,14 @@ jobs:
 
         # Unified binary-first approach for both platforms
         echo "Installing with binary-first approach..."
-        poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
+        poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
 
         if [[ "${{ runner.os }}" == "macOS" ]]; then
           poetry install --no-interaction --no-ansi
         else
           poetry install --no-interaction --no-ansi --extras "ml"
         fi
-      timeout-minutes: 5
+      timeout-minutes: 8  # Increase timeout for DuckDB compilation
       env:
         # Force use of wheels when available
         PIP_PREFER_BINARY: 1
@@ -128,7 +128,7 @@ jobs:
 
   quick-validation:
     needs: test-environments
-    runs-on: ubuntu-latest-4-cores  # Use medium runner for validation
+    runs-on: ubuntu-latest  # Fallback from larger runners
     name: "Validate Recommendations"
 
     steps:
@@ -157,7 +157,7 @@ jobs:
         # Use the same robust installation as the main test - Ubuntu with ML
         poetry config installer.max-workers 1
         # Use same binary-first approach as main test
-        poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
+        poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
         poetry install --no-interaction --no-ansi --extras "ml"
       env:
         PIP_PREFER_BINARY: 1
