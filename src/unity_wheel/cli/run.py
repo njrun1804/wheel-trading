@@ -101,8 +101,8 @@ def generate_recommendation(
 
     # Get real market data - fail if not available
     try:
-        market_snapshot = get_market_data_sync(portfolio_value, TICKER)
-        logger.info(f"Successfully fetched real Unity market data")
+        market_snapshot, confidence = get_market_data_sync(portfolio_value, TICKER)
+        logger.info("Successfully fetched real Unity market data", extra={"confidence": confidence})
         current_price = market_snapshot.current_price
 
         # CRITICAL: Validate this is real market data, not mock/dummy data

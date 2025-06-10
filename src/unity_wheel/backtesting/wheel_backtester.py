@@ -230,7 +230,7 @@ class WheelBacktester:
         # Risk metrics
         sharpe_ratio = self._calculate_sharpe(returns_series)
         max_drawdown = self._calculate_max_drawdown(equity_curve)
-        var_95, cvar_95 = self._calculate_var_cvar(returns_series)
+        var_95, cvar_95, _ = self._calculate_var_cvar(returns_series)
 
         # Trade statistics
         winning_trades = sum(1 for p in positions if p.realized_pnl > 0)
@@ -582,10 +582,10 @@ class WheelBacktester:
         self,
         returns: pd.Series,
         confidence: float = 0.95,
-    ) -> Tuple[float, float]:
-        """Calculate VaR and CVaR."""
+    ) -> Tuple[float, float, float]:
+        """Calculate VaR and CVaR with a confidence score."""
         if len(returns) < 20:
-            return 0.0, 0.0
+            return 0.0, 0.0, 0.3
 
         # Historical VaR
         var_percentile = (1 - confidence) * 100
@@ -594,7 +594,9 @@ class WheelBacktester:
         # CVaR (expected shortfall)
         cvar = returns[returns <= var].mean()
 
-        return var, cvar
+        conf = 1.0 if len(returns) >= 250 else 0.8
+
+        return var, cvar, conf
 
     def _calculate_max_gap_loss(
         self,

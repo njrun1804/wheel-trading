@@ -251,12 +251,13 @@ class TestWheelBacktester:
         # Create returns series
         returns = pd.Series(np.random.normal(-0.001, 0.02, 100))  # Slight negative drift
 
-        var_95, cvar_95 = backtester._calculate_var_cvar(returns)
+        var_95, cvar_95, conf = backtester._calculate_var_cvar(returns)
 
         # VaR should be negative (loss)
         assert var_95 < 0
         # CVaR should be worse than VaR
         assert cvar_95 < var_95
+        assert 0 <= conf <= 1
 
     def test_max_drawdown_calculation(self, backtester):
         """Test maximum drawdown calculation."""

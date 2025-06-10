@@ -241,7 +241,7 @@ class TestAdvancedFinancialModeling:
         np.random.seed(42)
         returns = np.random.normal(0.001, 0.02, 252)
 
-        metrics = modeler.calculate_risk_adjusted_metrics(
+        metrics, conf = modeler.calculate_risk_adjusted_metrics(
             returns=returns,
             borrowed_capital=20000,
             total_capital=50000,
@@ -257,6 +257,7 @@ class TestAdvancedFinancialModeling:
         # Leverage ratio should be correct
         expected_leverage = 50000 / (50000 - 20000)
         assert abs(metrics.leverage_ratio - expected_leverage) < 0.01
+        assert 0 <= conf <= 1
 
     def test_optimal_capital_structure(self, modeler):
         """Test optimal leverage calculation."""
@@ -276,7 +277,7 @@ class TestAdvancedFinancialModeling:
         np.random.seed(42)
         returns = np.random.standard_t(df=5, size=1000) * 0.03
 
-        var_result = modeler.calculate_var_with_leverage(
+        var_result, conf = modeler.calculate_var_with_leverage(
             position_size=100000,
             borrowed_amount=60000,
             returns_distribution=returns,
@@ -288,6 +289,7 @@ class TestAdvancedFinancialModeling:
         assert "var_leveraged" in var_result
         assert "cvar_basic" in var_result
         assert "cvar_leveraged" in var_result
+        assert 0 <= conf <= 1
 
         # Leveraged VaR should be higher
         assert var_result["var_leveraged"] > var_result["var_basic"]

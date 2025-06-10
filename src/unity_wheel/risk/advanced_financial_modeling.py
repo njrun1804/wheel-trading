@@ -221,7 +221,7 @@ class AdvancedFinancialModeling:
         total_capital: float,
         risk_free_rate: float = 0.05,
         benchmark_returns: Optional[np.ndarray] = None,
-    ) -> RiskAdjustedMetrics:
+    ) -> Tuple[RiskAdjustedMetrics, float]:
         """
         Calculate comprehensive risk-adjusted metrics.
 
@@ -307,7 +307,7 @@ class AdvancedFinancialModeling:
             else float("inf")
         )
 
-        return RiskAdjustedMetrics(
+        metrics = RiskAdjustedMetrics(
             sharpe_ratio=sharpe_ratio,
             sortino_ratio=sortino_ratio,
             calmar_ratio=calmar_ratio,
@@ -321,6 +321,10 @@ class AdvancedFinancialModeling:
             debt_to_equity=debt_to_equity,
             interest_coverage=interest_coverage,
         )
+
+        confidence = 1.0 if len(returns) >= 252 else 0.8
+
+        return metrics, confidence
 
     def optimize_capital_structure(
         self,
@@ -526,7 +530,7 @@ class AdvancedFinancialModeling:
         unity_returns: np.ndarray,
         interest_rates: np.ndarray,
         other_factors: Optional[Dict[str, np.ndarray]] = None,
-    ) -> Dict[str, float]:
+    ) -> Tuple[Dict[str, float], float]:
         """
         Analyze correlation between Unity returns and interest rates.
 
@@ -642,7 +646,7 @@ class AdvancedFinancialModeling:
         model_risk_multiplier = 1.2  # 20% model risk buffer
         worst_case_var = var_leveraged * model_risk_multiplier
 
-        return {
+        results = {
             "var_basic": var_basic,
             "var_leveraged": var_leveraged,
             "cvar_basic": cvar_basic,
@@ -655,3 +659,7 @@ class AdvancedFinancialModeling:
                 net_returns < -0.30
             ),  # 30% loss triggers margin call
         }
+
+        conf = 1.0 if len(returns_distribution) >= 250 else 0.8
+
+        return results, conf
