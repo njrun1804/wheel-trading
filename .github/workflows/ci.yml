@@ -112,19 +112,19 @@ jobs:
         PIP_PREFER_BINARY: 1
         PIP_ONLY_BINARY: ":all:"
 
-    # Core functionality tests only - use python -m pytest to avoid plugin conflicts
+    # Core functionality tests only - disable pytest-cov plugin completely
     - name: Test options mathematics
       run: |
         source .venv/bin/activate
-        python -m pytest tests/test_math.py -v --tb=short
-        python -m pytest tests/test_options_properties.py -v --tb=short
+        python -m pytest tests/test_math.py -v --tb=short -p no:cov
+        python -m pytest tests/test_options_properties.py -v --tb=short -p no:cov
       continue-on-error: false
 
     - name: Test risk calculations
       run: |
         source .venv/bin/activate
         # Test basic risk calculations (may skip ML-dependent tests on failure)
-        python -m pytest tests/test_regime_aware_risk.py -v --tb=short || {
+        python -m pytest tests/test_regime_aware_risk.py -v --tb=short -p no:cov || {
           echo "Risk tests failed, checking if it's an ML dependency issue..."
           if [[ "${{ runner.os }}" == "macOS" ]]; then
             echo "Skipping ML-dependent tests on macOS due to scikit-learn issues"
@@ -138,7 +138,7 @@ jobs:
     - name: Test recommendation flow
       run: |
         source .venv/bin/activate
-        python -m pytest tests/test_e2e_recommendation_flow.py -v --tb=short
+        python -m pytest tests/test_e2e_recommendation_flow.py -v --tb=short -p no:cov
       continue-on-error: ${{ runner.os == 'macOS' }}
 
     - name: Validate configuration
