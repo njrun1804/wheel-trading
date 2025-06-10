@@ -11,7 +11,6 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-import numpy as np
 
 from src.config.loader import get_config
 
@@ -316,6 +315,26 @@ class DynamicPositionSizer:
 
         # Larger accounts: no special restrictions
         return self.max_contracts_absolute, ""
+
+    def contracts_for_trade(
+        self,
+        portfolio_value: float,
+        buying_power: float,
+        strike_price: float,
+        option_premium: float,
+        **kwargs,
+    ) -> int:
+        """Determine contracts using defaults and risk limits."""
+
+        result = self.calculate_position_size(
+            portfolio_value=portfolio_value,
+            buying_power=buying_power,
+            strike_price=strike_price,
+            option_premium=option_premium,
+            kelly_fraction=self.config.risk.kelly_fraction,
+            **kwargs,
+        )
+        return result.contracts
 
     def calculate_from_recommendation(
         self,

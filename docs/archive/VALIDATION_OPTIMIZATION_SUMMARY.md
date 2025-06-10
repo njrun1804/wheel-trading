@@ -34,7 +34,7 @@ Optimized the entire validation infrastructure to match the project reality:
   - `max_position_size`: 1.00 (100% allocation)
   - `max_margin_percent`: 0.95 (up to broker limit)
   - `max_var_95`: 0.50 (50% VaR acceptable)
-  - `max_contracts_per_trade`: 100 (no artificial limit)
+  - `contracts_per_trade`: dynamic (fallback default `1`)
 
 ### 5. Developer Experience
 - **Makefile**: Simplified to `make quick`, `make recommend`, `make test`
