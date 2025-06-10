@@ -13,6 +13,10 @@ import duckdb
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
+from src.unity_wheel.utils import get_logger
+
+logger = get_logger(__name__)
+
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 
 
@@ -228,7 +232,8 @@ def main():
                     )
                     inserted += 1
                     options_added += 1
-                except:
+                except duckdb.Error as exc:
+                    logger.warning("Failed to insert option row: %s", exc)
                     pass  # Skip duplicates
 
             if inserted > 0:
