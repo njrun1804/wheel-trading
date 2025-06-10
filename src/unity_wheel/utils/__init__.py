@@ -25,6 +25,12 @@ from .trading_calendar import (
     get_next_expiry_friday,
     is_trading_day,
 )
+from .trading_calendar_enhancements import (
+    EnhancedTradingCalendar,
+    calculate_theta_decay,
+    get_market_hours,
+    is_near_unity_earnings,
+)
 
 __all__ = [
     # Logging
@@ -48,8 +54,12 @@ __all__ = [
     "get_feature_flags",
     # Trading Calendar
     "SimpleTradingCalendar",
+    "EnhancedTradingCalendar",
     "is_trading_day",
     "get_next_expiry_friday",
     "days_to_expiry",
+    "get_market_hours",
+    "is_near_unity_earnings",
+    "calculate_theta_decay",
     "set_seed",
 ]

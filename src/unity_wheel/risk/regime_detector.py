@@ -4,6 +4,7 @@ Prevents risk skewing from mixing different market regimes.
 """
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Dict, Optional, Tuple
 
 import numpy as np
@@ -11,6 +12,15 @@ import pandas as pd
 from sklearn.mixture import GaussianMixture
 
 from ..utils import get_logger
+
+
+class MarketRegime(str, Enum):
+    """Market regime classification."""
+
+    NORMAL = "NORMAL"
+    VOLATILE = "VOLATILE"
+    STRESSED = "STRESSED"
+
 
 logger = get_logger(__name__)
 
@@ -36,6 +46,15 @@ class RegimeInfo:
             return 0.33  # Third-Kelly
         else:
             return 0.25  # Quarter-Kelly
+
+
+def basic_regime_classify(volatility: float) -> MarketRegime:
+    """Classify market regime using simple volatility thresholds."""
+    if volatility > 0.80:
+        return MarketRegime.STRESSED
+    if volatility > 0.60:
+        return MarketRegime.VOLATILE
+    return MarketRegime.NORMAL
 
 
 class RegimeDetector:

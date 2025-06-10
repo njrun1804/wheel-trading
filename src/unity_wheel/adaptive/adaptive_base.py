@@ -7,7 +7,6 @@ import os
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -15,15 +14,8 @@ from scipy.stats import norm
 
 from src.config.loader import get_config
 
+from ..risk.regime_detector import MarketRegime, basic_regime_classify
 from .utils import get_logger
-
-
-class MarketRegime(str, Enum):
-    """Market regime classification."""
-
-    NORMAL = "NORMAL"
-    VOLATILE = "VOLATILE"
-    STRESSED = "STRESSED"
 
 
 logger = get_logger(__name__)
@@ -62,13 +54,8 @@ class UnityConditions:
 
     @property
     def regime(self) -> MarketRegime:
-        """Simple regime classification based on volatility."""
-        if self.unity_volatility > 0.80:
-            return MarketRegime.STRESSED
-        elif self.unity_volatility > 0.60:
-            return MarketRegime.VOLATILE
-        else:
-            return MarketRegime.NORMAL
+        """Market regime classification based on volatility."""
+        return basic_regime_classify(self.unity_volatility)
 
 
 @dataclass
