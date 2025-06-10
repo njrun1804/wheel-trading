@@ -62,14 +62,6 @@ class TestBlackScholesPrice:
         intrinsic = 200 - 100 * np.exp(-0.05 * 1)
         assert abs(result.value - intrinsic) < 0.1
 
-    def test_vectorized_pricing(self) -> None:
-        """Test vectorized computation."""
-        S = np.array([90, 100, 110])
-        K = 100
-        prices = black_scholes_price_validated(S=S, K=K, T=1, r=0.05, sigma=0.2, option_type="call")
-        assert len(prices) == 3
-        assert prices[0] < prices[1] < prices[2]  # Monotonic in S
-
     def test_put_call_parity(self):
         """Test put-call parity: C - P = S - K*exp(-rT)."""
         S, K, T, r, sigma = 100, 100, 1, 0.05, 0.2

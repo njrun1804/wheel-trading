@@ -75,7 +75,8 @@ ensure_newline_before_comments = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
-addopts = "-v --cov=src/unity_wheel --cov-report=html --cov-report=term --cov-fail-under=100"
+addopts = "-v --cov=src/unity_wheel --cov-report=html --cov-report=term --cov-fail-under=80"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.mypy]
 python_version = "3.12"

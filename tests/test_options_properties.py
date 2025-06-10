@@ -132,22 +132,21 @@ class TestGreeksProperties:
     @settings(max_examples=100)
     def test_delta_bounds(self, spot, strike, time, rate, vol):
         """Test that delta is within theoretical bounds."""
-        greeks_result = calculate_all_greeks(spot, strike, time, rate, vol)
+        call_greeks, call_confidence = calculate_all_greeks(spot, strike, time, rate, vol, "call")
+        put_greeks, put_confidence = calculate_all_greeks(spot, strike, time, rate, vol, "put")
 
-        assume(greeks_result.confidence > 0.8)
+        assume(call_confidence > 0.8 and put_confidence > 0.8)
 
         # Call delta: 0 to 1
         assert (
-            0 <= greeks_result.call_greeks.delta <= 1.01
-        ), f"Call delta out of bounds: {greeks_result.call_greeks.delta}"
+            0 <= call_greeks["delta"] <= 1.01
+        ), f"Call delta out of bounds: {call_greeks['delta']}"
 
         # Put delta: -1 to 0
-        assert (
-            -1.01 <= greeks_result.put_greeks.delta <= 0
-        ), f"Put delta out of bounds: {greeks_result.put_greeks.delta}"
+        assert -1.01 <= put_greeks["delta"] <= 0, f"Put delta out of bounds: {put_greeks['delta']}"
 
         # Put-call delta relationship: delta_call - delta_put = 1
-        delta_diff = greeks_result.call_greeks.delta - greeks_result.put_greeks.delta
+        delta_diff = call_greeks["delta"] - put_greeks["delta"]
         assert abs(delta_diff - 1.0) < 0.01, f"Delta parity violated: {delta_diff:.6f} != 1.0"
 
     @given(
@@ -160,21 +159,18 @@ class TestGreeksProperties:
     @settings(max_examples=100)
     def test_gamma_properties(self, spot, strike, time, rate, vol):
         """Test gamma properties."""
-        greeks_result = calculate_all_greeks(spot, strike, time, rate, vol)
+        call_greeks, call_confidence = calculate_all_greeks(spot, strike, time, rate, vol, "call")
+        put_greeks, put_confidence = calculate_all_greeks(spot, strike, time, rate, vol, "put")
 
-        assume(greeks_result.confidence > 0.8)
+        assume(call_confidence > 0.8 and put_confidence > 0.8)
 
         # Gamma should be positive for both calls and puts
-        assert (
-            greeks_result.call_greeks.gamma >= 0
-        ), f"Call gamma negative: {greeks_result.call_greeks.gamma}"
-        assert (
-            greeks_result.put_greeks.gamma >= 0
-        ), f"Put gamma negative: {greeks_result.put_greeks.gamma}"
+        assert call_greeks["gamma"] >= 0, f"Call gamma negative: {call_greeks['gamma']}"
+        assert put_greeks["gamma"] >= 0, f"Put gamma negative: {put_greeks['gamma']}"
 
         # Call and put gamma should be equal
         assert (
-            abs(greeks_result.call_greeks.gamma - greeks_result.put_greeks.gamma) < 0.0001
+            abs(call_greeks["gamma"] - put_greeks["gamma"]) < 0.0001
         ), "Call and put gamma not equal"
 
     @given(
@@ -187,18 +183,17 @@ class TestGreeksProperties:
     @settings(max_examples=100)
     def test_theta_decay(self, spot, strike, time, rate, vol):
         """Test that theta represents time decay (usually negative)."""
-        greeks_result = calculate_all_greeks(spot, strike, time, rate, vol)
+        call_greeks, call_confidence = calculate_all_greeks(spot, strike, time, rate, vol, "call")
+        put_greeks, put_confidence = calculate_all_greeks(spot, strike, time, rate, vol, "put")
 
-        assume(greeks_result.confidence > 0.8)
+        assume(call_confidence > 0.8 and put_confidence > 0.8)
         assume(time > 7 / 365)  # More than a week to expiry
 
         # For most reasonable cases, theta should be negative
         # (options lose value as time passes)
         # Exception: deep ITM puts can have positive theta due to interest
         if spot > strike * 1.1:  # OTM put
-            assert (
-                greeks_result.put_greeks.theta <= 0.01
-            ), f"OTM put theta positive: {greeks_result.put_greeks.theta}"
+            assert put_greeks["theta"] <= 0.01, f"OTM put theta positive: {put_greeks['theta']}"
 
 
 class TestImpliedVolatility:
