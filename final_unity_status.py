@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Final Unity data status check."""
+"""Report the current status of Unity market data."""
 import os
 
 import duckdb
@@ -7,7 +7,7 @@ import duckdb
 db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 conn = duckdb.connect(db_path, read_only=True)
 
-print("🎯 UNITY DATA COLLECTION - FINAL STATUS")
+print("🎯 UNITY DATA STATUS")
 print("=" * 60)
 
 # Stock data
@@ -23,27 +23,26 @@ print(f"   Records: {stock[0]:,}")
 print(f"   Period: {stock[1]} to {stock[2]}")
 print(f"   Price range: ${stock[3]:.2f} - ${stock[4]:.2f}")
 
-# Options data
-options = conn.execute(
+# Options data (real but currently incomplete)
+try:
+    options = conn.execute(
+        """
+        SELECT
+            COUNT(*) as total,
+            COUNT(DISTINCT trade_date) as days,
+            MIN(trade_date) as start,
+            MAX(trade_date) as end
+        FROM unity_options_ticks
     """
-    SELECT
-        COUNT(*) as total,
-        COUNT(DISTINCT DATE(timestamp)) as days,
-        COUNT(DISTINCT expiration) as exps,
-        COUNT(DISTINCT strike) as strikes,
-        MIN(DATE(timestamp)) as start,
-        MAX(DATE(timestamp)) as end
-    FROM databento_option_chains
-    WHERE symbol = 'U'
-"""
-).fetchone()
+    ).fetchone()
 
-print(f"\n📈 OPTIONS DATA: ✅ COMPLETE")
-print(f"   Records: {options[0]:,} (97.5% of ~13,230 target)")
-print(f"   Trading days: {options[1]}")
-print(f"   Expirations: {options[2]}")
-print(f"   Strikes: {options[3]}")
-print(f"   Period: {options[4]} to {options[5]}")
+    print(f"\n📈 OPTIONS DATA: {'✅ REAL BUT INCOMPLETE' if options[0] else '❌ NONE'}")
+    print(f"   Records: {options[0]:,}")
+    print(f"   Trading days: {options[1]}")
+    if options[0]:
+        print(f"   Period: {options[2]} to {options[3]}")
+except Exception as exc:
+    print(f"\n📈 OPTIONS DATA: Table not found ({exc})")
 
 # Compliance check
 print(f"\n✅ SPECIFICATION COMPLIANCE:")
@@ -54,5 +53,8 @@ print(f"   ✅ Monthly expirations only")
 print(f"   ✅ 21-49 DTE filter applied")
 print(f"   ✅ All required fields populated")
 
-print(f"\n🎉 SUCCESS! Unity dataset is perfect and ready for use!")
+print(
+    "\n⚠️  Stock data complete. Options data download still in progress."
+)
+print("   See UNITY_DATA_STATUS.md for details.")
 conn.close()
