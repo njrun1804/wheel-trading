@@ -8,9 +8,10 @@ You have full access to the Unity Wheel Trading Bot codebase through symbolic li
 ### ✅ **What Works for You:**
 1. **File Access**: Use `unity_trading/` instead of `src/unity_wheel/`
 2. **Testing**: Run `pytest tests/test_*.py -v` - all 106+ tests pass
-3. **Type Checking**: `mypy --strict unity_trading data_pipeline ml_engine strategy_engine risk_engine app --ignore-missing-imports`
+3. **Type Checking**: `mypy --strict unity_trading data_pipeline app --ignore-missing-imports`
 4. **Quick Validation**: `./scripts/housekeeping.sh --unity-check` (2 seconds)
 5. **Auto-Fix**: `./scripts/housekeeping.sh --fix` resolves file placement issues
+6. Legacy packages `ml_engine`, `risk_engine`, and `strategy_engine` have been removed; use modules under `unity_trading`.
 
 ### ❌ **What Blocks You:**
 1. **Execution Code**: Never add `execute_trade()`, `place_order()`, `broker.execute()`
