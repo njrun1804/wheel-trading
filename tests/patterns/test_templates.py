@@ -15,7 +15,7 @@ from hypothesis import assume, given, settings
 from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
-from src.unity_wheel.models.greeks import CalculationResult
+from src.unity_wheel.math.options import CalculationResult
 from src.unity_wheel.models.position import Position
 
 # ============================================================================
@@ -480,7 +480,7 @@ class TestConfidencePropagation:
 
     def test_confidence_based_decisions(self):
         """Test decision making based on confidence."""
-        from src.unity_wheel.models.greeks import CalculationResult
+        from src.unity_wheel.math.options import CalculationResult
 
         # High confidence - proceed
         high_conf_result = CalculationResult(value=100, confidence=0.95)

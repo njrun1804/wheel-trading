@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 
-from ...utils import get_logger
+from src.unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
 

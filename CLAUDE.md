@@ -703,9 +703,9 @@ python -c "from src.unity_wheel.metrics import metrics_collector; print(metrics_
 
 ### Databento (Options Data)
 ```python
-# Quick setup
+# Quick setup (uses Google Cloud Secrets for API key)
 from src.unity_wheel.data_providers.databento import DatabentoClient
-client = DatabentoClient(api_key="xxx")  # Or use DATABENTO_API_KEY env
+client = DatabentoClient()  # Auto-retrieves key from Google Secrets
 
 # Get Unity options
 from src.unity_wheel.data_providers.databento.integration import get_wheel_candidates
@@ -713,6 +713,8 @@ candidates = await get_wheel_candidates("U", target_delta=0.30)
 
 # Debug connection
 python tools/debug/debug_databento.py
+
+# Full documentation: docs/DATABENTO_UNITY_GUIDE.md
 ```
 
 ### Schwab (Account Data)

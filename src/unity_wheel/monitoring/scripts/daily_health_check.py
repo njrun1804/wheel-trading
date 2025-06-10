@@ -112,8 +112,8 @@ async def test_decision_engine() -> dict:
 
         # Try to fetch real Unity data from Databento
         try:
-            from ...cli.databento_integration import get_market_data_sync
-            from ...data_providers.databento import DatabentoClient
+            from src.unity_wheel.cli.databento_integration import get_market_data_sync
+            from src.unity_wheel.data_providers.databento import DatabentoClient
 
             # Get real market data
             market_data = get_market_data_sync(100000, config.unity.ticker)

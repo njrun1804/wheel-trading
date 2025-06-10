@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from unity_wheel.models.position import Position, WheelPosition
+from unity_wheel.models.position import Position
 from unity_wheel.strategy.wheel import WheelStrategy
 
 

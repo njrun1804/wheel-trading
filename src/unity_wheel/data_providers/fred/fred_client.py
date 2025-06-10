@@ -13,10 +13,11 @@ import aiohttp
 from aiohttp import ClientError, ClientSession, ClientTimeout
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ...secrets.integration import get_fred_api_key
-from ...storage.cache.general_cache import cached
-from ...utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
-from ...utils.data_validator import die
+from src.unity_wheel.secrets.integration import get_fred_api_key
+from src.unity_wheel.storage.cache.general_cache import cached
+from src.unity_wheel.utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
+from src.unity_wheel.utils.data_validator import die
+
 from .fred_models import (
     FREDDataset,
     FREDObservation,
