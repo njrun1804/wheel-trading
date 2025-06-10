@@ -12,9 +12,35 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Global env to speed up installations
+env:
+  POETRY_VIRTUALENVS_IN_PROJECT: true
+  PIP_NO_COMPILE: true
+  PIP_DISABLE_PIP_VERSION_CHECK: true
+
 jobs:
   # Fast syntax/import validation
+  # Quick change detection to skip CI on non-code changes
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          code:
+            - 'src/**'
+            - 'tests/**'
+            - 'pyproject.toml'
+            - 'poetry.lock'
+            - '.github/workflows/**'
+
   smoke-test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     name: "Smoke Test"
     steps:

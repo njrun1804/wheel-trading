@@ -1,0 +1,45 @@
+# Optimized CodeQL configuration for faster scans
+name: "Unity Wheel CodeQL config"
+
+# Only scan relevant paths
+paths:
+  - src/unity_wheel
+paths-ignore:
+  - tests
+  - examples
+  - tools
+  - docs
+  - '**/*.md'
+  - '**/__pycache__'
+  - '**/*.pyc'
+
+# Use specific queries for financial applications
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
+  # Custom queries for financial security
+  - id: hardcoded-credentials
+    severity: error
+  - id: sql-injection
+    severity: error
+  - id: sensitive-data-exposure
+    severity: warning
+
+# Limit analysis scope for speed
+query-filters:
+  - include:
+      severity: 
+        - error
+        - warning
+      tags:
+        - security
+        - maintainability
+        - reliability
+  - exclude:
+      tags:
+        - experimental
+        - deprecated
+
+# Performance settings
+max-results-per-rule: 100
+threads: 4

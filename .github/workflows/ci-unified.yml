@@ -1,0 +1,238 @@
+# Unified CI workflow - replaces ci.yml and ci-optimized.yml
+name: CI Unified
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Global env for performance
+env:
+  POETRY_VIRTUALENVS_IN_PROJECT: true
+  PIP_NO_COMPILE: true
+  PIP_DISABLE_PIP_VERSION_CHECK: true
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  # 1. Quick path filter (5 seconds)
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # For better change detection
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          code:
+            - 'src/**'
+            - 'tests/**'
+            - 'pyproject.toml'
+            - 'poetry.lock'
+            - '.github/workflows/**'
+          docs:
+            - '**/*.md'
+            - 'docs/**'
+
+  # 2. Fast format/lint checks (30 seconds, parallel)
+  fast-checks:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run pre-commit
+      uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files --show-diff-on-failure
+
+  # 3. Build and cache dependencies (1 minute)
+  build:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+    
+    - name: Cache Poetry installation
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local
+          ~/.cache/pypoetry
+        key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+    
+    - name: Install Poetry
+      run: |
+        pip install --upgrade pip poetry==1.8.2
+        poetry config virtualenvs.in-project true
+    
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-py3.12-${{ hashFiles('poetry.lock') }}
+        restore-keys: |
+          venv-${{ runner.os }}-py3.12-
+    
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction --no-ansi
+        # Pre-compile Python files for faster test runs
+        poetry run python -m compileall src/
+    
+    - name: Upload venv as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: venv-${{ runner.os }}
+        path: .venv
+        retention-days: 1
+
+  # 4. Parallel test matrix (2 minutes total, runs in parallel)
+  test:
+    needs: [build, fast-checks]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        test-suite:
+          - "unit-fast"      # Math, options, utils (30s)
+          - "unit-slow"      # Risk, analytics (1m)
+          - "integration"    # E2E tests (1.5m)
+        include:
+          # Add one macOS test for cross-platform validation
+          - os: macos-latest
+            test-suite: "unit-fast"
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Download venv
+      uses: actions/download-artifact@v4
+      with:
+        name: venv-${{ runner.os }}
+        path: .venv
+    
+    - name: Install system dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y libopenblas-dev
+    
+    - name: Run ${{ matrix.test-suite }} tests
+      run: |
+        source .venv/bin/activate
+        case "${{ matrix.test-suite }}" in
+          "unit-fast")
+            pytest tests/test_math*.py tests/test_options*.py tests/test_utils*.py \
+              -v --tb=short --maxfail=3 -n auto
+            ;;
+          "unit-slow")
+            pytest tests/test_risk*.py tests/test_analytics*.py tests/test_adaptive*.py \
+              -v --tb=short --maxfail=3 -n auto
+            ;;
+          "integration")
+            pytest tests/test_e2e*.py tests/test_integrated*.py tests/test_wheel.py \
+              -v --tb=short --maxfail=1
+            ;;
+        esac
+    
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.test-suite }}
+        path: pytest-results.xml
+
+  # 5. Validate configuration (30 seconds)
+  validate:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download venv
+      uses: actions/download-artifact@v4
+      with:
+        name: venv-ubuntu-latest
+        path: .venv
+    - name: Validate
+      run: |
+        source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+        python -m src.unity_wheel.utils.validate
+
+  # 6. Performance benchmarks (1 minute, only on main)
+  benchmarks:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download venv
+      uses: actions/download-artifact@v4
+      with:
+        name: venv-ubuntu-latest
+        path: .venv
+    - name: Run performance benchmarks
+      run: |
+        source .venv/bin/activate
+        pytest tests/test_performance_benchmarks.py \
+          --benchmark-only \
+          --benchmark-json=benchmark.json \
+          --benchmark-max-time=0.1
+    - name: Check SLA compliance
+      run: |
+        source .venv/bin/activate
+        python -c "
+        import json
+        with open('benchmark.json') as f:
+            data = json.load(f)
+        # Verify key SLAs
+        for bench in data['benchmarks']:
+            if 'black_scholes' in bench['name']:
+                assert bench['stats']['mean'] < 0.0002, f'Black-Scholes SLA violated: {bench[\"stats\"][\"mean\"]*1000:.2f}ms'
+            if 'greeks' in bench['name']:
+                assert bench['stats']['mean'] < 0.0003, f'Greeks SLA violated: {bench[\"stats\"][\"mean\"]*1000:.2f}ms'
+        print('✅ All performance SLAs met')
+        "
+    - name: Store benchmark result
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'pytest'
+        output-file-path: benchmark.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+
+  # 7. Final status check
+  ci-status:
+    needs: [test, validate]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check status
+      run: |
+        if [[ "${{ needs.test.result }}" == "success" && "${{ needs.validate.result }}" == "success" ]]; then
+          echo "✅ CI passed successfully"
+          exit 0
+        else
+          echo "❌ CI failed"
+          exit 1
+        fi
