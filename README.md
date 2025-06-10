@@ -349,3 +349,5 @@ MIT License - See [LICENSE](LICENSE) for details
 ### Disclaimer
 
 All outputs are for informational purposes only and do not constitute financial advice. Consult a licensed financial professional before making any investment decisions.
+
+**Important:** Outputs from this project are provided solely for informational and educational purposes. They do not constitute personalized financial advice or a solicitation to trade. You are solely responsible for any investment decisions you make.
