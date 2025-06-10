@@ -113,7 +113,7 @@ jobs:
           # Skip if already cached
           command -v gfortran || brew install libomp
         else
-          sudo apt-get update && sudo apt-get install -y libopenblas-base
+          sudo apt-get update && sudo apt-get install -y libopenblas-dev
         fi
 
     - name: Install Poetry

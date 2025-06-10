@@ -14,6 +14,7 @@ from ..models import Account, Position
 from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits, analyze_borrowing_decision
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
+from ..strategy.position_evaluator import PositionEvaluator, SwitchAnalysis
 from ..utils import (
     DecisionLogger,
     RecoveryStrategy,
@@ -99,6 +100,7 @@ class WheelAdvisor:
         self.assignment_model = UnityAssignmentModel()
         self.borrowing_analyzer = BorrowingCostAnalyzer()
         self.financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
+        self.position_evaluator = PositionEvaluator()
 
         logger.info(
             "WheelAdvisor initialized",
@@ -206,6 +208,88 @@ class WheelAdvisor:
                 return self._create_hold_recommendation(
                     f"Low confidence ({confidence:.0%}) in strike selection"
                 )
+
+            # Check if we have existing Unity option positions to compare
+            existing_unity_options = [
+                p
+                for p in current_positions
+                if p.underlying == "U" and p.position_type.value in ["put", "call"]
+            ]
+
+            # If we have existing options, evaluate switching opportunities
+            if existing_unity_options:
+                logger.info(
+                    f"Found {len(existing_unity_options)} existing Unity option positions",
+                    extra={"positions": [str(p) for p in existing_unity_options]},
+                )
+
+                # Prepare available strikes for comparison
+                available_strikes_list = []
+                for option in option_chain:
+                    if option["strike"] and option["bid"] and option["ask"]:
+                        available_strikes_list.append(
+                            (
+                                option["strike"],
+                                option["days_to_expiry"],
+                                option["bid"],
+                                option["ask"],
+                            )
+                        )
+
+                # Analyze each existing position for potential switch
+                best_switch = None
+                for position in existing_unity_options:
+                    # Get current bid/ask for existing position
+                    current_option = next(
+                        (
+                            opt
+                            for opt in option_chain
+                            if opt["strike"] == position.strike
+                            and opt["days_to_expiry"] == self._get_position_dte(position)
+                        ),
+                        None,
+                    )
+
+                    if current_option:
+                        switch_analysis = self.position_evaluator.find_best_switch_opportunity(
+                            current_position=position,
+                            current_bid=current_option["bid"],
+                            current_ask=current_option["ask"],
+                            current_dte=current_option["days_to_expiry"],
+                            available_strikes=available_strikes_list,
+                            underlying_price=current_price,
+                            volatility=volatility,
+                            risk_free_rate=market_snapshot.get("risk_free_rate", 0.05),
+                            contracts=abs(position.quantity),
+                        )
+
+                        if switch_analysis and (
+                            not best_switch
+                            or switch_analysis.switch_benefit > best_switch.switch_benefit
+                        ):
+                            best_switch = switch_analysis
+
+                # If we found a beneficial switch, recommend it
+                if best_switch and best_switch.should_switch:
+                    logger.info(
+                        f"Found beneficial position switch",
+                        extra={
+                            "current_strike": best_switch.current_position.strike,
+                            "new_strike": best_switch.new_position.strike,
+                            "benefit": best_switch.switch_benefit,
+                            "rationale": best_switch.rationale,
+                        },
+                    )
+
+                    # Return switch recommendation
+                    return self._create_switch_recommendation(
+                        best_switch, current_price, market_snapshot["buying_power"]
+                    )
+                else:
+                    # No beneficial switch found, keep existing positions
+                    return self._create_hold_recommendation(
+                        "Keep existing positions - no better alternatives found"
+                    )
 
             # Calculate position size with risk constraints
             account = Account(
@@ -627,3 +711,53 @@ class WheelAdvisor:
             ),
             details={},
         )
+
+    def _create_switch_recommendation(
+        self, switch_analysis: "SwitchAnalysis", current_price: float, buying_power: float
+    ) -> Recommendation:
+        """Create a SWITCH recommendation based on analysis."""
+        # Create risk metrics from the new position
+        new_pos = switch_analysis.new_position
+
+        return Recommendation(
+            action="ADJUST",  # Use standard action
+            rationale=switch_analysis.rationale,
+            confidence=switch_analysis.confidence,
+            risk=RiskMetrics(
+                max_loss=new_pos.max_risk,
+                probability_assignment=new_pos.probability_itm,
+                expected_return=new_pos.annualized_return,
+                edge_ratio=(
+                    new_pos.daily_expected_return / (new_pos.max_risk / buying_power)
+                    if new_pos.max_risk > 0
+                    else 0
+                ),
+                var_95=new_pos.max_risk * 0.05,  # Simplified VaR
+                margin_required=new_pos.strike * 100 * 0.2,  # Basic margin calc
+            ),
+            details={
+                "action_type": "roll_position",
+                "current_strike": switch_analysis.current_position.strike,
+                "current_expiry": switch_analysis.current_position.expiry_days,
+                "new_strike": new_pos.strike,
+                "new_expiry": new_pos.expiry_days,
+                "strike": new_pos.strike,  # For compatibility
+                "contracts": 1,  # Will be calculated later
+                "switch_benefit": switch_analysis.switch_benefit,
+                "switch_cost": switch_analysis.total_switch_cost,
+                "improvement_pct": switch_analysis.switch_benefit_pct,
+            },
+        )
+
+    def _get_position_dte(self, position: Position) -> int:
+        """Get days to expiry for a position."""
+        if not position.expiration:
+            return 0
+
+        # Calculate days from now to expiration
+        from datetime import datetime
+
+        now = datetime.now().date()
+        days_to_expiry = (position.expiration - now).days
+
+        return max(0, days_to_expiry)
