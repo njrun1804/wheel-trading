@@ -21,9 +21,9 @@ from databento_dbn import Schema, SType
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from ....config.loader import get_config
+from ...secrets.integration import get_databento_api_key
 from ...utils.logging import StructuredLogger
 from ...utils.recovery import RecoveryContext
-from ..secrets.integration import get_databento_api_key
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -75,6 +75,9 @@ class DatabentoClient:
         # Instrument mapping cache
         self._instrument_map: Optional[db.common.symbology.InstrumentMap] = None
         self._definitions_cache: Dict[str, InstrumentDefinition] = {}
+
+        # Cache successful symbol formats for Unity
+        self._symbol_format_cache: Dict[str, Tuple[List[str], SType]] = {}
 
         # Live session management
         self._live_sessions: Dict[str, db.Live] = {}
@@ -195,14 +198,91 @@ class DatabentoClient:
                 },
             )
 
-            response = self.client.timeseries.get_range(
-                dataset="OPRA.PILLAR",
-                schema=Schema.DEFINITION,
-                start=start,
-                end=end,
-                symbols=[f"{underlying}.OPT"],  # Options for underlying
-                stype_in=SType.PARENT,  # CRITICAL: Must use PARENT for .OPT symbols
-            )
+            # Check cache for successful symbol format
+            if underlying in self._symbol_format_cache:
+                symbols, stype_in = self._symbol_format_cache[underlying]
+                logger.debug(
+                    "Using cached symbol format",
+                    extra={"underlying": underlying, "symbols": symbols},
+                )
+                symbol_formats = [(symbols, stype_in)]
+            else:
+                # Handle Unity-specific symbol format
+                if underlying == "U":
+                    # Unity requires special handling - try multiple formats
+                    symbol_formats = [
+                        (["U.OPT"], SType.PARENT),  # Standard format first
+                        (["U     *"], SType.PARENT),  # Unity with 5 spaces
+                        (["U"], SType.RAW_SYMBOL),  # Raw symbol
+                    ]
+                else:
+                    symbol_formats = [
+                        ([f"{underlying}.OPT"], SType.PARENT),  # Standard format
+                    ]
+
+            # Try each format until one works
+            last_error = None
+            response = None
+            for symbols, stype_in in symbol_formats:
+                try:
+                    logger.debug(
+                        "Trying symbol format",
+                        extra={"underlying": underlying, "symbols": symbols, "stype": stype_in},
+                    )
+
+                    response = self.client.timeseries.get_range(
+                        dataset="OPRA.PILLAR",
+                        schema=Schema.DEFINITION,
+                        start=start,
+                        end=end,
+                        symbols=symbols,
+                        stype_in=stype_in,
+                    )
+
+                    # Cache successful format
+                    if underlying not in self._symbol_format_cache:
+                        self._symbol_format_cache[underlying] = (symbols, stype_in)
+                        logger.info(
+                            "Cached successful symbol format",
+                            extra={"underlying": underlying, "symbols": symbols},
+                        )
+                    break
+
+                except Exception as e:
+                    last_error = e
+                    if "subscription" in str(e).lower():
+                        # Subscription error - don't retry
+                        logger.error(
+                            "Databento subscription error",
+                            extra={"underlying": underlying, "error": str(e)},
+                        )
+                        if os.getenv("DATABENTO_SKIP_VALIDATION", "false").lower() == "true":
+                            logger.warning(
+                                "Skipping Databento validation due to DATABENTO_SKIP_VALIDATION=true"
+                            )
+                            return []
+                        raise ValueError(
+                            f"Databento subscription does not include options data for {underlying}. "
+                            f"Please check your subscription or use DATABENTO_SKIP_VALIDATION=true"
+                        )
+                    logger.debug(
+                        "Symbol format failed", extra={"symbols": symbols, "error": str(e)}
+                    )
+                    continue
+
+            if response is None:
+                # All formats failed
+                if last_error:
+                    if os.getenv("DATABENTO_SKIP_VALIDATION", "false").lower() == "true":
+                        logger.warning(
+                            f"Could not retrieve options for {underlying}, skipping due to DATABENTO_SKIP_VALIDATION=true"
+                        )
+                        return []
+                    raise ValueError(
+                        f"Could not retrieve options for {underlying}. "
+                        f"Last error: {last_error}. "
+                        f"Try setting DATABENTO_SKIP_VALIDATION=true to skip data validation."
+                    )
 
             # Parse definitions
             definitions = []
@@ -323,21 +403,61 @@ class DatabentoClient:
                 end = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
                 start = end - timedelta(days=1)
 
-            response = self.client.timeseries.get_range(
-                dataset="XNAS.BASIC",  # NASDAQ for most tech stocks
-                schema=Schema.TRADES,
-                start=start,
-                end=end,
-                symbols=[symbol],
-            )
+            # Unity trades on NYSE American, not NASDAQ
+            dataset = "XAMER.BASIC" if symbol == "U" else "XNAS.BASIC"
 
-            # Get last trade
-            last_trade = None
+            try:
+                response = self.client.timeseries.get_range(
+                    dataset=dataset,
+                    schema=Schema.TRADES,
+                    start=start,
+                    end=end,
+                    symbols=[symbol],
+                )
+            except Exception as e:
+                # If NYSE American fails, try composite dataset
+                if symbol == "U" and "dataset" in str(e).lower():
+                    logger.warning(
+                        "NYSE American dataset failed for Unity, trying composite",
+                        extra={"error": str(e)},
+                    )
+                    response = self.client.timeseries.get_range(
+                        dataset="EQUS.MINI",  # Composite mini NBBO
+                        schema=Schema.MBP_1,  # Use MBP-1 for quotes
+                        start=start,
+                        end=end,
+                        symbols=[symbol],
+                    )
+                else:
+                    raise
+
+            # Get last trade or quote
+            last_record = None
             for record in response:
-                last_trade = record
+                last_record = record
 
-            if last_trade:
-                return UnderlyingPrice.from_databento_trade(last_trade, symbol)
+            if last_record:
+                # Check if we got MBP-1 data (from EQUS.MINI fallback)
+                if hasattr(last_record, "bid_px") and hasattr(last_record, "ask_px"):
+                    # Convert MBP-1 record to UnderlyingPrice
+                    from decimal import Decimal
+
+                    bid = Decimal(str(last_record.bid_px / 1e9))  # Convert from fixed-point
+                    ask = Decimal(str(last_record.ask_px / 1e9))
+                    mid = (bid + ask) / 2
+
+                    return UnderlyingPrice(
+                        symbol=symbol,
+                        last_price=mid,
+                        bid=bid,
+                        ask=ask,
+                        timestamp=datetime.fromtimestamp(
+                            last_record.ts_event / 1e9, tz=timezone.utc
+                        ),
+                    )
+                else:
+                    # Standard trade record
+                    return UnderlyingPrice.from_databento_trade(last_record, symbol)
             else:
                 raise ValueError(f"No trades found for {symbol}")
 
