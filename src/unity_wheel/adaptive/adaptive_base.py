@@ -14,6 +14,7 @@ import numpy as np
 from scipy.stats import norm
 
 from src.config.loader import get_config
+from ..math.options import CalculationResult
 
 from .utils import get_logger
 
@@ -423,8 +424,15 @@ class OutcomeTracker:
 
 def calculate_assignment_probability(
     spot_price: float, strike_price: float, dte: int, volatility: float
-) -> float:
-    """Simple probability of finishing ITM for a put."""
+) -> CalculationResult:
+    """Simple probability of finishing ITM for a put.
+
+    Returns
+    -------
+    CalculationResult
+        value: probability of finishing in the money
+        confidence: basic confidence based on time to expiry
+    """
 
     # Log-normal distribution parameters
     time_to_expiry = dte / 365.0
@@ -436,4 +444,7 @@ def calculate_assignment_probability(
     # Probability that price < strike at expiry
     prob_itm = norm.cdf(-d2)
 
-    return prob_itm
+    # Simple confidence heuristic: shorter DTE has slightly lower confidence
+    confidence = 1.0 if dte > 30 else 0.9 if dte > 7 else 0.8
+
+    return CalculationResult(prob_itm, confidence, [])

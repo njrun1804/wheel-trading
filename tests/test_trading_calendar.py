@@ -23,15 +23,15 @@ class TestSimpleTradingCalendar:
         """Test that weekends are not trading days."""
         # Saturday
         saturday = datetime(2025, 1, 11)
-        assert not calendar.is_trading_day(saturday)
+        assert not calendar.is_trading_day(saturday).value
 
         # Sunday
         sunday = datetime(2025, 1, 12)
-        assert not calendar.is_trading_day(sunday)
+        assert not calendar.is_trading_day(sunday).value
 
         # Monday (should be trading day if not holiday)
         monday = datetime(2025, 1, 13)
-        assert calendar.is_trading_day(monday)
+        assert calendar.is_trading_day(monday).value
 
     def test_known_holidays_2025(self, calendar):
         """Test known 2025 holidays."""
@@ -50,7 +50,7 @@ class TestSimpleTradingCalendar:
         ]
 
         for holiday in holidays:
-            assert not calendar.is_trading_day(holiday), f"{holiday} should be a holiday"
+            assert not calendar.is_trading_day(holiday).value, f"{holiday} should be a holiday"
 
     def test_weekend_holiday_observance(self, calendar):
         """Test holidays that fall on weekends are observed on weekdays."""
@@ -58,8 +58,8 @@ class TestSimpleTradingCalendar:
         july_3_2026 = datetime(2026, 7, 3)
         july_4_2026 = datetime(2026, 7, 4)
 
-        assert not calendar.is_trading_day(july_3_2026)  # Observed holiday
-        assert not calendar.is_trading_day(july_4_2026)  # Actual Saturday
+        assert not calendar.is_trading_day(july_3_2026).value  # Observed holiday
+        assert not calendar.is_trading_day(july_4_2026).value  # Actual Saturday
 
     def test_third_friday_calculation(self, calendar):
         """Test third Friday calculations."""
@@ -80,7 +80,7 @@ class TestSimpleTradingCalendar:
         ]
 
         for year, month, expected in third_fridays:
-            result = calendar._get_third_friday(year, month)
+            result = calendar._get_third_friday(year, month).value
             assert (
                 result == expected
             ), f"Third Friday of {month}/{year} should be {expected}, got {result}"
@@ -89,33 +89,33 @@ class TestSimpleTradingCalendar:
         """Test getting next expiry Friday."""
         # Test from middle of month
         jan_10_2025 = datetime(2025, 1, 10)
-        next_expiry = calendar.get_next_expiry_friday(jan_10_2025)
+        next_expiry = calendar.get_next_expiry_friday(jan_10_2025).value
         assert next_expiry.date() == date(2025, 1, 17)
 
         # Test from after third Friday (should get next month)
         jan_20_2025 = datetime(2025, 1, 20)
-        next_expiry = calendar.get_next_expiry_friday(jan_20_2025)
+        next_expiry = calendar.get_next_expiry_friday(jan_20_2025).value
         assert next_expiry.date() == date(2025, 2, 21)
 
         # Test year boundary
         dec_20_2024 = datetime(2024, 12, 20)
-        next_expiry = calendar.get_next_expiry_friday(dec_20_2024)
+        next_expiry = calendar.get_next_expiry_friday(dec_20_2024).value
         assert next_expiry.date() == date(2025, 1, 17)
 
     def test_is_expiry_friday(self, calendar):
         """Test expiry Friday detection."""
         # Third Friday
-        assert calendar.is_expiry_friday(datetime(2025, 1, 17))
+        assert calendar.is_expiry_friday(datetime(2025, 1, 17)).value
 
         # Not third Friday (second Friday)
-        assert not calendar.is_expiry_friday(datetime(2025, 1, 10))
+        assert not calendar.is_expiry_friday(datetime(2025, 1, 10)).value
 
         # Not Friday
-        assert not calendar.is_expiry_friday(datetime(2025, 1, 16))
+        assert not calendar.is_expiry_friday(datetime(2025, 1, 16)).value
 
     def test_get_monthly_expiries(self, calendar):
         """Test getting all monthly expiries for a year."""
-        expiries_2025 = calendar.get_monthly_expiries(2025)
+        expiries_2025 = calendar.get_monthly_expiries(2025).value
         assert len(expiries_2025) == 12
 
         # Check first and last
@@ -123,7 +123,7 @@ class TestSimpleTradingCalendar:
         assert expiries_2025[-1] == date(2025, 12, 19)
 
         # Test specific months
-        q1_expiries = calendar.get_monthly_expiries(2025, months=[1, 2, 3])
+        q1_expiries = calendar.get_monthly_expiries(2025, months=[1, 2, 3]).value
         assert len(q1_expiries) == 3
         assert q1_expiries[0] == date(2025, 1, 17)
         assert q1_expiries[2] == date(2025, 3, 21)
@@ -134,28 +134,28 @@ class TestSimpleTradingCalendar:
         start = datetime(2025, 1, 13)  # Monday
         end = datetime(2025, 1, 17)  # Friday
 
-        trading_days = calendar.get_trading_days_between(start, end)
+        trading_days = calendar.get_trading_days_between(start, end).value
         assert len(trading_days) == 5  # Mon-Fri
 
         # Include MLK Day
         start = datetime(2025, 1, 17)  # Friday
         end = datetime(2025, 1, 21)  # Tuesday (Mon is MLK Day)
 
-        trading_days = calendar.get_trading_days_between(start, end)
+        trading_days = calendar.get_trading_days_between(start, end).value
         assert len(trading_days) == 2  # Friday and Tuesday only
 
     def test_days_to_next_expiry(self, calendar):
         """Test calculating days to expiration."""
         # From Jan 10 to Jan 17 (third Friday)
         jan_10 = datetime(2025, 1, 10)
-        days = calendar.days_to_next_expiry(jan_10)
+        days = calendar.days_to_next_expiry(jan_10).value
 
         # Should be 5 trading days (Mon 13, Tue 14, Wed 15, Thu 16, Fri 17)
         assert days == 5
 
         # From Jan 17 (expiry day) should get next month
         jan_17 = datetime(2025, 1, 17)
-        days = calendar.days_to_next_expiry(jan_17)
+        days = calendar.days_to_next_expiry(jan_17).value
 
         # Count trading days from Jan 17 to Feb 21
         # Excluding MLK Day (Jan 20) and Presidents Day (Feb 17)
@@ -165,25 +165,25 @@ class TestSimpleTradingCalendar:
         """Test getting next/previous trading days."""
         # From Friday to next Monday
         friday = datetime(2025, 1, 10)
-        next_day = calendar.get_next_trading_day(friday)
+        next_day = calendar.get_next_trading_day(friday).value
         assert next_day.date() == date(2025, 1, 13)
 
         # From Monday to previous Friday
         monday = datetime(2025, 1, 13)
-        prev_day = calendar.get_previous_trading_day(monday)
+        prev_day = calendar.get_previous_trading_day(monday).value
         assert prev_day.date() == date(2025, 1, 10)
 
         # Skip over holiday (MLK Day)
         friday_before_mlk = datetime(2025, 1, 17)
-        next_day = calendar.get_next_trading_day(friday_before_mlk)
+        next_day = calendar.get_next_trading_day(friday_before_mlk).value
         assert next_day.date() == date(2025, 1, 21)  # Tuesday
 
     def test_convenience_functions(self):
         """Test module-level convenience functions."""
         # Test is_trading_day
-        assert not is_trading_day(datetime(2025, 1, 1))  # New Year's
-        assert is_trading_day(datetime(2025, 1, 2))  # Jan 2
+        assert not is_trading_day(datetime(2025, 1, 1)).value  # New Year's
+        assert is_trading_day(datetime(2025, 1, 2)).value  # Jan 2
 
         # Test get_next_expiry_friday
-        next_expiry = get_next_expiry_friday(datetime(2025, 1, 10))
+        next_expiry = get_next_expiry_friday(datetime(2025, 1, 10)).value
         assert next_expiry.date() == date(2025, 1, 17)

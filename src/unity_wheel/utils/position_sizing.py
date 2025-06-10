@@ -15,6 +15,7 @@ from src.config.loader import get_config
 
 from ..risk.unity_margin import UnityMarginCalculator
 from .logging import StructuredLogger
+from ..math.options import CalculationResult
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -402,11 +403,14 @@ def calculate_dynamic_contracts(
     account_type: str = "margin",
     current_price: Optional[float] = None,
     **kwargs,
-) -> int:
-    """
-    Simple interface for dynamic contract calculation.
+) -> CalculationResult:
+    """Simple interface for dynamic contract calculation.
 
-    Returns just the number of contracts.
+    Returns
+    -------
+    CalculationResult
+        value: number of contracts
+        confidence: confidence from position sizing result
     """
     sizer = DynamicPositionSizer()
     result = sizer.calculate_position_size(
@@ -419,4 +423,4 @@ def calculate_dynamic_contracts(
         current_price=current_price,
         **kwargs,
     )
-    return result.contracts
+    return CalculationResult(result.contracts, result.confidence, result.warnings)

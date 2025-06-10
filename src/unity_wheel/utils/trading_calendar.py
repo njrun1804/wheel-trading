@@ -8,6 +8,8 @@ import calendar
 from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Set, Union
 
+from ..math.options import CalculationResult
+
 
 class SimpleTradingCalendar:
     """Simple US equity market trading calendar.
@@ -131,7 +133,7 @@ class SimpleTradingCalendar:
         self._holiday_cache[year] = holidays
         return holidays
 
-    def is_trading_day(self, check_date: Union[datetime, date]) -> bool:
+    def is_trading_day(self, check_date: Union[datetime, date]) -> CalculationResult:
         """Check if a given date is a trading day.
 
         Args:
@@ -146,13 +148,13 @@ class SimpleTradingCalendar:
 
         # Check weekend
         if check_date.weekday() >= 5:  # Saturday = 5, Sunday = 6
-            return False
+            return CalculationResult(False, 1.0, [])
 
         # Check holidays
         holidays = self._get_holidays_for_year(check_date.year)
-        return check_date not in holidays
+        return CalculationResult(check_date not in holidays, 1.0, [])
 
-    def get_next_trading_day(self, from_date: datetime) -> datetime:
+    def get_next_trading_day(self, from_date: datetime) -> CalculationResult:
         """Get the next trading day from a given date.
 
         Args:
@@ -162,11 +164,11 @@ class SimpleTradingCalendar:
             Next trading day
         """
         next_day = from_date + timedelta(days=1)
-        while not self.is_trading_day(next_day):
+        while not self.is_trading_day(next_day).value:
             next_day += timedelta(days=1)
-        return next_day
+        return CalculationResult(next_day, 1.0, [])
 
-    def get_previous_trading_day(self, from_date: datetime) -> datetime:
+    def get_previous_trading_day(self, from_date: datetime) -> CalculationResult:
         """Get the previous trading day from a given date.
 
         Args:
@@ -176,11 +178,13 @@ class SimpleTradingCalendar:
             Previous trading day
         """
         prev_day = from_date - timedelta(days=1)
-        while not self.is_trading_day(prev_day):
+        while not self.is_trading_day(prev_day).value:
             prev_day -= timedelta(days=1)
-        return prev_day
+        return CalculationResult(prev_day, 1.0, [])
 
-    def get_trading_days_between(self, start_date: datetime, end_date: datetime) -> List[date]:
+    def get_trading_days_between(
+        self, start_date: datetime, end_date: datetime
+    ) -> CalculationResult:
         """Get all trading days between two dates (inclusive).
 
         Args:
@@ -195,13 +199,13 @@ class SimpleTradingCalendar:
         end = end_date.date() if isinstance(end_date, datetime) else end_date
 
         while current <= end:
-            if self.is_trading_day(current):
+            if self.is_trading_day(current).value:
                 trading_days.append(current)
             current += timedelta(days=1)
 
-        return trading_days
+        return CalculationResult(trading_days, 1.0, [])
 
-    def get_next_expiry_friday(self, from_date: datetime) -> datetime:
+    def get_next_expiry_friday(self, from_date: datetime) -> CalculationResult:
         """Get next standard monthly option expiration (3rd Friday).
 
         Standard monthly options expire on the 3rd Friday of each month.
@@ -216,9 +220,13 @@ class SimpleTradingCalendar:
         current = from_date.date() if isinstance(from_date, datetime) else from_date
 
         # Check current month first
-        third_friday = self._get_third_friday(current.year, current.month)
+        third_friday = self._get_third_friday(current.year, current.month).value
         if third_friday > current:
-            return datetime.combine(third_friday, datetime.min.time())
+            return CalculationResult(
+                datetime.combine(third_friday, datetime.min.time()),
+                1.0,
+                [],
+            )
 
         # Move to next month
         if current.month == 12:
@@ -228,10 +236,16 @@ class SimpleTradingCalendar:
             year = current.year
             month = current.month + 1
 
-        third_friday = self._get_third_friday(year, month)
-        return datetime.combine(third_friday, datetime.min.time())
+        third_friday = self._get_third_friday(year, month).value
+        return CalculationResult(
+            datetime.combine(third_friday, datetime.min.time()),
+            1.0,
+            [],
+        )
 
-    def get_monthly_expiries(self, year: int, months: Optional[List[int]] = None) -> List[date]:
+    def get_monthly_expiries(
+        self, year: int, months: Optional[List[int]] = None
+    ) -> CalculationResult:
         """Get all monthly option expiration dates for a year.
 
         Args:
@@ -247,11 +261,11 @@ class SimpleTradingCalendar:
         expiries = []
         for month in months:
             if 1 <= month <= 12:
-                expiries.append(self._get_third_friday(year, month))
+                expiries.append(self._get_third_friday(year, month).value)
 
-        return sorted(expiries)
+        return CalculationResult(sorted(expiries), 1.0, [])
 
-    def _get_third_friday(self, year: int, month: int) -> date:
+    def _get_third_friday(self, year: int, month: int) -> CalculationResult:
         """Get the third Friday of a given month.
 
         Args:
@@ -268,9 +282,9 @@ class SimpleTradingCalendar:
             first_friday += timedelta(days=1)
 
         # Third Friday is 2 weeks later
-        return first_friday + timedelta(weeks=2)
+        return CalculationResult(first_friday + timedelta(weeks=2), 1.0, [])
 
-    def is_expiry_friday(self, check_date: datetime) -> bool:
+    def is_expiry_friday(self, check_date: datetime) -> CalculationResult:
         """Check if a date is a standard monthly option expiration.
 
         Args:
@@ -284,13 +298,13 @@ class SimpleTradingCalendar:
 
         # Must be a Friday
         if check_date.weekday() != 4:
-            return False
+            return CalculationResult(False, 1.0, [])
 
         # Check if it's the 3rd Friday
-        third_friday = self._get_third_friday(check_date.year, check_date.month)
-        return check_date == third_friday
+        third_friday = self._get_third_friday(check_date.year, check_date.month).value
+        return CalculationResult(check_date == third_friday, 1.0, [])
 
-    def days_to_next_expiry(self, from_date: datetime) -> int:
+    def days_to_next_expiry(self, from_date: datetime) -> CalculationResult:
         """Calculate trading days until next monthly expiration.
 
         Args:
@@ -299,26 +313,27 @@ class SimpleTradingCalendar:
         Returns:
             Number of trading days until expiration
         """
-        next_expiry = self.get_next_expiry_friday(from_date)
-        trading_days = self.get_trading_days_between(from_date, next_expiry)
+        next_expiry = self.get_next_expiry_friday(from_date).value
+        trading_days = self.get_trading_days_between(from_date, next_expiry).value
         # Subtract 1 to not count the starting date
-        return len(trading_days) - 1 if trading_days else 0
+        value = len(trading_days) - 1 if trading_days else 0
+        return CalculationResult(value, 1.0, [])
 
 
 # Convenience functions
 _calendar = SimpleTradingCalendar()
 
 
-def is_trading_day(date: datetime) -> bool:
+def is_trading_day(date: datetime) -> CalculationResult:
     """Check if market is open on given date."""
     return _calendar.is_trading_day(date)
 
 
-def get_next_expiry_friday(date: datetime) -> datetime:
+def get_next_expiry_friday(date: datetime) -> CalculationResult:
     """Get next monthly option expiration date."""
     return _calendar.get_next_expiry_friday(date)
 
 
-def days_to_expiry(from_date: datetime) -> int:
+def days_to_expiry(from_date: datetime) -> CalculationResult:
     """Get trading days to next monthly expiration."""
     return _calendar.days_to_next_expiry(from_date)

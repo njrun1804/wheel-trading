@@ -10,6 +10,8 @@ Additional features:
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional, Tuple
 
+from ..math.options import CalculationResult
+
 from .trading_calendar import SimpleTradingCalendar
 
 
@@ -61,7 +63,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         super().__init__()
         self._early_close_cache: Dict[int, List[date]] = {}
 
-    def is_early_close(self, check_date: datetime) -> bool:
+    def is_early_close(self, check_date: datetime) -> CalculationResult:
         """Check if market closes early on given date (1 PM ET).
 
         Args:
@@ -74,24 +76,24 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
             check_date = check_date.date()
 
         year = check_date.year
-        early_closes = self._get_early_closes_for_year(year)
-        return check_date in early_closes
+        early_closes = self._get_early_closes_for_year(year).value
+        return CalculationResult(check_date in early_closes, 1.0, [])
 
-    def _get_early_closes_for_year(self, year: int) -> List[date]:
+    def _get_early_closes_for_year(self, year: int) -> CalculationResult:
         """Get all early close dates for a year."""
         if year in self._early_close_cache:
-            return self._early_close_cache[year]
+            return CalculationResult(self._early_close_cache[year], 1.0, [])
 
         early_closes = []
         for name, calculator in self.EARLY_CLOSE_DAYS.items():
             early_close = calculator(year)
-            if early_close and self.is_trading_day(early_close):
+            if early_close and self.is_trading_day(early_close).value:
                 early_closes.append(early_close)
 
         self._early_close_cache[year] = early_closes
-        return early_closes
+        return CalculationResult(early_closes, 1.0, [])
 
-    def get_market_hours(self, check_date: datetime) -> Tuple[time, time]:
+    def get_market_hours(self, check_date: datetime) -> CalculationResult:
         """Get market open and close times for a date.
 
         Args:
@@ -100,19 +102,19 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         Returns:
             Tuple of (open_time, close_time) in ET
         """
-        if not self.is_trading_day(check_date):
-            return None, None
+        if not self.is_trading_day(check_date).value:
+            return CalculationResult((None, None), 1.0, [])
 
         open_time = time(9, 30)  # 9:30 AM ET
 
-        if self.is_early_close(check_date):
+        if self.is_early_close(check_date).value:
             close_time = time(13, 0)  # 1:00 PM ET
         else:
             close_time = time(16, 0)  # 4:00 PM ET
 
-        return open_time, close_time
+        return CalculationResult((open_time, close_time), 1.0, [])
 
-    def trading_hours_remaining(self, from_time: datetime) -> float:
+    def trading_hours_remaining(self, from_time: datetime) -> CalculationResult:
         """Calculate trading hours remaining in the day.
 
         Args:
@@ -121,10 +123,10 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         Returns:
             Hours remaining (0 if after close or non-trading day)
         """
-        if not self.is_trading_day(from_time):
-            return 0.0
+        if not self.is_trading_day(from_time).value:
+            return CalculationResult(0.0, 1.0, [])
 
-        open_time, close_time = self.get_market_hours(from_time)
+        open_time, close_time = self.get_market_hours(from_time).value
         current_time = from_time.time()
 
         # Convert times to minutes for easier calculation
@@ -132,12 +134,14 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         close_minutes = close_time.hour * 60 + close_time.minute
 
         if current_minutes >= close_minutes:
-            return 0.0
+            return CalculationResult(0.0, 1.0, [])
 
         remaining_minutes = close_minutes - current_minutes
-        return remaining_minutes / 60.0
+        return CalculationResult(remaining_minutes / 60.0, 1.0, [])
 
-    def is_near_unity_earnings(self, check_date: datetime, days_buffer: int = 7) -> bool:
+    def is_near_unity_earnings(
+        self, check_date: datetime, days_buffer: int = 7
+    ) -> CalculationResult:
         """Check if date is near Unity earnings (typically 3rd week of earnings months).
 
         Unity reports earnings quarterly, usually in the 3rd week of:
@@ -158,7 +162,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
 
         # Check if we're in an earnings month
         if check_date.month not in self.UNITY_EARNINGS_MONTHS:
-            return False
+            return CalculationResult(False, 1.0, [])
 
         # Estimate earnings date as 3rd Thursday of the month
         # (typical for tech companies)
@@ -168,11 +172,11 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
 
         # Check if we're within buffer
         days_until = abs((earnings_estimate - check_date).days)
-        return days_until <= days_buffer
+        return CalculationResult(days_until <= days_buffer, 1.0, [])
 
     def get_expiry_fridays_avoiding_earnings(
         self, from_date: datetime, count: int = 3
-    ) -> List[Tuple[date, bool]]:
+    ) -> CalculationResult:
         """Get next expiry Fridays with earnings warnings.
 
         Args:
@@ -186,16 +190,16 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         check_date = from_date
 
         while len(expiries) < count:
-            expiry = self.get_next_expiry_friday(check_date)
-            near_earnings = self.is_near_unity_earnings(expiry)
+            expiry = self.get_next_expiry_friday(check_date).value
+            near_earnings = self.is_near_unity_earnings(expiry).value
             expiries.append((expiry.date(), near_earnings))
             check_date = expiry + timedelta(days=1)
 
-        return expiries
+        return CalculationResult(expiries, 1.0, [])
 
     def calculate_theta_decay_days(
         self, start_date: datetime, expiry_date: datetime
-    ) -> Dict[str, float]:
+    ) -> CalculationResult:
         """Calculate detailed theta decay metrics.
 
         Options decay faster over weekends and holidays since
@@ -212,7 +216,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         total_days = (expiry_date.date() - start_date.date()).days
 
         # Trading days
-        trading_days = len(self.get_trading_days_between(start_date, expiry_date)) - 1
+        trading_days = len(self.get_trading_days_between(start_date, expiry_date).value) - 1
 
         # Non-trading days accelerate theta decay
         non_trading_days = total_days - trading_days
@@ -221,14 +225,14 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         early_closes = 0
         current = start_date
         while current <= expiry_date:
-            if self.is_early_close(current):
+            if self.is_early_close(current).value:
                 early_closes += 1
             current += timedelta(days=1)
 
         # Effective decay days (weekends count as 0.5 days for theta)
         effective_days = trading_days + (non_trading_days * 0.5) - (early_closes * 0.15)
 
-        return {
+        result = {
             "calendar_days": total_days,
             "trading_days": trading_days,
             "non_trading_days": non_trading_days,
@@ -237,8 +241,9 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
             "daily_decay_rate": 1.0 / effective_days if effective_days > 0 else 0,
             "weekend_acceleration": non_trading_days / total_days if total_days > 0 else 0,
         }
+        return CalculationResult(result, 1.0, [])
 
-    def optimal_entry_day(self, target_expiry: datetime) -> datetime:
+    def optimal_entry_day(self, target_expiry: datetime) -> CalculationResult:
         """Find optimal entry day for a target expiration.
 
         Considers:
@@ -259,7 +264,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         entry_date = target_expiry - timedelta(days=target_dte)
 
         # Adjust to trading day
-        while not self.is_trading_day(entry_date):
+        while not self.is_trading_day(entry_date).value:
             entry_date -= timedelta(days=1)
 
         # Prefer Tuesday-Thursday
@@ -268,23 +273,23 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         elif entry_date.weekday() == 4:  # Friday
             entry_date -= timedelta(days=1)
 
-        return entry_date
+        return CalculationResult(entry_date, 1.0, [])
 
 
 # Convenience functions
-def get_market_hours(date: datetime) -> Tuple[time, time]:
+def get_market_hours(date: datetime) -> CalculationResult:
     """Get market open/close for a date."""
     calendar = EnhancedTradingCalendar()
     return calendar.get_market_hours(date)
 
 
-def is_near_unity_earnings(date: datetime, buffer: int = 7) -> bool:
+def is_near_unity_earnings(date: datetime, buffer: int = 7) -> CalculationResult:
     """Check if near Unity earnings date."""
     calendar = EnhancedTradingCalendar()
     return calendar.is_near_unity_earnings(date, buffer)
 
 
-def calculate_theta_decay(start: datetime, expiry: datetime) -> Dict[str, float]:
+def calculate_theta_decay(start: datetime, expiry: datetime) -> CalculationResult:
     """Calculate theta decay metrics."""
     calendar = EnhancedTradingCalendar()
     return calendar.calculate_theta_decay_days(start, expiry)

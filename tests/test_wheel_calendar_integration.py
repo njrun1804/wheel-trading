@@ -33,13 +33,13 @@ class TestWheelCalendarIntegration:
         """Test that DTE should use trading days, not calendar days."""
         # Friday to next monthly expiry
         friday = datetime(2025, 1, 10)  # Friday
-        next_expiry = calendar.get_next_expiry_friday(friday)
+        next_expiry = calendar.get_next_expiry_friday(friday).value
 
         # Calendar days
         calendar_days = (next_expiry.date() - friday.date()).days
 
         # Trading days (should be less due to weekend)
-        trading_days = calendar.days_to_next_expiry(friday)
+        trading_days = calendar.days_to_next_expiry(friday).value
 
         assert trading_days < calendar_days
         assert trading_days == 5  # Mon-Fri next week
@@ -48,11 +48,11 @@ class TestWheelCalendarIntegration:
         """Test that recommendations avoid holidays."""
         # New Year's Day 2025
         new_years = datetime(2025, 1, 1)
-        assert not calendar.is_trading_day(new_years)
+        assert not calendar.is_trading_day(new_years).value
 
         # MLK Day 2025
         mlk_day = datetime(2025, 1, 20)
-        assert not calendar.is_trading_day(mlk_day)
+        assert not calendar.is_trading_day(mlk_day).value
 
     def test_early_close_risk_adjustment(self, enhanced_calendar):
         """Test risk adjustments for early close days."""
@@ -60,15 +60,15 @@ class TestWheelCalendarIntegration:
         black_friday = datetime(2025, 11, 28)
 
         # Should be early close
-        assert enhanced_calendar.is_early_close(black_friday)
+        assert enhanced_calendar.is_early_close(black_friday).value
 
         # Market hours should show 1 PM close
-        open_time, close_time = enhanced_calendar.get_market_hours(black_friday)
+        open_time, close_time = enhanced_calendar.get_market_hours(black_friday).value
         assert close_time.hour == 13  # 1 PM
 
         # Trading hours remaining at noon
         noon = datetime(2025, 11, 28, 12, 0)
-        remaining = enhanced_calendar.trading_hours_remaining(noon)
+        remaining = enhanced_calendar.trading_hours_remaining(noon).value
         assert remaining == 1.0  # 1 hour left
 
     def test_unity_earnings_avoidance(self, enhanced_calendar):
@@ -77,22 +77,22 @@ class TestWheelCalendarIntegration:
         feb_earnings = datetime(2025, 2, 20)  # 3rd Thursday
 
         # Should detect near earnings
-        assert enhanced_calendar.is_near_unity_earnings(feb_earnings, days_buffer=7)
+        assert enhanced_calendar.is_near_unity_earnings(feb_earnings, days_buffer=7).value
 
         # Week before should also trigger
         week_before = feb_earnings - timedelta(days=7)
-        assert enhanced_calendar.is_near_unity_earnings(week_before, days_buffer=7)
+        assert enhanced_calendar.is_near_unity_earnings(week_before, days_buffer=7).value
 
         # Month before should be safe
         month_before = datetime(2025, 1, 20)
-        assert not enhanced_calendar.is_near_unity_earnings(month_before, days_buffer=7)
+        assert not enhanced_calendar.is_near_unity_earnings(month_before, days_buffer=7).value
 
     def test_optimal_expiry_selection(self, enhanced_calendar):
         """Test selecting expiries that avoid earnings."""
         # Start in late January
         start_date = datetime(2025, 1, 25)
 
-        expiries = enhanced_calendar.get_expiry_fridays_avoiding_earnings(start_date, count=3)
+        expiries = enhanced_calendar.get_expiry_fridays_avoiding_earnings(start_date, count=3).value
 
         # February expiry should warn about earnings
         feb_expiry, feb_warning = expiries[0]
@@ -110,7 +110,7 @@ class TestWheelCalendarIntegration:
         start = datetime(2025, 1, 6)  # Monday
         expiry = datetime(2025, 2, 21)  # February expiry
 
-        decay = enhanced_calendar.calculate_theta_decay_days(start, expiry)
+        decay = enhanced_calendar.calculate_theta_decay_days(start, expiry).value
 
         # Should have metrics
         assert "calendar_days" in decay
@@ -135,8 +135,8 @@ class TestWheelCalendarIntegration:
 
         # Calculate actual trading days to expiry
         today = datetime.now()
-        next_expiry = calendar.get_next_expiry_friday(today)
-        actual_trading_days = calendar.days_to_next_expiry(today)
+        next_expiry = calendar.get_next_expiry_friday(today).value
+        actual_trading_days = calendar.days_to_next_expiry(today).value
 
         # Call strategy with calendar-aware DTE
         result = wheel_strategy.find_optimal_put_strike(
@@ -158,23 +158,23 @@ class TestWheelCalendarIntegration:
         """Test awareness of weekend gap risk."""
         # Friday position entry has weekend gap risk
         friday = datetime(2025, 1, 10)
-        assert calendar.is_trading_day(friday)
+        assert calendar.is_trading_day(friday).value
         assert friday.weekday() == 4  # Confirm it's Friday
 
         # Next trading day is Monday (3 calendar days later)
-        next_trading = calendar.get_next_trading_day(friday)
+        next_trading = calendar.get_next_trading_day(friday).value
         gap_days = (next_trading.date() - friday.date()).days
         assert gap_days == 3  # Weekend gap
 
         # Tuesday entry has less gap risk
         tuesday = datetime(2025, 1, 14)
-        next_trading = calendar.get_next_trading_day(tuesday)
+        next_trading = calendar.get_next_trading_day(tuesday).value
         gap_days = (next_trading.date() - tuesday.date()).days
         assert gap_days == 1  # Just overnight
 
     def test_monthly_expiry_consistency(self, calendar):
         """Test that monthly expiries are consistent."""
-        expiries_2025 = calendar.get_monthly_expiries(2025)
+        expiries_2025 = calendar.get_monthly_expiries(2025).value
 
         # Should have 12 monthly expiries
         assert len(expiries_2025) == 12
@@ -182,9 +182,9 @@ class TestWheelCalendarIntegration:
         # All should be Fridays
         for expiry in expiries_2025:
             assert expiry.weekday() == 4  # Friday
-            assert calendar.is_expiry_friday(expiry)
+            assert calendar.is_expiry_friday(expiry).value
 
         # All should be trading days (except if holiday)
         for expiry in expiries_2025:
             if expiry != datetime(2025, 4, 18).date():  # Good Friday
-                assert calendar.is_trading_day(expiry)
+                assert calendar.is_trading_day(expiry).value
