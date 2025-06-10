@@ -35,6 +35,8 @@ The Unity Wheel Trading Bot now includes sophisticated financial modeling capabi
 - Optimal capital structure analysis
 - Correlation analysis (Unity vs rates)
 - Leveraged VaR calculations
+- Portfolio-wide leverage optimization
+- Real-time rate updates
 
 ## How It Works
 
@@ -135,6 +137,17 @@ print(f"Probability of profit: {mc_result.probability_profit:.1%}")
 print(f"Expected shortfall: {mc_result.expected_shortfall:.2%}")
 ```
 
+### 5. Portfolio-Wide Leverage Optimization
+```python
+portfolio = [
+    {"expected_return": 0.20, "volatility": 0.50, "weight": 0.6},
+    {"expected_return": 0.15, "volatility": 0.30, "weight": 0.4},
+]
+
+optimal = modeler.optimize_portfolio_leverage(portfolio, max_leverage=1.5)
+print(f"Portfolio leverage: {optimal.optimal_leverage:.2f}x")
+```
+
 ## Configuration
 
 No additional configuration needed! The system automatically:
@@ -172,8 +185,6 @@ New metrics tracked:
 ## Future Enhancements
 
 While fully integrated, potential improvements include:
-- Real-time interest rate updates
 - Dynamic correlation monitoring
 - Machine learning for return prediction
-- Portfolio-wide leverage optimization
 - Stress testing scenarios
