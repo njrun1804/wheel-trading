@@ -35,16 +35,30 @@ jobs:
 
   test-matrix:
     needs: smoke-test
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: true  # Fail fast to surface issues quickly
+      max-parallel: 40  # Utilize high concurrency limit
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        test-group: [math, risk, integration]
-        exclude:
-          # Skip ML tests on macOS
-          - os: macos-latest
+        include:
+          # Ubuntu with larger runners for faster execution
+          - runner: ubuntu-latest-4-cores
+            os: ubuntu-latest
+            test-group: math
+          - runner: ubuntu-latest-8-cores
+            os: ubuntu-latest
             test-group: risk
+          - runner: ubuntu-latest-8-cores
+            os: ubuntu-latest
+            test-group: integration
+          # macOS with standard runners
+          - runner: macos-latest
+            os: macos-latest
+            test-group: math
+          - runner: macos-latest
+            os: macos-latest
+            test-group: integration
+        # Note: risk tests excluded from macOS in matrix above
 
     name: "${{ matrix.os }} - ${{ matrix.test-group }}"
 
@@ -128,7 +142,7 @@ jobs:
 
   # Quick validation runs in parallel
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores  # Use medium runner for faster validation
     name: "Validate Core"
 
     steps:

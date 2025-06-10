@@ -9,9 +9,15 @@ on:
   pull_request:
     branches: [ main ]
 
+# Run all checks in parallel for fastest feedback
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # Run all checks in parallel with no dependencies
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores  # Use medium runner for faster linting
     name: "Lint & Format"
 
     steps:
@@ -35,7 +41,7 @@ jobs:
       run: pre-commit run --all-files --show-diff-on-failure
 
   type-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores  # Use medium runner for faster type checking
     name: "Type Check"
 
     steps:
@@ -57,7 +63,7 @@ jobs:
         mypy src/unity_wheel/api/ --ignore-missing-imports
 
   security:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores  # Use medium runner for faster security scanning
     name: "Security Scan"
 
     steps:

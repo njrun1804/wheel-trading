@@ -9,17 +9,25 @@ on:
   pull_request:
     branches: [ main ]
 
+# Increase concurrency for faster CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-environments:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: true  # Fail fast to surface issues quickly
+      max-parallel: 40  # Utilize high concurrency limit
       matrix:
         include:
-          - os: ubuntu-latest
+          - runner: ubuntu-latest-8-cores  # Use larger runner for faster builds
+            os: ubuntu-latest
             name: "Development Environment (Claude Code)"
             python-version: "3.12"
-          - os: macos-latest
+          - runner: macos-latest  # Keep standard for macOS
+            os: macos-latest
             name: "Runtime Environment (User)"
             python-version: "3.12"
 
@@ -120,7 +128,7 @@ jobs:
 
   quick-validation:
     needs: test-environments
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores  # Use medium runner for validation
     name: "Validate Recommendations"
 
     steps:
