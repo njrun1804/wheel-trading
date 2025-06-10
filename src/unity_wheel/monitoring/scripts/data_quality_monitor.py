@@ -53,12 +53,13 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
     # Unity prices
     try:
         result = conn.execute(
-            f"""
+            """
             SELECT MAX(date) as latest,
                    CURRENT_DATE - MAX(date) as days_old,
                    COUNT(*) as records
-            FROM price_history WHERE symbol = '{UNITY_TICKER}'
-        """
+            FROM price_history WHERE symbol = ?
+        """,
+            (UNITY_TICKER,),
         ).fetchone()
 
         if result[0]:
@@ -75,12 +76,13 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
     try:
         # Check if table exists by trying to query it
         result = conn.execute(
-            f"""
+            """
             SELECT MAX(timestamp) as latest,
                    COUNT(*) as records,
                    COUNT(DISTINCT DATE(timestamp)) as days_with_data
-            FROM options_data WHERE underlying = '{UNITY_TICKER}'
-        """
+            FROM options_data WHERE underlying = ?
+        """,
+            (UNITY_TICKER,),
         ).fetchone()
 
         if result[0]:

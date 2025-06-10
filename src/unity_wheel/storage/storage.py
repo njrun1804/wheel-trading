@@ -190,7 +190,7 @@ class Storage:
             query = f"""
                 SELECT * FROM {dataset}
                 WHERE timestamp >= ? AND timestamp <= ?
-            """
+            """  # nosec B608 - dataset validated against whitelist
             params = [start_date, end_date]
 
             if symbols and dataset == "option_chains":

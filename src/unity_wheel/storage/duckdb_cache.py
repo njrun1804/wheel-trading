@@ -234,7 +234,7 @@ class DuckDBCache:
         """Export table to Parquet for GCS backup."""
         table = validate_table_name(table)
         async with self.connection() as conn:
-            df = conn.execute(f"SELECT * FROM {table}").df()
+            df = conn.execute(f"SELECT * FROM {table}").df()  # nosec B608 - table validated
 
             output_file = output_dir / f"{table}_{datetime.utcnow():%Y%m%d}.parquet"
             df.to_parquet(output_file, compression="snappy")
@@ -252,7 +252,7 @@ class DuckDBCache:
                 f"""
                 INSERT INTO {table}
                 SELECT * FROM read_parquet(?)
-            """,
+            """,  # nosec B608 - table validated
                 [str(parquet_file)],
             )
 
@@ -265,7 +265,9 @@ class DuckDBCache:
             tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
             for table in tables:
                 safe_table = validate_table_name(table)
-                count = conn.execute(f"SELECT COUNT(*) FROM {safe_table}").fetchone()[0]
+                count = conn.execute(f"SELECT COUNT(*) FROM {safe_table}").fetchone()[
+                    0
+                ]  # nosec B608
                 stats[f"{table}_count"] = count
 
             # Get database file size
@@ -275,7 +277,9 @@ class DuckDBCache:
             # Get age of oldest records
             for table in tables:
                 safe_table = validate_table_name(table)
-                oldest = conn.execute(f"SELECT MIN(created_at) FROM {safe_table}").fetchone()[0]
+                oldest = conn.execute(f"SELECT MIN(created_at) FROM {safe_table}").fetchone()[
+                    0
+                ]  # nosec B608
                 if oldest:
                     age_days = (datetime.utcnow() - oldest).days
                     stats[f"{table}_oldest_days"] = age_days
@@ -299,7 +303,7 @@ class DuckDBCache:
             for table in tables:
                 safe_table = validate_table_name(table)
                 deleted = conn.execute(
-                    f"DELETE FROM {safe_table} WHERE created_at < ?", [cutoff]
+                    f"DELETE FROM {safe_table} WHERE created_at < ?", [cutoff]  # nosec B608
                 ).rowcount
 
                 if deleted > 0:
@@ -316,6 +320,6 @@ class DuckDBCache:
             tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
             for table in tables:
                 safe_table = validate_table_name(table)
-                conn.execute(f"DELETE FROM {safe_table}")
+                conn.execute(f"DELETE FROM {safe_table}")  # nosec B608
 
         logger.warning("cache_cleared_all")

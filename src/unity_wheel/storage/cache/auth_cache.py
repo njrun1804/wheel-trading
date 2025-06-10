@@ -249,8 +249,9 @@ class AuthCache:
             # Clear from disk
             for cache_file in self.cache_dir.rglob("*.cache"):
                 try:
-                    with open(cache_file, "rb") as f:
-                        cached = pickle.load(f)
+                    # Use JSON instead of pickle for security
+                    with open(cache_file, "r") as f:
+                        cached = json.load(f)
                     if cached.get("endpoint") == endpoint:
                         cache_file.unlink()
                 except Exception:
@@ -277,8 +278,9 @@ class AuthCache:
             total_size += cache_file.stat().st_size
 
             try:
-                with open(cache_file, "rb") as f:
-                    cached = pickle.load(f)
+                # Use JSON instead of pickle for security
+                with open(cache_file, "r") as f:
+                    cached = json.load(f)
                 endpoints.add(cached.get("endpoint", "unknown"))
             except Exception:
                 pass
