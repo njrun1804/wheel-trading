@@ -98,7 +98,7 @@ jobs:
     - name: Upload venv as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: venv-${{ runner.os }}
+        name: venv-Linux
         path: .venv
         retention-days: 1
 
@@ -128,10 +128,18 @@ jobs:
         python-version: "3.12"
 
     - name: Download venv
+      if: runner.os == 'Linux'
       uses: actions/download-artifact@v4
       with:
-        name: venv-${{ runner.os }}
+        name: venv-Linux
         path: .venv
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        pip install poetry==1.8.2
+        poetry config virtualenvs.in-project true
+        poetry install --no-interaction --no-ansi
 
     - name: Install system dependencies
       if: runner.os == 'Linux'
@@ -172,7 +180,7 @@ jobs:
     - name: Download venv
       uses: actions/download-artifact@v4
       with:
-        name: venv-ubuntu-latest
+        name: venv-Linux
         path: .venv
     - name: Validate
       run: |
@@ -190,7 +198,7 @@ jobs:
     - name: Download venv
       uses: actions/download-artifact@v4
       with:
-        name: venv-ubuntu-latest
+        name: venv-Linux
         path: .venv
     - name: Run performance benchmarks
       run: |
