@@ -83,5 +83,4 @@ diagnostics_history.json
 *.pyc
 __pycache__/
 .env.local
-.codex/
 .claude/
