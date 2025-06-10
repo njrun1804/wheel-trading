@@ -21,6 +21,7 @@ cryptography = "44.0.1"
 pyyaml = "6.0.2"
 pydantic-settings = "2.6.1"
 scikit-learn = "^1.4.0"
+duckdb = "^0.9.0"
 google-cloud-secret-manager = { version = "2.20.2", optional = true }
 
 [tool.poetry.extras]
