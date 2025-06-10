@@ -171,6 +171,14 @@ python run.py --export-metrics
 ./scripts/autonomous-checks.sh
 ```
 
+### Regenerating Metrics
+
+If `exports/metrics.db` has been deleted, you can recreate it by running:
+
+```bash
+python run.py --export-metrics
+```
+
 ### Cloud Run Deployment
 
 ```bash
