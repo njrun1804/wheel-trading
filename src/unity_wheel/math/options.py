@@ -147,6 +147,7 @@ def black_scholes_price_validated(
 
 
 @timed_operation(threshold_ms=0.2)
+# === BEGIN core_options_pricing ===
 @cached(ttl=timedelta(minutes=5))
 @with_recovery(strategy=RecoveryStrategy.FALLBACK)
 def black_scholes_price_validated(
@@ -310,6 +311,9 @@ def black_scholes_price_validated(
     except Exception as e:
         logger.error(f"Error in Black-Scholes calculation: {e}")
         return CalculationResult(np.nan, 0.0, [f"Calculation error: {str(e)}"])
+
+
+# === END core_options_pricing ===
 
 
 @timed_operation(threshold_ms=0.3)

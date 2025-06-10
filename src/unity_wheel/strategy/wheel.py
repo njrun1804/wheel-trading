@@ -144,6 +144,7 @@ class WheelStrategy:
             target_delta=target_delta,
         )
 
+    # === BEGIN vectorized_strike_selection ===
     @timed_operation(threshold_ms=20.0)  # Much faster!
     def find_optimal_put_strike_vectorized(
         self,
@@ -279,6 +280,8 @@ class WheelStrategy:
             confidence=float(confidence),
             reason=reason,
         )
+
+    # === END vectorized_strike_selection ===
 
     @timed_operation(threshold_ms=100.0)
     @with_recovery(strategy=RecoveryStrategy.FALLBACK)

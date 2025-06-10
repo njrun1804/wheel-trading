@@ -109,6 +109,7 @@ class WheelAdvisor:
             },
         )
 
+    # === BEGIN main_recommendation_engine ===
     @timed_operation(threshold_ms=200.0)  # 200ms SLA
     @with_recovery(strategy=RecoveryStrategy.FALLBACK)
     def advise_position(self, market_snapshot: MarketSnapshot) -> Recommendation:
@@ -447,6 +448,8 @@ class WheelAdvisor:
             )
 
             return self._create_hold_recommendation(f"Calculation error: {str(e)}")
+
+    # === END main_recommendation_engine ===
 
     def _validate_snapshot(self, snapshot: MarketSnapshot) -> Tuple[bool, str]:
         """Validate market snapshot data."""
