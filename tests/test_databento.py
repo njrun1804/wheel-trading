@@ -8,6 +8,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from src.unity_wheel.data_providers.databento.client import DatentoClient
+from src.config.loader import get_config
+
+UNITY = get_config().unity.ticker
 from src.unity_wheel.data_providers.databento.types import (
     DataQuality,
     InstrumentDefinition,
@@ -27,7 +30,7 @@ class TestDatentoTypes:
         raw_data = {
             "instrument_id": 12345,
             "raw_symbol": "U 24 06 21 00055 C",
-            "underlying": "U",
+            "underlying": UNITY,
             "instrument_class": "C",
             "strike_price": 55000,  # In 1/1000ths
             "expiration": "2024-06-21T00:00:00",
@@ -38,7 +41,7 @@ class TestDatentoTypes:
 
         assert defn.instrument_id == 12345
         assert defn.raw_symbol == "U 24 06 21 00055 C"
-        assert defn.underlying == "U"
+        assert defn.underlying == UNITY
         assert defn.option_type == OptionType.CALL
         assert defn.strike_price == Decimal("55")
         assert defn.multiplier == 100
@@ -100,7 +103,7 @@ class TestDataValidator:
         for i in range(5):  # Monday through Friday
             chains.append(
                 OptionChain(
-                    underlying="U",
+                    underlying=UNITY,
                     expiration=datetime(2024, 6, 21),
                     spot_price=Decimal("50"),
                     timestamp=start + timedelta(days=i),
@@ -133,7 +136,7 @@ class TestDataValidator:
         validator = DataValidator()
 
         chain = OptionChain(
-            underlying="U",
+            underlying=UNITY,
             expiration=datetime.now() + timedelta(days=45),
             spot_price=Decimal("50"),
             timestamp=datetime.now(),
@@ -186,7 +189,7 @@ class TestDataValidator:
         validator = DataValidator()
 
         chain = OptionChain(
-            underlying="U",
+            underlying=UNITY,
             expiration=datetime.now() + timedelta(days=45),
             spot_price=Decimal("50"),
             timestamp=datetime.now(),
@@ -199,7 +202,7 @@ class TestDataValidator:
             InstrumentDefinition(
                 instrument_id=1,
                 raw_symbol="U 24 06 21 00050 C",
-                underlying="U",
+                underlying=UNITY,
                 option_type=OptionType.CALL,
                 strike_price=Decimal("50"),
                 expiration=chain.expiration,
@@ -207,7 +210,7 @@ class TestDataValidator:
             InstrumentDefinition(
                 instrument_id=2,
                 raw_symbol="U 24 06 21 00050 P",
-                underlying="U",
+                underlying=UNITY,
                 option_type=OptionType.PUT,
                 strike_price=Decimal("50"),
                 expiration=chain.expiration,
@@ -289,7 +292,7 @@ class TestDatabentoClient:
         chain_time = base_time - timedelta(seconds=30)
 
         chain = OptionChain(
-            underlying="U",
+            underlying=UNITY,
             expiration=base_time + timedelta(days=45),
             spot_price=Decimal("50"),
             timestamp=chain_time,
@@ -324,7 +327,7 @@ class TestDatabentoClient:
             quality = await client.validate_data_quality(chain)
 
         assert isinstance(quality, DataQuality)
-        assert quality.symbol == "U"
+        assert quality.symbol == UNITY
         assert not quality.bid_ask_spread_ok  # Has wide spreads
         assert not quality.sufficient_liquidity  # Has low sizes
         assert quality.data_staleness_seconds == pytest.approx(30, abs=5)

@@ -20,13 +20,13 @@ logger = logging.getLogger(__name__)
 
 async def create_databento_market_snapshot(
     portfolio_value: float,
-    ticker: str = "U",
+    ticker: str | None = None,
 ) -> tuple[MarketSnapshot, float]:
     """Create market snapshot from real Databento data.
 
     Args:
         portfolio_value: Total portfolio value
-        ticker: Stock ticker (default: "U" for Unity)
+        ticker: Stock ticker (defaults to config value)
 
     Returns:
         MarketSnapshot with real Unity options data
@@ -35,6 +35,7 @@ async def create_databento_market_snapshot(
         ValueError: If unable to fetch real Unity options data
     """
     # Load API key via SecretInjector
+    ticker = ticker or get_settings().unity.ticker
     with SecretInjector(service="databento"):
         client = DatabentoClient()
         integration = DatabentoIntegration(client)
@@ -133,12 +134,12 @@ async def create_databento_market_snapshot(
             await client.close()
 
 
-def get_market_data_sync(portfolio_value: float, ticker: str = "U") -> tuple[MarketSnapshot, float]:
+def get_market_data_sync(portfolio_value: float, ticker: str | None = None) -> tuple[MarketSnapshot, float]:
     """Synchronous wrapper for getting market data.
 
     Args:
         portfolio_value: Total portfolio value
-        ticker: Stock ticker (default: "U" for Unity)
+        ticker: Stock ticker (defaults to config value)
 
     Returns:
         MarketSnapshot with real Unity options data
@@ -150,6 +151,7 @@ def get_market_data_sync(portfolio_value: float, ticker: str = "U") -> tuple[Mar
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
+        ticker = ticker or get_settings().unity.ticker
         return loop.run_until_complete(create_databento_market_snapshot(portfolio_value, ticker))
     finally:
         loop.close()

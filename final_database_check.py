@@ -46,10 +46,11 @@ stock_check = conn.execute(
 """
 ).fetchone()
 
-print(f"\n   📊 Stock Data:")
+print("\n   📊 Stock Data:")
 print(f"      Records: {stock_check[0]:,}")
 print(f"      Period: {stock_check[2]} to {stock_check[3]}")
-print(f"      Data Quality: {'✅ PERFECT' if stock_check[4] == 0 else '❌ Issues found'}")
+stock_quality = "✅ PERFECT" if stock_check[4] == 0 else "❌ Issues found"
+print(f"      Data Quality: {stock_quality}")
 
 # Options data
 options_check = conn.execute(
@@ -66,22 +67,28 @@ options_check = conn.execute(
 """
 ).fetchone()
 
-print(f"\n   📈 Options Data:")
+print("\n   📈 Options Data:")
 print(f"      Records: {options_check[0]:,}")
 print(f"      Period: {options_check[4]} to {options_check[5]}")
 print(f"      Inverted Spreads: {options_check[2]}")
 print(f"      Negative Prices: {options_check[3]}")
-print(
-    f"      Data Quality: {'✅ PERFECT' if options_check[2] == 0 and options_check[3] == 0 else '❌ Issues remain'}"
+opts_quality = (
+    "✅ PERFECT"
+    if options_check[2] == 0 and options_check[3] == 0
+    else "❌ Issues remain"
 )
+print(f"      Data Quality: {opts_quality}")
 
 # FRED data verification
 print("\n💹 FRED DATA:")
 fred_series = conn.execute(
     """
-    SELECT COUNT(DISTINCT series_id), COUNT(*), MIN(calculation_date), MAX(calculation_date)
+    SELECT COUNT(DISTINCT series_id),
+           COUNT(*),
+           MIN(calculation_date),
+           MAX(calculation_date)
     FROM fred_features
-"""
+    """
 ).fetchone()
 
 print(f"   Series: {fred_series[0]}")

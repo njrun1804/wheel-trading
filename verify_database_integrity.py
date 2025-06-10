@@ -109,7 +109,8 @@ try:
         ).fetchone()
         if fred_count[0] > 0:
             print(
-                f"\n   Found {fred_count[0]:,} FRED records across {fred_count[1]} series in economic_data table"
+                f"\n   Found {fred_count[0]:,} FRED records across "
+                f"{fred_count[1]} series in economic_data table"
             )
 
 except Exception as e:

@@ -213,13 +213,14 @@ class DatabentoClient:
                 )
                 symbol_formats = [(symbols, stype_in)]
             else:
+                unity_ticker = get_config().unity.ticker
                 # Handle Unity-specific symbol format
-                if underlying == "U":
+                if underlying == unity_ticker:
                     # Unity requires special handling - try multiple formats
                     symbol_formats = [
-                        (["U.OPT"], SType.PARENT),  # Standard format first
-                        (["U     *"], SType.PARENT),  # Unity with 5 spaces
-                        (["U"], SType.RAW_SYMBOL),  # Raw symbol
+                        ([f"{unity_ticker}.OPT"], SType.PARENT),  # Standard format first
+                        ([f"{unity_ticker}     *"], SType.PARENT),
+                        ([unity_ticker], SType.RAW_SYMBOL),
                     ]
                 else:
                     symbol_formats = [
