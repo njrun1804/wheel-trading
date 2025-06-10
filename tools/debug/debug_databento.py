@@ -5,11 +5,14 @@ import asyncio
 import os
 import sys
 from datetime import datetime, timedelta, timezone
+import logging
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.unity_wheel.databento import DatabentoClient
-from src.unity_wheel.utils import setup_structured_logging
+from src.unity_wheel.utils import setup_structured_logging, get_logger
+
+logger = get_logger(__name__)
 
 
 async def debug_databento():
@@ -114,8 +117,8 @@ async def debug_databento():
         try:
             # This would require admin API access
             print("   Note: Full dataset listing requires admin access")
-        except:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to list datasets", exc_info=exc)
 
     finally:
         await client.close()
