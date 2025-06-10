@@ -6,7 +6,6 @@ decisions in a tax-free environment.
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -263,7 +262,7 @@ class PureBorrowingAnalyzer:
             return 0
 
         highest_rate_loan = max(
-            self.loans.values(), key=lambda l: l.annual_rate if l.principal > 0 else 0
+            self.loans.values(), key=lambda loan: loan.annual_rate if loan.principal > 0 else 0
         )
 
         if highest_rate_loan.principal > 0:

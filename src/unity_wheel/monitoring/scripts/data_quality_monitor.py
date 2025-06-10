@@ -4,14 +4,13 @@
 import os
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, Tuple
-
-from src.unity_wheel.utils.logging import get_logger
 
 import duckdb
 
 from src.config.loader import get_config
+from src.unity_wheel.utils.logging import get_logger
 
 # Get Unity ticker once
 _config = get_config()
