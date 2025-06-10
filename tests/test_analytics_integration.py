@@ -6,6 +6,8 @@ Ensures autonomous operation and proper error handling.
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 
+from src.config.loader import get_config
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -22,13 +24,15 @@ from src.unity_wheel.analytics import (
     WheelRecommendation,
 )
 
+TICKER = get_config().unity.ticker
+
 
 class TestDynamicOptimizer:
     """Test dynamic parameter optimization."""
 
     def test_optimization_bounds(self):
         """Test parameter bounds are respected."""
-        optimizer = DynamicOptimizer("U")
+        optimizer = DynamicOptimizer(TICKER)
 
         # Extreme market state
         extreme_state = MarketState(
@@ -49,7 +53,7 @@ class TestDynamicOptimizer:
 
     def test_optimization_validation(self):
         """Test optimization validation catches issues."""
-        optimizer = DynamicOptimizer("U")
+        optimizer = DynamicOptimizer(TICKER)
 
         # Create result with negative objective
         result = optimizer.OptimizationResult(
@@ -70,7 +74,7 @@ class TestDynamicOptimizer:
 
     def test_continuous_adjustments(self):
         """Test smooth parameter transitions."""
-        optimizer = DynamicOptimizer("U")
+        optimizer = DynamicOptimizer(TICKER)
 
         vol_percentiles = [0.2, 0.4, 0.6, 0.8]
         deltas = []
@@ -103,11 +107,11 @@ class TestIVSurfaceAnalyzer:
         for i in range(252):
             date = datetime.now() - timedelta(days=252 - i)
             iv = 0.30 + 0.20 * np.sin(i / 40)  # Oscillating IV
-            analyzer.update_iv_history("U", date, iv)
+            analyzer.update_iv_history(TICKER, date, iv)
 
         # Test IV rank
         current_iv = 0.50  # High IV
-        iv_rank, iv_percentile = analyzer._calculate_iv_rank("U", current_iv)
+        iv_rank, iv_percentile = analyzer._calculate_iv_rank(TICKER, current_iv)
 
         assert iv_rank > 90  # Should be high rank
         assert iv_percentile > 90
@@ -150,7 +154,7 @@ class TestEventAnalyzer:
 
     def test_earnings_adjustment(self):
         """Test earnings event adjustments."""
-        analyzer = EventImpactAnalyzer("U")
+        analyzer = EventImpactAnalyzer(TICKER)
 
         # Add earnings in 7 days
         events = [{"type": "earnings", "date": datetime.now() + timedelta(days=7)}]
@@ -167,7 +171,7 @@ class TestEventAnalyzer:
 
     def test_event_too_close(self):
         """Test avoiding trades near events."""
-        analyzer = EventImpactAnalyzer("U")
+        analyzer = EventImpactAnalyzer(TICKER)
 
         # Earnings in 3 days
         events = [{"type": "earnings", "date": datetime.now() + timedelta(days=3)}]
@@ -185,7 +189,7 @@ class TestAnomalyDetector:
 
     def test_volume_spike_detection(self):
         """Test detection of volume anomalies."""
-        detector = AnomalyDetector("U")
+        detector = AnomalyDetector(TICKER)
 
         # Historical data with normal volume
         dates = pd.date_range(end=datetime.now(), periods=100)
@@ -208,7 +212,7 @@ class TestAnomalyDetector:
 
     def test_ml_anomaly_detection(self):
         """Test ML-based anomaly detection."""
-        detector = AnomalyDetector("U")
+        detector = AnomalyDetector(TICKER)
 
         # Create synthetic historical data
         n_samples = 500
@@ -237,7 +241,7 @@ class TestSeasonalityDetector:
 
     def test_day_of_week_pattern(self):
         """Test detection of day-of-week effects."""
-        detector = SeasonalityDetector("U")
+        detector = SeasonalityDetector(TICKER)
 
         # Create data with Monday weakness
         dates = pd.date_range(start="2022-01-01", end="2024-01-01", freq="B")
@@ -259,7 +263,7 @@ class TestSeasonalityDetector:
 
     def test_earnings_cycle_pattern(self):
         """Test detection of quarterly patterns."""
-        detector = SeasonalityDetector("U")
+        detector = SeasonalityDetector(TICKER)
 
         # Create data with higher vol in earnings months
         dates = pd.date_range(start="2022-01-01", end="2024-01-01", freq="B")
@@ -286,7 +290,7 @@ class TestIntegratedDecisionEngine:
     @pytest.mark.asyncio
     async def test_full_recommendation_flow(self):
         """Test complete recommendation generation."""
-        engine = IntegratedDecisionEngine("U", 100000)
+        engine = IntegratedDecisionEngine(TICKER, 100000)
 
         # Mock data
         current_prices = {
@@ -339,12 +343,12 @@ class TestIntegratedDecisionEngine:
         assert isinstance(recommendation, WheelRecommendation)
         assert recommendation.action in ["SELL_PUT", "NO_TRADE", "ROLL", "CLOSE"]
         assert 0 <= recommendation.confidence <= 1
-        assert recommendation.symbol == "U"
+        assert recommendation.symbol == TICKER
 
     @pytest.mark.asyncio
     async def test_no_trade_conditions(self):
         """Test conditions that should result in NO_TRADE."""
-        engine = IntegratedDecisionEngine("U", 100000)
+        engine = IntegratedDecisionEngine(TICKER, 100000)
 
         # Extreme anomaly conditions
         current_prices = {
@@ -381,12 +385,12 @@ class TestIntegratedDecisionEngine:
 
     def test_decision_report_generation(self):
         """Test human-readable report generation."""
-        engine = IntegratedDecisionEngine("U", 100000)
+        engine = IntegratedDecisionEngine(TICKER, 100000)
 
         # Mock recommendation
         recommendation = WheelRecommendation(
             action="SELL_PUT",
-            symbol="U",
+            symbol=TICKER,
             strike=22.5,
             expiration=datetime.now() + timedelta(35),
             contracts=4,

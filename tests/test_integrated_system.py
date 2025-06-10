@@ -9,6 +9,8 @@ import os
 import sys
 from datetime import datetime, timedelta
 
+from src.config.loader import get_config
+
 import duckdb
 import numpy as np
 import pandas as pd
@@ -18,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.unity_wheel.analytics import EventType, IntegratedDecisionEngine
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+TICKER = get_config().unity.ticker
 
 
 def load_unity_data():
@@ -25,10 +28,10 @@ def load_unity_data():
     conn = duckdb.connect(DB_PATH)
 
     data = conn.execute(
-        """
+        f"""
         SELECT date, open, high, low, close, volume, returns
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = '{TICKER}'
         ORDER BY date
     """
     ).fetchall()
@@ -262,7 +265,7 @@ async def main():
     # Initialize decision engine
     print("\n🧠 Initializing Integrated Decision Engine...")
     engine = IntegratedDecisionEngine(
-        symbol="U", portfolio_value=100000, config={"max_contracts": 10, "min_confidence": 0.30}
+        symbol=TICKER, portfolio_value=100000, config={"max_contracts": 10, "min_confidence": 0.30}
     )
 
     # Fit anomaly detector on historical data

@@ -9,6 +9,8 @@ import os
 import sys
 from datetime import datetime
 
+from src.config.loader import get_config
+
 import duckdb
 import numpy as np
 import pandas as pd
@@ -19,6 +21,7 @@ from src.unity_wheel.analytics.market_calibrator import MarketCalibrator
 from src.unity_wheel.risk.regime_detector import RegimeDetector
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+TICKER = get_config().unity.ticker
 
 
 async def test_calibration():
@@ -32,10 +35,10 @@ async def test_calibration():
 
     # Load Unity data
     data = conn.execute(
-        """
+        f"""
         SELECT date, open, high, low, close, volume, returns
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = '{TICKER}'
         ORDER BY date
     """
     ).fetchall()
@@ -52,7 +55,7 @@ async def test_calibration():
     print(f"   Date range: {dates[0]} to {dates[-1]}")
 
     # Initialize calibrator
-    calibrator = MarketCalibrator(symbol="U")
+    calibrator = MarketCalibrator(symbol=TICKER)
 
     # Calibrate parameters
     print("\n🔧 Calibrating optimal parameters...")

@@ -8,6 +8,8 @@ import os
 import sys
 from datetime import datetime
 
+from src.config.loader import get_config
+
 import duckdb
 import numpy as np
 
@@ -20,6 +22,7 @@ from src.unity_wheel.analytics.dynamic_optimizer import (
 )
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+TICKER = get_config().unity.ticker
 
 
 def calculate_market_state(returns: np.ndarray, prices: list) -> MarketState:
@@ -70,10 +73,10 @@ def main():
     # Load Unity data
     conn = duckdb.connect(DB_PATH)
     data = conn.execute(
-        """
+        f"""
         SELECT date, open, high, low, close, volume, returns
         FROM price_history
-        WHERE symbol = 'U' AND returns IS NOT NULL
+        WHERE symbol = '{TICKER}' AND returns IS NOT NULL
         ORDER BY date
     """
     ).fetchall()
@@ -91,7 +94,7 @@ def main():
     print(f"   20-day Momentum: {market_state.price_momentum:+.1%}")
 
     # Initialize optimizer
-    optimizer = DynamicOptimizer(symbol="U")
+    optimizer = DynamicOptimizer(symbol=TICKER)
 
     # Run optimization
     print(f"\n🔧 Running Dynamic Optimization...")

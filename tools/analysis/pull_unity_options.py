@@ -8,6 +8,11 @@ import os
 import sys
 from datetime import datetime, timedelta
 
+from src.config.loader import get_config
+
+config = get_config()
+TICKER = config.unity.ticker
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.unity_wheel.utils.databento_unity import (
@@ -50,7 +55,7 @@ async def main():
         conn = duckdb.connect(db_path)
 
         # Update price history
-        conn.execute("DELETE FROM price_history WHERE symbol = 'U'")
+        conn.execute(f"DELETE FROM price_history WHERE symbol = '{TICKER}'")
 
         for _, row in bars.iterrows():
             conn.execute(
@@ -60,7 +65,7 @@ async def main():
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             """,
                 [
-                    "U",
+                    TICKER,
                     row["ts_event"].date() if hasattr(row["ts_event"], "date") else row.name.date(),
                     float(row.get("open", row["close"])),
                     float(row.get("high", row["close"])),

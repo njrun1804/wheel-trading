@@ -8,6 +8,8 @@ import os
 import warnings
 from datetime import datetime, timedelta
 
+from src.config.loader import get_config
+
 import duckdb
 import numpy as np
 import pandas as pd
@@ -17,6 +19,7 @@ from sklearn.mixture import GaussianMixture
 warnings.filterwarnings("ignore")
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+TICKER = get_config().unity.ticker
 
 
 class RegimeAwareRiskAnalyzer:
@@ -187,10 +190,10 @@ def main():
 
     # Get Unity returns
     returns_data = conn.execute(
-        """
+        f"""
         SELECT date, returns
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = '{TICKER}'
         AND returns IS NOT NULL
         ORDER BY date
     """

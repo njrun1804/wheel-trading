@@ -15,6 +15,8 @@ from decimal import Decimal
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from src.config.loader import get_config
+
 import pytest
 
 from src.unity_wheel.data_providers.schwab.ingestion import (
@@ -25,6 +27,8 @@ from src.unity_wheel.data_providers.schwab.ingestion import (
 )
 from src.unity_wheel.schwab.client import SchwabClient
 from src.unity_wheel.schwab.types import PositionType, SchwabAccount, SchwabPosition
+
+TICKER = get_config().unity.ticker
 
 
 class TestDataStorage:
@@ -43,7 +47,7 @@ class TestDataStorage:
         # Create test positions
         positions = [
             SchwabPosition(
-                symbol="U",
+                symbol=TICKER,
                 quantity=Decimal("100"),
                 position_type=PositionType.STOCK,
                 market_value=Decimal("5000"),
@@ -85,7 +89,7 @@ class TestDataStorage:
         for i in range(5):
             timestamp = datetime.now(timezone.utc) - timedelta(days=i)
             position = SchwabPosition(
-                symbol="U",
+                symbol=TICKER,
                 quantity=Decimal("100"),
                 position_type=PositionType.STOCK,
                 market_value=Decimal(f"{5000 - i * 100}"),
@@ -206,7 +210,7 @@ class TestDataIngestion:
         # Mock responses
         mock_positions = [
             SchwabPosition(
-                symbol="U",
+                symbol=TICKER,
                 quantity=Decimal("100"),
                 position_type=PositionType.STOCK,
                 market_value=Decimal("5000"),
@@ -356,7 +360,7 @@ class TestDataSanityChecks:
         positions = [
             # Normal position
             SchwabPosition(
-                symbol="U",
+                symbol=TICKER,
                 quantity=Decimal("100"),
                 position_type=PositionType.STOCK,
                 market_value=Decimal("5000"),
@@ -474,7 +478,7 @@ class TestDataSanityChecks:
         positions = [
             # Odd lot - potential stock split
             SchwabPosition(
-                symbol="U",
+                symbol=TICKER,
                 quantity=Decimal("150"),  # Not a round lot
                 position_type=PositionType.STOCK,
                 market_value=Decimal("7500"),
@@ -555,7 +559,7 @@ async def test_full_data_pipeline():
         # Mock comprehensive data
         mock_client.get_positions.return_value = [
             SchwabPosition(
-                symbol="U",
+                symbol=TICKER,
                 quantity=Decimal("200"),
                 position_type=PositionType.STOCK,
                 market_value=Decimal("10000"),

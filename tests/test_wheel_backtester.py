@@ -6,10 +6,13 @@ from unittest.mock import AsyncMock, Mock, patch
 import numpy as np
 import pandas as pd
 import pytest
+from src.config.loader import get_config
 
 from src.unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.strategy.wheel import WheelParameters
+
+TICKER = get_config().unity.ticker
 
 
 class TestWheelBacktester:
@@ -96,7 +99,7 @@ class TestWheelBacktester:
 
         # Run backtest
         results = await backtester.backtest_strategy(
-            symbol="U",
+            symbol=TICKER,
             start_date=datetime(2024, 1, 1),
             end_date=datetime(2024, 3, 31),
             initial_capital=100000,
@@ -127,7 +130,7 @@ class TestWheelBacktester:
 
         # Run backtest
         results = await backtester.backtest_strategy(
-            symbol="U",
+            symbol=TICKER,
             start_date=datetime(2024, 1, 1),
             end_date=datetime(2024, 2, 28),
             initial_capital=100000,
@@ -166,7 +169,7 @@ class TestWheelBacktester:
 
         # Run optimization
         results = await backtester.optimize_parameters(
-            symbol="U",
+            symbol=TICKER,
             start_date=datetime(2024, 1, 1),
             end_date=datetime(2024, 3, 31),
             delta_range=(0.25, 0.35),
@@ -184,7 +187,7 @@ class TestWheelBacktester:
         """Test Unity-specific gap risk tracking."""
         # Create position with gap move
         position = BacktestPosition(
-            symbol="U",
+            symbol=TICKER,
             position_type="stock",  # After assignment
             strike=35.0,
             expiration=datetime(2024, 2, 1),
@@ -229,7 +232,7 @@ class TestWheelBacktester:
         """Test position lifecycle management."""
         # Create short put position
         position = BacktestPosition(
-            symbol="U",
+            symbol=TICKER,
             position_type="put",
             strike=35.0,
             expiration=datetime(2024, 2, 15),

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import pytest
+from src.config.loader import get_config
 
 from src.unity_wheel.models.position import Position
 from src.unity_wheel.strategy.wheel import WheelStrategy
+
+TICKER = get_config().unity.ticker
 
 
 class TestWheelStrategy:
@@ -73,7 +76,7 @@ class TestWheelStrategy:
         """Test position sizing calculation."""
         # With 20% max allocation and $100k portfolio
         size = wheel.calculate_position_size(
-            symbol="U",
+            symbol=TICKER,
             current_price=35,
             portfolio_value=100000,
         )
@@ -83,7 +86,7 @@ class TestWheelStrategy:
 
         # Test with larger portfolio
         size = wheel.calculate_position_size(
-            symbol="U",
+            symbol=TICKER,
             current_price=35,
             portfolio_value=1000000,
         )
@@ -93,7 +96,7 @@ class TestWheelStrategy:
     def test_should_roll_position_expiry(self, wheel):
         """Test rolling decision based on expiry."""
         position = Position(
-            symbol="U",
+            symbol=TICKER,
             qty=-1,
             avg_price=2.50,
             option_type="put",
@@ -112,7 +115,7 @@ class TestWheelStrategy:
     def test_should_roll_position_deep_itm_put(self, wheel):
         """Test rolling deep ITM put."""
         position = Position(
-            symbol="U",
+            symbol=TICKER,
             qty=-1,
             avg_price=2.50,
             option_type="put",
@@ -131,7 +134,7 @@ class TestWheelStrategy:
     def test_should_roll_position_deep_itm_call(self, wheel):
         """Test rolling deep ITM call."""
         position = Position(
-            symbol="U",
+            symbol=TICKER,
             qty=-1,
             avg_price=2.50,
             option_type="call",
@@ -150,7 +153,7 @@ class TestWheelStrategy:
     def test_should_not_roll_position(self, wheel):
         """Test when position should not be rolled."""
         position = Position(
-            symbol="U",
+            symbol=TICKER,
             qty=-1,
             avg_price=2.50,
             option_type="put",
