@@ -68,21 +68,19 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
 
         # Exchange code for tokens
         async with aiohttp.ClientSession() as session:
-            # For authorization_code grant, use credentials in POST body (not Basic Auth)
+            # Official Schwab library uses Basic Auth for authorization_code grant
             token_data = {
                 "grant_type": "authorization_code",
                 "code": code,
                 "redirect_uri": redirect_uri,
-                "client_id": client_id,
-                "client_secret": client_secret,
             }
 
             headers = {
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json",
+                "Authorization": f"Basic {auth_b64}"
             }
 
-            print(f"   Using POST body credentials: {client_id}:***")
+            print(f"   Using Basic Auth (official method): {client_id}:***")
 
             async with session.post(
                 token_url, data=token_data, headers=headers, timeout=aiohttp.ClientTimeout(total=30)
