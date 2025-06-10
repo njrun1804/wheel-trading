@@ -9,7 +9,9 @@ from datetime import datetime, timedelta, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.unity_wheel.databento import DatabentoClient
-from src.unity_wheel.utils import setup_structured_logging
+from src.unity_wheel.utils import get_logger, setup_structured_logging
+
+logger = get_logger(__name__)
 
 
 async def debug_databento():
@@ -82,8 +84,12 @@ async def debug_databento():
                 else:
                     print(f"   ✅ Found {count} definitions for {symbol}")
 
-            except Exception as e:
-                print(f"   ❌ Error with {symbol}: {e}")
+            except Exception as exc:
+                logger.error(
+                    "definition_fetch_failed",
+                    extra={"symbol": symbol, "error": str(exc), "error_type": type(exc).__name__},
+                )
+                print(f"   ❌ Error with {symbol}: {exc}")
 
         # Test 3: Try getting trade data for Unity
         print("\n3. Testing Unity stock trades...")
@@ -106,16 +112,23 @@ async def debug_databento():
 
             print(f"   {'✅' if count > 0 else '❌'} Found {count} trades")
 
-        except Exception as e:
-            print(f"   ❌ Error getting trades: {e}")
+        except Exception as exc:
+            logger.error(
+                "trade_fetch_failed",
+                extra={"error": str(exc), "error_type": type(exc).__name__},
+            )
+            print(f"   ❌ Error getting trades: {exc}")
 
         # Test 4: List available datasets
         print("\n4. Checking available data...")
         try:
             # This would require admin API access
             print("   Note: Full dataset listing requires admin access")
-        except:
-            pass
+        except Exception as exc:
+            logger.error(
+                "list_datasets_failed",
+                extra={"error": str(exc), "error_type": type(exc).__name__},
+            )
 
     finally:
         await client.close()

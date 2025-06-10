@@ -9,11 +9,15 @@ from datetime import datetime, timedelta
 
 import duckdb
 
+from src.unity_wheel.utils.logging import get_logger
+
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+
+logger = get_logger(__name__)
 
 
 def get_monthly_expirations(year, month):
@@ -228,8 +232,11 @@ def main():
                     )
                     inserted += 1
                     options_added += 1
-                except:
-                    pass  # Skip duplicates
+                except duckdb.Error as exc:
+                    logger.error(
+                        "generate_option_failed",
+                        extra={"error": str(exc), "error_type": type(exc).__name__},
+                    )
 
             if inserted > 0:
                 print(f"   Added {inserted} options for {expiration} expiration")
