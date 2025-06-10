@@ -11,7 +11,12 @@ from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits, analyze_borrowing_decision
+from ..risk import (
+    BorrowingCostAnalyzer,
+    RiskAnalyzer,
+    RiskLimits,
+    analyze_borrowing_decision,
+)
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
@@ -529,16 +534,16 @@ class WheelAdvisor:
         volume = option_data.get("volume", 0)
         open_interest = option_data.get("open_interest", 0)
 
-        # Check bid-ask spread
-        if ask - bid > self.MAX_BID_ASK_SPREAD:
+        # Check bid-ask spread using configured constraints
+        if ask - bid > self.constraints.MAX_BID_ASK_SPREAD:
             return False
 
         # Check volume
-        if volume < self.MIN_VOLUME:
+        if volume < self.constraints.MIN_VOLUME:
             return False
 
         # Check open interest
-        if open_interest < self.MIN_OPEN_INTEREST:
+        if open_interest < self.constraints.MIN_OPEN_INTEREST:
             return False
 
         return True

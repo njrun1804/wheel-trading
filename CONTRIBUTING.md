@@ -20,7 +20,7 @@ This project uses an automated housekeeping script to enforce file placement and
    ```bash
    ruff format . && black .
    ruff check --fix .
-   mypy --strict unity_trading data_pipeline ml_engine strategy_engine risk_engine app --ignore-missing-imports
+   mypy --strict src/unity_wheel data_pipeline ml_engine strategy_engine risk_engine app --ignore-missing-imports
    pytest -q
    ```
 4. Commit your changes once all checks pass.

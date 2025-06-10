@@ -24,7 +24,11 @@ def test_environment_variables() -> Dict[str, Any]:
 
     for var, expected in required_vars.items():
         actual = os.getenv(var)
-        results[var] = {"expected": expected, "actual": actual, "correct": actual == expected}
+        results[var] = {
+            "expected": expected,
+            "actual": actual,
+            "correct": actual == expected,
+        }
 
     return results
 
@@ -59,21 +63,21 @@ def test_imports():
     # Test Unity Wheel modules
     try:
         sys.path.insert(0, os.getcwd())
-        from unity_trading.math.options import black_scholes_price_validated
+        from src.unity_wheel.math.options import black_scholes_price_validated
 
         import_tests["unity_math"] = True
     except ImportError as e:
         import_tests["unity_math"] = f"Failed: {e}"
 
     try:
-        from unity_trading.strategy.wheel import WheelStrategy
+        from src.unity_wheel.strategy.wheel import WheelStrategy
 
         import_tests["unity_strategy"] = True
     except ImportError as e:
         import_tests["unity_strategy"] = f"Failed: {e}"
 
     try:
-        from unity_trading.utils.position_sizing import calculate_position_size
+        from src.unity_wheel.utils.position_sizing import calculate_position_size
 
         import_tests["unity_utils"] = True
     except ImportError as e:
@@ -88,7 +92,7 @@ def test_functionality():
 
     try:
         sys.path.insert(0, os.getcwd())
-        from unity_trading.math.options import black_scholes_price_validated
+        from src.unity_wheel.math.options import black_scholes_price_validated
 
         result = black_scholes_price_validated(100, 100, 1, 0.05, 0.2, "call")
         tests["black_scholes"] = {
