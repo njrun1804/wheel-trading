@@ -57,29 +57,29 @@ Larger runners are billed per-minute, so we:
 4. Keep macOS on standard runners (no larger options)
 5. Use caching to minimize setup time on every run
 
-## Optimized Workflow Structure (NEW)
+## Harmonized Workflow Structure (Simplified)
 
-### Primary Workflows
+### Active Workflows
 
-1. **ci-unified.yml** (NEW - Recommended) ⚡
-   - Replaces both `ci.yml` and `ci-optimized.yml`
-   - Runs in ~3 minutes (vs 8 minutes previously)
+1. **ci.yml** ⚡ Main Test Suite
+   - Consolidated workflow for all testing
+   - Runs in ~3-4 minutes
    - Features:
      - Path filtering to skip non-code changes
-     - Parallel test execution across categories
-     - Dependency caching and artifact sharing
-     - Performance benchmark tracking
-     - SLA compliance checking
+     - Cross-platform testing (Ubuntu + macOS)
+     - Smart caching with Poetry
+     - Pre-commit checks included
+     - Performance benchmarks on main branch only
 
-2. **ci-fast.yml** 🚀
-   - Quick pre-commit checks only
+2. **fast-checks.yml** 🚀 Quick Validation
+   - Formatting and linting only
    - Runs in <1 minute
-   - Use for: Rapid feedback on formatting/linting
+   - Perfect for rapid PR feedback
 
-3. **security.yml** (NEW) 🔒
-   - Optimized CodeQL scanning (10 min timeout)
-   - Dependency vulnerability checks (Safety, Bandit)
-   - Secret scanning (TruffleHog)
+3. **security.yml** 🔒 Security Scanning
+   - CodeQL analysis (10 min timeout)
+   - Dependency vulnerability checks
+   - Secret scanning with TruffleHog
    - Runs on PRs and weekly schedule
 
 ### Performance Improvements
@@ -96,10 +96,9 @@ Larger runners are billed per-minute, so we:
 
 | Workflow | Trigger | Use Case | Runtime |
 |----------|---------|----------|---------|
-| ci-unified | PR/Push | Full CI suite | ~3 min |
-| ci-fast | PR/Push | Quick checks | <1 min |
+| ci | PR/Push | Full test suite | ~3-4 min |
+| fast-checks | PR/Push | Quick formatting | <1 min |
 | security | PR/Weekly | Security scans | ~5 min |
-| ci (legacy) | Manual | Fallback option | ~8 min |
 
 ### Key Optimizations
 
@@ -131,20 +130,26 @@ Larger runners are billed per-minute, so we:
    - Limited scan paths
    - Focused query sets
 
-## Migration Guide
+## Workflow Status
 
-To use the new optimized workflows:
+### Current Setup (Harmonized)
+- **CI** - Main test workflow (active)
+- **Fast Checks** - Quick validation (active)
+- **Security** - Security scanning (active)
+- **CodeQL** - Code analysis (active)
 
-1. **For new PRs**: Workflows run automatically
-2. **To disable old workflows**:
-   ```bash
-   gh workflow disable "CI"
-   gh workflow disable "CI Optimized"
-   ```
-3. **To monitor performance**:
-   ```bash
-   gh run list --workflow="CI Unified" --limit=10
-   ```
+### Disabled Workflows
+- **CI Optimized** - Replaced by simplified CI
+- **CI Unified** - Merged into main CI workflow
+
+### Monitoring Performance
+```bash
+# View recent CI runs
+gh run list --workflow="CI" --limit=10
+
+# Check specific run details
+gh run view <run-id> --log
+```
 
 ## Troubleshooting
 
