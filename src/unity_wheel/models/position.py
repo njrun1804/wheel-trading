@@ -20,6 +20,10 @@ class PositionType(str, Enum):
     PUT = "put"
 
 
+# Typed alias used by tests and external modules for option flavor
+OptionType = Literal["call", "put"]
+
+
 @dataclass(frozen=True)
 class Position:
     """
