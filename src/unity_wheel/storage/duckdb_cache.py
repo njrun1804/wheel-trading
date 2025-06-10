@@ -12,7 +12,23 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import duckdb
+try:
+    import duckdb
+
+    _HAS_DUCKDB = True
+except ImportError:
+    _HAS_DUCKDB = False
+
+    # Create dummy for when DuckDB isn't available
+    class duckdb:  # type: ignore
+        class DuckDBPyConnection:  # type: ignore
+            pass
+
+        @staticmethod
+        def connect(*args, **kwargs):  # type: ignore
+            raise ImportError("DuckDB not available on this platform")
+
+
 import pandas as pd
 
 from ..utils import get_logger
@@ -54,9 +70,18 @@ class DuckDBCache:
         self._conn: Optional[duckdb.DuckDBPyConnection] = None
         self._last_vacuum = datetime.min
 
+        if not _HAS_DUCKDB:
+            logger.warning("DuckDB not available - cache will be disabled")
+
+    def _check_duckdb_available(self):
+        """Check if DuckDB is available, raise error if not."""
+        if not _HAS_DUCKDB:
+            raise ImportError("DuckDB not available on this platform - storage operations disabled")
+
     @asynccontextmanager
     async def connection(self):
         """Get thread-safe connection to DuckDB."""
+        self._check_duckdb_available()
         conn = duckdb.connect(str(self.db_path))
         try:
             yield conn
@@ -65,6 +90,9 @@ class DuckDBCache:
 
     async def initialize(self):
         """Create cache tables if not exists."""
+        if not _HAS_DUCKDB:
+            logger.warning("DuckDB not available - skipping cache initialization")
+            return
         async with self.connection() as conn:
             # Option chains table
             conn.execute(
