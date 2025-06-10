@@ -7,6 +7,8 @@ import time
 from datetime import datetime, timedelta
 from typing import Dict, Tuple
 
+from src.unity_wheel.utils.logging import get_logger
+
 import duckdb
 
 from src.config.loader import get_config
@@ -14,6 +16,8 @@ from src.config.loader import get_config
 # Get Unity ticker once
 _config = get_config()
 UNITY_TICKER = _config.unity.ticker
+
+logger = get_logger(__name__)
 
 
 # Colors for terminal output
@@ -69,7 +73,8 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
                 "records": result[2],
                 "status": "good" if result[1] <= 1 else ("warning" if result[1] <= 7 else "error"),
             }
-    except:
+    except duckdb.Error as exc:
+        logger.error("Failed checking unity_prices: %s", exc, exc_info=exc)
         freshness["unity_prices"] = {"status": "error", "records": 0}
 
     # Options data
@@ -99,7 +104,8 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
             }
         else:
             freshness["options"] = {"status": "error", "records": 0}
-    except:
+    except duckdb.Error as exc:
+        logger.error("Failed checking options data: %s", exc, exc_info=exc)
         freshness["options"] = {"status": "error", "records": 0}
 
     # FRED data
@@ -120,7 +126,8 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
                 "series_count": result[2],
                 "status": "good" if result[1] <= 7 else ("warning" if result[1] <= 30 else "error"),
             }
-    except:
+    except duckdb.Error as exc:
+        logger.error("Failed checking FRED data: %s", exc, exc_info=exc)
         freshness["fred"] = {"status": "error", "series_count": 0}
 
     return freshness
@@ -150,7 +157,8 @@ def check_data_quality(conn) -> Dict[str, any]:
             "large": gaps[1],
             "status": "good" if gaps[1] == 0 else ("warning" if gaps[1] < 5 else "error"),
         }
-    except:
+    except duckdb.Error as exc:
+        logger.error("Failed checking price gaps: %s", exc, exc_info=exc)
         quality["price_gaps"] = {"status": "error"}
 
     # Check Unity volatility
@@ -173,7 +181,8 @@ def check_data_quality(conn) -> Dict[str, any]:
                 "max_daily_move": vol[1] * 100,
                 "status": "good" if vol[0] < 1.0 else ("warning" if vol[0] < 1.5 else "error"),
             }
-    except:
+    except duckdb.Error as exc:
+        logger.error("Failed checking volatility: %s", exc, exc_info=exc)
         quality["volatility"] = {"status": "error"}
 
     # Check options bid-ask spreads
@@ -201,7 +210,8 @@ def check_data_quality(conn) -> Dict[str, any]:
                     "good" if spreads[0] < 0.1 else ("warning" if spreads[0] < 0.3 else "error")
                 ),
             }
-    except:
+    except duckdb.Error as exc:
+        logger.error("Failed checking spreads: %s", exc, exc_info=exc)
         quality["spreads"] = {"status": "none"}
 
     return quality

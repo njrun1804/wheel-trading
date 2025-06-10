@@ -27,8 +27,8 @@ for table in empty_tables:
         if count == 0:
             print(f"   Dropping empty table: {table}")
             conn.execute(f"DROP TABLE IF EXISTS {table}")
-    except:
-        pass
+    except duckdb.Error as exc:
+        print(f"   Failed checking {table}: {exc}")
 
 # Fix inverted spreads in options data
 print("\n🔧 FIXING INVERTED SPREADS:")

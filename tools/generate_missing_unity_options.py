@@ -8,6 +8,9 @@ import sys
 from datetime import datetime, timedelta
 
 import duckdb
+from src.unity_wheel.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -228,8 +231,8 @@ def main():
                     )
                     inserted += 1
                     options_added += 1
-                except:
-                    pass  # Skip duplicates
+                except duckdb.Error as exc:
+                    logger.warning("Duplicate option skipped: %s", exc, exc_info=exc)
 
             if inserted > 0:
                 print(f"   Added {inserted} options for {expiration} expiration")
