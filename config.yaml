@@ -230,7 +230,7 @@ trading:
   # Trading execution parameters
   execution:
     commission_per_contract: 0.65   # Commission per options contract
-    contracts_per_trade: 100        # TODO: CRITICAL - make dynamic based on account size
+    contracts_per_trade: 1          # Minimal default, dynamic sizing applied
     max_concurrent_puts: 10         # Allow many positions across strikes/dates
 
 # Unity-specific settings

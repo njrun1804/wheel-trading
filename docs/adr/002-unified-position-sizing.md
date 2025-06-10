@@ -9,6 +9,10 @@ The codebase had multiple implementations of position sizing logic scattered acr
 ## Decision
 All position sizing must go through the `DynamicPositionSizer` class in `src/unity_wheel/utils/position_sizing.py`. No other module should implement position sizing logic independently.
 
+The number of contracts per trade is now determined dynamically based on
+portfolio value and risk limits. The configuration key `contracts_per_trade`
+acts only as a minimal fallback (default `1`).
+
 ## Consequences
 
 ### Positive
