@@ -11,7 +11,6 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-
 from src.config.loader import get_config
 
 from ..risk.unity_margin import UnityMarginCalculator

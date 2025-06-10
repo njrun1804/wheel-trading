@@ -76,3 +76,12 @@ diagnostics_history.json
 
 # macOS duplicate files
 * [0-9].py
+# Temporary and cache directories
+.DS_Store
+.mypy_cache/
+.hypothesis/
+*.pyc
+__pycache__/
+.env.local
+.codex/
+.claude/

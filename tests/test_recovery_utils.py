@@ -2,11 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.unity_wheel.utils.recovery import (
-    RecoveryStrategy,
-    validate_and_recover,
-    with_recovery,
-)
+from src.unity_wheel.utils.recovery import RecoveryStrategy, validate_and_recover, with_recovery
 
 
 def test_with_recovery_retry() -> None:

@@ -412,6 +412,13 @@ src/
 
 ### Design Principles & Guidelines
 
+**🚨 CRITICAL: NO SYNTHETIC DATA POLICY**
+- **NEVER** use synthetic, mock, dummy, or generated market data
+- **ALWAYS** use real data from authorized providers (Databento, Schwab, FRED)
+- **PROHIBITED**: Black-Scholes generated option prices, synthetic Greeks, mock volume/OI
+- **REQUIRED**: All market data MUST come from live APIs with proper credentials
+- **VERIFICATION**: Any data collection MUST be validated against known real market data
+
 1. **Every calculation returns confidence** - `(value, confidence)` tuples
 2. **Never crash** - Use `@with_recovery`, return NaN with explanation
 3. **Log everything** - Function name, inputs, outputs, timing
@@ -420,6 +427,7 @@ src/
 6. **Validate inputs** - Use Pydantic models everywhere
 7. **Test edge cases** - Property-based testing with Hypothesis
 8. **Self-monitor** - Automatic SLA tracking and alerting
+9. **Real data only** - NO synthetic/mock/dummy data allowed under any circumstance
 
 ## Quick Test Commands
 
