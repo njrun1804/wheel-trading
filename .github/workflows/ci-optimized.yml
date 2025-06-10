@@ -26,7 +26,9 @@ jobs:
         python-version: "3.12"
 
     - name: Install minimal dependencies
-      run: pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn duckdb aiohttp pyyaml pydantic-settings
+      run: |
+        pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn aiohttp pyyaml pydantic-settings
+        pip install duckdb || echo "DuckDB installation failed, continuing without it"
 
     - name: Validate Python syntax
       run: python -m py_compile src/unity_wheel/**/*.py
@@ -113,11 +115,18 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Binary-first for all platforms including DuckDB
-        poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
-        if [[ "${{ matrix.test-group }}" == "risk" ]]; then
-          poetry install --no-interaction --extras "ml"
+        # Platform and test-group specific installation
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          # Ubuntu: install all dependencies including DuckDB
+          poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
+          if [[ "${{ matrix.test-group }}" == "risk" ]]; then
+            poetry install --no-interaction --extras "ml,storage"
+          else
+            poetry install --no-interaction --extras "storage"
+          fi
         else
+          # macOS: skip DuckDB to avoid compilation issues
+          poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
           poetry install --no-interaction
         fi
       timeout-minutes: 5
@@ -159,8 +168,10 @@ jobs:
 
     - name: Quick install
       run: |
-        pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn duckdb
+        pip install numpy scipy pandas pydantic python-dotenv pytz click rich scikit-learn
         pip install aiohttp pyyaml pydantic-settings
+        # Try to install DuckDB, but don't fail if it doesn't work
+        pip install duckdb || echo "DuckDB installation failed, continuing without it"
 
     - name: Validate configuration
       run: |

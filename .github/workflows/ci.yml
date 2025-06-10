@@ -86,14 +86,15 @@ jobs:
         # Configure pip to prefer binary packages
         poetry config installer.max-workers 1
 
-        # Unified binary-first approach for both platforms
-        echo "Installing with binary-first approach..."
-        poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
-
+        # Platform-specific installation approach
         if [[ "${{ runner.os }}" == "macOS" ]]; then
+          echo "Installing on macOS without DuckDB to avoid compilation issues..."
+          poetry run pip install --only-binary=:all: numpy scipy scikit-learn || true
           poetry install --no-interaction --no-ansi
         else
-          poetry install --no-interaction --no-ansi --extras "ml"
+          echo "Installing on Ubuntu with full dependencies..."
+          poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
+          poetry install --no-interaction --no-ansi --extras "ml,storage"
         fi
       timeout-minutes: 8  # Increase timeout for DuckDB compilation
       env:
@@ -107,8 +108,8 @@ jobs:
         source .venv/bin/activate
 
         if [[ "${{ runner.os }}" == "macOS" ]]; then
-          # Skip ML-dependent tests on macOS
-          python -m pytest tests/test_math.py tests/test_options_properties.py tests/test_e2e_recommendation_flow.py \
+          # Run only core math tests on macOS (no DuckDB/ML dependencies)
+          python -m pytest tests/test_math.py tests/test_options_properties.py \
             -v --tb=short -p no:cov -n auto
         else
           # Run all tests on Ubuntu
@@ -158,7 +159,7 @@ jobs:
         poetry config installer.max-workers 1
         # Use same binary-first approach as main test
         poetry run pip install --only-binary=:all: numpy scipy scikit-learn duckdb || true
-        poetry install --no-interaction --no-ansi --extras "ml"
+        poetry install --no-interaction --no-ansi --extras "ml,storage"
       env:
         PIP_PREFER_BINARY: 1
         PIP_ONLY_BINARY: ":all:"
