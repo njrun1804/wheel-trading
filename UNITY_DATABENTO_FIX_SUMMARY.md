@@ -57,3 +57,30 @@ python run.py --portfolio 100000
 ```
 
 The system will skip Databento validation and use fallback data sources.
+
+## Unity Options Availability Summary
+
+### ✅ Confirmed: Unity HAS Listed Options
+- **Total Available**: 31 options (15 calls, 16 puts)
+- **Current Price**: $25.35
+- **Expirations**: 7 dates from June 2025 to January 2027
+- **Most Liquid**: December 2025 expiration (13 options)
+- **Strike Range**: $5 to $70
+
+### ⚠️ Integration Challenges
+1. **Date Handling**: The client's date logic may not align with when Unity option definitions are available
+2. **Limited Liquidity**: Only monthly options, no weeklies
+3. **Mock Data Fallback**: The main `run.py` uses mock data instead of real Databento
+4. **Exchange Issue**: Unity trades on NYSE American but Databento uses different dataset names
+
+### 🎯 Current State
+- Unity options ARE available via Databento ✅
+- Symbol format "U.OPT" works correctly ✅
+- Client can fetch data when dates align ✅
+- Main app still uses mock data, not integrated ⚠️
+
+### 📝 Next Steps for Full Integration
+1. Update `run.py` to use real Databento data instead of mock
+2. Adjust date handling for Unity's specific option availability patterns
+3. Consider relaxing DTE requirements (Unity only has monthly options)
+4. Handle limited liquidity gracefully in recommendations

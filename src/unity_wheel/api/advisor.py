@@ -7,6 +7,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
@@ -17,6 +18,7 @@ from ..utils import (
     RecoveryStrategy,
     StructuredLogger,
     get_logger,
+    is_trading_day,
     timed_operation,
     with_recovery,
 )
@@ -57,7 +59,7 @@ class TradingConstraints:
 
     def __init__(self):
         """Initialize constraints from config."""
-        from ..config.loader import get_config
+        from src.config.loader import get_config
 
         config = get_config()
 
@@ -68,7 +70,7 @@ class TradingConstraints:
         self.MAX_DECISION_TIME = config.operations.api.max_decision_time
 
         # Liquidity requirements
-        self.MIN_BID_ASK_SPREAD = config.operations.api.min_bid_ask_spread
+        self.MAX_BID_ASK_SPREAD = config.operations.api.max_bid_ask_spread
         self.MIN_VOLUME = config.operations.api.min_volume
         self.MIN_OPEN_INTEREST = config.operations.api.min_open_interest
 
@@ -93,6 +95,7 @@ class WheelAdvisor:
         # Initialize components
         self.strategy = WheelStrategy(self.wheel_params)
         self.risk_analyzer = RiskAnalyzer(self.risk_limits)
+        self.assignment_model = UnityAssignmentModel()
 
         logger.info(
             "WheelAdvisor initialized",
@@ -220,13 +223,35 @@ class WheelAdvisor:
                     f"Position size would exceed {self.constraints.MAX_POSITION_PCT:.0%} portfolio limit"
                 )
 
+            # Calculate Unity-specific assignment probability
+            near_earnings = market_snapshot.get("near_earnings", False)
+            now = datetime.now()
+            # Check if it's Friday AND a trading day (not a holiday)
+            is_trading_friday = now.weekday() == 4 and is_trading_day(now)
+            assignment_prob = self.assignment_model.probability_of_assignment(
+                spot_price=current_price,
+                strike_price=strike_rec.strike,
+                days_to_expiry=self.wheel_params.target_dte,
+                volatility=volatility,
+                near_earnings=near_earnings,
+                is_friday=is_trading_friday,
+            )
+
+            # Use Unity-specific assignment probability if confidence is good
+            if assignment_prob.confidence > 0.7:
+                effective_assignment_prob = assignment_prob.probability
+                if assignment_prob.warnings:
+                    logger.info(f"Assignment warnings: {', '.join(assignment_prob.warnings)}")
+            else:
+                effective_assignment_prob = strike_rec.probability_itm
+
             # Calculate comprehensive risk metrics
             risk_metrics = self._calculate_risk_metrics(
                 strike=strike_rec.strike,
                 premium=strike_rec.premium,
                 contracts=contracts,
                 current_price=current_price,
-                probability_itm=strike_rec.probability_itm,
+                probability_itm=effective_assignment_prob,
                 volatility=volatility,
                 portfolio_value=account.cash_balance,
             )
@@ -236,7 +261,7 @@ class WheelAdvisor:
                 premium=strike_rec.premium,
                 strike=strike_rec.strike,
                 current_price=current_price,
-                probability_assign=strike_rec.probability_itm,
+                probability_assign=effective_assignment_prob,
                 contracts=contracts,
             )
 
@@ -248,6 +273,12 @@ class WheelAdvisor:
                 size_confidence,
                 1.0 if edge > 0.01 else edge * 100,  # Scale edge to confidence
             )
+
+            # Check assignment probability threshold
+            if effective_assignment_prob > 0.50:
+                return self._create_hold_recommendation(
+                    f"Assignment probability {effective_assignment_prob:.1%} too high (>50%)"
+                )
 
             # Check decision latency
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -425,15 +456,15 @@ class WheelAdvisor:
         open_interest = option_data.get("open_interest", 0)
 
         # Check bid-ask spread
-        if ask - bid > self.constraints.MIN_BID_ASK_SPREAD:
+        if ask - bid > self.MAX_BID_ASK_SPREAD:
             return False
 
         # Check volume
-        if volume < self.constraints.MIN_VOLUME:
+        if volume < self.MIN_VOLUME:
             return False
 
         # Check open interest
-        if open_interest < self.constraints.MIN_OPEN_INTEREST:
+        if open_interest < self.MIN_OPEN_INTEREST:
             return False
 
         return True
