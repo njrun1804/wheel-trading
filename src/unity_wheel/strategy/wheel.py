@@ -287,6 +287,130 @@ class WheelStrategy:
 
     # === END vectorized_strike_selection ===
 
+    @timed_operation(threshold_ms=20.0)
+    def find_optimal_call_strike_vectorized(
+        self,
+        current_price: float,
+        cost_basis: float,
+        available_strikes: List[float],
+        volatility: float,
+        days_to_expiry: int,
+        risk_free_rate: float = 0.05,
+        target_delta: Optional[float] = None,
+    ) -> Optional[StrikeRecommendation]:
+        """Vectorized version of find_optimal_call_strike."""
+
+        if not available_strikes:
+            logger.warning("No strikes available")
+            return None
+
+        if target_delta is None:
+            target_delta = self.params.target_delta
+
+        time_to_expiry = days_to_expiry / 365.0
+
+        strikes = np.array(available_strikes, dtype=float)
+
+        config = get_config()
+        max_moneyness = config.strategy.strike_range.max_moneyness
+
+        valid_mask = (strikes >= cost_basis) & (strikes <= current_price * max_moneyness)
+        strikes = strikes[valid_mask]
+
+        if len(strikes) == 0:
+            logger.warning("No valid call strikes within range")
+            return None
+
+        greeks, greek_confidence = calculate_all_greeks(
+            S=current_price,
+            K=strikes,
+            T=time_to_expiry,
+            r=risk_free_rate,
+            sigma=volatility,
+            option_type="call",
+        )
+
+        price_result = black_scholes_price_validated(
+            S=current_price,
+            K=strikes,
+            T=time_to_expiry,
+            r=risk_free_rate,
+            sigma=volatility,
+            option_type="call",
+        )
+
+        prob_result = probability_itm_validated(
+            S=current_price,
+            K=strikes,
+            T=time_to_expiry,
+            r=risk_free_rate,
+            sigma=volatility,
+            option_type="call",
+        )
+
+        deltas = greeks["delta"]
+        premiums = price_result.value
+        prob_itms = prob_result.value
+
+        safety_margin = (strikes - cost_basis) / cost_basis
+        delta_scores = np.abs(deltas - target_delta)
+        delta_scores -= 0.05 * (safety_margin > 0.05)
+
+        scores = delta_scores
+
+        confidence_mask = (
+            (greek_confidence > 0.5)
+            & (price_result.confidence > 0.5)
+            & (prob_result.confidence > 0.5)
+        )
+
+        valid_indices = np.where(confidence_mask)[0]
+        if len(valid_indices) == 0:
+            logger.warning("No call strikes with sufficient confidence")
+            return None
+
+        best_idx = valid_indices[np.argmin(scores[valid_indices])]
+
+        best_strike = strikes[best_idx]
+        best_delta = deltas[best_idx]
+        best_premium = premiums[best_idx]
+        best_prob_itm = prob_itms[best_idx]
+        best_safety_margin = safety_margin[best_idx]
+
+        confidence = np.mean(
+            [
+                greek_confidence,
+                price_result.confidence,
+                prob_result.confidence,
+                0.9 if abs(best_delta - target_delta) < 0.05 else 0.7,
+            ]
+        )
+
+        reason = f"Delta {best_delta:.2f} with {best_safety_margin:.1%} above cost basis"
+
+        logger.info(
+            "Optimal call strike selected (vectorized)",
+            extra={
+                "strike": best_strike,
+                "delta": best_delta,
+                "premium": best_premium,
+                "prob_itm": best_prob_itm,
+                "confidence": confidence,
+                "strikes_evaluated": len(strikes),
+            },
+        )
+
+        return StrikeRecommendation(
+            strike=float(best_strike),
+            delta=float(best_delta),
+            probability_itm=float(best_prob_itm),
+            premium=float(best_premium),
+            confidence=float(confidence),
+            reason=reason,
+        )
+
+    # === END vectorized_call_selection ===
+
     @timed_operation(threshold_ms=100.0)
     @with_recovery(strategy=RecoveryStrategy.FALLBACK)
     def find_optimal_call_strike(
@@ -298,131 +422,16 @@ class WheelStrategy:
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
     ) -> Optional[StrikeRecommendation]:
-        """
-        Find optimal call strike above cost basis with validation.
+        """Find optimal call strike with vectorized implementation."""
 
-        Parameters
-        ----------
-        current_price : float
-            Current stock price
-        cost_basis : float
-            Average cost basis of shares
-        available_strikes : List[float]
-            Available strike prices
-        volatility : float
-            Implied volatility
-        days_to_expiry : int
-            Days until expiration
-        risk_free_rate : float
-            Risk-free rate
-
-        Returns
-        -------
-        Optional[StrikeRecommendation]
-            Recommendation with confidence score
-        """
-        # Filter strikes above cost basis
-        valid_strikes = [s for s in available_strikes if s >= cost_basis]
-        if not valid_strikes:
-            logger.warning(f"No strikes above cost basis {cost_basis}")
-            return None
-
-        time_to_expiry = days_to_expiry / 365.0
-        target_delta = self.params.target_delta
-
-        best_strike = None
-        best_score = float("inf")
-
-        config = get_config()
-        max_moneyness = config.strategy.strike_range.max_moneyness
-
-        for strike in valid_strikes:
-            # Skip strikes too far OTM (above max moneyness)
-            if strike > current_price * max_moneyness:
-                continue
-
-            # Calculate Greeks
-            greeks, greek_confidence = calculate_all_greeks(
-                S=current_price,
-                K=strike,
-                T=time_to_expiry,
-                r=risk_free_rate,
-                sigma=volatility,
-                option_type="call",
-            )
-
-            if greek_confidence < 0.5:
-                continue
-
-            delta = greeks.get("delta", 0)
-
-            # Calculate premium
-            price_result = black_scholes_price_validated(
-                S=current_price,
-                K=strike,
-                T=time_to_expiry,
-                r=risk_free_rate,
-                sigma=volatility,
-                option_type="call",
-            )
-
-            premium = price_result.value
-
-            # Calculate probability ITM
-            prob_result = probability_itm_validated(
-                S=current_price,
-                K=strike,
-                T=time_to_expiry,
-                r=risk_free_rate,
-                sigma=volatility,
-                option_type="call",
-            )
-
-            # Score based on delta distance
-            delta_distance = abs(delta - target_delta)
-
-            # Bonus for strikes further above cost basis
-            safety_margin = (strike - cost_basis) / cost_basis
-            if safety_margin > 0.05:  # 5% above cost basis
-                delta_distance -= 0.05  # Improve score
-
-            confidence = min(greek_confidence, price_result.confidence, prob_result.confidence)
-
-            if delta_distance < best_score:
-                best_score = delta_distance
-                best_strike = {
-                    "strike": strike,
-                    "delta": delta,
-                    "premium": premium,
-                    "prob_itm": prob_result.value,
-                    "confidence": confidence,
-                    "safety_margin": safety_margin,
-                }
-
-        if not best_strike:
-            return None
-
-        reason = f"Delta {best_strike['delta']:.2f} with {best_strike['safety_margin']:.1%} above cost basis"
-
-        logger.info(
-            "Optimal call strike selected",
-            extra={
-                "current_price": current_price,
-                "cost_basis": cost_basis,
-                "strike": best_strike["strike"],
-                "delta": best_strike["delta"],
-                "safety_margin": best_strike["safety_margin"],
-                "confidence": best_strike["confidence"],
-            },
-        )
-
-        return StrikeRecommendation(
-            strike=best_strike["strike"],
-            delta=best_strike["delta"],
-            probability_itm=best_strike["prob_itm"],
-            premium=best_strike["premium"],
-            confidence=best_strike["confidence"],
-            reason=reason,
+        return self.find_optimal_call_strike_vectorized(
+            current_price=current_price,
+            cost_basis=cost_basis,
+            available_strikes=available_strikes,
+            volatility=volatility,
+            days_to_expiry=days_to_expiry,
+            risk_free_rate=risk_free_rate,
+            target_delta=self.params.target_delta,
         )
 
     @timed_operation(threshold_ms=10.0)

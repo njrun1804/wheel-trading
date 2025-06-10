@@ -23,7 +23,8 @@ Market Data → Validation → Risk Analysis → Strategy → Recommendation
 
 ### 📊 **`src/unity_wheel/strategy/`** - Trading Logic
 - `wheel.py:626` - Core wheel strategy implementation
-- `wheel.py:153` - Vectorized strike selection (10x performance boost)
+ - `wheel.py:153` - Vectorized put strike selection (10x performance boost)
+ - `wheel.py:291` - Vectorized call strike selection
 
 ### ⚠️ **`src/unity_wheel/risk/`** - Risk Management
 - `analytics.py:798` - Portfolio risk calculations with confidence scores
@@ -83,7 +84,7 @@ recommendation = WheelAdvisor().advise_position(account, positions, chains)
 
 ## Performance Optimizations (v2.2)
 
-- **Vectorized Calculations**: Process all strikes simultaneously (10x speedup)
+ - **Vectorized Calculations**: Process put and call strikes simultaneously (10x speedup)
 - **Lazy Loading**: Data loaded only when needed
 - **Caching**: 5-minute TTL on expensive calculations
 - **Memory Efficient**: <100MB typical usage
