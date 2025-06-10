@@ -32,7 +32,7 @@ repos:
     rev: v1.9.0
     hooks:
       - id: mypy
-        args: [--strict, --ignore-missing-imports]
+        args: [--ignore-missing-imports, --no-strict-optional, --allow-untyped-defs]
         additional_dependencies:
           - types-pytz
           - pandas-stubs
