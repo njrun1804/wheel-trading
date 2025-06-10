@@ -96,6 +96,15 @@ risk:
     max_theta_decay: 500.0          # Maximum daily theta decay
     max_rho_exposure: 1000.0        # Maximum rho exposure
 
+  # Correlation matrix for multi-asset risk aggregation
+  correlation_matrix:
+    U:
+      U: 1.0
+      SPY: 0.5
+    SPY:
+      U: 0.5
+      SPY: 1.0
+
   # Margin and leverage limits
   margin:
     max_utilization: 0.85           # Match max_margin_percent above

@@ -102,6 +102,21 @@ class GreekLimits(BaseModel):
     max_rho_exposure: float = Field(500.0, ge=0.0, description="Maximum rho exposure")
 
 
+class CorrelationMatrix(BaseModel):
+    """Correlation matrix for risk aggregation."""
+
+    matrix: Dict[str, Dict[str, float]] = Field(default_factory=dict)
+
+    @field_validator("matrix")
+    @classmethod
+    def validate_matrix(cls, v: Dict[str, Dict[str, float]]) -> Dict[str, Dict[str, float]]:
+        for outer in v.values():
+            for val in outer.values():
+                if not -1.0 <= val <= 1.0:
+                    raise ValueError("Correlation values must be between -1 and 1")
+        return v
+
+
 class MarginConfig(BaseModel):
     """Margin and leverage configuration."""
 
@@ -178,6 +193,7 @@ class RiskConfig(BaseModel):
     kelly_fraction: float = Field(0.50, ge=0.0, le=1.0, description="Kelly criterion fraction")
     limits: RiskLimits = Field(default_factory=RiskLimits)
     greeks: GreekLimits = Field(default_factory=GreekLimits)
+    correlation_matrix: CorrelationMatrix = Field(default_factory=CorrelationMatrix)
     margin: MarginConfig = Field(default_factory=MarginConfig)
     circuit_breakers: CircuitBreakers = Field(default_factory=CircuitBreakers)
     adaptive_limits: AdaptiveLimits = Field(default_factory=AdaptiveLimits)

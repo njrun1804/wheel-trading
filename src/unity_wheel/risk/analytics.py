@@ -460,10 +460,11 @@ class RiskAnalyzer:
             Aggregated Greeks and confidence score
         """
         total_delta = 0.0
-        total_gamma = 0.0
-        total_vega = 0.0
-        total_theta = 0.0
-        total_rho = 0.0
+        gamma_exposures: List[float] = []
+        vega_exposures: List[float] = []
+        theta_exposures: List[float] = []
+        rho_exposures: List[float] = []
+        underlyings: List[str] = []
 
         for position, greeks, underlying_price in positions:
             # Scale by position size and contract multiplier
@@ -473,30 +474,33 @@ class RiskAnalyzer:
             if greeks.delta is not None:
                 total_delta += qty * multiplier * greeks.delta
 
-            if greeks.gamma is not None:
-                # Gamma in shares per $1 move
-                # TODO(codex): Consider position correlations - same underlying positions have correlated gamma risk
-                # CODEX-ENHANCEMENT: Could weight by correlation matrix for multi-asset portfolios
-                total_gamma += qty * multiplier * greeks.gamma
+            gamma_exposures.append(qty * multiplier * (greeks.gamma or 0.0))
+            vega_exposures.append(qty * multiplier * (greeks.vega or 0.0))
+            theta_exposures.append(qty * multiplier * (greeks.theta or 0.0))
+            rho_exposures.append(qty * multiplier * (greeks.rho or 0.0))
+            underlyings.append(position.underlying)
 
-            if greeks.vega is not None:
-                # Vega in dollars per 1% volatility move
-                total_vega += qty * multiplier * greeks.vega
+        corr_matrix = get_config().risk.correlation_matrix.matrix
 
-            if greeks.theta is not None:
-                # Theta in dollars per day
-                total_theta += qty * multiplier * greeks.theta
+        def corr(u1: str, u2: str) -> float:
+            if u1 == u2:
+                return 1.0
+            return corr_matrix.get(u1, {}).get(u2, corr_matrix.get(u2, {}).get(u1, 0.0))
 
-            if greeks.rho is not None:
-                # Rho in dollars per 1% rate move
-                total_rho += qty * multiplier * greeks.rho
+        def correlated_sum(values: List[float]) -> float:
+            total = 0.0
+            n = len(values)
+            for i in range(n):
+                for j in range(n):
+                    total += values[i] * values[j] * corr(underlyings[i], underlyings[j])
+            return float(np.sqrt(total))
 
         aggregated = {
             "delta": total_delta,
-            "gamma": total_gamma,
-            "vega": total_vega,
-            "theta": total_theta,
-            "rho": total_rho,
+            "gamma": correlated_sum(gamma_exposures),
+            "vega": correlated_sum(vega_exposures),
+            "theta": correlated_sum(theta_exposures),
+            "rho": correlated_sum(rho_exposures),
             "delta_dollars": total_delta * underlying_price if positions else 0,
         }
 
