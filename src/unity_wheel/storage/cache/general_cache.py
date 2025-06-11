@@ -11,8 +11,8 @@ from functools import lru_cache, wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
-from src.unity_wheel.utils.logging import get_logger
 from src.unity_wheel.metrics import metrics_collector
+from src.unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
