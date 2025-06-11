@@ -15,10 +15,10 @@ repos:
 
   # Code formatting (automated)
   - repo: https://github.com/psf/black
-    rev: 24.2.0
+    rev: 24.10.0
     hooks:
       - id: black
-        language_version: python3.12
+        language_version: python3.11
         args: [--line-length=100]
 
   - repo: https://github.com/pycqa/isort

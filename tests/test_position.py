@@ -74,7 +74,7 @@ class TestPositionBasic:
         with pytest.raises(ValueError, match="Invalid symbol format"):
             Position("U241220X00080000", 1)  # Invalid option type (X)
 
-        with pytest.raises(ValueError, match="Invalid symbol format"):
+        with pytest.raises(ValueError, match="Symbol must be a non-empty string"):
             Position("", 100)  # Empty symbol
 
     def test_invalid_quantity(self) -> None:

@@ -73,11 +73,11 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.11"
         cache: 'pip'
 
     - name: Install tools
-      run: pip install safety bandit
+      run: pip install safety
 
     - name: Run Safety check
       run: |
@@ -98,24 +98,8 @@ jobs:
             print('✅ No known vulnerabilities')
         "
 
-    - name: Run Bandit
-      run: |
-        bandit -r src/ -f json -o bandit-report.json || true
-
-        # Parse results
-        python -c "
-        import json
-        with open('bandit-report.json') as f:
-            data = json.load(f)
-        issues = data.get('results', [])
-        high_issues = [i for i in issues if i['issue_severity'] == 'HIGH']
-        if high_issues:
-            print(f'⚠️  Found {len(high_issues)} high severity issues')
-            for i in high_issues[:3]:
-                print(f'  - {i[\"filename\"]}:{i[\"line_number\"]} - {i[\"issue_text\"]}')
-        else:
-            print('✅ No high severity issues')
-        "
+    # Bandit removed - no longer in dependencies
+    # Static analysis now handled by CodeQL above
 
     - name: Upload security reports
       if: always()
@@ -124,7 +108,6 @@ jobs:
         name: security-reports
         path: |
           safety-report.json
-          bandit-report.json
 
   # Secret scanning
   secret-scan:
