@@ -1,22 +1,19 @@
-"""
-Unified storage layer with local-first DuckDB cache and GCS backup.
-Implements get_or_fetch pattern for all data types.
+"""Unified local storage layer backed by DuckDB.
+
+All data is stored locally using a DuckDB cache.  The module provides a
+``get_or_fetch`` pattern for convenient caching of API responses and model
+results.
 """
 
-import asyncio
-import json
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
 from ..utils import get_logger, with_recovery
 from .duckdb_cache import CacheConfig, DuckDBCache
-from .gcs_adapter import GCSAdapter, GCSConfig
 
 logger = get_logger(__name__)
 
-T = TypeVar("T")
 
 
 @dataclass
@@ -24,9 +21,6 @@ class StorageConfig:
     """Configuration for unified storage."""
 
     cache_config: CacheConfig = field(default_factory=CacheConfig)
-    gcs_config: Optional[GCSConfig] = None
-    enable_gcs_backup: bool = True
-    backup_interval_hours: int = 24
 
 
 class Storage:
@@ -35,19 +29,12 @@ class Storage:
     def __init__(self, config: Optional[StorageConfig] = None):
         self.config = config or StorageConfig()
 
-        # Initialize components
+        # Initialize local cache
         self.cache = DuckDBCache(self.config.cache_config)
-        self.gcs = GCSAdapter(self.config.gcs_config) if self.config.enable_gcs_backup else None
-
-        # Track last backup time
-        self._last_backup: Dict[str, datetime] = {}
 
     async def initialize(self):
         """Initialize storage components."""
         await self.cache.initialize()
-
-        if self.gcs and self.gcs.enabled:
-            self.gcs.set_lifecycle_policy()
 
     async def get_or_fetch_option_chain(
         self, symbol: str, expiration: datetime, fetch_func: Callable, max_age_minutes: int = 15
@@ -79,15 +66,6 @@ class Storage:
             chain_data=chain_data,
         )
 
-        # Backup raw response to GCS if enabled
-        if self.gcs and self.gcs.enabled:
-            await self.gcs.upload_raw_response(
-                source=f"options_{symbol}", timestamp=timestamp, data=chain_data
-            )
-
-        # Check if we need to backup to Parquet
-        await self._check_backup("option_chains")
-
         return chain_data
 
     async def get_or_fetch_positions(
@@ -115,15 +93,6 @@ class Storage:
             account_id=account_id, positions=data["positions"], account_data=data["account_data"]
         )
 
-        # Backup raw response to GCS
-        if self.gcs and self.gcs.enabled:
-            await self.gcs.upload_raw_response(
-                source=f"positions_{account_id}", timestamp=datetime.utcnow(), data=data
-            )
-
-        # Check if we need to backup
-        await self._check_backup("position_snapshots")
-
         return data
 
     async def store_prediction(
@@ -143,6 +112,8 @@ class Storage:
             """,
                 [prediction_id, datetime.utcnow(), input_features, predictions, model_version],
             )
+
+        await self.cache._check_vacuum()
 
     async def store_greeks(
         self, option_symbol: str, spot_price: float, risk_free_rate: float, greeks: Dict[str, float]
@@ -170,6 +141,8 @@ class Storage:
                 ],
             )
 
+        await self.cache._check_vacuum()
+
     async def get_historical_data(
         self,
         dataset: str,
@@ -177,7 +150,7 @@ class Storage:
         end_date: datetime,
         symbols: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
-        """Get historical data from cache or GCS."""
+        """Get historical data from the local cache."""
         results = []
 
         # First check local cache
@@ -202,27 +175,6 @@ class Storage:
             if not df.empty:
                 results.extend(df.to_dict("records"))
 
-        # If we need more data and GCS is enabled
-        if self.gcs and self.gcs.enabled and len(results) == 0:
-            # List available files in GCS
-            files = await self.gcs.list_parquet_files(
-                dataset=dataset, start_date=start_date, end_date=end_date
-            )
-
-            # Download and import relevant files
-            for file_path in files[:5]:  # Limit to avoid huge downloads
-                local_file = await self.gcs.download_parquet(
-                    file_path, self.config.cache_config.cache_dir / "downloads"
-                )
-
-                if local_file:
-                    await self.cache.import_from_parquet(local_file, dataset)
-
-            # Query again after import
-            async with self.cache.connection() as conn:
-                df = conn.execute(query, params).df()
-                if not df.empty:
-                    results.extend(df.to_dict("records"))
 
         logger.info(
             "historical_data_retrieved",
@@ -234,63 +186,10 @@ class Storage:
 
         return results
 
-    async def _check_backup(self, table: str):
-        """Check if we need to backup table to GCS."""
-        if not self.gcs or not self.gcs.enabled:
-            return
-
-        last_backup = self._last_backup.get(table, datetime.min)
-        hours_since = (datetime.utcnow() - last_backup).total_seconds() / 3600
-
-        if hours_since >= self.config.backup_interval_hours:
-            await self._backup_table(table)
-
-    async def _backup_table(self, table: str):
-        """Backup table to GCS as Parquet."""
-        try:
-            # Export to local Parquet
-            export_dir = self.config.cache_config.cache_dir / "exports"
-            export_dir.mkdir(exist_ok=True)
-
-            parquet_file = await self.cache.export_to_parquet(table, export_dir)
-
-            # Upload to GCS
-            await self.gcs.upload_parquet(parquet_file, table)
-
-            # Clean up local file
-            parquet_file.unlink()
-
-            # Update last backup time
-            self._last_backup[table] = datetime.utcnow()
-
-            logger.info("table_backed_up", table=table)
-
-        except Exception as e:
-            logger.error("backup_failed", table=table, error=str(e))
-
     async def get_storage_stats(self) -> Dict[str, Any]:
         """Get storage statistics."""
-        stats = await self.cache.get_storage_stats()
-
-        # Add backup status
-        stats["last_backups"] = {
-            table: last.isoformat() if last != datetime.min else "never"
-            for table, last in self._last_backup.items()
-        }
-
-        # Add GCS status
-        stats["gcs_enabled"] = self.gcs.enabled if self.gcs else False
-
-        return stats
+        return await self.cache.get_storage_stats()
 
     async def cleanup_old_data(self):
         """Run maintenance to clean up old data."""
         await self.cache._vacuum()
-
-        # Also clean up old export files
-        export_dir = self.config.cache_config.cache_dir / "exports"
-        if export_dir.exists():
-            for file in export_dir.glob("*.parquet"):
-                if file.stat().st_mtime < (datetime.utcnow() - timedelta(days=7)).timestamp():
-                    file.unlink()
-                    logger.info("cleaned_old_export", file=file.name)

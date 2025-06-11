@@ -27,7 +27,7 @@ from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,
 )
 from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
-from src.unity_wheel.storage.storage import Storage
+from src.unity_wheel.storage.storage import Storage, StorageConfig
 from src.unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -563,11 +563,8 @@ async def main():
         # Create storage stack
         from pathlib import Path
 
-        from src.unity_wheel.storage.storage import StorageConfig
-
         cache_config = CacheConfig(cache_dir=Path(db_path).parent)
-        storage_config = StorageConfig(cache_config=cache_config, enable_gcs_backup=False)
-        storage = Storage(storage_config)
+        storage = Storage(StorageConfig(cache_config=cache_config))
         await storage.initialize()
 
         adapter = DatabentoStorageAdapter(storage)

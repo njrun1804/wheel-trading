@@ -70,7 +70,6 @@ async def test_integration():
     print("\n6. Testing Storage Stats:")
     stats = await storage.get_storage_stats()
     print(f"   Cache location: {storage.config.cache_config.cache_dir}")
-    print(f"   GCS enabled: {stats['gcs_enabled']}")
     if "tables" in stats:
         for table, info in stats["tables"].items():
             if table.startswith("fred"):

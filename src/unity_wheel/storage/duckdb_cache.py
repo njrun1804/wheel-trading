@@ -166,6 +166,12 @@ class DuckDBCache:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_positions_created ON position_snapshots(created_at)"
             )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_greeks_created ON greeks_cache(created_at)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_predictions_created ON predictions_cache(created_at)"
+            )
 
     async def store_option_chain(
         self,
@@ -229,6 +235,8 @@ class DuckDBCache:
             """,
                 [account_id, timestamp, positions, account_data],
             )
+
+        await self._check_vacuum()
 
     async def get_latest_positions(
         self, account_id: str, max_age_minutes: int = 30

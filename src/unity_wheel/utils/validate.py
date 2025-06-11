@@ -64,7 +64,7 @@ class EnvironmentValidator:
     def _check_python_version(self) -> None:
         """Check Python version meets requirements."""
         required_major = 3
-        required_minor = 12
+        required_minor = 9
 
         current_major = sys.version_info.major
         current_minor = sys.version_info.minor

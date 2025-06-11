@@ -2,6 +2,27 @@
 
 Unity Wheel Trading Bot v2.2 - File organization rules for autonomous operation.
 
+## Agent Quick Start
+
+- **No execution code** – only recommendations.
+- **Return confidence scores** from all calculations.
+- **Never hardcode** ticker "U"; use `config.unity.ticker`.
+
+**Start each session**
+```bash
+./scripts/housekeeping.sh --unity-check
+```
+
+**Before committing**
+```bash
+./scripts/housekeeping.sh --check-staged
+```
+
+**Detailed violations**
+```bash
+./scripts/housekeeping.sh --explain --json
+```
+
 ## Session Start Checklist
 
 ```bash
@@ -97,7 +118,6 @@ gh run watch                     # Watch CI
 
 ```
 run.py                   # Main entry point
-run_legacy.py            # Legacy entry (deprecated)
 config.yaml              # Configuration
 my_positions.yaml        # User positions
 README.md, CLAUDE.md     # Core docs
@@ -368,6 +388,30 @@ Score: 92/100
 
 # With details
 ./scripts/housekeeping.sh --json --explain
+```
+
+Example output with details:
+
+```json
+{
+  "timestamp": "2025-01-15T09:00:00Z",
+  "version": "2.2.0",
+  "score": 92,
+  "critical": false,
+  "violations": {
+    "test_files": 1,
+    "missing_confidence": 1,
+    "execution_code": 0,
+    "adaptive_files": 0,
+    "fetch_files": 0,
+    "hardcoded_ticker": 0,
+    "static_positions": 0
+  },
+  "details": [
+    "test_files:tests/test_dummy.py",
+    "missing_confidence:src/unity_wheel/math/metrics.py:black_scholes_price"
+  ]
+}
 ```
 
 ## Remember

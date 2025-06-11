@@ -663,3 +663,67 @@ class AdvancedFinancialModeling:
         conf = 1.0 if len(returns_distribution) >= 250 else 0.8
 
         return results, conf
+
+    def optimize_portfolio_leverage(
+        self,
+        portfolio: List[Dict[str, float]],
+        max_leverage: float = 2.0,
+        n_points: int = 20,
+        n_simulations: int = 1000,
+        risk_tolerance: float = 0.5,
+        random_seed: int | None = None,
+    ) -> OptimalCapitalStructure:
+        """Find optimal leverage for an entire portfolio using Monte Carlo."""
+        if not portfolio:
+            raise ValueError("Portfolio cannot be empty")
+
+        weights = np.array([p.get("weight", 1.0) for p in portfolio], dtype=float)
+        weights /= weights.sum()
+
+        expected = float(
+            sum(w * p["expected_return"] for w, p in zip(weights, portfolio))
+        )
+        volatility = float(
+            np.sqrt(sum((w * p["volatility"]) ** 2 for w, p in zip(weights, portfolio)))
+        )
+        horizon = max(int(p.get("time_horizon", 252)) for p in portfolio)
+
+        leverage_points = np.linspace(1.0, max_leverage, n_points)
+        curve = []
+
+        for lev in leverage_points:
+            mc = self.monte_carlo_simulation(
+                expected_return=expected,
+                volatility=volatility,
+                time_horizon=horizon,
+                position_size=lev,
+                borrowed_amount=max(0.0, lev - 1.0),
+                n_simulations=n_simulations,
+                include_path_dependency=False,
+                random_seed=random_seed,
+            )
+            ret = mc.mean_return * lev
+            risk = mc.std_return * lev
+            curve.append((lev, ret, risk))
+
+        leverages = np.array([c[0] for c in curve])
+        returns = np.array([c[1] for c in curve])
+        risks = np.array([c[2] for c in curve])
+
+        utilities = returns - (1 - risk_tolerance) * risks**2
+        optimal_idx = int(np.argmax(utilities))
+
+        frontier = [(risks[i], returns[i]) for i in range(len(risks))]
+        frontier.sort(key=lambda x: x[0])
+
+        leverage_curve = [(leverages[i], returns[i], risks[i]) for i in range(len(leverages))]
+
+        return OptimalCapitalStructure(
+            optimal_leverage=leverages[optimal_idx],
+            optimal_debt_ratio=(leverages[optimal_idx] - 1) / leverages[optimal_idx],
+            expected_return=returns[optimal_idx],
+            risk_level=risks[optimal_idx],
+            sharpe_ratio=returns[optimal_idx] / risks[optimal_idx] if risks[optimal_idx] > 0 else 0,
+            leverage_curve=leverage_curve,
+            efficient_frontier=frontier,
+        )

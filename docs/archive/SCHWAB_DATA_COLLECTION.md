@@ -24,7 +24,6 @@ If data is stale (> TTL):
     → SchwabDataFetcher
     → Schwab API (with rate limiting)
     → Store in DuckDB cache
-    → Optional GCS backup
     ↓
 Return data to user
 ```
@@ -172,7 +171,6 @@ Assumptions:
 API Calls: 50 (after cache)
 Schwab API: Free (no cost)
 Storage: < 100MB DuckDB
-GCS Backup: < $1/month
 Total: < $1/month
 ```
 
