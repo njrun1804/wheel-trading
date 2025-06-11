@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Install git hooks for data validation enforcement
 
-set -e
 
 # Colors
 RED='\033[0;31m'

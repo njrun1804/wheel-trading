@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Pre-trading checklist - Run this EVERY TIME before using the system
 
-set -euo pipefail
 
 # Colors
 RED='\033[0;31m'

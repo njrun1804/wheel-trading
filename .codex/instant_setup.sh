@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Instant setup - Minimal, fast, works immediately
 # This is the most reliable approach for containers
 

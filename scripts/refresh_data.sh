@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Automated data refresh script for wheel trading system
 
 # Colors for output

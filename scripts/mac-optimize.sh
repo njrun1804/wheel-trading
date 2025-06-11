@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Advanced Mac optimizations for Claude Code and development
 
 echo "🚀 Applying advanced Mac optimizations..."

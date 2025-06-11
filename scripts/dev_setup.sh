@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Quick development setup for Unity Wheel Bot
 # Optimized for single-user macOS environment
 
-set -e
 
 echo "🚀 Unity Wheel Bot - Development Setup"
 echo "====================================="

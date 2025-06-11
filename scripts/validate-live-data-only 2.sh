@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Script to ensure the system is using ONLY live data, no mock/dummy/fake data
 
-set -euo pipefail
 
 # Colors
 RED='\033[0;31m'

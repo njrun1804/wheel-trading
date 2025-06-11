@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Sync Codex changes back to main src/ directory
 
 echo "🔄 SYNCING CODEX CHANGES TO SRC"

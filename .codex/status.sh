@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Quick status check for Codex container
 
 echo "🔍 CODEX CONTAINER STATUS"

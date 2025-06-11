@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Periodic maintenance tasks for Unity Wheel Trading Bot
 
-set -euo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"

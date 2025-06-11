@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Quick health check for single-user recommendation system
 # Focuses on what matters: math accuracy and recommendation capability
 
-set -e
 
 echo "🔍 Unity Wheel Bot - Quick Check"
 echo "================================"

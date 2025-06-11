@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Unity Wheel Bot - Complete Commit Workflow
 # Runs all checks, commits, and waits for CI/CD to pass
 
-set -euo pipefail
 
 # Version
 readonly VERSION="1.0.0"

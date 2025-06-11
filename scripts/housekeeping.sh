@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Unity Wheel Bot v2.2 - Autonomous housekeeping enforcement
 # Exit codes: 0=success, 1=non-critical issues, 2=critical failures
 
-set -euo pipefail
 
 # Version
 readonly VERSION="2.2.0"

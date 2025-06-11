@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # DEPRECATED: This continuous monitoring script has been replaced by on-demand health checks
 #
 # The wheel trading bot now uses a pull-when-asked architecture with no continuous

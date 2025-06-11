@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Quick script to check for improper data sources in Unity Wheel Trading Bot
 # Used by CI/CD and other shell scripts
 
-set -euo pipefail
 
 # Colors (when running interactively)
 if [[ -t 1 ]]; then

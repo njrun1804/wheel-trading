@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Offline setup script for Codex environment
 
-set -e
 
 echo "🚀 CODEX OFFLINE SETUP"
 echo "======================"

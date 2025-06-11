@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Fix Import Conflicts - Handles the math module shadowing issue
 # This is a workaround for the unity_trading.math shadowing stdlib math
 

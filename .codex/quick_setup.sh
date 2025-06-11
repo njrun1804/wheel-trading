@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Quick Container Setup - Minimal approach
 # Handles the math module naming conflict properly
 

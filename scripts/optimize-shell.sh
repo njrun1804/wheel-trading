@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Shell optimizations for Claude Code performance
 
 echo "Applying shell optimizations..."

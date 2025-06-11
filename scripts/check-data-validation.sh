@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Check that data validation with hard exits is properly implemented
 
-set -e
 
 # Colors
 RED='\033[0;31m'

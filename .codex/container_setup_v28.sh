@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Comprehensive Container Setup for Unity Wheel Trading Bot v2.2
 # Handles numpy, sklearn, hypothesis, and essential dependencies with proper fallbacks
 
-set -e
 
 echo "🚀 UNITY WHEEL CONTAINER SETUP v29"
 echo "=================================="

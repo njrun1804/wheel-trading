@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Find optimization opportunities for Codex
 
 echo "🔍 FINDING OPTIMIZATION OPPORTUNITIES"
