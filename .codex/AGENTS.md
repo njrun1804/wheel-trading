@@ -46,7 +46,7 @@ Unity Wheel Trading Bot v2.2 - Options wheel strategy recommendation system with
 |----------|---------|---------|
 | **Recommendations** | Generate JSON trade suggestions | `{"action": "SELL_PUT", "strike": 35}` |
 | **Mock Mode** | USE_MOCK_DATA=true for testing | Safe container testing |
-| **Read Operations** | Query Schwab positions, Databento chains | All GET endpoints |
+| **Read Operations** | Query Databento chains | All GET endpoints |
 | **Risk Calculations** | VaR, Greeks, portfolio analytics | All math operations |
 | **Logging & Metrics** | Track decisions and performance | Via proper APIs |
 
@@ -72,9 +72,8 @@ graph LR
     C --> D[Strategy Engine]
     D --> E[Recommendation]
 
-    A1[Schwab API] --> A
-    A2[Databento] --> A
-    A3[FRED] --> A
+    A1[Databento] --> A
+    A2[FRED] --> A
 
     E --> F[JSON Output]
     E --> G[Metrics DB]
@@ -189,7 +188,6 @@ rm -rf unity_trading/
 - Portfolio position sizing
 
 ### 📊 Data Sources
-- **Schwab API**: Account data, positions
 - **Databento**: Options chains, market data
 - **FRED**: Risk-free rates, economic data
 
@@ -232,8 +230,6 @@ python -c "from src.unity_wheel.math.options import black_scholes_price_validate
 
 ### Required for Live Mode
 ```bash
-SCHWAB_CLIENT_ID=xxx
-SCHWAB_CLIENT_SECRET=xxx
 DATABENTO_API_KEY=xxx
 ```
 
@@ -300,7 +296,7 @@ echo "Strategy: $INSTALL_STRATEGY"
 
 **FINANCIAL DISCLAIMER**: This software is for educational purposes only. Not financial advice. No warranties implied. Past performance does not guarantee future results. Options trading involves substantial risk of loss.
 
-**DATA USAGE**: All market data must come from licensed providers (Schwab, Databento). No web scraping or unauthorized data sources.
+**DATA USAGE**: All market data must come from licensed providers (Databento). No web scraping or unauthorized data sources.
 
 **COMPLIANCE NOTES**:
 - Never executes trades (recommendations only)

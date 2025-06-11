@@ -17,7 +17,6 @@ from src.unity_wheel.secrets.integration import (
     SecretInjector,
     get_databento_api_key,
     get_ofred_api_key,
-    get_schwab_credentials,
     migrate_env_to_secrets,
 )
 from src.unity_wheel.secrets.manager import EnvironmentSecretBackend, LocalSecretBackend
@@ -262,26 +261,12 @@ class TestSecretInjector:
 class TestIntegrationFunctions:
     """Test integration helper functions."""
 
-    def test_get_schwab_credentials(self):
-        """Test get_schwab_credentials helper."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            manager = SecretManager(provider=SecretProvider.LOCAL, storage_path=Path(tmpdir))
-            manager.set_credentials("schwab", client_id="test_id", client_secret="test_secret")
-
-            with patch(
-                "src.unity_wheel.secrets.integration.get_secret_manager", return_value=manager
-            ):
-                creds = get_schwab_credentials()
-                assert creds["client_id"] == "test_id"
-                assert creds["client_secret"] == "test_secret"
-
     def test_migrate_env_to_secrets(self):
         """Test migrating environment variables to secrets."""
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SecretManager(provider=SecretProvider.LOCAL, storage_path=Path(tmpdir))
 
             # Set environment variables
-            os.environ["WHEEL_AUTH__CLIENT_ID"] = "env_client_id"
             os.environ["DATABENTO_API_KEY"] = "env_databento_key"
 
             try:
@@ -292,11 +277,9 @@ class TestIntegrationFunctions:
                     migrate_env_to_secrets()
 
                     # Verify migrated
-                    assert manager.backend.get_secret("schwab_client_id") == "env_client_id"
                     assert manager.backend.get_secret("databento_api_key") == "env_databento_key"
             finally:
                 # Cleanup
-                del os.environ["WHEEL_AUTH__CLIENT_ID"]
                 del os.environ["DATABENTO_API_KEY"]
 
 
