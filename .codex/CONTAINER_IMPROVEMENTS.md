@@ -59,8 +59,8 @@ New comprehensive setup script that handles:
 
 **Old (incorrect):**
 ```python
-from unity_trading.math.options import black_scholes_price_validated
-from unity_trading.strategy.wheel import WheelStrategy
+from src.unity_wheel.math.options import black_scholes_price_validated
+from src.unity_wheel.strategy.wheel import WheelStrategy
 ```
 
 **New (correct):**

@@ -270,7 +270,7 @@ unity_trading/             # DUPLICATE - SHOULD BE REMOVED
 ### Import Errors
 ```python
 # ❌ Wrong
-from unity_trading.math.options import black_scholes
+from src.unity_wheel.math.options import black_scholes
 
 # ✅ Correct
 from src.unity_wheel.math.options import black_scholes_price_validated

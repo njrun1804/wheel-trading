@@ -2,7 +2,7 @@
 
 ## The Math Module Conflict
 
-This project has `unity_trading.math` which conflicts with Python's stdlib `math` module.
+This project has `src.unity_wheel.math` which conflicts with Python's stdlib `math` module.
 This breaks pip and many imports when the project is in PYTHONPATH.
 
 ### Solutions:

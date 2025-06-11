@@ -14,7 +14,7 @@
 - Offline mode enabled
 - Container mode active
 
-⚠️ **Known import issue:** The project's `unity_trading.math` module conflicts with numpy's internal imports. This is handled automatically - the code has fallbacks.
+⚠️ **Known import issue:** The project's `src.unity_wheel.math` module conflicts with numpy's internal imports. This is handled automatically - the code has fallbacks.
 
 ## You're Ready to Go!
 
