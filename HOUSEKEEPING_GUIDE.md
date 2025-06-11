@@ -370,6 +370,30 @@ Score: 92/100
 ./scripts/housekeeping.sh --json --explain
 ```
 
+Example output with details:
+
+```json
+{
+  "timestamp": "2025-01-15T09:00:00Z",
+  "version": "2.2.0",
+  "score": 92,
+  "critical": false,
+  "violations": {
+    "test_files": 1,
+    "missing_confidence": 1,
+    "execution_code": 0,
+    "adaptive_files": 0,
+    "fetch_files": 0,
+    "hardcoded_ticker": 0,
+    "static_positions": 0
+  },
+  "details": [
+    "test_files:tests/test_dummy.py",
+    "missing_confidence:src/unity_wheel/math/metrics.py:black_scholes_price"
+  ]
+}
+```
+
 ## Remember
 
 1. Start every session: Run unity-check (2 seconds)
