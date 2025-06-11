@@ -60,17 +60,20 @@ class TestEnhancedTradingCalendar:
         # Mock a Wednesday at 2 PM
         wed_2pm = datetime(2025, 11, 12, 14, 0)  # 2 PM
         remaining = calendar.trading_hours_remaining(wed_2pm)
-        assert remaining == 2.0  # 2 hours until 4 PM
+        assert remaining.value == 2.0  # 2 hours until 4 PM
+        assert remaining.confidence > 0
 
         # Early close day at noon (Christmas Eve)
         xmas_eve_noon = datetime(2025, 12, 24, 12, 0)
         remaining = calendar.trading_hours_remaining(xmas_eve_noon)
-        assert remaining == 1.0  # 1 hour until 1 PM
+        assert remaining.value == 1.0  # 1 hour until 1 PM
+        assert remaining.confidence > 0
 
         # After hours
         after_close = datetime(2025, 11, 12, 17, 0)  # 5 PM
         remaining = calendar.trading_hours_remaining(after_close)
-        assert remaining == 0.0
+        assert remaining.value == 0.0
+        assert remaining.confidence > 0
 
     def test_unity_earnings_detection(self, calendar):
         """Test Unity earnings date detection."""

@@ -15,8 +15,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Detect code changes to skip workflow on docs-only updates
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          code:
+            - 'src/**'
+            - 'tests/**'
+            - 'pyproject.toml'
+            - 'poetry.lock'
+            - '.github/workflows/**'
+
   # Run all checks in parallel with no dependencies
   lint:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest  # Fallback from larger runners
     name: "Lint & Format"
 
@@ -41,6 +63,8 @@ jobs:
       run: pre-commit run --all-files --show-diff-on-failure
 
   type-check:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest  # Fallback from larger runners
     name: "Type Check"
 
@@ -66,6 +90,8 @@ jobs:
         echo "✅ Type checking completed (non-blocking)"
 
   security:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest  # Fallback from larger runners
     name: "Security Scan"
 

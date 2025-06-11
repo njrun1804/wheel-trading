@@ -10,6 +10,8 @@ Additional features:
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional, Tuple
 
+from ..math import CalculationResult
+
 from .trading_calendar import SimpleTradingCalendar
 
 
@@ -112,17 +114,17 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
 
         return open_time, close_time
 
-    def trading_hours_remaining(self, from_time: datetime) -> float:
+    def trading_hours_remaining(self, from_time: datetime) -> CalculationResult:
         """Calculate trading hours remaining in the day.
 
         Args:
             from_time: Current time (assumed ET)
 
         Returns:
-            Hours remaining (0 if after close or non-trading day)
+            CalculationResult with hours remaining and confidence
         """
         if not self.is_trading_day(from_time):
-            return 0.0
+            return CalculationResult(0.0, 0.8, ["Non-trading day"])
 
         open_time, close_time = self.get_market_hours(from_time)
         current_time = from_time.time()
@@ -132,10 +134,10 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         close_minutes = close_time.hour * 60 + close_time.minute
 
         if current_minutes >= close_minutes:
-            return 0.0
+            return CalculationResult(0.0, 0.9, ["After market close"])
 
         remaining_minutes = close_minutes - current_minutes
-        return remaining_minutes / 60.0
+        return CalculationResult(remaining_minutes / 60.0, 1.0, [])
 
     def is_near_unity_earnings(self, check_date: datetime, days_buffer: int = 7) -> bool:
         """Check if date is near Unity earnings (typically 3rd week of earnings months).

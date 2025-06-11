@@ -79,10 +79,10 @@ except ImportError:
 # Try project import
 sys.path.insert(0, '.')
 try:
-    from unity_trading.math import options
-    print('   ✅ Unity trading imports work')
+    from src.unity_wheel.math import options
+    print('   ✅ Unity Wheel imports work')
 except ImportError as e:
-    print(f'   ⚠️  Unity trading import failed: {str(e).split(\":\")[0]}')
+    print(f'   ⚠️  Unity Wheel import failed: {str(e).split(\":\")[0]}')
 "
 echo ""
 

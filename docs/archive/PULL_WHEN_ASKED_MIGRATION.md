@@ -16,7 +16,7 @@ The Unity Wheel Trading Bot has been successfully migrated from a continuous mon
 ### After (v2.0)
 - On-demand data fetching only
 - REST APIs only (no WebSocket)
-- Single storage layer (DuckDB + optional GCS)
+- Single storage layer (DuckDB only)
 - Zero background processes
 - Simple, cost-effective infrastructure
 
@@ -29,11 +29,6 @@ The Unity Wheel Trading Bot has been successfully migrated from a continuous mon
    - 30-day TTL with automatic cleanup
    - SQL interface for complex queries
    - < 5GB typical disk usage
-
-2. **GCS Adapter** (`src/unity_wheel/storage/gcs_adapter.py`)
-   - Optional cold backup only
-   - Lifecycle policies (Standard → Nearline → Delete)
-   - No hot queries or BigQuery
 
 3. **Unified Storage** (`src/unity_wheel/storage/storage.py`)
    - Single `get_or_fetch` pattern for all data
@@ -92,7 +87,6 @@ The Unity Wheel Trading Bot has been successfully migrated from a continuous mon
 ### Environment Variables
 - Same pattern: `WHEEL_SECTION__PARAM`
 - Credentials use SecretManager
-- Optional GCS configuration
 
 ## Cost Impact
 
@@ -101,7 +95,7 @@ The Unity Wheel Trading Bot has been successfully migrated from a continuous mon
 | Component | Before (v1.0) | After (v2.0) |
 |-----------|---------------|--------------|
 | Compute | $50-100 (always on) | < $5 (on demand) |
-| Storage | $20-50 (multiple DBs) | < $10 (DuckDB + GCS) |
+| Storage | $20-50 (multiple DBs) | < $10 (DuckDB only) |
 | APIs | $100+ (streaming) | < $40 (cached REST) |
 | **Total** | **$170-250** | **< $55** |
 

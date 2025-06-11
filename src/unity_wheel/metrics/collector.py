@@ -12,6 +12,10 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 import numpy as np
 
 from ..utils.logging import get_logger
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..risk.analytics import RiskMetrics
 
 logger = get_logger(__name__)
 
@@ -117,6 +121,17 @@ class MetricsCollector:
         # Action-specific metrics
         self.action_metrics: Dict[str, List[float]] = defaultdict(list)
 
+        # Function timing metrics
+        self.function_timings: Dict[str, List[float]] = defaultdict(list)
+
+        # Cache statistics
+        self.cache_hits: int = 0
+        self.cache_misses: int = 0
+        self.cache_evictions: int = 0
+
+        # Risk metrics history
+        self.risk_history: Dict[str, List[float]] = defaultdict(list)
+
         # Load historical data if available
         if persistence_path and persistence_path.exists():
             self._load_from_disk()
@@ -195,6 +210,62 @@ class MetricsCollector:
                     },
                 )
                 break
+
+    def record_function_timing(self, operation: str, duration_ms: float) -> None:
+        """Record execution time for a function."""
+        self.function_timings[operation].append(duration_ms)
+
+    def record_cache_hit(self) -> None:
+        """Increment cache hit counter."""
+        self.cache_hits += 1
+
+    def record_cache_miss(self) -> None:
+        """Increment cache miss counter."""
+        self.cache_misses += 1
+
+    def record_cache_eviction(self) -> None:
+        """Increment cache eviction counter."""
+        self.cache_evictions += 1
+
+    def record_risk_metrics(self, metrics: "RiskMetrics") -> None:
+        """Store risk metrics for distribution analysis."""
+        for name, value in metrics.to_dict().items():
+            if isinstance(value, (int, float)):
+                self.risk_history[name].append(float(value))
+
+    def get_function_stats(self) -> Dict[str, Dict[str, float]]:
+        """Get aggregated timing statistics for recorded functions."""
+        stats = {}
+        for op, times in self.function_timings.items():
+            arr = np.array(times)
+            stats[op] = {
+                "count": len(times),
+                "avg_ms": float(np.mean(arr)),
+                "p95_ms": float(np.percentile(arr, 95)),
+            }
+        return stats
+
+    def get_cache_summary(self) -> Dict[str, float]:
+        """Return cache statistics."""
+        total = self.cache_hits + self.cache_misses
+        hit_rate = self.cache_hits / total if total else 0.0
+        return {
+            "hits": self.cache_hits,
+            "misses": self.cache_misses,
+            "evictions": self.cache_evictions,
+            "hit_rate": hit_rate,
+        }
+
+    def get_risk_distribution(self) -> Dict[str, Dict[str, float]]:
+        """Return distribution stats for recorded risk metrics."""
+        summary = {}
+        for name, values in self.risk_history.items():
+            arr = np.array(values)
+            summary[name] = {
+                "avg": float(np.mean(arr)),
+                "p95": float(np.percentile(arr, 95)),
+            }
+        return summary
 
     def get_performance_summary(self, hours: Optional[int] = None) -> PerformanceMetrics:
         """Get performance summary for recent period."""

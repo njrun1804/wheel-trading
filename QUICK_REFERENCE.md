@@ -25,8 +25,8 @@ python run.py --performance
 ## 🤖 Autonomous Operations
 
 ```bash
-# Start monitoring (runs continuously)
-./scripts/monitor.sh
+# Run a full health check (on demand)
+./scripts/health_check.sh
 
 # One-time full check
 ./scripts/autonomous-checks.sh
@@ -58,14 +58,13 @@ python -c "from unity_wheel.utils import get_feature_flags; f = get_feature_flag
 export WHEEL_STRATEGY__DELTA_TARGET=0.25
 export WHEEL_STRATEGY__DAYS_TO_EXPIRY_TARGET=30
 
-# Control monitoring
-export MONITOR_INTERVAL=300  # 5 minutes
+# Control health check
 export EXPORT_METRICS=true
 ```
 
 ## 📊 Key Files
 
-- `logs/monitor.log` - Continuous monitoring output
+- `logs/health_check.log` - Health check output
 - `exports/` - Metric export files
 - `feature_flags.json` - Feature states
 - `metrics.db` - Performance history
@@ -129,8 +128,8 @@ git commit --no-verify
 ## 📞 Support
 
 1. Run diagnostics first: `python run.py --diagnose`
-2. Check logs: `tail -f logs/monitor.log`
-3. Review alerts in monitoring output
+2. Check logs: `tail -f logs/health_check.log`
+3. Review any alerts in the health check output
 4. Check version: `python run.py --version`
 
 ---

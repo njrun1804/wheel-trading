@@ -16,4 +16,5 @@
 ```bash
 ./scripts/housekeeping.sh --check-staged || exit 1
 ```
+See HOUSEKEEPING_GUIDE.md#agent-quick-start for a quick summary.
 --- BEGIN TASK ---

@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
-
-import numpy as np
+from typing import List, Optional, Tuple
 
 from ..math.options import (
     black_scholes_price_validated,
-    implied_volatility_validated,
     probability_itm_validated,
 )
 from ..models.position import Position, PositionType
@@ -76,6 +72,7 @@ class SwitchAnalysis:
     switch_benefit_pct: float  # Switch benefit as % of capital
     daily_return_improvement: float  # Improvement in daily return
     risk_adjusted_benefit: float  # Benefit adjusted for risk change
+    breakeven_days: float  # Days to recoup switching cost
 
     # Decision
     should_switch: bool
@@ -330,7 +327,7 @@ class PositionEvaluator:
         option_type = "P" if current_position.position_type == PositionType.PUT else "C"
 
         new_position = Position(
-            symbol=f"{current_position.underlying}{yy}{mm}{dd}{option_type}{int(new_strike*1000):08d}",
+            symbol=f"{current_position.underlying}{yy}{mm}{dd}{option_type}{int(new_strike * 1000):08d}",
             quantity=-contracts if current_position.is_short else contracts,
         )
 
@@ -377,6 +374,11 @@ class PositionEvaluator:
         # Daily return improvement
         daily_improvement = new_eval.daily_expected_return - current_eval.daily_expected_return
 
+        # Days required to recover switching cost
+        breakeven_days = (
+            total_switch_cost / daily_improvement if daily_improvement > 0 else float("inf")
+        )
+
         # Risk-adjusted benefit (penalize if new position is riskier)
         risk_ratio = new_eval.probability_itm / (
             current_eval.probability_itm + 0.01
@@ -422,6 +424,7 @@ class PositionEvaluator:
             switch_benefit_pct=switch_benefit_pct,
             daily_return_improvement=daily_improvement,
             risk_adjusted_benefit=risk_adjusted_benefit,
+            breakeven_days=breakeven_days,
             should_switch=should_switch,
             confidence=confidence,
             rationale=rationale,
