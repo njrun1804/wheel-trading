@@ -5,7 +5,7 @@ sys.modules["google"] = Mock()
 sys.modules["google.cloud"] = Mock()
 sys.modules["google.cloud.exceptions"] = Mock()
 
-from src.unity_wheel.risk.analytics import RiskAnalyzer, RiskMetrics, RiskLimits
+from src.unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits, RiskMetrics
 
 
 def test_risk_limit_breach_report():
