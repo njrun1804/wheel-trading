@@ -695,9 +695,12 @@ class WheelAdvisor:
         except Exception:  # pragma: no cover - duckdb optional in some envs
             return None
 
-        db_path = Path(os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb"))
+        # First try unified database, then fall back to home database
+        db_path = Path("data/unified_wheel_trading.duckdb")
         if not db_path.exists():
-            return None
+            db_path = Path(os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb"))
+            if not db_path.exists():
+                return None
 
         try:
             conn = duckdb.connect(str(db_path))
