@@ -6,7 +6,7 @@ import pytest
 
 from src.unity_wheel.api.advisor import WheelAdvisor
 from src.unity_wheel.api.dependencies import AdvisorDependencies, create_dependencies
-from src.unity_wheel.risk.limits import RiskLimits
+from src.unity_wheel.risk.limits import TradingLimits as RiskLimits
 from src.unity_wheel.strategy.wheel import WheelParameters
 
 
