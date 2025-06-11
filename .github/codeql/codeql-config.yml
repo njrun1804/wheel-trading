@@ -1,0 +1,18 @@
+# Simplified CodeQL configuration for compatibility
+name: "Unity Wheel CodeQL config"
+
+# Only scan relevant paths
+paths:
+  - src/unity_wheel
+paths-ignore:
+  - tests
+  - examples
+  - tools
+  - docs
+  - '**/*.md'
+  - '**/__pycache__'
+  - '**/*.pyc'
+
+# Use standard queries
+queries:
+  - uses: security-and-quality

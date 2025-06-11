@@ -77,7 +77,7 @@ async def exchange_callback_for_tokens_fixed(callback_url: str):
 
             headers = {
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Authorization": f"Basic {auth_b64}"
+                "Authorization": f"Basic {auth_b64}",
             }
 
             print(f"   Using Basic Auth (official method): {client_id}:***")

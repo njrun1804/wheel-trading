@@ -1,9 +1,10 @@
 import asyncio
-from datetime import datetime, timezone
-from types import SimpleNamespace
-from enum import Enum
 import sys
 import types
+from datetime import datetime, timezone
+from enum import Enum
+from types import SimpleNamespace
+
 import pytest
 
 # Mock google.cloud to avoid optional dependency issues
@@ -18,30 +19,42 @@ sys.modules.setdefault("google.cloud", fake_cloud)
 sys.modules.setdefault("google.cloud.exceptions", fake_exceptions)
 sys.modules.setdefault("databento", types.ModuleType("databento"))
 fake_dbn = types.ModuleType("databento_dbn")
+
+
 class DummyEnum:
     pass
+
+
 fake_dbn.Schema = DummyEnum
 fake_dbn.SType = DummyEnum
 sys.modules.setdefault("databento_dbn", fake_dbn)
 fake_tenacity = types.ModuleType("tenacity")
+
+
 def dummy_decorator(*args, **kwargs):
     def wrapper(fn):
         async def inner(*i, **k):
             return await fn(*i, **k)
+
         return inner
+
     return wrapper
+
+
 fake_tenacity.retry = dummy_decorator
 fake_tenacity.retry_if_exception_type = lambda *a, **k: None
 fake_tenacity.stop_after_attempt = lambda *a, **k: None
 fake_tenacity.wait_exponential = lambda *a, **k: None
 sys.modules.setdefault("tenacity", fake_tenacity)
 
-from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
 from src.unity_wheel.data_providers.base.manager import FREDDataManager
+from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
+
 
 class DummyDBClient:
     async def _get_underlying_price(self, underlying, timestamp=None):
         return SimpleNamespace(last_price=30.0)
+
 
 def test_get_wheel_candidates_concurrent(monkeypatch):
     client = DummyDBClient()
@@ -72,11 +85,14 @@ def test_get_wheel_candidates_concurrent(monkeypatch):
     assert len(res) == len(expirations)
     assert elapsed < 0.25
 
+
 class DummyClientCtx:
     async def __aenter__(self):
         return self
+
     async def __aexit__(self, exc_type, exc, tb):
         pass
+
 
 def test_update_data_concurrent(monkeypatch):
     class Series(Enum):

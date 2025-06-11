@@ -101,7 +101,9 @@ async def generate_recommendation(
 
     # Get real market data - fail if not available
     try:
-        market_snapshot, confidence = await create_databento_market_snapshot(portfolio_value, TICKER)
+        market_snapshot, confidence = await create_databento_market_snapshot(
+            portfolio_value, TICKER
+        )
         logger.info("Successfully fetched real Unity market data", extra={"confidence": confidence})
         current_price = market_snapshot.current_price
 
