@@ -40,7 +40,7 @@ cat > .codex/.env <<EOF
 export USE_MOCK_DATA=true
 export OFFLINE_MODE=true
 export DATABENTO_SKIP_VALIDATION=true
-export PYTHONPATH="$(pwd):$(pwd)/unity_trading:\$PYTHONPATH"
+export PYTHONPATH="$(pwd):\$PYTHONPATH"
 export LOG_LEVEL=INFO
 EOF
 

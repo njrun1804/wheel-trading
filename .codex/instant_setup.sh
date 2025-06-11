@@ -22,7 +22,7 @@ python3 -m pip install numpy pandas scipy pydantic 2>/dev/null && echo "✓ Pack
 cd - >/dev/null
 
 # 3. Set PYTHONPATH after packages
-export PYTHONPATH="$(pwd):$(pwd)/unity_trading:$PYTHONPATH"
+export PYTHONPATH="$(pwd):$PYTHONPATH"
 
 # 4. Create directories
 mkdir -p /tmp/.wheel/cache /tmp/.wheel/secrets 2>/dev/null
@@ -64,4 +64,4 @@ echo ""
 echo "📝 Note: Unity trading has a 'math' module that conflicts with numpy imports."
 echo "   This is OK - the code handles it automatically with fallbacks."
 echo ""
-echo "To make permanent: source .codex/.container_env"
+echo "To make permanent: source .codex/.env"

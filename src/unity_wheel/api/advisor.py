@@ -11,7 +11,14 @@ from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits, analyze_borrowing_decision
+from ..risk import (
+    BorrowingCostAnalyzer,
+    RiskAnalyzer,
+    RiskLimits,
+    RiskLevel,
+    RiskMetrics as AnalyticsMetrics,
+    analyze_borrowing_decision,
+)
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
@@ -290,6 +297,7 @@ class WheelAdvisor:
 
             # Calculate comprehensive risk metrics
             risk_metrics = self._calculate_risk_metrics(
+                ticker=market_snapshot["ticker"],
                 strike=strike_rec.strike,
                 premium=strike_rec.premium,
                 contracts=contracts,
@@ -309,6 +317,35 @@ class WheelAdvisor:
             )
 
             risk_metrics["edge_ratio"] = edge
+
+            dataclass_metrics = AnalyticsMetrics(
+                var_95=risk_metrics["var_95"],
+                var_99=risk_metrics["var_95"],
+                cvar_95=risk_metrics["cvar_95"],
+                cvar_99=risk_metrics["cvar_95"],
+                kelly_fraction=0.0,
+                portfolio_delta=0.0,
+                portfolio_gamma=0.0,
+                portfolio_vega=0.0,
+                portfolio_theta=0.0,
+                margin_requirement=risk_metrics["margin_required"],
+                margin_utilization=risk_metrics["margin_required"] / account.cash_balance,
+            )
+
+            breaches = self.risk_analyzer.check_limits(
+                dataclass_metrics, account.cash_balance
+            )
+            risk_report = self.risk_analyzer.generate_risk_report(
+                dataclass_metrics, breaches, account.cash_balance
+            )
+
+            for b in breaches:
+                if b.severity == RiskLevel.CRITICAL:
+                    confidence *= 0.5
+                elif b.severity == RiskLevel.HIGH:
+                    confidence *= 0.7
+                else:
+                    confidence *= 0.9
 
             # Overall confidence
             confidence = min(
@@ -344,6 +381,7 @@ class WheelAdvisor:
                         "edge": edge,
                         "decision_time": elapsed,
                     },
+                    risk_report=risk_report,
                 )
 
             # Add borrowing metrics to risk metrics
@@ -394,6 +432,7 @@ class WheelAdvisor:
                         0, strike_rec.strike * 100 * contracts - available_cash
                     ),
                 },
+                risk_report=risk_report,
             )
 
             # Log successful decision
@@ -547,6 +586,7 @@ class WheelAdvisor:
 
     def _calculate_risk_metrics(
         self,
+        ticker: str,
         strike: float,
         premium: float,
         contracts: int,
@@ -556,6 +596,9 @@ class WheelAdvisor:
         portfolio_value: float,
     ) -> RiskMetrics:
         """Calculate comprehensive risk metrics."""
+        import numpy as np
+        from scipy import stats
+
         # Max loss (assignment at strike)
         max_loss = strike * self.constraints.CONTRACTS_PER_TRADE * contracts
 
@@ -564,20 +607,35 @@ class WheelAdvisor:
         premium_return = (premium / strike) * (365 / days_to_expiry)
         expected_return = premium_return * (1 - probability_itm)
 
-        # VaR calculation (simplified)
-        position_var = max_loss * volatility * 1.65 * probability_itm
+        position_value = strike * self.constraints.CONTRACTS_PER_TRADE * contracts
+
+        # Historical returns for VaR/CVaR
+        returns = self._load_historical_returns(ticker)
+        if returns is None:
+            # Fallback using volatility
+            daily_vol = volatility / np.sqrt(252)
+            quantiles = np.linspace(0.001, 0.999, 252)
+            returns = stats.norm.ppf(quantiles) * daily_vol
+
+        var_pct, _ = self.risk_analyzer.calculate_var(returns, 0.95)
+        cvar_pct, _ = self.risk_analyzer.calculate_cvar(returns, 0.95)
+
+        position_var = position_value * var_pct
+        position_cvar = position_value * cvar_pct
 
         # Margin requirement
         margin_required = strike * self.constraints.CONTRACTS_PER_TRADE * contracts * 0.20
-
-        return RiskMetrics(
+        metrics = RiskMetrics(
             max_loss=max_loss,
             probability_assignment=probability_itm,
             expected_return=expected_return,
             edge_ratio=0.0,  # Calculated separately
             var_95=position_var,
+            cvar_95=position_cvar,
             margin_required=margin_required,
         )
+        metrics_collector.record_risk_metrics(metrics)
+        return metrics
 
     def _calculate_edge(
         self,
@@ -625,7 +683,39 @@ class WheelAdvisor:
                 expected_return=0.0,
                 edge_ratio=0.0,
                 var_95=0.0,
+                cvar_95=0.0,
                 margin_required=0.0,
             ),
             details={},
+            risk_report={},
         )
+
+    def _load_historical_returns(self, ticker: str, days: int = 252):
+        """Load recent returns from local storage if available."""
+        import os
+        from pathlib import Path
+        import numpy as np
+        try:
+            import duckdb
+        except Exception:  # pragma: no cover - duckdb optional in some envs
+            return None
+
+        db_path = Path(os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb"))
+        if not db_path.exists():
+            return None
+
+        try:
+            conn = duckdb.connect(str(db_path))
+            rows = conn.execute(
+                "SELECT returns FROM price_history WHERE symbol = ? ORDER BY date DESC LIMIT ?",
+                [ticker, days],
+            ).fetchall()
+            conn.close()
+        except Exception as e:  # pragma: no cover - ignore DB issues
+            logger.warning("load_returns_failed", error=str(e))
+            return None
+
+        returns = [float(r[0]) for r in rows if r[0] is not None]
+        if len(returns) < 20:
+            return None
+        return np.array(list(reversed(returns)))

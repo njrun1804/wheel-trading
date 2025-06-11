@@ -87,7 +87,7 @@ from src.unity_wheel.secrets import SecretManager
 manager = SecretManager()
 
 # Check for required credentials
-required = ['schwab', 'databento', 'ofred']
+required = ['databento', 'ofred']
 missing = []
 
 for service in required:

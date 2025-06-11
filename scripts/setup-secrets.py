@@ -192,11 +192,6 @@ def main():
     print("# Initialize (auto-detects provider)")
     print("secrets = SecretManager()")
     print()
-    print("# Get Schwab credentials")
-    print("schwab_creds = secrets.get_credentials('schwab')")
-    print("client_id = schwab_creds['client_id']")
-    print("client_secret = schwab_creds['client_secret']")
-    print()
     print("# Get individual secret")
     print("databento_key = secrets.get_secret('databento_api_key')")
 

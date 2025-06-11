@@ -13,6 +13,7 @@ from src.config.loader import get_config
 
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader
 from ..math.options import black_scholes_price_validated
+from ..math import CalculationResult
 from ..storage import Storage
 from ..strategy.wheel import WheelParameters, WheelStrategy
 from ..utils import get_logger, timed_operation
@@ -185,14 +186,14 @@ class WheelBacktester:
                 strike = self._find_backtest_strike(current_price, params.target_delta)
 
                 # Calculate realistic premium
-                premium = self._calculate_backtest_premium(current_price, strike, params.target_dte)
+                premium_result = self._calculate_backtest_premium(current_price, strike, params.target_dte)
 
                 if contracts_per_trade is None:
                     contracts = self.position_sizer.contracts_for_trade(
                         portfolio_value=capital,
                         buying_power=capital,
                         strike_price=strike,
-                        option_premium=premium * 100,
+                        option_premium=premium_result.value * 100,
                     )
                 else:
                     contracts = contracts_per_trade
@@ -206,7 +207,7 @@ class WheelBacktester:
                     entry_date=date,
                     entry_price=current_price,
                     contracts=contracts,
-                    premium_collected=premium * 100 * contracts,
+                    premium_collected=premium_result.value * 100 * contracts,
                 )
 
                 capital += active_position.premium_collected
@@ -236,8 +237,8 @@ class WheelBacktester:
         annualized_return = (1 + total_return) ** (1 / years) - 1
 
         # Risk metrics
-        sharpe_ratio = self._calculate_sharpe(returns_series)
-        max_drawdown = self._calculate_max_drawdown(equity_curve)
+        sharpe_result = self._calculate_sharpe(returns_series)
+        max_dd_result = self._calculate_max_drawdown(equity_curve)
         var_95, cvar_95, _ = self._calculate_var_cvar(returns_series)
 
         # Trade statistics
@@ -250,8 +251,8 @@ class WheelBacktester:
         return BacktestResults(
             total_return=total_return,
             annualized_return=annualized_return,
-            sharpe_ratio=sharpe_ratio,
-            max_drawdown=max_drawdown,
+            sharpe_ratio=sharpe_result.value,
+            max_drawdown=max_dd_result.value,
             win_rate=winning_trades / len(positions) if positions else 0,
             total_trades=len(positions),
             winning_trades=winning_trades,
@@ -514,7 +515,7 @@ class WheelBacktester:
         spot: float,
         strike: float,
         dte: int,
-    ) -> float:
+    ) -> CalculationResult:
         """Calculate realistic option premium for backtest."""
         # Use simplified IV model for Unity
         # Higher IV for lower strikes, near-term
@@ -543,7 +544,14 @@ class WheelBacktester:
             option_type="put",
         )
 
-        return result.value if result.confidence > 0.5 else spot * 0.02
+        if result.confidence > 0.5:
+            premium = result.value
+            conf = result.confidence
+        else:
+            premium = spot * 0.02
+            conf = 0.5 * result.confidence
+
+        return CalculationResult(premium, conf, [])
 
     def _is_near_earnings(self, date: datetime) -> bool:
         """Check if date is near Unity earnings."""
@@ -566,25 +574,30 @@ class WheelBacktester:
 
         return False
 
-    def _calculate_sharpe(self, returns: pd.Series) -> float:
+    def _calculate_sharpe(self, returns: pd.Series) -> CalculationResult:
         """Calculate Sharpe ratio."""
         if len(returns) < 2:
-            return 0.0
+            return CalculationResult(0.0, 0.3, ["Insufficient data"])
 
         # Annualized Sharpe
         mean_return = returns.mean() * 252
         std_return = returns.std() * np.sqrt(252)
 
         if std_return == 0:
-            return 0.0
+            return CalculationResult(0.0, 0.5, ["Zero volatility"])
 
-        return mean_return / std_return
+        sharpe = mean_return / std_return
+        return CalculationResult(sharpe, 1.0, [])
 
-    def _calculate_max_drawdown(self, equity_curve: pd.Series) -> float:
+    def _calculate_max_drawdown(self, equity_curve: pd.Series) -> CalculationResult:
         """Calculate maximum drawdown."""
+        if len(equity_curve) == 0:
+            return CalculationResult(0.0, 0.0, ["Empty curve"])
+
         rolling_max = equity_curve.expanding().max()
         drawdowns = (equity_curve - rolling_max) / rolling_max
-        return drawdowns.min()
+        max_dd = drawdowns.min()
+        return CalculationResult(max_dd, 1.0, [])
 
     def _calculate_var_cvar(
         self,

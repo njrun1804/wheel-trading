@@ -22,5 +22,6 @@ git status
 ```
 
 *Note: -y auto-approves git/system prompts only, not Claude's "Can I...?" prompts*
+See HOUSEKEEPING_GUIDE.md#agent-quick-start for a quick summary.
 
 --- END SESSION ---

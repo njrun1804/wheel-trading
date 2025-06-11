@@ -36,7 +36,6 @@ git mv src/unity_wheel/strategy/adaptive_base.py src/unity_wheel/strategy/adapti
 ```bash
 # Create CLI module for main entry points
 mkdir -p src/unity_wheel/cli
-git mv run.py src/unity_wheel/cli/run_legacy.py
 git mv run.py src/unity_wheel/cli/run.py
 
 # Create simple entry point scripts at root
@@ -166,8 +165,7 @@ wheel-trading/
 │   └── unity_wheel/
 │       ├── __init__.py
 │       ├── cli/                    # Command-line interface
-│       │   ├── run.py              # Main entry point
-│       │   └── run_legacy.py       # Legacy entry point
+│       │   └── run.py              # Main entry point
 │       ├── analytics/              # Analysis modules
 │       │   ├── market/             # Market analysis
 │       │   ├── portfolio/          # Portfolio analysis

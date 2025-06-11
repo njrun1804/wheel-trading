@@ -615,9 +615,27 @@ output_json() {
     "static_positions": $violation_static_positions,
     "missing_confidence": $violation_missing_confidence,
     "data_sources": $violation_data_sources
-  }
-}
+  }$( [[ "$EXPLAIN" == "true" && ${#violation_details[@]} -gt 0 ]] && echo "," )
 EOF
+
+    if [[ "$EXPLAIN" == "true" && ${#violation_details[@]} -gt 0 ]]; then
+        echo "  \"details\": ["
+        local i=0
+        local last=$(( ${#violation_details[@]} - 1 ))
+        for detail in "${violation_details[@]}"; do
+            printf '    "%s"' "$detail"
+            if [[ $i -lt $last ]]; then
+                printf ',\n'
+            else
+                printf '\n'
+            fi
+            : $((i++))
+        done
+        echo "  ]"
+        echo "}"
+    else
+        echo "}"
+    fi
 }
 
 # Main execution
@@ -677,6 +695,31 @@ main() {
                     echo -e "${YELLOW}⚠️  $total_violations issues found${NC}"
                     echo "   Run with --fix to auto-resolve file placement"
                     echo "   Run with --explain for details"
+                fi
+
+                if [[ "$EXPLAIN" == "true" && ${#violation_details[@]} -gt 0 ]]; then
+                    echo ""
+                    for detail in "${violation_details[@]}"; do
+                        IFS=':' read -r type file extra <<< "$detail"
+                        case $type in
+                            execution_code)
+                                echo "   [execution_code] $file";;
+                            hardcoded_ticker)
+                                echo "   [hardcoded_ticker] $file";;
+                            static_position)
+                                echo "   [static_position] $file";;
+                            missing_confidence)
+                                echo "   [missing_confidence] $file ($extra)";;
+                            external_data)
+                                echo "   [external_data] $file";;
+                            hardcoded_data)
+                                echo "   [hardcoded_data] $file";;
+                            mock_data)
+                                echo "   [mock_data] $file";;
+                            *)
+                                echo "   [$type] $file";;
+                        esac
+                    done
                 fi
             fi
             ;;
