@@ -243,13 +243,18 @@ await storage.cleanup_old_data()
 ### Self-Validating Mathematics
 
 ```python
+import asyncio
 from unity_wheel.math import black_scholes_price_validated
+from src.unity_wheel.data_providers.base import FREDDataManager
+
+# Pull latest risk‑free rate from FRED
+rf_rate, _ = asyncio.run(FREDDataManager().get_or_fetch_risk_free_rate(3))
 
 result = black_scholes_price_validated(
     S=35.50,    # Unity current price
     K=32.50,    # Strike price
     T=0.123,    # 45 days to expiration
-    r=0.05,     # Risk-free rate
+    r=rf_rate,  # FRED risk-free rate
     sigma=0.65, # Implied volatility
     option_type="put"
 )
