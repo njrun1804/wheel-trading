@@ -9,12 +9,12 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Callable, Dict, List, Optional, Tuple
 
-from ..math import CalculationResult
-
 import numpy as np
 
 from src.config.loader import get_config
 from src.unity_wheel.utils.logging import StructuredLogger
+
+from ..math import CalculationResult
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -87,7 +87,9 @@ class BorrowingCostAnalyzer:
     CONFIDENCE_MULTIPLIER = 1.0  # No safety factor
     TAX_ADJUSTMENT = 1.0  # Tax-free environment
 
-    def __init__(self, rate_fetcher: Optional[Callable[[str], float]] = None, auto_update: bool = False):
+    def __init__(
+        self, rate_fetcher: Optional[Callable[[str], float]] = None, auto_update: bool = False
+    ):
         """Initialize with configuration.
 
         Parameters
