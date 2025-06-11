@@ -14,7 +14,6 @@ from src.unity_wheel.secrets.integration import (
     SecretInjector,
     get_databento_api_key,
     get_ofred_api_key,
-    get_schwab_credentials,
     migrate_env_to_secrets,
 )
 
@@ -57,10 +56,6 @@ async def demo_integration_helpers():
     print("\n=== Integration Helper Functions ===\n")
 
     try:
-        # Get Schwab credentials using helper
-        creds = get_schwab_credentials()
-        print(f"✓ Got Schwab credentials via helper: {creds['client_id'][:8]}...")
-
         # Get Databento API key using helper
         databento_key = get_databento_api_key()
         print(f"✓ Got Databento API key via helper: {databento_key[:8]}...")

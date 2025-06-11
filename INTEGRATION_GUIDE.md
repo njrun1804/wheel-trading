@@ -9,8 +9,7 @@ This guide consolidates all external service integrations for the Unity Wheel Tr
 
 1. [Secret Management](#secret-management)
 2. [Databento Integration](#databento-integration)
-3. [Schwab Integration](#schwab-integration)
-4. [FRED Integration](#fred-integration)
+3. [FRED Integration](#fred-integration)
 
 ## Secret Management
 
@@ -31,12 +30,6 @@ manager = SecretManager()
 
 # Add Databento API key
 await manager.store_secret("databento", {"api_key": "YOUR_API_KEY"})
-
-# Add Schwab OAuth credentials
-await manager.store_secret("schwab", {
-    "client_id": "YOUR_CLIENT_ID",
-    "client_secret": "YOUR_CLIENT_SECRET"
-})
 
 # Add FRED API key
 await manager.store_secret("fred", {"api_key": "YOUR_API_KEY"})
@@ -122,68 +115,6 @@ quote = await integration.get_live_quote("U 250117P00210000")
 - Anomaly detection for price spikes
 - Stale data warnings after 15 minutes
 - Corporate action detection
-
-## Schwab Integration
-
-Read-only access to portfolio positions and account data. No trading execution.
-
-### OAuth Setup
-
-1. **Register app** at [developer.schwab.com](https://developer.schwab.com)
-   - Callback URL: `https://127.0.0.1:5000/callback`
-   - Scopes: `accounts`, `positions` (read-only)
-
-2. **Initial authorization:**
-```python
-from src.unity_wheel.schwab import SchwabClient
-
-client = SchwabClient(client_id, client_secret)
-auth_url = client.get_authorization_url()
-print(f"Visit: {auth_url}")
-
-# After authorization
-tokens = await client.exchange_code(auth_code)
-```
-
-3. **Store credentials:**
-```python
-await manager.store_secret("schwab", {
-    "client_id": "YOUR_CLIENT_ID",
-    "client_secret": "YOUR_CLIENT_SECRET",
-    "refresh_token": tokens["refresh_token"]
-})
-```
-
-### Usage
-
-```python
-async with SchwabClient(client_id, client_secret) as client:
-    # Get positions (never cached)
-    positions = await client.get_positions()
-
-    # Get account info (cached 30s)
-    account = await client.get_account()
-
-    # Detect corporate actions
-    actions = client.detect_corporate_actions(positions)
-    if actions:
-        logger.warning(f"Corporate actions detected: {actions}")
-```
-
-### Features
-
-- **Automatic token refresh** before expiration
-- **Position validation** with OCC symbol parsing
-- **Corporate action detection** from anomalies
-- **Graceful degradation** with cached fallback
-- **Comprehensive error handling** with retry logic
-
-### Limitations
-
-- Read-only access (no trading)
-- 120 requests/minute rate limit
-- Positions endpoint never cached
-- Account data cached for 30 seconds
 
 ## FRED Integration
 
@@ -292,11 +223,6 @@ pytest tests/test_autonomous_flow.py -v
 - **"Rate limit exceeded"** - Integration handles automatically with backoff
 - **"Invalid symbol"** - Check OCC symbol format: "U 250117P00210000"
 - **"No data"** - Verify market hours and symbol liquidity
-
-### Schwab Issues
-- **"Token expired"** - Automatic refresh, check refresh_token validity
-- **"Position mismatch"** - Check for corporate actions
-- **"Network timeout"** - Automatic retry with cached fallback
 
 ### FRED Issues
 - **"No data for date"** - FRED updates with lag, use previous business day

@@ -52,10 +52,6 @@ async def setup():
 
     # Add your API keys
     await manager.store_secret('databento', {'api_key': 'YOUR_KEY'})
-    await manager.store_secret('schwab', {
-        'client_id': 'YOUR_ID',
-        'client_secret': 'YOUR_SECRET'
-    })
     await manager.store_secret('fred', {'api_key': 'YOUR_KEY'})
 
 asyncio.run(setup())
@@ -270,7 +266,6 @@ python run.py --export-metrics
 ├── secrets/          # Encrypted credentials
 ├── cache/           # API response cache
 │   ├── databento/   # Options data
-│   ├── schwab/      # Account data
 │   └── fred/        # Economic data
 ├── logs/            # Application logs
 └── metrics/         # Performance data
@@ -295,10 +290,6 @@ features:
 databento:
   enabled: true
   cache_ttl: 3600
-
-schwab:
-  enabled: true
-  rate_limit: 120
 
 fred:
   enabled: true
@@ -480,10 +471,7 @@ print(loader.generate_health_report())
 "
 
 # Test integrations
-python -c "
-from src.unity_wheel.schwab import test_connection
-test_connection()
-"
+# (Broker integration removed)
 ```
 
 ## Best Practices

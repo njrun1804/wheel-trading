@@ -218,7 +218,7 @@ trading:
   mode: paper
   # Broker settings
   broker:
-    name: schwab
+    name: none
     api_key: ""  # Set via WHEEL_TRADING__BROKER__API_KEY env var
     api_secret: ""  # Set via WHEEL_TRADING__BROKER__API_SECRET env var
   # Market hours (Eastern Time)
@@ -458,7 +458,6 @@ system:
   storage:
     databases:
       performance: "~/.wheel_trading/performance.db"
-      schwab_data: "~/.wheel_trading/schwab_data.db"
       cache: "~/.wheel_trading/cache/wheel_cache.duckdb"
     backup_interval_hours: 24
 
@@ -471,8 +470,8 @@ auth:
 
   # OAuth endpoints
   redirect_uri: "http://localhost:8182/callback"
-  auth_url: "https://api.schwabapi.com/v1/oauth/authorize"
-  token_url: "https://api.schwabapi.com/v1/oauth/token"
+  auth_url: ""
+  token_url: ""
   scope: "AccountsRead MarketDataRead"
 
   # Token management

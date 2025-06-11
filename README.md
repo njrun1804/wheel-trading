@@ -42,7 +42,6 @@ User requests recommendation
 Check local DuckDB cache (15-30 min TTL)
     ↓
 If stale → Fetch from APIs:
-    • Schwab: Positions & account data
     • Databento: Option chains (REST only)
     • FRED: Macro indicators
     ↓
@@ -75,7 +74,7 @@ wheel-trading/
 ├── tests/                       # All tests
 ├── examples/                    # Organized examples
 │   ├── core/                    # Config, risk, validation
-│   ├── data/                    # Databento, Schwab, FRED
+│   ├── data/                    # Databento and FRED
 │   └── auth/                    # Authentication, secrets
 ├── tools/                       # Development utilities
 │   ├── debug/                   # Debugging tools
@@ -113,9 +112,8 @@ For detailed setup instructions, see [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md
 
 ### Required Credentials
 
-1. **Schwab API**: OAuth credentials (read-only access)
-2. **Databento**: API key for options data
-3. **FRED** (optional): Free API key for economic data
+1. **Databento**: API key for options data
+2. **FRED** (optional): Free API key for economic data
 
 See [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md) for detailed setup.
 
