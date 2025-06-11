@@ -41,11 +41,11 @@ if len(df) > 0:
     print(f"Index (timestamp): {df.index[0]}")
     for col in df.columns:
         print(f"{col}: {first_row[col]} (type: {type(first_row[col])})")
-        
+
 # Check if symbol is in a different column
 print("\n\nChecking for symbol data:")
 for col in df.columns:
-    if 'symbol' in col.lower() or col in ['raw_symbol', 'ts_symbol']:
+    if "symbol" in col.lower() or col in ["raw_symbol", "ts_symbol"]:
         print(f"Found symbol column '{col}':")
         print(df[col].head())
         break

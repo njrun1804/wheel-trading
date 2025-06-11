@@ -20,7 +20,7 @@ from src.unity_wheel.math.options import (
     validate_inputs,
 )
 from src.unity_wheel.utils.logging import StructuredLogger
-from src.unity_wheel.utils.performance_cache import cached, cache_key_for_options, options_cache
+from src.unity_wheel.utils.performance_cache import cache_key_for_options, cached, options_cache
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -47,12 +47,12 @@ def black_scholes_price_enhanced(
 ) -> CalculationResult:
     """
     Enhanced Black-Scholes price calculation with advanced caching.
-    
+
     This function provides the same functionality as black_scholes_price_validated
     but with enhanced performance through the new caching system.
     """
     start_time = time.time()
-    
+
     # Convert inputs
     S = np.asarray(S)
     K = np.asarray(K)
@@ -171,8 +171,7 @@ def black_scholes_price_enhanced(
 
     except Exception as e:
         logger.error(
-            "enhanced_black_scholes_error",
-            extra={"error": str(e), "option_type": option_type}
+            "enhanced_black_scholes_error", extra={"error": str(e), "option_type": option_type}
         )
         return CalculationResult(np.nan, 0.0, [f"Calculation error: {str(e)}"])
 
@@ -192,12 +191,12 @@ def calculate_all_greeks_enhanced(
 ) -> Tuple[Dict[str, FloatOrArray], float]:
     """
     Enhanced Greeks calculation with advanced caching.
-    
+
     Provides significant performance improvements for repeated calculations
     with the same parameters.
     """
     start_time = time.time()
-    
+
     # Convert inputs
     S = np.asarray(S)
     K = np.asarray(K)
@@ -246,7 +245,7 @@ def calculate_all_greeks_enhanced(
 
         # Standard Greeks calculation
         from scipy.stats import norm
-        
+
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * sqrt_T)
         d2 = d1 - sigma * sqrt_T
 
@@ -291,7 +290,7 @@ def calculate_all_greeks_enhanced(
             confidence *= 0.8
             warnings_list.append("Negative gamma detected")
 
-        confidence *= (1.0 - 0.1 * len(warnings_list))
+        confidence *= 1.0 - 0.1 * len(warnings_list)
         confidence = max(0.0, min(1.0, confidence))
 
         # Log performance metrics
@@ -309,10 +308,7 @@ def calculate_all_greeks_enhanced(
         return greeks, confidence
 
     except Exception as e:
-        logger.error(
-            "enhanced_greeks_error",
-            extra={"error": str(e), "option_type": option_type}
-        )
+        logger.error("enhanced_greeks_error", extra={"error": str(e), "option_type": option_type})
         return {
             "delta": 0.0,
             "gamma": 0.0,
@@ -339,19 +335,19 @@ def implied_volatility_enhanced(
 ) -> CalculationResult:
     """
     Enhanced implied volatility calculation with caching.
-    
+
     Uses Newton-Raphson method with fallback to bisection for robustness.
     Results are cached to improve performance for repeated calculations.
     """
     start_time = time.time()
-    
+
     # Validate inputs
     if option_price <= 0:
         return CalculationResult(np.nan, 0.0, ["Option price must be positive"])
-    
+
     if spot_price <= 0 or strike_price <= 0:
         return CalculationResult(np.nan, 0.0, ["Spot and strike prices must be positive"])
-    
+
     if time_to_expiry <= 0:
         return CalculationResult(np.nan, 0.0, ["Time to expiry must be positive"])
 
@@ -364,14 +360,10 @@ def implied_volatility_enhanced(
         upper_bound = strike_price
 
     if option_price < intrinsic:
-        return CalculationResult(
-            np.nan, 0.0, ["Option price below intrinsic value"]
-        )
-    
+        return CalculationResult(np.nan, 0.0, ["Option price below intrinsic value"])
+
     if option_price > upper_bound:
-        return CalculationResult(
-            np.nan, 0.0, ["Option price above maximum possible value"]
-        )
+        return CalculationResult(np.nan, 0.0, ["Option price above maximum possible value"])
 
     # Initial guess based on at-the-money approximation
     moneyness = spot_price / strike_price
@@ -379,37 +371,37 @@ def implied_volatility_enhanced(
         initial_guess = abs(np.log(moneyness)) / np.sqrt(time_to_expiry) + 0.20
     else:
         initial_guess = abs(np.log(moneyness)) / np.sqrt(time_to_expiry) + 0.20
-    
+
     initial_guess = max(0.01, min(5.0, initial_guess))  # Bound initial guess
 
     try:
         # Newton-Raphson method
         sigma = initial_guess
         warnings_list = []
-        
+
         for i in range(max_iterations):
             # Calculate price and vega
             bs_result = black_scholes_price_enhanced(
                 spot_price, strike_price, time_to_expiry, risk_free_rate, sigma, option_type
             )
-            
+
             if bs_result.confidence < 0.5:
                 warnings_list.extend(bs_result.warnings)
                 break
-                
+
             calculated_price = bs_result.value
-            
+
             # Calculate vega for Newton-Raphson
             greeks, _ = calculate_all_greeks_enhanced(
                 spot_price, strike_price, time_to_expiry, risk_free_rate, sigma, option_type
             )
             vega = greeks["vega"] * 100  # Convert back to per unit change
-            
+
             # Check for convergence
             price_diff = calculated_price - option_price
             if abs(price_diff) < tolerance:
                 confidence = 0.95 if not warnings_list else 0.85
-                
+
                 computation_time_ms = (time.time() - start_time) * 1000
                 logger.debug(
                     "enhanced_iv_completed",
@@ -420,9 +412,9 @@ def implied_volatility_enhanced(
                         "computation_time_ms": computation_time_ms,
                     },
                 )
-                
+
                 return CalculationResult(sigma, confidence, warnings_list)
-            
+
             # Newton-Raphson update
             if abs(vega) > 1e-10:
                 sigma_new = sigma - price_diff / vega
@@ -431,28 +423,28 @@ def implied_volatility_enhanced(
             else:
                 warnings_list.append("Low vega - switching to bisection method")
                 break
-        
+
         # Fallback to bisection method if Newton-Raphson fails
         logger.debug("IV calculation falling back to bisection method")
-        
+
         vol_low, vol_high = 0.001, 5.0
-        
+
         for i in range(max_iterations):
             vol_mid = (vol_low + vol_high) / 2
-            
+
             bs_result = black_scholes_price_enhanced(
                 spot_price, strike_price, time_to_expiry, risk_free_rate, vol_mid, option_type
             )
-            
+
             if bs_result.confidence < 0.5:
                 break
-                
+
             calculated_price = bs_result.value
-            
+
             if abs(calculated_price - option_price) < tolerance:
                 confidence = 0.80 if not warnings_list else 0.70
                 warnings_list.append("Used bisection method fallback")
-                
+
                 computation_time_ms = (time.time() - start_time) * 1000
                 logger.debug(
                     "enhanced_iv_bisection_completed",
@@ -463,30 +455,27 @@ def implied_volatility_enhanced(
                         "computation_time_ms": computation_time_ms,
                     },
                 )
-                
+
                 return CalculationResult(vol_mid, confidence, warnings_list)
-            
+
             if calculated_price > option_price:
                 vol_high = vol_mid
             else:
                 vol_low = vol_mid
-        
+
         # If all methods fail
         warnings_list.append("IV calculation did not converge")
         return CalculationResult(initial_guess, 0.30, warnings_list)
-        
+
     except Exception as e:
-        logger.error(
-            "enhanced_iv_error",
-            extra={"error": str(e), "option_type": option_type}
-        )
+        logger.error("enhanced_iv_error", extra={"error": str(e), "option_type": option_type})
         return CalculationResult(np.nan, 0.0, [f"IV calculation error: {str(e)}"])
 
 
 async def get_cache_performance_stats() -> Dict:
     """Get performance statistics for the options cache."""
     stats = options_cache.get_stats()
-    
+
     return {
         "cache_name": "options",
         "hit_rate": stats.hit_rate,
@@ -516,7 +505,7 @@ def get_option_price(
 ) -> Tuple[float, float]:
     """
     Get option price with confidence score.
-    
+
     Returns:
         Tuple of (price, confidence)
     """
@@ -536,7 +525,7 @@ def get_option_greeks(
 ) -> Tuple[Dict[str, float], float]:
     """
     Get option Greeks with confidence score.
-    
+
     Returns:
         Tuple of (greeks_dict, confidence)
     """
@@ -555,7 +544,7 @@ def get_implied_volatility(
 ) -> Tuple[float, float]:
     """
     Get implied volatility with confidence score.
-    
+
     Returns:
         Tuple of (implied_vol, confidence)
     """

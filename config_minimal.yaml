@@ -17,7 +17,7 @@ unity:
 risk:
   max_position_size: 0.20    # 20% max per position
   max_var_95: 0.05           # 5% VaR limit
-  max_cvar_95: 0.075         # 7.5% CVaR limit  
+  max_cvar_95: 0.075         # 7.5% CVaR limit
   max_volatility: 1.50       # Stop at 150% vol
   max_drawdown: -0.20        # -20% circuit breaker
 

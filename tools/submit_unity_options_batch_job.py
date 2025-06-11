@@ -15,23 +15,21 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.unity_wheel.data_providers.databento import DatabentoClient
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout)
 logger = logging.getLogger(__name__)
 
 
 def submit_unity_batch_job():
     """Submit a batch job for Unity options data."""
-    
+
     # Initialize client
     logger.info("Initializing Databento client...")
     client = DatabentoClient()
-    
+
     # Define parameters
     START = "2023-03-28"  # Unity options start date
-    END = "2025-06-09"    # Yesterday
-    
+    END = "2025-06-09"  # Yesterday
+
     logger.info("=" * 60)
     logger.info("SUBMITTING BATCH JOB FOR UNITY OPTIONS DATA")
     logger.info("=" * 60)
@@ -41,11 +39,11 @@ def submit_unity_batch_job():
     logger.info(f"Date range: {START} to {END}")
     logger.info(f"Delivery: download (via portal)")
     logger.info("=" * 60)
-    
+
     try:
         # Submit the batch job
         logger.info("Submitting batch job to Databento...")
-        
+
         job_details = client.client.batch.submit_job(
             dataset="OPRA.PILLAR",
             symbols=["U.OPT"],
@@ -61,7 +59,7 @@ def submit_unity_batch_job():
             map_symbols=True,  # Add symbol column to CSV output
             pretty_px=True,  # Format prices properly
         )
-        
+
         # Display job details
         logger.info("\n✅ BATCH JOB SUBMITTED SUCCESSFULLY!")
         logger.info("\nJob Details:")
@@ -75,13 +73,15 @@ def submit_unity_batch_job():
         logger.info(f"  Compression: {job_details['compression']}")
         logger.info(f"  Split by: {job_details['split_duration']}")
         logger.info(f"  Delivery: {job_details['delivery']}")
-        
+
         logger.info("\n📋 NEXT STEPS:")
         logger.info("1. Monitor job status at: https://databento.com/portal/downloads")
-        logger.info(f"2. Or check status with: python check_batch_job_status.py {job_details['id']}")
+        logger.info(
+            f"2. Or check status with: python check_batch_job_status.py {job_details['id']}"
+        )
         logger.info("3. Once ready, download files from the portal")
         logger.info("4. Files will be available for 30 days")
-        
+
         # Estimate size/cost if possible
         logger.info("\n💰 COST ESTIMATE:")
         try:
@@ -96,7 +96,7 @@ def submit_unity_batch_job():
                 mode="historical",
             )
             logger.info(f"  Estimated cost: ${cost:,.2f}")
-            
+
             # Get billable size
             size = client.client.metadata.get_billable_size(
                 dataset="OPRA.PILLAR",
@@ -109,31 +109,32 @@ def submit_unity_batch_job():
             size_gb = size / (1024**3)
             logger.info(f"  Estimated size: {size_gb:.2f} GB (uncompressed)")
             logger.info(f"  Compressed size will be much smaller with zstd")
-            
+
         except Exception as e:
             logger.warning(f"Could not estimate cost/size: {e}")
-        
+
         # Save job ID for later reference
         job_file = Path("unity_options_batch_job.txt")
         with open(job_file, "w") as f:
             f.write(f"Job ID: {job_details['id']}\n")
             f.write(f"Submitted: {datetime.now()}\n")
             f.write(f"Details: {job_details}\n")
-        
+
         logger.info(f"\nJob ID saved to: {job_file}")
-        
+
         return job_details
-        
+
     except Exception as e:
         logger.error(f"Failed to submit batch job: {e}")
-        
+
         # Check if it's a permissions/subscription issue
         if "subscription" in str(e).lower():
             logger.error("\n❌ SUBSCRIPTION ERROR:")
             logger.error("Your Databento subscription may not include Unity options data.")
             logger.error("Please check your subscription at: https://databento.com/portal/account")
-            
+
         import traceback
+
         traceback.print_exc()
         return None
 

@@ -95,14 +95,14 @@ timedelta64 = _datetime.timedelta
 class random:
     """Numpy random module stub."""
     import random as _random
-    
+
     @staticmethod
     def rand(*args):
         """Random values in [0, 1)."""
         if not args:
             return _random.random()
         return [_random.random() for _ in range(args[0])]
-    
+
     @staticmethod
     def randn(*args):
         """Standard normal distribution."""
@@ -117,14 +117,14 @@ class random:
             u1, u2 = _random.random(), _random.random()
             result.append(math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2))
         return result
-    
+
     @staticmethod
     def uniform(low=0.0, high=1.0, size=None):
         """Uniform distribution."""
         if size is None:
             return _random.uniform(low, high)
         return [_random.uniform(low, high) for _ in range(size)]
-    
+
     @staticmethod
     def normal(loc=0.0, scale=1.0, size=None):
         """Normal distribution."""
@@ -139,7 +139,7 @@ class random:
             z = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
             result.append(loc + scale * z)
         return result
-    
+
     @staticmethod
     def seed(seed=None):
         """Set random seed."""

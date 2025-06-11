@@ -4,6 +4,7 @@ Check Unity options table schema.
 """
 
 from pathlib import Path
+
 import duckdb
 
 db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
@@ -22,5 +23,5 @@ if sample:
     columns = conn.execute("DESCRIBE unity_options_daily").fetchall()
     for i, (col, _) in enumerate(columns):
         print(f"  {col}: {sample[i]}")
-        
+
 conn.close()
