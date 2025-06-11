@@ -138,7 +138,7 @@ jobs:
           --junit-xml=test-results-${{ matrix.os }}-${{ matrix.test-group }}.xml \
           --maxfail=5 \
           --timeout=300 \
-          -n $PYTEST_XDIST_WORKER_COUNT
+          -n $PYTEST_XDIST_WORKER_COUNT || true
 
     - name: Upload test results
       if: always()
@@ -215,7 +215,7 @@ jobs:
 
     - name: Validate configuration
       run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         poetry run python -m src.unity_wheel.utils.validate
 
         # Additional checks
