@@ -13,8 +13,8 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from ..utils import get_logger
 from ..metrics import metrics_collector
+from ..utils import get_logger
 
 logger = get_logger(__name__)
 

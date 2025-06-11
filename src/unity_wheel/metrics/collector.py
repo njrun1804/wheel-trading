@@ -7,12 +7,11 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Deque, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Deque, Dict, List, Optional, Tuple
 
 import numpy as np
 
 from ..utils.logging import get_logger
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..risk.analytics import RiskMetrics
