@@ -138,7 +138,7 @@ jobs:
           --junit-xml=test-results-${{ matrix.os }}-${{ matrix.test-group }}.xml \
           --maxfail=5 \
           --timeout=300 \
-          -n $PYTEST_XDIST_WORKER_COUNT || true
+          -n $PYTEST_XDIST_WORKER_COUNT
 
     - name: Upload test results
       if: always()
@@ -182,7 +182,7 @@ jobs:
           --cov-report=term:skip-covered \
           --no-cov-on-fail \
           -n auto \
-          -q || true
+          -q
 
     - name: Upload coverage
       uses: codecov/codecov-action@v4
@@ -252,7 +252,7 @@ jobs:
         poetry run pytest tests/test_performance_benchmarks.py \
           --benchmark-only \
           --benchmark-json=benchmark.json \
-          --benchmark-max-time=0.5 || true
+          --benchmark-max-time=0.5
 
     - name: Check performance
       run: |
@@ -322,7 +322,7 @@ jobs:
         LINT_OK="false"
         TEST_OK="false"
         VALIDATE_OK="false"
-        
+
         if [[ "${{ needs.lint.result }}" == "success" || "${{ needs.lint.result }}" == "skipped" ]]; then
           LINT_OK="true"
         fi
@@ -332,7 +332,7 @@ jobs:
         if [[ "${{ needs.validate.result }}" == "success" || "${{ needs.validate.result }}" == "skipped" ]]; then
           VALIDATE_OK="true"
         fi
-        
+
         if [[ "$LINT_OK" == "true" && "$TEST_OK" == "true" && "$VALIDATE_OK" == "true" ]]; then
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### ✅ All checks passed!" >> $GITHUB_STEP_SUMMARY

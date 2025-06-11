@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+from scipy.stats import norm
 
 from src.unity_wheel.math.options import (
     black_scholes_price_validated,
@@ -436,6 +437,27 @@ class TestEdgeCases:
             S=200, K=100, T=0, r=0.05, sigma=0, option_type="call"
         )
         assert abs(result4.value - 100) < 1e-10
+
+
+class TestNormCdfCache:
+    """Ensure normal CDF caching operates correctly."""
+
+    def test_norm_cdf_caching(self) -> None:
+        from src.unity_wheel.math.options import norm_cdf_cached, _cached_norm_cdf_scalar
+
+        _cached_norm_cdf_scalar.cache_clear()
+        info_start = _cached_norm_cdf_scalar.cache_info()
+        assert info_start.hits == 0 and info_start.misses == 0
+
+        val1 = norm_cdf_cached(0.7)
+        assert np.isclose(val1, norm.cdf(0.7))
+        info_after_first = _cached_norm_cdf_scalar.cache_info()
+        assert info_after_first.misses == 1
+
+        val2 = norm_cdf_cached(0.7)
+        info_after_second = _cached_norm_cdf_scalar.cache_info()
+        assert val1 == val2
+        assert info_after_second.hits == 1
 
 
 # Risk analytics tests moved to test_risk.py since these are now part of RiskAnalyzer class

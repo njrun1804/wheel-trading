@@ -61,14 +61,8 @@ else
     log "⚠️  Options fetch script not found, skipping"
 fi
 
-# 4. Update positions snapshot
-log "💼 Updating positions..."
-if [ -n "$SCHWAB_CLIENT_ID" ]; then
-    python -m src.unity_wheel.schwab.data_ingestion >> "$LOG_FILE" 2>&1
-    check_status $? "Position snapshot"
-else
-    log "⚠️  Skipping position update - no Schwab credentials"
-fi
+# 4. Update positions snapshot (no broker integration configured)
+log "💼 Skipping position update - no broker integration"
 
 # 5. Refresh FRED data (only if older than 1 day)
 log "📊 Checking economic data..."

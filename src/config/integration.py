@@ -44,9 +44,6 @@ class ConfigAdapter:
             MAX_POSITION_SIZE=config.risk.max_position_size,
             # Logging
             LOG_LEVEL=config.operations.logging.level,
-            # Google Cloud (if needed)
-            GOOGLE_CLOUD_PROJECT=None,
-            GOOGLE_APPLICATION_CREDENTIALS=None,
         )
 
         # Track parameter usage

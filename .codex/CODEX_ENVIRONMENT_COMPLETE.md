@@ -125,10 +125,17 @@ python .codex/minimal_trader.py
 ### Quick Validation
 ```bash
 # After making changes, test them
+<<<<<<< HEAD
 python -c "from src.unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
 
 # Check specific module
 python -c "from src.unity_wheel.risk.analytics import RiskAnalyzer; print('Risk module works')"
+=======
+python -c "from src/unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
+
+# Check specific module
+python -c "from src/unity_wheel.risk.analytics import RiskAnalyzer; print('Risk module works')"
+>>>>>>> main
 
 # Run targeted test
 pytest tests/test_wheel.py::test_find_optimal_put_strike -v
@@ -167,7 +174,11 @@ python -c "from src/unity_wheel import __version__; print(__version__)"
 export USE_PURE_PYTHON=true
 
 # Test basic calculation
+<<<<<<< HEAD
 python -c "from src.unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
+=======
+python -c "from src/unity_wheel.math.options import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
+>>>>>>> main
 ```
 
 ### If Data Access Fails
@@ -177,7 +188,11 @@ export USE_MOCK_DATA=true
 export DATABENTO_SKIP_VALIDATION=true
 
 # Test advisor
+<<<<<<< HEAD
 python -c "from src.unity_wheel.api.advisor import WheelAdvisor; print('Mock data mode')"
+=======
+python -c "from src/unity_wheel.api.advisor import WheelAdvisor; print('Mock data mode')"
+>>>>>>> main
 ```
 
 ---

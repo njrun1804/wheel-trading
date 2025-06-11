@@ -165,6 +165,31 @@ class ObservabilityExporter:
             perf_data = self._get_cached_performance_data(conn)
             perf_stats = perf_data if perf_data else {}
 
+            # Add runtime function timing metrics from metrics_collector
+            for op, stats_dict in metrics_collector.get_function_stats().items():
+                metrics.extend(
+                    [
+                        MetricPoint(
+                            timestamp=timestamp,
+                            metric_name="function_duration_ms",
+                            value=stats_dict["avg_ms"],
+                            tags={"operation": op, "stat": "avg"},
+                        ),
+                        MetricPoint(
+                            timestamp=timestamp,
+                            metric_name="function_duration_ms",
+                            value=stats_dict["p95_ms"],
+                            tags={"operation": op, "stat": "p95"},
+                        ),
+                        MetricPoint(
+                            timestamp=timestamp,
+                            metric_name="function_call_count",
+                            value=stats_dict["count"],
+                            tags={"operation": op},
+                        ),
+                    ]
+                )
+
             for operation, stats in perf_stats.items():
                 metrics.extend(
                     [
@@ -217,6 +242,47 @@ class ObservabilityExporter:
                             metric_name="decision_success_rate",
                             value=decision_stats.get("success_rate", 0),
                             tags={"metric": "observed"},
+                        ),
+                    ]
+                )
+
+            # Cache statistics
+            cache_stats = metrics_collector.get_cache_summary()
+            metrics.extend(
+                [
+                    MetricPoint(
+                        timestamp=timestamp,
+                        metric_name="cache_hit_rate",
+                        value=cache_stats["hit_rate"],
+                    ),
+                    MetricPoint(
+                        timestamp=timestamp,
+                        metric_name="cache_hits",
+                        value=cache_stats["hits"],
+                    ),
+                    MetricPoint(
+                        timestamp=timestamp,
+                        metric_name="cache_evictions",
+                        value=cache_stats["evictions"],
+                    ),
+                ]
+            )
+
+            # Risk metric distributions
+            for metric_name, values in metrics_collector.get_risk_distribution().items():
+                metrics.extend(
+                    [
+                        MetricPoint(
+                            timestamp=timestamp,
+                            metric_name="risk_metric",
+                            value=values["avg"],
+                            tags={"metric": metric_name, "stat": "avg"},
+                        ),
+                        MetricPoint(
+                            timestamp=timestamp,
+                            metric_name="risk_metric",
+                            value=values["p95"],
+                            tags={"metric": metric_name, "stat": "p95"},
                         ),
                     ]
                 )
