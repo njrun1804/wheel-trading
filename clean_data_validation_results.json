@@ -1,0 +1,7 @@
+{
+  "data_clean": true,
+  "walk_forward_sharpe": 0,
+  "optimal_params_valid": false,
+  "regime_count": 0,
+  "survives_shocks": true
+}

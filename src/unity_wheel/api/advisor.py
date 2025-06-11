@@ -11,14 +11,9 @@ from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import (
-    BorrowingCostAnalyzer,
-    RiskAnalyzer,
-    RiskLimits,
-    RiskLevel,
-    RiskMetrics as AnalyticsMetrics,
-    analyze_borrowing_decision,
-)
+from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLevel, RiskLimits
+from ..risk import RiskMetrics as AnalyticsMetrics
+from ..risk import analyze_borrowing_decision
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
@@ -150,6 +145,27 @@ class WheelAdvisor:
         )
 
         try:
+            # POLICY ENGINE: Stop trading if volatility exceeds 120%
+            if market_snapshot.volatility and market_snapshot.volatility > 1.20:
+                logger.warning(
+                    f"STOP TRADING: Volatility {market_snapshot.volatility:.1%} exceeds 120% threshold",
+                    extra={
+                        "volatility": market_snapshot.volatility,
+                        "threshold": 1.20,
+                        "action": "circuit_breaker",
+                    },
+                )
+                return Recommendation(
+                    action="NO_TRADE",
+                    reasoning="Volatility exceeds 120% circuit breaker threshold",
+                    confidence=1.0,
+                    parameters={
+                        "current_volatility": f"{market_snapshot.volatility:.1%}",
+                        "threshold": "120%",
+                        "policy": "stop_trading_high_vol",
+                    },
+                )
+
             # Validate market data with comprehensive data quality checks
             validator = _get_market_validator()
             validation_result = validator.validate(market_snapshot)
@@ -332,9 +348,7 @@ class WheelAdvisor:
                 margin_utilization=risk_metrics["margin_required"] / account.cash_balance,
             )
 
-            breaches = self.risk_analyzer.check_limits(
-                dataclass_metrics, account.cash_balance
-            )
+            breaches = self.risk_analyzer.check_limits(dataclass_metrics, account.cash_balance)
             risk_report = self.risk_analyzer.generate_risk_report(
                 dataclass_metrics, breaches, account.cash_balance
             )
@@ -694,7 +708,9 @@ class WheelAdvisor:
         """Load recent returns from local storage if available."""
         import os
         from pathlib import Path
+
         import numpy as np
+
         try:
             import duckdb
         except Exception:  # pragma: no cover - duckdb optional in some envs

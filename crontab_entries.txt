@@ -1,0 +1,14 @@
+# Unity Wheel Trading - Automated Monitoring
+# Add these to your crontab with: crontab -e
+
+# Daily health check at 4:10 PM ET on weekdays
+10 16 * * 1-5 cd /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading && /Users/mikeedwards/.pyenv/versions/3.11.10/bin/python src/unity_wheel/monitoring/scripts/daily_health_check.py >> logs/health_check.log 2>&1
+
+# Update positions every hour during market hours (9:30 AM - 4:00 PM ET)
+30 9-15 * * 1-5 cd /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading && /Users/mikeedwards/.pyenv/versions/3.11.10/bin/python update_positions.py >> logs/position_updates.log 2>&1
+
+# Weekly performance report on Friday at 4:30 PM ET
+30 16 * * 5 cd /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading && /Users/mikeedwards/.pyenv/versions/3.11.10/bin/python src/unity_wheel/monitoring/scripts/weekly_report.py >> logs/weekly_reports.log 2>&1
+
+# Data quality check every morning at 8:00 AM ET
+0 8 * * 1-5 cd /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading && /Users/mikeedwards/.pyenv/versions/3.11.10/bin/python src/unity_wheel/monitoring/scripts/data_quality_monitor.py >> logs/data_quality.log 2>&1
