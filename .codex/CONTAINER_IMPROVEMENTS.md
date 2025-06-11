@@ -28,7 +28,7 @@
    - Removed confusing `unity_trading` symlink references
    - Added clear import guidance
 
-### 🎯 **Major Addition: container_setup_v26.sh**
+### 🎯 **Major Addition: container_setup.sh**
 
 New comprehensive setup script that handles:
 - **Dependencies**: numpy, pandas, scipy, sklearn, hypothesis
@@ -89,4 +89,4 @@ The container environment now handles:
 ---
 
 **Last Updated**: January 2025
-**Script Version**: container_setup_v26.sh
+**Script Version**: container_setup.sh

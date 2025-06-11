@@ -130,7 +130,7 @@ python -c "from src.unity_wheel.strategy.wheel import validate_strike; print(val
 ### 🔧 Setup & Environment
 ```bash
 # Quick container setup
-./container_setup.sh
+./.codex/container_setup.sh
 
 # Activate environment
 source .codex/activate_container.sh

@@ -47,6 +47,10 @@ source .codex/.env
 ## Available Scripts
 
 ### 🚀 container_setup.sh
+Run the full setup:
+```bash
+./.codex/container_setup.sh
+```
 Full setup with dependency installation, environment configuration, and validation tests.
 
 ### 🏃 quick_setup.sh
