@@ -39,6 +39,14 @@
         "http://localhost:3000/mcp"
       ],
       "env": {}
+    },
+    "python_analysis": {
+      "type": "stdio",
+      "command": "stdio",
+      "args": [
+        "python3 scripts/python-mcp-server.py"
+      ],
+      "env": {}
     }
   }
 }
