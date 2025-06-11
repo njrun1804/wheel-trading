@@ -12,8 +12,8 @@ import pandas as pd
 from src.config.loader import get_config
 
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader
-from ..math.options import black_scholes_price_validated
 from ..math import CalculationResult
+from ..math.options import black_scholes_price_validated
 from ..storage import Storage
 from ..strategy.wheel import WheelParameters, WheelStrategy
 from ..utils import get_logger, timed_operation
@@ -186,7 +186,9 @@ class WheelBacktester:
                 strike = self._find_backtest_strike(current_price, params.target_delta)
 
                 # Calculate realistic premium
-                premium_result = self._calculate_backtest_premium(current_price, strike, params.target_dte)
+                premium_result = self._calculate_backtest_premium(
+                    current_price, strike, params.target_dte
+                )
 
                 if contracts_per_trade is None:
                     contracts = self.position_sizer.contracts_for_trade(
