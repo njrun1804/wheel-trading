@@ -443,7 +443,7 @@ class TestNormCdfCache:
     """Ensure normal CDF caching operates correctly."""
 
     def test_norm_cdf_caching(self) -> None:
-        from src.unity_wheel.math.options import norm_cdf_cached, _cached_norm_cdf_scalar
+        from src.unity_wheel.math.options import _cached_norm_cdf_scalar, norm_cdf_cached
 
         _cached_norm_cdf_scalar.cache_clear()
         info_start = _cached_norm_cdf_scalar.cache_info()

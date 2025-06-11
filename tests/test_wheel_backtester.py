@@ -1,9 +1,9 @@
 """Tests for wheel strategy backtester."""
 
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
 import sys
+from datetime import datetime, timedelta
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, Mock, patch
 
 # Provide minimal stubs for optional dependencies
 sys.modules.setdefault("databento", SimpleNamespace())
@@ -26,9 +26,9 @@ import pandas as pd
 import pytest
 
 from src.unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
+from src.unity_wheel.data_providers.base import FREDDataManager
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.strategy.wheel import WheelParameters
-from src.unity_wheel.data_providers.base import FREDDataManager
 
 
 class TestWheelBacktester:

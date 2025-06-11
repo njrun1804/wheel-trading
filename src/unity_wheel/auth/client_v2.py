@@ -7,8 +7,8 @@ that automatically retrieves credentials from SecretManager.
 
 from typing import Any, Dict, Optional
 
-from ..secrets.integration import SecretInjector
 from ..secrets import SecretManager
+from ..secrets.integration import SecretInjector
 from ..utils.logging import get_logger
 from .auth_client import AuthClient as BaseAuthClient
 

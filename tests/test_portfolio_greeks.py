@@ -1,5 +1,6 @@
 import sys
 import types
+
 import numpy as np
 
 # Stub google.cloud to avoid optional dependency errors during import
@@ -15,9 +16,9 @@ sys.modules.setdefault("google.cloud.exceptions", exceptions)
 sys.modules.setdefault("google", google)
 sys.modules.setdefault("google.cloud", cloud)
 
-from src.unity_wheel.risk.analytics import RiskAnalyzer
-from src.unity_wheel.models.position import Position
 from src.unity_wheel.models.greeks import Greeks
+from src.unity_wheel.models.position import Position
+from src.unity_wheel.risk.analytics import RiskAnalyzer
 
 
 def test_aggregate_greeks_default_correlation() -> None:
