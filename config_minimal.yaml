@@ -1,0 +1,46 @@
+# Minimal Unity Wheel Trading Bot Configuration
+# Generated for local-only operation (v2.2.0)
+
+# Essential metadata
+metadata:
+  version: "2.2.0"
+  environment: "production"
+
+# Unity-specific settings
+unity:
+  ticker: "U"
+  target_delta: 0.30
+  target_dte: 45
+  max_concurrent_puts: 3
+
+# Risk management
+risk:
+  max_position_size: 0.20    # 20% max per position
+  max_var_95: 0.05           # 5% VaR limit
+  max_cvar_95: 0.075         # 7.5% CVaR limit  
+  max_volatility: 1.50       # Stop at 150% vol
+  max_drawdown: -0.20        # -20% circuit breaker
+
+# Strategy parameters
+strategy:
+  delta_target: 0.30
+  expiration:
+    days_to_expiry_target: 45
+
+# Options Greeks
+greeks:
+  delta_target: 0.30
+  max_gamma_exposure: 100.0
+  max_vega_exposure: 1000.0
+
+# Data providers
+data:
+  databento_enabled: true
+  fred_enabled: true
+  cache_ttl_minutes: 15
+
+# System settings
+system:
+  log_level: "INFO"
+  cache_dir: "~/.wheel_trading/cache"
+  max_memory_mb: 500
