@@ -97,7 +97,6 @@ gh run watch                     # Watch CI
 
 ```
 run.py                   # Main entry point
-run_legacy.py            # Legacy entry (deprecated)
 config.yaml              # Configuration
 my_positions.yaml        # User positions
 README.md, CLAUDE.md     # Core docs
