@@ -54,6 +54,17 @@ print(f"Action: {result.action}")  # 'invest' or 'paydown_debt'
 print(f"Hurdle rate: {result.hurdle_rate:.1%}")
 ```
 
+### Real-Time Rate Updates
+```python
+from src.unity_wheel.risk import BorrowingCostAnalyzer
+
+def fetch_live_rate(source):
+    return {"schwab_margin": 0.095}.get(source)
+
+analyzer = BorrowingCostAnalyzer(rate_fetcher=fetch_live_rate, auto_update=True)
+analyzer.update_rates()
+```
+
 ### Advanced Analysis with NPV/IRR
 ```python
 from src.unity_wheel.risk.pure_borrowing_analyzer import PureBorrowingAnalyzer

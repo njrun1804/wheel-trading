@@ -27,7 +27,7 @@ async def test_complete_integration():
 
     # 1. Initialize storage layer
     print("\n1️⃣ Initializing Storage Layer...")
-    storage = Storage(StorageConfig(enable_gcs_backup=False))  # Local only for test
+    storage = Storage()  # Local only for test
     await storage.initialize()
     print("   ✅ DuckDB initialized")
 

@@ -27,9 +27,12 @@ from src.unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
 from src.unity_wheel.data_providers.validation import validate_market_data
+from src.unity_wheel.data_providers.base import FREDDataManager
+from src.unity_wheel.storage.storage import Storage
 from src.unity_wheel.monitoring import get_performance_monitor
 from src.unity_wheel.monitoring.diagnostics import SelfDiagnostics
 from src.unity_wheel.observability import get_observability_exporter
+from src.unity_wheel.metrics import metrics_collector
 from src.unity_wheel.risk import RiskLimits
 from src.unity_wheel.secrets.integration import SecretInjector
 from src.unity_wheel.strategy import WheelParameters
@@ -79,6 +82,17 @@ def generate_recommendation(
     """Generate wheel strategy recommendation for Unity using real market data."""
     settings = get_settings()
 
+    # Initialize FRED data manager and retrieve risk metrics
+    storage = Storage()
+    asyncio.run(storage.initialize())
+    fred_manager = FREDDataManager(storage=storage)
+    rf_rate, _ = asyncio.run(fred_manager.get_or_fetch_risk_free_rate(3))
+    regime, vix = asyncio.run(fred_manager.get_volatility_regime())
+    logger.info(
+        "Fetched FRED metrics",
+        extra={"risk_free_rate": rf_rate, "volatility_regime": regime, "vix": vix},
+    )
+
     # Create wheel parameters from settings
     wheel_params = WheelParameters(
         target_delta=settings.wheel_delta_target,
@@ -92,6 +106,8 @@ def generate_recommendation(
         max_cvar_95=0.075,
         max_margin_utilization=0.5,
     )
+    # Scale limits based on volatility regime
+    risk_limits.scale_by_volatility(vix / 100 if vix else 0.2)
 
     # Initialize advisor
     advisor = WheelAdvisor(wheel_params, risk_limits)
@@ -101,7 +117,9 @@ def generate_recommendation(
 
     # Get real market data - fail if not available
     try:
-        market_snapshot, confidence = get_market_data_sync(portfolio_value, TICKER)
+        market_snapshot, confidence = get_market_data_sync(
+            portfolio_value, TICKER, risk_free_rate=rf_rate
+        )
         logger.info("Successfully fetched real Unity market data", extra={"confidence": confidence})
         current_price = market_snapshot.current_price
 
@@ -265,7 +283,22 @@ def main(
     # Show performance metrics if requested
     if performance:
         monitor = get_performance_monitor()
-        print(monitor.generate_report(format=output_format))
+        perf_report = monitor.generate_report(format=output_format)
+        metrics_report = metrics_collector.generate_report()
+        if output_format == "json":
+            print(
+                json.dumps(
+                    {
+                        "performance": json.loads(perf_report),
+                        "decision_metrics": metrics_report,
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            print(perf_report)
+            print("")
+            print(metrics_report)
         return 0
 
     # Export metrics for dashboards if requested

@@ -63,18 +63,6 @@ class Settings(BaseSettings):
         alias="LOG_LEVEL",
     )
 
-    # Google Cloud
-    google_cloud_project: str | None = Field(
-        None,
-        description="Google Cloud project ID",
-        alias="GOOGLE_CLOUD_PROJECT",
-    )
-    google_application_credentials: str | None = Field(
-        None,
-        description="Path to Google Cloud credentials",
-        alias="GOOGLE_APPLICATION_CREDENTIALS",
-    )
-
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

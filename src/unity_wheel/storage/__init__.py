@@ -1,6 +1,7 @@
-"""
-Unified storage layer for wheel trading bot.
-Local-first with DuckDB, optional GCS backup.
+"""Local storage utilities for the wheel trading bot.
+
+The storage layer is backed solely by DuckDB and provides helpers for
+interacting with the local cache.
 """
 
 from .storage import Storage, StorageConfig
@@ -21,13 +22,10 @@ except ImportError:
         pass
 
 
-from .gcs_adapter import GCSAdapter, GCSConfig
 
 __all__ = [
     "Storage",
     "StorageConfig",
-    "GCSAdapter",
-    "GCSConfig",
 ]
 
 if _HAS_DUCKDB:
