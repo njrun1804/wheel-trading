@@ -18,6 +18,7 @@ class RiskMetrics(TypedDict):
     expected_return: float
     edge_ratio: float
     var_95: float
+    cvar_95: float
     margin_required: float
 
 
@@ -29,6 +30,7 @@ class Recommendation(TypedDict):
     confidence: float
     risk: RiskMetrics
     details: Dict[str, Any]
+    risk_report: Dict[str, Any]
 
 
 class PositionData(TypedDict):
