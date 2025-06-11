@@ -53,6 +53,11 @@ htmlcov/
 data/
 output/
 temp/
+# Run artifacts
+databento_pull.log
+my_positions.txt
+test_broker_data.txt
+bandit-report.json
 
 # Local sensitive files
 my_positions.yaml
