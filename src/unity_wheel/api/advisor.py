@@ -11,14 +11,9 @@ from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import (
-    BorrowingCostAnalyzer,
-    RiskAnalyzer,
-    RiskLimits,
-    RiskLevel,
-    RiskMetrics as AnalyticsMetrics,
-    analyze_borrowing_decision,
-)
+from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLevel, RiskLimits
+from ..risk import RiskMetrics as AnalyticsMetrics
+from ..risk import analyze_borrowing_decision
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
@@ -332,9 +327,7 @@ class WheelAdvisor:
                 margin_utilization=risk_metrics["margin_required"] / account.cash_balance,
             )
 
-            breaches = self.risk_analyzer.check_limits(
-                dataclass_metrics, account.cash_balance
-            )
+            breaches = self.risk_analyzer.check_limits(dataclass_metrics, account.cash_balance)
             risk_report = self.risk_analyzer.generate_risk_report(
                 dataclass_metrics, breaches, account.cash_balance
             )
@@ -694,7 +687,9 @@ class WheelAdvisor:
         """Load recent returns from local storage if available."""
         import os
         from pathlib import Path
+
         import numpy as np
+
         try:
             import duckdb
         except Exception:  # pragma: no cover - duckdb optional in some envs

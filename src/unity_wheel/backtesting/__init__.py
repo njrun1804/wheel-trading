@@ -1,7 +1,7 @@
 """Backtesting framework for wheel strategy."""
 
-from .wheel_backtester import BacktestPosition, BacktestResults, WheelBacktester
 from .exceptions import InsufficientDataError
+from .wheel_backtester import BacktestPosition, BacktestResults, WheelBacktester
 
 __all__ = [
     "WheelBacktester",

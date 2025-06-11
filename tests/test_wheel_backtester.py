@@ -1,14 +1,13 @@
 """Tests for wheel strategy backtester."""
 
+import sys
+import types
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
-
-import sys
-import types
 
 # Stub Databento modules to avoid heavy dependency during testing
 sys.modules.setdefault("databento", types.ModuleType("databento"))
@@ -27,9 +26,10 @@ sys.modules.setdefault("tenacity", tenacity_stub)
 from src.unity_wheel.backtesting import (
     BacktestPosition,
     BacktestResults,
-    WheelBacktester,
     InsufficientDataError,
+    WheelBacktester,
 )
+
 # PriceHistoryLoader.MINIMUM_DAYS constant
 MINIMUM_DAYS = 20
 from src.unity_wheel.storage import Storage

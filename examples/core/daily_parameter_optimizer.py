@@ -7,9 +7,9 @@ It is designed to run once per day on a local machine.
 """
 
 import asyncio
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-import sys
 
 import numpy as np
 import pandas as pd
@@ -19,9 +19,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.unity_wheel.analytics.dynamic_optimizer import DynamicOptimizer, MarketState
 from src.unity_wheel.backtesting import WheelBacktester
+from src.unity_wheel.data_providers.databento import DatabentoClient, PriceHistoryLoader
 from src.unity_wheel.risk.advanced_financial_modeling import AdvancedFinancialModeling
 from src.unity_wheel.storage import Storage
-from src.unity_wheel.data_providers.databento import DatabentoClient, PriceHistoryLoader
 
 
 async def run_daily_optimization(symbol: str = "U") -> None:
