@@ -680,9 +680,7 @@ class AdvancedFinancialModeling:
         weights = np.array([p.get("weight", 1.0) for p in portfolio], dtype=float)
         weights /= weights.sum()
 
-        expected = float(
-            sum(w * p["expected_return"] for w, p in zip(weights, portfolio))
-        )
+        expected = float(sum(w * p["expected_return"] for w, p in zip(weights, portfolio)))
         volatility = float(
             np.sqrt(sum((w * p["volatility"]) ** 2 for w, p in zip(weights, portfolio)))
         )

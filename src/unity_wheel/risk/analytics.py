@@ -520,10 +520,12 @@ class RiskAnalyzer:
                 corr_matrix[i, j] = correlations.get((a, b), correlations.get((b, a), 0.0))
 
         def aggregate_component(key: str, dollar: bool = False) -> float:
-            vec = np.array([
-                exposures[u][key] * (price_lookup[u] if dollar else 1.0)
-                for u in unique_underlyings
-            ])
+            vec = np.array(
+                [
+                    exposures[u][key] * (price_lookup[u] if dollar else 1.0)
+                    for u in unique_underlyings
+                ]
+            )
             return float(np.sqrt(vec @ corr_matrix @ vec))
 
         aggregated = {
