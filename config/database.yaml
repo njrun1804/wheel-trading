@@ -1,0 +1,63 @@
+# Master Database Configuration
+# Single source of truth for all wheel trading data
+
+database:
+  # Primary database file
+  master_db: "data/wheel_trading_master.duckdb"
+
+  # Connection settings
+  connection:
+    timeout: 30
+    memory_limit: "2GB"
+    threads: 4
+
+  # Core tables
+  tables:
+    stock_prices:
+      description: "Historical stock prices with technical indicators"
+      primary_key: ["symbol", "date"]
+      indexes: ["date", "symbol_date"]
+
+    options:
+      description: "Options data with Greeks and implied volatility"
+      primary_key: ["option_symbol", "date"]
+      indexes: ["date", "expiration", "underlying_date", "dte", "delta"]
+
+    economic_indicators:
+      description: "FRED economic data (rates, inflation, etc.)"
+      primary_key: ["date", "indicator"]
+      indexes: ["date"]
+
+  # Trading views
+  views:
+    current_market:
+      description: "Latest market snapshot"
+      refresh: "real_time"
+
+    wheel_candidates:
+      description: "Options suitable for wheel strategy"
+      refresh: "daily"
+      filters:
+        - "option_type = 'P'"
+        - "dte BETWEEN 20 AND 60"
+        - "delta BETWEEN -0.40 AND -0.15"
+        - "volume >= 10"
+
+    data_quality_summary:
+      description: "Data freshness and quality metrics"
+      refresh: "hourly"
+
+# Data quality thresholds
+quality:
+  max_staleness_days: 3
+  min_volume_threshold: 10
+  min_option_premium: 0.10
+  required_dte_range: [20, 60]
+  target_delta_range: [-0.40, -0.15]
+
+# Performance settings
+performance:
+  cache_size: "1GB"
+  query_timeout: 30
+  batch_size: 1000
+  parallel_workers: 4

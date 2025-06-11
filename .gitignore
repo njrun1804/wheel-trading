@@ -96,3 +96,4 @@ diagnostics_history.json
 __pycache__/
 .env.local
 .claude/
+.mcp.json

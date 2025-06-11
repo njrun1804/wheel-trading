@@ -11,24 +11,10 @@
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
     },
-    "web": {
-      "transport": "stdio",
-      "command": "npx",
-      "args": ["-y", "mcp-web-search"]
-    },
-    "wiki": {
-      "transport": "stdio",
-      "command": "npx",
-      "args": ["-y", "wikipedia-mcp"]
-    },
-    "vscode": {
-      "transport": "sse",
-      "command": "http://localhost:3000/mcp"
-    },
     "python_analysis": {
       "transport": "stdio",
-      "command": "python3",
-      "args": ["scripts/python-mcp-server.py"]
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": ["/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/python-mcp-server.py"]
     }
   }
 }

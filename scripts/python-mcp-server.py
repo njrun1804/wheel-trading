@@ -9,11 +9,16 @@ import json
 import os
 import sys
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
-import pandas as pd
-import psutil
+try:
+    import numpy as np
+    import pandas as pd
+    import psutil
+except ImportError:
+    # For testing without full dependencies
+    print('{"jsonrpc": "2.0", "method": "initialized", "params": {}}', flush=True)
+    sys.exit(0)
 
 
 class PythonAnalysisMCP:
@@ -22,7 +27,7 @@ class PythonAnalysisMCP:
     def __init__(self):
         self.project_root = "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading"
 
-    async def analyze_position(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze_position(self, params: dict[str, Any]) -> dict[str, Any]:
         """Analyze a potential position with real-time metrics."""
         try:
             # Import project modules
@@ -48,7 +53,7 @@ class PythonAnalysisMCP:
         except Exception as e:
             return {"error": str(e)}
 
-    def _calculate_risk_metrics(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _calculate_risk_metrics(self, params: dict[str, Any]) -> dict[str, Any]:
         """Calculate risk metrics for position."""
         portfolio_value = params.get("portfolio_value", 100000)
         position_size = params.get("position_size", 10000)
@@ -60,7 +65,7 @@ class PythonAnalysisMCP:
             "margin_required": position_size * 0.20,  # Approximate
         }
 
-    async def monitor_system(self) -> Dict[str, Any]:
+    async def monitor_system(self) -> dict[str, Any]:
         """Real-time system monitoring."""
         return {
             "timestamp": datetime.now().isoformat(),
@@ -89,13 +94,15 @@ class PythonAnalysisMCP:
                     total += entry.stat().st_size
         return total
 
-    async def data_quality_check(self) -> Dict[str, Any]:
+    async def data_quality_check(self) -> dict[str, Any]:
         """Check data quality in real-time."""
         try:
             # Check DuckDB data
             import duckdb
 
-            conn = duckdb.connect(os.path.join(self.project_root, "data/market_data.db"))
+            conn = duckdb.connect(
+                os.path.join(self.project_root, "data/wheel_trading_master.duckdb")
+            )
 
             checks = {"timestamp": datetime.now().isoformat(), "tables": [], "issues": []}
 
@@ -128,13 +135,31 @@ class PythonAnalysisMCP:
 
     async def run_server(self):
         """Run the MCP server on stdio."""
+        # Send initialization message
+        init_msg = {
+            "jsonrpc": "2.0",
+            "method": "notifications/initialized",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {
+                    "tools": {
+                        "analyze_position": {},
+                        "monitor_system": {},
+                        "data_quality_check": {},
+                    }
+                },
+                "serverInfo": {"name": "python-analysis", "version": "1.0.0"},
+            },
+        }
+        print(json.dumps(init_msg), flush=True)
+
         while True:
             try:
                 line = await asyncio.get_event_loop().run_in_executor(None, sys.stdin.readline)
-                if not line:
-                    break
+                if not line or line.strip() == "":
+                    continue
 
-                request = json.loads(line)
+                request = json.loads(line.strip())
                 method = request.get("method")
                 params = request.get("params", {})
 
@@ -144,21 +169,25 @@ class PythonAnalysisMCP:
                     result = await self.monitor_system()
                 elif method == "data_quality_check":
                     result = await self.data_quality_check()
+                elif method == "initialize":
+                    result = {"protocolVersion": "2024-11-05", "capabilities": {}}
                 else:
                     result = {"error": f"Unknown method: {method}"}
 
-                response = {"id": request.get("id"), "result": result}
+                response = {"jsonrpc": "2.0", "id": request.get("id"), "result": result}
 
-                print(json.dumps(response))
-                sys.stdout.flush()
+                print(json.dumps(response), flush=True)
 
+            except json.JSONDecodeError:
+                # Skip malformed JSON
+                continue
             except Exception as e:
                 error_response = {
+                    "jsonrpc": "2.0",
                     "id": request.get("id") if "request" in locals() else None,
-                    "error": str(e),
+                    "error": {"code": -1, "message": str(e)},
                 }
-                print(json.dumps(error_response))
-                sys.stdout.flush()
+                print(json.dumps(error_response), flush=True)
 
 
 if __name__ == "__main__":

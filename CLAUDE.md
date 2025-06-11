@@ -1,6 +1,6 @@
-# CLAUDE.md - Unity Wheel Trading Bot v2.2
+# CLAUDE.md - Unity Wheel Trading Bot v3.0
 
-Minimal context file. For details, read referenced docs below.
+Optimized for Claude Code CLI. Minimal context, maximum efficiency.
 
 ## Quick Commands
 ```bash
@@ -9,47 +9,48 @@ python run.py --diagnose         # System health
 pytest -v -m "not slow"          # Fast tests
 ```
 
-## Key Files
-- `advisor.py:106` - Main logic
-- `wheel.py:153` - Strike selection
-- `options.py:746` - Math
-- `config.yaml` - Settings
+## Critical Paths
+- Entry: `run.py` → `src/unity_wheel/api/advisor.py`
+- Data: `data/wheel_trading_master.duckdb` (single source)
+- Config: `config.yaml` + env vars
 
-## Reference Docs
-When you need details, read these:
-- `docs/QUICK_REFERENCE.md` - Full commands & workflows
-- `docs/ARCHITECTURE.md` - System design
-- `docs/DATABENTO_UNITY_GUIDE.md` - Data integration
-- `CLAUDE-BACKUP-FULL.md` - Original 949-line reference
-
-## Critical Values
+## Key Values
 Unity (U) | Delta: 0.30 | Max position: 100% | Min confidence: 0.30
 
-## MCP Toolkits & Retrieval Policy
+## MCP Servers (Active)
+1. `fs` - File system access
+2. `github` - Repository management
+3. `python_analysis` - Real-time trading analysis
 
-You have six toolkits:
+## Development Workflow
+1. **Local Only** - No cloud deployment
+2. **GitHub** - Source control (`njrun1804/wheel-trading`)
+3. **Testing** - Always test before commits
 
-1. `mcp__fs__*` – my whole local drive
-2. `mcp__vscode__*` – the open workspace (preferred for edits)
-3. `mcp__python_analysis__*` – **real-time trading analysis**
-4. `mcp__github__*` – public repos & issues
-5. `mcp__web__*` – live news & the wider web
-6. `mcp__wiki__*` – encyclopaedia facts
+## Code Style
+- No comments unless complex math
+- Type hints everywhere
+- Follow existing patterns
+- Prefer editing over creating
 
-**Priority:** 1 → 2 → 3 → 4 → 5 → 6.
-**Never paste >2,000 tokens from any single file; summarise instead.**
+## Key Components
+- Trading: `src/unity_wheel/strategy/wheel.py`
+- Risk: `src/unity_wheel/risk/`
+- Math: `src/unity_wheel/math/options.py`
+- API: `src/unity_wheel/api/`
 
-## Python Analysis MCP Capabilities
+## When You Need More
+- Architecture: `docs/ARCHITECTURE.md`
+- Commands: `docs/QUICK_REFERENCE.md`
+- Original guide: `CLAUDE-BACKUP-FULL.md`
 
-- `analyze_position(params)` – Real-time position analysis with Greeks
-- `monitor_system()` – Live system performance monitoring
-- `data_quality_check()` – Validate data freshness and integrity
-- Direct access to project modules and mathematical functions
+## Autonomous Development
+- GitHub integration configured
+- Clear API boundaries
+- All auth handled automatically
+- MCP servers simplified
 
-## Large Repo Optimizations
-
-- Output limited to 8k tokens for faster responses
-- Enhanced mathematical analysis tools (statsmodels, scipy, sympy)
-- Performance profiling (line_profiler, memory_profiler, snakeviz)
-- Data validation (pandera, pydantic, jsonschema)
-- Advanced visualizations (plotly, dash, seaborn)
+# Important
+- Do exactly what's asked
+- Never create unnecessary files
+- Test changes locally first

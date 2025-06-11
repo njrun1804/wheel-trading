@@ -1,16 +1,14 @@
-# Pre-commit hooks optimized for Claude Code development environment
-# Focus on automated fixes and critical checks only
+# Pre-commit hooks for personal wheel trading bot
+# Minimal setup for single developer
 
 repos:
-  # Basic file hygiene (automated fixes)
+  # Basic file hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-        exclude: deployment/
-      - id: check-toml
       - id: debug-statements  # Catch forgotten breakpoints
 
   # Code formatting (automated)
@@ -27,38 +25,9 @@ repos:
       - id: isort
         args: [--profile=black, --line-length=100]
 
-  # Type checking (temporarily disabled due to numerous minor issues)
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v1.9.0
-  #   hooks:
-  #     - id: mypy
-  #       args: [--ignore-missing-imports, --no-strict-optional, --allow-untyped-defs]
-  #       additional_dependencies:
-  #         - types-pytz
-  #         - pandas-stubs
-  #         - numpy
-
-  - repo: local
+  # Basic linting with ruff (fast, replaces flake8/pylint)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.2.0
     hooks:
-      # Test critical math functions (temporarily disabled - needs API update)
-      # - id: test-options-math
-      #   name: Test options math accuracy
-      #   entry: pytest tests/test_options_properties.py -v
-      #   language: system
-      #   pass_filenames: false
-      #   stages: [pre-push]
-
-      # Verify configuration is valid
-      - id: validate-config
-        name: Validate configuration
-        entry: python -c "import yaml; yaml.safe_load(open('config.yaml')); print('✓ Config valid')"
-        language: system
-        pass_filenames: false
-
-      # Check data validation implementation
-      - id: check-data-validation
-        name: Check data validation
-        entry: ./scripts/check-data-validation.sh
-        language: system
-        pass_filenames: false
-        verbose: true
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]

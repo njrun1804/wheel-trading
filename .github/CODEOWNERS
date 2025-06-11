@@ -1,26 +1,33 @@
-# This is a CODEOWNERS file that defines individuals or teams responsible for code in a repository.
-# Each line is a file pattern followed by one or more owners.
+# CODEOWNERS for Wheel Trading Bot
+# This file defines code ownership for automatic review assignment
 
-# Default owner for everything in the repo
+# Global owner
 * @njrun1804
 
-# Python files
-*.py @njrun1804
+# Core trading logic
+/src/unity_wheel/strategy/ @njrun1804
+/src/unity_wheel/analytics/ @njrun1804
+/src/unity_wheel/risk/ @njrun1804
+/src/unity_wheel/math/ @njrun1804
 
-# JavaScript/TypeScript files
-*.js @njrun1804
-*.ts @njrun1804
-*.jsx @njrun1804
-*.tsx @njrun1804
+# API and entry points (for external tool access)
+/src/unity_wheel/api/ @njrun1804
+/run.py @njrun1804
 
-# GitHub Actions workflows
-.github/workflows/ @njrun1804
+# Data providers
+/src/unity_wheel/data_providers/ @njrun1804
+
+# Configuration
+/config.yaml @njrun1804
+/src/config/ @njrun1804
+
+# Tests
+/tests/ @njrun1804
 
 # Documentation
-*.md @njrun1804
-docs/ @njrun1804
+/README.md @njrun1804
+/docs/ @njrun1804
+/CLAUDE.md @njrun1804
 
-# Configuration files
-*.json @njrun1804
-*.yaml @njrun1804
-*.yml @njrun1804
+# Scripts
+/scripts/ @njrun1804
