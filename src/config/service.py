@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class ConfigurationService:
     """
     Singleton service for centralized configuration management.
-    
+
     This service:
     - Provides a single point of access for all configuration
     - Ensures thread-safe lazy loading
@@ -26,11 +26,11 @@ class ConfigurationService:
     - Supports dynamic reloading
     - Provides health monitoring
     """
-    
-    _instance: Optional['ConfigurationService'] = None
+
+    _instance: Optional["ConfigurationService"] = None
     _lock = threading.Lock()
-    
-    def __new__(cls, config_path: Union[str, Path] = "config.yaml") -> 'ConfigurationService':
+
+    def __new__(cls, config_path: Union[str, Path] = "config.yaml") -> "ConfigurationService":
         """Create or return the singleton instance."""
         if cls._instance is None:
             with cls._lock:
@@ -38,25 +38,25 @@ class ConfigurationService:
                     cls._instance = super().__new__(cls)
                     cls._instance._initialized = False
         return cls._instance
-    
+
     def __init__(self, config_path: Union[str, Path] = "config.yaml"):
         """Initialize the configuration service."""
         if self._initialized:
             return
-            
+
         with self._lock:
             if self._initialized:
                 return
-                
+
             self.config_path = Path(config_path)
             self._loader: Optional[ConfigurationLoader] = None
             self._config_cache: Optional[WheelConfig] = None
             self._last_reload_time: Optional[float] = None
             self._access_count = 0
             self._initialized = True
-            
+
             logger.info(f"ConfigurationService initialized with path: {self.config_path}")
-    
+
     @property
     def loader(self) -> ConfigurationLoader:
         """Get or create the configuration loader."""
@@ -66,20 +66,20 @@ class ConfigurationService:
                     self._loader = ConfigurationLoader(self.config_path)
                     logger.info("ConfigurationLoader created")
         return self._loader
-    
+
     @property
     def config(self) -> WheelConfig:
         """Get the current configuration."""
         self._access_count += 1
-        
+
         if self._config_cache is None:
             with self._lock:
                 if self._config_cache is None:
                     self._config_cache = self.loader.config
                     logger.info("Configuration loaded and cached")
-                    
+
         return self._config_cache
-    
+
     def reload(self) -> WheelConfig:
         """Reload configuration from source."""
         with self._lock:
@@ -89,7 +89,7 @@ class ConfigurationService:
             self._last_reload_time = datetime.now().timestamp()
             logger.info("Configuration reloaded successfully")
             return self._config_cache
-    
+
     def get_health_report(self) -> Dict[str, Any]:
         """Get configuration health report."""
         return {
@@ -97,29 +97,29 @@ class ConfigurationService:
             "last_reload": self._last_reload_time,
             "loader_health": self.loader.generate_health_report(),
             "config_valid": self._config_cache is not None,
-            "singleton_id": id(self)
+            "singleton_id": id(self),
         }
-    
+
     def track_parameter_usage(self, parameter: str, impact: float = 0.0) -> None:
         """Track parameter usage and impact."""
         self.loader.track_parameter_usage(parameter, impact)
-    
+
     def get_unused_parameters(self) -> List[str]:
         """Get list of unused configuration parameters."""
         return self.loader.get_unused_parameters()
-    
+
     def get_parameter_stats(self) -> Dict[str, Dict[str, Any]]:
         """Get statistics about parameter usage."""
         return self.loader.get_parameter_stats()
-    
+
     def validate_health(self) -> Tuple[bool, List[str]]:
         """Validate configuration health."""
         return self.loader.validate_health()
-    
+
     def __getattr__(self, name: str) -> Any:
         """Delegate attribute access to the config object."""
         return getattr(self.config, name)
-    
+
     @classmethod
     def reset(cls) -> None:
         """Reset the singleton instance (mainly for testing)."""

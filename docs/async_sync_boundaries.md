@@ -75,7 +75,7 @@ class DatabentoClient:
         """Async method for API calls."""
         response = await self._api_call(...)
         return response
-    
+
     def get_option_chain_sync(self, symbol: str) -> OptionChain:
         """Sync wrapper for easy integration."""
         import asyncio
@@ -106,7 +106,7 @@ class WheelAdvisor:
         # Use sync wrappers when needed
         if need_fresh_data:
             data = self.databento_client.get_option_chain_sync(symbol)
-        
+
         # All calculations remain sync
         recommendation = self.strategy.find_optimal_strike(...)
         return recommendation

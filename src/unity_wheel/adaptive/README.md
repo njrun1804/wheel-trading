@@ -117,7 +117,7 @@ adaptive:
   enabled: true
   max_volatility: 1.50  # Stop trading above this
   min_confidence: 0.30  # Minimum confidence required
-  
+
 strategy:
   # Adaptive system will override these based on conditions
   greeks:

@@ -25,11 +25,10 @@ from ..utils import (
     timed_operation,
     with_recovery,
 )
-from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
 
 # Import dependency injection
 from .dependencies import AdvisorDependencies, get_default_dependencies
-
+from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(logger)
@@ -72,7 +71,7 @@ class WheelAdvisor:
     ):
         """
         Initialize advisor with strategy and risk components.
-        
+
         Parameters
         ----------
         wheel_params : Optional[WheelParameters]
@@ -83,19 +82,19 @@ class WheelAdvisor:
             Dependency container for all components
         """
         self.constraints = TradingConstraints()
-        
+
         # Use dependency injection
         if dependencies is None:
             dependencies = get_default_dependencies()
-        
+
         # Override specific components if provided
         if wheel_params:
             dependencies._wheel_parameters = wheel_params
         if risk_limits:
             dependencies._risk_limits = risk_limits
-            
+
         self.dependencies = dependencies
-        
+
         # Get components from dependencies
         self.wheel_params = self.dependencies.wheel_parameters
         self.risk_limits = self.dependencies.risk_limits

@@ -487,4 +487,3 @@ def get_config_loader(config_path: Union[str, Path] = "config.yaml") -> Configur
     if _config_loader is None:
         _config_loader = ConfigurationLoader(config_path)
     return _config_loader
-
