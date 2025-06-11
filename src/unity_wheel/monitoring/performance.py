@@ -14,6 +14,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import numpy as np
 
 from ..utils import get_logger
+from ..metrics import metrics_collector
 
 logger = get_logger(__name__)
 
@@ -451,6 +452,7 @@ def performance_monitored(operation: Optional[str] = None):
             finally:
                 duration_ms = (time.time() - start_time) * 1000
                 monitor.record(op_name, duration_ms, success)
+                metrics_collector.record_function_timing(op_name, duration_ms)
 
         return wrapper
 

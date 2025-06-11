@@ -16,7 +16,7 @@ from src.unity_wheel.databento import DatabentoClient
 from src.unity_wheel.databento.databento_storage_adapter import DatabentoStorageAdapter
 from src.unity_wheel.databento.integration import DatentoIntegration
 from src.unity_wheel.databento.validation import DataValidator
-from src.unity_wheel.storage import Storage, StorageConfig
+from src.unity_wheel.storage import Storage
 from src.unity_wheel.utils import setup_structured_logging
 
 
@@ -30,7 +30,7 @@ async def pull_wheel_data_integrated():
     print("📋 Following DATABENTO_STORAGE_PLAN.md")
 
     # Initialize unified storage (DuckDB + optional GCS)
-    storage = Storage(StorageConfig(enable_gcs_backup=bool(os.getenv("GCP_PROJECT_ID"))))
+    storage = Storage()
     await storage.initialize()
 
     # Initialize Databento storage adapter

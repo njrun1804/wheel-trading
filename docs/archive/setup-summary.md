@@ -21,14 +21,13 @@
 - Security: KMS, Secret Manager, Binary Authorization, Security Center
 - Monitoring: Logging, Monitoring, Cloud Trace
 - Compute: Cloud Run, Cloud Functions, App Engine
-- Storage: Artifact Registry, Cloud Storage
+- Storage: Artifact Registry
 - Database: Firestore, Cloud SQL, Redis
 - Messaging: Pub/Sub, Cloud Scheduler
 
 ### Resources Created:
 
 - Artifact Registry: us-central1-docker.pkg.dev/wheel-strategy-202506/wheel-trading
-- Logs Bucket: gs://wheel-strategy-202506-logs
 - Monitoring Channel: Email alerts to njrun1804@gmail.com
 
 ## 🚀 Next Steps
@@ -64,7 +63,6 @@ gh api repos/njrun1804/wheel-trading/vulnerability-alerts
 
 ## 🔐 Security Features
 
-- Audit logs exported to Cloud Storage
 - Vulnerability scanning on all code pushes
 - Automated dependency updates
 - Secret scanning with push protection

@@ -21,16 +21,44 @@ python run.py --diagnose
 # View performance metrics
 python run.py --performance
 
-# Continuous monitoring
-./scripts/monitor.sh
+# Quick health check
+./scripts/health_check.sh
 ```
+
+## 🍎 M4 MacBook Pro Setup
+
+The project includes optimizations specifically for macOS 15.5 on the 12‑core M4 Pro MacBook. To enable them:
+
+1. **Run the tuning script once** (requires sudo):
+   ```bash
+   ./scripts/mac-optimize.sh
+   ```
+2. **Use the optimized data loader** when fetching history:
+   ```bash
+   python tools/data/fetch_unity_data_optimized.py
+   ```
+3. **Increase parallelism** to match your hardware by setting:
+   ```bash
+   export WHEEL_DATABENTO__LOADER__MAX_WORKERS=12
+   ```
+   (the default in `config.yaml` is already 12)
+4. **Confirm compiled libraries** and disable pure Python mode for best performance:
+   ```bash
+   export USE_PURE_PYTHON=false
+   ```
+5. **Validate the environment** before running any commands:
+   ```bash
+   source .codex/.container_env
+   python .codex/check_environment.py
+   ```
+
 
 ## 💰 Cost Efficiency
 
 - **< $50/month** total operational cost
 - No streaming subscriptions
 - Intelligent caching reduces API calls by 90%+
-- Optional cloud backup (GCS) for long-term analysis
+- Uses Google Cloud Secret Manager for credentials (only GCP dependency)
 
 ## 🏗️ Architecture
 
@@ -42,7 +70,6 @@ User requests recommendation
 Check local DuckDB cache (15-30 min TTL)
     ↓
 If stale → Fetch from APIs:
-    • Schwab: Positions & account data
     • Databento: Option chains (REST only)
     • FRED: Macro indicators
     ↓
@@ -56,10 +83,6 @@ Store in cache → Generate recommendation
    - 30-day automatic cleanup
    - < 5GB typical usage
 
-2. **Optional GCS Backup**
-   - Raw API responses
-   - Parquet exports for analysis
-   - Lifecycle policies for cost control
 
 ## 📁 Project Structure
 
@@ -75,7 +98,7 @@ wheel-trading/
 ├── tests/                       # All tests
 ├── examples/                    # Organized examples
 │   ├── core/                    # Config, risk, validation
-│   ├── data/                    # Databento, Schwab, FRED
+│   ├── data/                    # Databento and FRED
 │   └── auth/                    # Authentication, secrets
 ├── tools/                       # Development utilities
 │   ├── debug/                   # Debugging tools
@@ -102,6 +125,8 @@ pip install -r requirements-dev.txt
 
 # Set up credentials
 python scripts/setup-secrets.py
+# This stores your API keys in Google Cloud Secret Manager or
+# local encrypted storage depending on the environment.
 
 # Verify installation
 python -m unity_wheel.validate
@@ -113,9 +138,8 @@ For detailed setup instructions, see [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md
 
 ### Required Credentials
 
-1. **Schwab API**: OAuth credentials (read-only access)
-2. **Databento**: API key for options data
-3. **FRED** (optional): Free API key for economic data
+1. **Databento**: API key for options data
+2. **FRED** (optional): Free API key for economic data
 
 See [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md) for detailed setup.
 
@@ -167,8 +191,8 @@ python run.py --performance
 # Export metrics dashboard
 python run.py --export-metrics
 
-# Continuous monitoring
-./scripts/monitor.sh
+# Run a health check
+./scripts/health_check.sh
 
 # Run all autonomous checks
 ./scripts/autonomous-checks.sh
@@ -219,13 +243,18 @@ await storage.cleanup_old_data()
 ### Self-Validating Mathematics
 
 ```python
+import asyncio
 from unity_wheel.math import black_scholes_price_validated
+from src.unity_wheel.data_providers.base import FREDDataManager
+
+# Pull latest risk‑free rate from FRED
+rf_rate, _ = asyncio.run(FREDDataManager().get_or_fetch_risk_free_rate(3))
 
 result = black_scholes_price_validated(
     S=35.50,    # Unity current price
     K=32.50,    # Strike price
     T=0.123,    # 45 days to expiration
-    r=0.05,     # Risk-free rate
+    r=rf_rate,  # FRED risk-free rate
     sigma=0.65, # Implied volatility
     option_type="put"
 )
@@ -280,6 +309,19 @@ poetry run mypy src/ --strict
 poetry run pre-commit run --all-files
 ```
 
+### Container Quick Commands
+
+```bash
+# Setup container environment
+./.codex/container_setup.sh
+
+# Run container tests
+./.codex/container_test.sh
+
+# Commit changes quickly
+./.codex/container_commit.sh "your commit message"
+```
+
 ## 📈 Performance
 
 ### Calculation Benchmarks
@@ -301,6 +343,8 @@ poetry run pre-commit run --all-files
 - OAuth tokens auto-refresh
 - No credentials in code or config
 - Machine-specific encryption keys
+- Google Cloud Secret Manager stores credentials securely
+  (the project's only Google Cloud dependency)
 
 ## 📝 Documentation
 

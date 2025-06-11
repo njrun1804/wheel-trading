@@ -1,7 +1,0 @@
-Account Value: $212,151.67
-Cash: $41,001.67
-Buying Power: $293,546.00
-
-Positions:
-U 7500 shares @ $24.7912
-U250718C00025000 -75 calls @ $2.08
