@@ -17,7 +17,7 @@ from src.config.schema import WheelConfig
 from src.unity_wheel.math.options import black_scholes_price_validated, calculate_all_greeks
 from src.unity_wheel.math.vectorized_options import vectorized_black_scholes
 
-# Strategy Components  
+# Strategy Components
 from src.unity_wheel.strategy.wheel import WheelStrategy
 from src.unity_wheel.api.advisor import WheelAdvisor
 
@@ -59,7 +59,7 @@ from src.unity_wheel.models.greeks import Greeks
 # Databento Types
 from src.unity_wheel.data_providers.databento.types import (
     OptionChain,
-    OptionQuote, 
+    OptionQuote,
     InstrumentDefinition
 )
 ```

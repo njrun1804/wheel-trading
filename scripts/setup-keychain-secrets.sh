@@ -17,23 +17,23 @@ fi
 add_to_keychain() {
     local service_name=$1
     local prompt_text=$2
-    
+
     echo -n "$prompt_text: "
     read -s api_key
     echo
-    
+
     if [ -z "$api_key" ]; then
         echo "⚠️  Skipping empty key"
         return
     fi
-    
+
     # Add to keychain (update if exists)
     security add-generic-password \
         -a "$USER" \
         -s "$service_name" \
         -w "$api_key" \
         -T "" -U
-    
+
     if [ $? -eq 0 ]; then
         echo "✓ Stored $service_name in Keychain"
     else

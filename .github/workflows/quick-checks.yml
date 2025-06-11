@@ -17,18 +17,18 @@ jobs:
     name: Lint, Format & Security
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Full history for better change detection
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-        
+
     - name: Load cached dependencies
       uses: actions/cache@v4
       id: cache
@@ -42,22 +42,22 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-quick-
           ${{ runner.os }}-
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pre-commit poetry
-        
+
     - name: Run pre-commit checks
       run: |
         pre-commit run --all-files --show-diff-on-failure
-        
+
     - name: Type checking (mypy)
       if: always()  # Run even if pre-commit fails
       run: |
         poetry install --no-interaction --no-root --only main,dev
         poetry run mypy src/ --config-file pyproject.toml || true  # Non-blocking for now
-        
+
     - name: Security scan (bandit)
       if: always()  # Run even if previous steps fail
       run: |
@@ -65,16 +65,16 @@ jobs:
         if [ -f bandit-report.json ]; then
           echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
           poetry run python -c "
-import json
-with open('bandit-report.json') as f:
-    data = json.load(f)
-    metrics = data.get('metrics', {})
-    print(f\"- Total issues: {metrics.get('_totals', {}).get('SEVERITY.UNDEFINED', 0)}\")
-    print(f\"- High severity: {metrics.get('SEVERITY.HIGH', 0)}\")
-    print(f\"- Medium severity: {metrics.get('SEVERITY.MEDIUM', 0)}\")
-          " >> $GITHUB_STEP_SUMMARY
+        import json
+        with open('bandit-report.json') as f:
+            data = json.load(f)
+            metrics = data.get('metrics', {})
+            print(f\"- Total issues: {metrics.get('_totals', {}).get('SEVERITY.UNDEFINED', 0)}\")
+            print(f\"- High severity: {metrics.get('SEVERITY.HIGH', 0)}\")
+            print(f\"- Medium severity: {metrics.get('SEVERITY.MEDIUM', 0)}\")
+        " >> $GITHUB_STEP_SUMMARY
         fi
-        
+
     - name: Check for large files
       run: |
         # Find files larger than 5MB
@@ -83,19 +83,19 @@ with open('bandit-report.json') as f:
           echo "⚠️ Large files detected (>5MB):" >> $GITHUB_STEP_SUMMARY
           echo "$large_files" >> $GITHUB_STEP_SUMMARY
         fi
-        
+
     - name: Performance check
       run: |
         # Quick performance validation
         poetry run python -c "
-import time
-from src.unity_wheel.math.options import black_scholes_price_validated as bs
-t0 = time.time()
-for _ in range(1000):
-    bs(100, 100, 1, 0.05, 0.2, 'call')
-t1 = time.time()
-elapsed = (t1 - t0) * 1000  # Convert to ms
-print(f'✓ 1000 Black-Scholes calculations: {elapsed:.1f}ms')
-if elapsed > 200:  # 0.2ms per calculation
-    print(f'⚠️ Performance warning: Expected <200ms, got {elapsed:.1f}ms')
+        import time
+        from src.unity_wheel.math.options import black_scholes_price_validated as bs
+        t0 = time.time()
+        for _ in range(1000):
+            bs(100, 100, 1, 0.05, 0.2, 'call')
+        t1 = time.time()
+        elapsed = (t1 - t0) * 1000  # Convert to ms
+        print(f'✓ 1000 Black-Scholes calculations: {elapsed:.1f}ms')
+        if elapsed > 200:  # 0.2ms per calculation
+            print(f'⚠️ Performance warning: Expected <200ms, got {elapsed:.1f}ms')
         " >> $GITHUB_STEP_SUMMARY

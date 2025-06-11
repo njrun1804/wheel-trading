@@ -84,6 +84,7 @@ class LiveDataValidator:
         # Check for API key using SecretManager
         try:
             from src.unity_wheel.secrets.integration import get_databento_api_key
+
             get_databento_api_key()  # Will raise if not configured
         except Exception:
             raise ValueError(
