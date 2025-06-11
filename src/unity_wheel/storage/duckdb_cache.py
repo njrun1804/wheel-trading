@@ -1,6 +1,8 @@
 """
 DuckDB-based local cache for all market data.
-Provides SQL interface with automatic TTL and LRU eviction.
+
+Provides a SQL interface with automatic TTL cleanup and
+LRU eviction when the database exceeds ``max_size_gb``.
 """
 
 import asyncio
@@ -187,6 +189,7 @@ class DuckDBCache:
             )
 
         await self._check_vacuum()
+        await self._evict_by_size()
 
     async def get_option_chain(
         self, symbol: str, expiration: datetime, max_age_minutes: int = 15
@@ -229,6 +232,9 @@ class DuckDBCache:
             """,
                 [account_id, timestamp, positions, account_data],
             )
+
+        await self._check_vacuum()
+        await self._evict_by_size()
 
     async def get_latest_positions(
         self, account_id: str, max_age_minutes: int = 30
@@ -341,6 +347,42 @@ class DuckDBCache:
             conn.execute("VACUUM")
 
         self._last_vacuum = datetime.utcnow()
+
+    async def _evict_by_size(self):
+        """Evict oldest rows when database exceeds max_size_gb."""
+        limit_bytes = int(self.config.max_size_gb * 1024**3)
+        current_size = self.db_path.stat().st_size
+
+        if current_size <= limit_bytes:
+            return
+
+        tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
+
+        async with self.connection() as conn:
+            while current_size > limit_bytes:
+                counts = {
+                    table: conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+                    for table in tables
+                }
+
+                if all(count == 0 for count in counts.values()):
+                    break
+
+                for table in sorted(tables, key=lambda t: counts[t], reverse=True):
+                    conn.execute(
+                        f"""
+                        DELETE FROM {table}
+                        WHERE created_at IN (
+                            SELECT created_at FROM {table}
+                            ORDER BY created_at ASC
+                            LIMIT 1000
+                        )
+                        """
+                    )
+                conn.execute("VACUUM")
+                current_size = self.db_path.stat().st_size
+                if current_size <= limit_bytes:
+                    break
 
     async def clear_all(self):
         """Clear all cached data."""

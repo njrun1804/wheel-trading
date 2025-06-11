@@ -144,6 +144,9 @@ class Storage:
                 [prediction_id, datetime.utcnow(), input_features, predictions, model_version],
             )
 
+        await self.cache._check_vacuum()
+        await self.cache._evict_by_size()
+
     async def store_greeks(
         self, option_symbol: str, spot_price: float, risk_free_rate: float, greeks: Dict[str, float]
     ):
@@ -169,6 +172,9 @@ class Storage:
                     greeks.get("iv", 0),
                 ],
             )
+
+        await self.cache._check_vacuum()
+        await self.cache._evict_by_size()
 
     async def get_historical_data(
         self,

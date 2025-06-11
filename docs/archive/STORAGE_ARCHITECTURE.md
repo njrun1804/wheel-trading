@@ -62,7 +62,7 @@ predictions_cache (
 **Features:**
 - 5GB max size (configurable)
 - 30-day TTL with automatic cleanup
-- LRU eviction when approaching size limit
+- LRU eviction enforced when DB exceeds `max_size_gb`
 - Export to Parquet for GCS backup
 
 ### 2. Google Cloud Storage (Optional)

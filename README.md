@@ -54,7 +54,7 @@ Store in cache → Generate recommendation
 1. **Local DuckDB** (~/.wheel_trading/cache/)
    - Primary storage for all data
    - 30-day automatic cleanup
-   - < 5GB typical usage
+   - LRU eviction keeps size under `max_size_gb`
 
 2. **Optional GCS Backup**
    - Raw API responses
