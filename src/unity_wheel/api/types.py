@@ -10,7 +10,7 @@ Action = Literal["HOLD", "ADJUST", "ROLL", "CLOSE"]
 OptionType = Literal["call", "put"]
 
 
-class RiskMetrics(TypedDict):
+class RiskMetrics(TypedDict, total=False):
     """Risk metrics for recommendation."""
 
     max_loss: float
@@ -18,7 +18,9 @@ class RiskMetrics(TypedDict):
     expected_return: float
     edge_ratio: float
     var_95: float
+    cvar_95: float
     margin_required: float
+    margin_utilization: float
 
 
 class Recommendation(TypedDict):
@@ -29,6 +31,7 @@ class Recommendation(TypedDict):
     confidence: float
     risk: RiskMetrics
     details: Dict[str, Any]
+    risk_report: Dict[str, Any]
 
 
 class PositionData(TypedDict):

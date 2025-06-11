@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
+import asyncio
+import numpy as np
 
 from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
 from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLimits, analyze_borrowing_decision
+from ..risk.analytics import RiskMetrics as AnalyticsRiskMetrics, RiskLevel
+from ..storage import Storage, StorageConfig
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..utils import (
@@ -99,6 +103,7 @@ class WheelAdvisor:
         self.assignment_model = UnityAssignmentModel()
         self.borrowing_analyzer = BorrowingCostAnalyzer()
         self.financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
+        self.storage = Storage(StorageConfig(enable_gcs_backup=False))
 
         logger.info(
             "WheelAdvisor initialized",
@@ -290,6 +295,7 @@ class WheelAdvisor:
 
             # Calculate comprehensive risk metrics
             risk_metrics = self._calculate_risk_metrics(
+                ticker=market_snapshot["ticker"],
                 strike=strike_rec.strike,
                 premium=strike_rec.premium,
                 contracts=contracts,
@@ -298,6 +304,32 @@ class WheelAdvisor:
                 volatility=volatility,
                 portfolio_value=account.cash_balance,
             )
+
+            analytics_metrics = AnalyticsRiskMetrics(
+                var_95=risk_metrics["var_95"],
+                var_99=risk_metrics["var_95"] * 1.2,
+                cvar_95=risk_metrics.get("cvar_95", 0.0),
+                cvar_99=risk_metrics.get("cvar_95", 0.0) * 1.2,
+                kelly_fraction=0.0,
+                portfolio_delta=0.0,
+                portfolio_gamma=0.0,
+                portfolio_vega=0.0,
+                portfolio_theta=0.0,
+                margin_requirement=risk_metrics["margin_required"],
+                margin_utilization=risk_metrics.get("margin_utilization", 0.0),
+            )
+
+            breaches = self.risk_analyzer.check_limits(analytics_metrics, account.cash_balance)
+            risk_report = self.risk_analyzer.generate_risk_report(
+                analytics_metrics, breaches, account.cash_balance
+            )
+
+            if breaches:
+                for breach in breaches:
+                    if breach.severity in (RiskLevel.CRITICAL, RiskLevel.HIGH):
+                        confidence *= 0.7
+                    else:
+                        confidence *= 0.9
 
             # Calculate edge
             edge = self._calculate_edge(
@@ -344,6 +376,7 @@ class WheelAdvisor:
                         "edge": edge,
                         "decision_time": elapsed,
                     },
+                    risk_report=risk_report,
                 )
 
             # Add borrowing metrics to risk metrics
@@ -394,6 +427,7 @@ class WheelAdvisor:
                         0, strike_rec.strike * 100 * contracts - available_cash
                     ),
                 },
+                risk_report=risk_report,
             )
 
             # Log successful decision
@@ -545,8 +579,23 @@ class WheelAdvisor:
 
         return True
 
+    def _fetch_historical_returns(self, ticker: str, days: int = 252) -> np.ndarray:
+        """Fetch historical returns from storage or return empty array."""
+        try:
+            end = datetime.utcnow()
+            start = end - timedelta(days=days)
+            data = asyncio.run(
+                self.storage.get_historical_data("price_history", start, end, [ticker])
+            )
+            returns = [row.get("returns", 0.0) for row in data]
+            return np.array(returns, dtype=float)
+        except Exception as exc:
+            logger.warning(f"historical_returns_unavailable: {exc}")
+            return np.array([])
+
     def _calculate_risk_metrics(
         self,
+        ticker: str,
         strike: float,
         premium: float,
         contracts: int,
@@ -564,11 +613,24 @@ class WheelAdvisor:
         premium_return = (premium / strike) * (365 / days_to_expiry)
         expected_return = premium_return * (1 - probability_itm)
 
-        # VaR calculation (simplified)
-        position_var = max_loss * volatility * 1.65 * probability_itm
+        # Fetch historical returns for VaR/CVaR
+        returns = self._fetch_historical_returns(ticker)
+        if returns.size > 0:
+            var_frac, _ = self.risk_analyzer.calculate_var(returns, 0.95, "historical")
+            cvar_frac, _ = self.risk_analyzer.calculate_cvar(returns, 0.95, "historical")
+        else:
+            # Fallback to volatility-based VaR
+            var_frac = volatility * 1.65
+            cvar_frac = var_frac * 1.2
+
+        position_value = strike * self.constraints.CONTRACTS_PER_TRADE * contracts
+        position_var = abs(var_frac) * position_value
+        position_cvar = abs(cvar_frac) * position_value
 
         # Margin requirement
-        margin_required = strike * self.constraints.CONTRACTS_PER_TRADE * contracts * 0.20
+        margin_required = position_value * 0.20
+
+        margin_utilization = margin_required / portfolio_value if portfolio_value else 0.0
 
         return RiskMetrics(
             max_loss=max_loss,
@@ -576,7 +638,9 @@ class WheelAdvisor:
             expected_return=expected_return,
             edge_ratio=0.0,  # Calculated separately
             var_95=position_var,
+            cvar_95=position_cvar,
             margin_required=margin_required,
+            margin_utilization=margin_utilization,
         )
 
     def _calculate_edge(
@@ -628,4 +692,5 @@ class WheelAdvisor:
                 margin_required=0.0,
             ),
             details={},
+            risk_report={},
         )
