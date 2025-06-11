@@ -19,7 +19,7 @@ Market Data → Validation → Risk Analysis → Strategy → Recommendation
 
 ### 🎯 **`src/unity_wheel/api/`** - External API Interface
 - `advisor.py:106` - Main recommendation engine (`WheelAdvisor.advise_position()`)
-- `advisor_simple.py` - Simplified interface for basic usage
+- `examples/advisor_simple.py` - Simplified interface for basic usage
 
 ### 📊 **`src/unity_wheel/strategy/`** - Trading Logic
 - `wheel.py:626` - Core wheel strategy implementation

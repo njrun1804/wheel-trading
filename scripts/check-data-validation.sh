@@ -69,7 +69,7 @@ echo -e "${GREEN}✓ Found $VALIDATE_COUNT validate_ usages${NC}"
 
 # Check specific files that must have validation
 CRITICAL_FILES=(
-    "src/unity_wheel/api/advisor_simple.py"
+    "examples/advisor_simple.py"
     "src/unity_wheel/portfolio/single_account.py"
     "src/unity_wheel/execution/unity_fill_model.py"
 )

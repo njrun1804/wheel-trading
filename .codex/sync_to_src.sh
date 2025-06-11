@@ -15,9 +15,7 @@ echo "📥 Copying optimized code to src/..."
 # Copy main codebase (use unity_trading as the primary)
 cp -r unity_trading/* src/unity_wheel/
 
-# Copy config and patterns
-cp -r data_pipeline/config/* src/config/
-cp -r data_pipeline/patterns/* src/patterns/
+# Copy config (no longer mirrored)
 
 echo "✅ Code synchronized to src/"
 

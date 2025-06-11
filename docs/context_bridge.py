@@ -293,5 +293,5 @@ When generating code for this project:
 9. ALWAYS use absolute imports from src.unity_wheel
 10. ALWAYS respect the performance SLAs listed above
 
-Refer to the pattern files in src/patterns/ for examples.
+Refer to the archived pattern files in docs/archive/patterns/ for examples.
 """

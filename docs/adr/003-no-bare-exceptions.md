@@ -96,5 +96,5 @@ except ZeroDivisionError:
 
 ## References
 - Python Exception Hierarchy: https://docs.python.org/3/library/exceptions.html
-- Error handling patterns: src/patterns/error_handling.py
+- Error handling patterns: docs/archive/patterns/error_handling.py
 - Logging guide: docs/LOGGING_GUIDE.md

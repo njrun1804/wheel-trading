@@ -97,7 +97,7 @@ fill_model.estimate_fill_price(bid=2, ask=2.1, size=-5, is_opening=True)  # Dies
 - Tracks Unity exposure (shares, puts, calls)
 
 ### SimpleWheelAdvisor
-- Location: `src/unity_wheel/api/advisor_simple.py`
+- Location: `examples/advisor_simple.py`
 - Extends base WheelAdvisor
 - Integrates Unity fill model
 - Dies if option data missing
