@@ -1,7 +1,5 @@
 """Test position evaluation and comparison framework."""
 
-from datetime import datetime, timedelta
-
 import pytest
 
 from src.unity_wheel.models.position import Position
@@ -79,6 +77,8 @@ class TestPositionEvaluator:
 
         # This should be beneficial (collecting more premium)
         assert analysis.new_expected_value > analysis.current_expected_value
+        assert analysis.breakeven_days != float("inf")
+        assert analysis.breakeven_days > 0
 
     def test_analyze_switch_not_beneficial(self):
         """Test analyzing a non-beneficial switch."""
