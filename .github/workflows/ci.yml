@@ -223,7 +223,7 @@ jobs:
         from src.config.loader import get_config
         config = get_config()
         assert config.unity.ticker == 'U', 'Unity ticker misconfigured'
-        assert 0 < config.risk.position_limits.max_position_size <= 1, 'Invalid position size'
+        assert 0 < config.risk.max_position_size <= 1, 'Invalid position size'
         print('✅ Configuration valid')
         "
 
