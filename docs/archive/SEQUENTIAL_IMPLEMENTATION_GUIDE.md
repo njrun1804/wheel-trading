@@ -50,7 +50,7 @@ pre-commit run --all-files
 python -c "from src.config.loader import get_config_loader; print(get_config_loader().generate_health_report())"
 
 # Run with mock data for testing
-python run.py --portfolio 100000 --use-mock  # After Task 4
+# (obsolete flag removed)
 ```
 
 ## Data Requirements & Costs
@@ -217,7 +217,6 @@ Wire together all data sources to feed real information into the decision engine
 
 3. Update run.py:
    - Use real data pipeline
-   - Add --use-mock flag for testing only
    - Show data source status in output
 
 4. Add monitoring in src/unity_wheel/monitoring/data_quality.py:

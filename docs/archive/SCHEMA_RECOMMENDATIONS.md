@@ -18,7 +18,8 @@ After reviewing the API inputs from Schwab and Databento against our DuckDB sche
 
 3. **Efficient Indexing**:
    - Primary keys prevent duplicate data
-   - Created_at indexes enable efficient cache expiration
+   - Created_at indexes enable efficient cache expiration (option chains,
+     position snapshots, greeks cache, predictions cache)
    - Symbol indexes speed up lookups
 
 ## Verified API Mappings

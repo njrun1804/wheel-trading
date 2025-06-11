@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
 from src.unity_wheel.utils.logging import get_logger
+from src.unity_wheel.metrics import metrics_collector
 
 logger = get_logger(__name__)
 
@@ -67,14 +68,17 @@ class CacheStatistics:
         self.hits += 1
         self.computation_time_saved_ms += time_saved_ms
         self.entries_by_key[key] = self.entries_by_key.get(key, 0) + 1
+        metrics_collector.record_cache_hit()
 
     def record_miss(self, key: str) -> None:
         """Record cache miss."""
         self.misses += 1
+        metrics_collector.record_cache_miss()
 
     def record_eviction(self, key: str) -> None:
         """Record cache eviction."""
         self.evictions += 1
+        metrics_collector.record_cache_eviction()
 
     def get_summary(self) -> Dict[str, Any]:
         """Get statistics summary."""

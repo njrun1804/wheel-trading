@@ -444,6 +444,7 @@ class RiskAnalyzer:
     def aggregate_portfolio_greeks(
         self,
         positions: List[Tuple[Position, Greeks, float]],
+        correlations: Optional[Dict[Tuple[str, str], float]] = None,
     ) -> Tuple[Dict[str, float], float]:
         """
         Aggregate Greeks across portfolio.
@@ -451,52 +452,87 @@ class RiskAnalyzer:
         Parameters
         ----------
         positions : List[Tuple[Position, Greeks, float]]
-            List of (position, greeks, underlying_price) tuples
+            List of ``(position, greeks, underlying_price)`` tuples
+        correlations : Dict[Tuple[str, str], float], optional
+            Pairwise correlation coefficients between underlyings.
+            Keys are ``(underlying_a, underlying_b)``. If omitted, a simple
+            correlation matrix is inferred assuming full correlation for the
+            same underlying and zero otherwise.
 
         Returns
         -------
         Tuple[Dict[str, float], float]
             Aggregated Greeks and confidence score
         """
-        total_delta = 0.0
-        total_gamma = 0.0
-        total_vega = 0.0
-        total_theta = 0.0
-        total_rho = 0.0
+        if not positions:
+            return {
+                "delta": 0.0,
+                "gamma": 0.0,
+                "vega": 0.0,
+                "theta": 0.0,
+                "rho": 0.0,
+                "delta_dollars": 0.0,
+            }, 0.0
 
-        for position, greeks, underlying_price in positions:
-            # Scale by position size and contract multiplier
+        underlyings = [pos.underlying for pos, _, _ in positions]
+        unique_underlyings = list(dict.fromkeys(underlyings))
+
+        if correlations is None:
+            correlations = {
+                (u1, u2): 1.0 if u1 == u2 else 0.0
+                for u1 in unique_underlyings
+                for u2 in unique_underlyings
+            }
+
+        price_lookup = {}
+        exposures = {
+            u: {"delta": 0.0, "gamma": 0.0, "vega": 0.0, "theta": 0.0, "rho": 0.0}
+            for u in unique_underlyings
+        }
+
+        for position, greeks, price in positions:
+            u = position.underlying
             multiplier = 100 if position.position_type != "stock" else 1
             qty = position.quantity
+            price_lookup[u] = price
 
             if greeks.delta is not None:
-                total_delta += qty * multiplier * greeks.delta
+                exposures[u]["delta"] += qty * multiplier * greeks.delta
 
             if greeks.gamma is not None:
-                # Gamma in shares per $1 move
-                # TODO(codex): Consider position correlations - same underlying positions have correlated gamma risk
-                # CODEX-ENHANCEMENT: Could weight by correlation matrix for multi-asset portfolios
-                total_gamma += qty * multiplier * greeks.gamma
+                exposures[u]["gamma"] += qty * multiplier * greeks.gamma
 
             if greeks.vega is not None:
-                # Vega in dollars per 1% volatility move
-                total_vega += qty * multiplier * greeks.vega
+                exposures[u]["vega"] += qty * multiplier * greeks.vega
 
             if greeks.theta is not None:
-                # Theta in dollars per day
-                total_theta += qty * multiplier * greeks.theta
+                exposures[u]["theta"] += qty * multiplier * greeks.theta
 
             if greeks.rho is not None:
-                # Rho in dollars per 1% rate move
-                total_rho += qty * multiplier * greeks.rho
+                exposures[u]["rho"] += qty * multiplier * greeks.rho
+
+        n = len(unique_underlyings)
+        corr_matrix = np.eye(n)
+        for i, a in enumerate(unique_underlyings):
+            for j, b in enumerate(unique_underlyings):
+                if i == j:
+                    continue
+                corr_matrix[i, j] = correlations.get((a, b), correlations.get((b, a), 0.0))
+
+        def aggregate_component(key: str, dollar: bool = False) -> float:
+            vec = np.array([
+                exposures[u][key] * (price_lookup[u] if dollar else 1.0)
+                for u in unique_underlyings
+            ])
+            return float(np.sqrt(vec @ corr_matrix @ vec))
 
         aggregated = {
-            "delta": total_delta,
-            "gamma": total_gamma,
-            "vega": total_vega,
-            "theta": total_theta,
-            "rho": total_rho,
-            "delta_dollars": total_delta * underlying_price if positions else 0,
+            "delta": aggregate_component("delta"),
+            "gamma": aggregate_component("gamma"),
+            "vega": aggregate_component("vega"),
+            "theta": aggregate_component("theta"),
+            "rho": aggregate_component("rho"),
+            "delta_dollars": aggregate_component("delta", dollar=True),
         }
 
         logger.debug(

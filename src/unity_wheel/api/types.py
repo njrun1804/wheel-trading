@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any, Dict, List, Literal, TypedDict
+from typing_extensions import NotRequired
 
 # Type aliases
 Action = Literal["HOLD", "ADJUST", "ROLL", "CLOSE"]
@@ -18,7 +19,9 @@ class RiskMetrics(TypedDict):
     expected_return: float
     edge_ratio: float
     var_95: float
+    cvar_95: float
     margin_required: float
+    borrowing_analysis: NotRequired[Dict[str, Any]]
 
 
 class Recommendation(TypedDict):
@@ -29,6 +32,7 @@ class Recommendation(TypedDict):
     confidence: float
     risk: RiskMetrics
     details: Dict[str, Any]
+    risk_report: Dict[str, Any]
 
 
 class PositionData(TypedDict):

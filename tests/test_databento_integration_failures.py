@@ -24,7 +24,7 @@ async def test_create_snapshot_spot_failure():
         patch("src.unity_wheel.cli.databento_integration.DatabentoIntegration"),
     ):
         with pytest.raises(ValueError, match="Failed to get Unity spot price"):
-            await create_databento_market_snapshot(100_000.0, "U")
+            await create_databento_market_snapshot(100_000.0, "U", risk_free_rate=0.05)
     mock_client.close.assert_awaited_once()
 
 
@@ -50,7 +50,7 @@ async def test_create_snapshot_no_candidates():
         ),
     ):
         with pytest.raises(ValueError, match="No Unity options found"):
-            await create_databento_market_snapshot(100_000.0, "U")
+            await create_databento_market_snapshot(100_000.0, "U", risk_free_rate=0.05)
     mock_client.close.assert_awaited_once()
 
 
@@ -61,4 +61,4 @@ def test_sync_wrapper_propagates_errors():
         side_effect=ValueError("bad"),
     ):
         with pytest.raises(ValueError, match="bad"):
-            get_market_data_sync(1.0)
+            get_market_data_sync(1.0, risk_free_rate=0.05)

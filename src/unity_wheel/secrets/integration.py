@@ -12,24 +12,8 @@ logger = get_logger(__name__)
 
 @lru_cache(maxsize=1)
 def get_secret_manager() -> SecretManager:
-    """Get singleton instance of SecretManager.
-
-    Caches the instance to avoid multiple initializations.
-    """
+    """Return a cached ``SecretManager`` instance."""
     return SecretManager()
-
-
-def get_schwab_credentials() -> Dict[str, str]:
-    """Get Schwab credentials from SecretManager.
-
-    Returns:
-        Dictionary with 'client_id' and 'client_secret'
-
-    Raises:
-        SecretNotFoundError: If credentials not configured
-    """
-    manager = get_secret_manager()
-    return manager.get_credentials("schwab")
 
 
 def get_databento_api_key() -> str:
@@ -66,11 +50,6 @@ def migrate_env_to_secrets() -> None:
     """
     manager = get_secret_manager()
     migrations = [
-        # Schwab credentials
-        ("WHEEL_AUTH__CLIENT_ID", "schwab_client_id"),
-        ("WHEEL_AUTH__CLIENT_SECRET", "schwab_client_secret"),
-        ("SCHWAB_APP_KEY", "schwab_client_id"),  # Legacy
-        ("SCHWAB_SECRET", "schwab_client_secret"),  # Legacy
         # Databento
         ("DATABENTO_API_KEY", "databento_api_key"),
         # FRED
@@ -122,15 +101,7 @@ class SecretInjector:
 
         # Handle service credentials
         if self.service:
-            if self.service == "schwab":
-                creds = manager.get_credentials("schwab")
-                self.secrets.update(
-                    {
-                        "WHEEL_AUTH__CLIENT_ID": creds["client_id"],
-                        "WHEEL_AUTH__CLIENT_SECRET": creds["client_secret"],
-                    }
-                )
-            elif self.service == "databento":
+            if self.service == "databento":
                 self.secrets["DATABENTO_API_KEY"] = manager.get_secret("databento_api_key")
             elif self.service == "fred":
                 self.secrets["FRED_API_KEY"] = manager.get_secret("ofred_api_key")
