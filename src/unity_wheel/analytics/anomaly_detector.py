@@ -12,8 +12,7 @@ import pandas as pd
 from scipy import stats
 from sklearn.ensemble import IsolationForest
 
-from src.config.loader import get_config
-
+from ...config.loader import get_config
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy
 

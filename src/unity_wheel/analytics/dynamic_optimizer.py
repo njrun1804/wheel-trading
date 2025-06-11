@@ -10,8 +10,7 @@ from typing import Dict, NamedTuple, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from src.config.loader import get_config
-
+from ...config.loader import get_config
 from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
