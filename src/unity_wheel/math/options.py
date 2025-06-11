@@ -6,17 +6,18 @@ import logging
 import warnings
 from dataclasses import dataclass
 from datetime import timedelta
+from functools import lru_cache
 from typing import Literal, NamedTuple, Optional, Tuple, Union, overload
 
 import numpy as np
 import numpy.typing as npt
 from scipy.stats import norm
-from functools import lru_cache
 
 from ..storage.cache.general_cache import cached
 from ..utils import RecoveryStrategy, get_feature_flags, get_logger, timed_operation, with_recovery
 
 logger = get_logger(__name__)
+
 
 # Cache frequently used values of the normal CDF for scalar inputs
 @lru_cache(maxsize=100)
@@ -30,6 +31,7 @@ def norm_cdf_cached(x: FloatOrArray) -> FloatOrArray:
     if np.ndim(x) == 0:
         return _cached_norm_cdf_scalar(float(x))
     return norm.cdf(x)
+
 
 # Type aliases
 FloatArray = npt.NDArray[np.float64]
@@ -585,9 +587,13 @@ def implied_volatility_validated(
         vega = S * norm.pdf(d1) * sqrt_T
 
         if option_type == "call":
-            bs_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d1 - sigma * sqrt_T)
+            bs_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(
+                d1 - sigma * sqrt_T
+            )
         else:
-            bs_price = K * np.exp(-r * T) * norm_cdf_cached(-(d1 - sigma * sqrt_T)) - S * norm_cdf_cached(-d1)
+            bs_price = K * np.exp(-r * T) * norm_cdf_cached(
+                -(d1 - sigma * sqrt_T)
+            ) - S * norm_cdf_cached(-d1)
 
         price_diff = bs_price - option_price
 

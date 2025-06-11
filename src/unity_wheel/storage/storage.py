@@ -15,7 +15,6 @@ from .duckdb_cache import CacheConfig, DuckDBCache
 logger = get_logger(__name__)
 
 
-
 @dataclass
 class StorageConfig:
     """Configuration for unified storage."""
@@ -174,7 +173,6 @@ class Storage:
 
             if not df.empty:
                 results.extend(df.to_dict("records"))
-
 
         logger.info(
             "historical_data_retrieved",
