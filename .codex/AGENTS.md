@@ -259,7 +259,7 @@ unity_trading/             # DUPLICATE - SHOULD BE REMOVED
 
 ## Agent Best Practices
 
-1. **Always check environment**: Source `.codex/.container_env` first
+1. **Always check environment**: Source `.codex/.env` first
 2. **Verify dependencies**: Check numpy availability before math operations
 3. **Use fallbacks**: Pure Python mode works in all environments
 4. **Test incrementally**: Run quick tests before full test suite
@@ -288,7 +288,7 @@ python -m pip install --user numpy pandas pydantic
 ### Container Issues
 ```bash
 # Reset environment
-rm -rf .codex/.container_env
+rm -rf .codex/.env
 ./.codex/container_setup.sh
 
 # Check container type

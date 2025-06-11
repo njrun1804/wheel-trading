@@ -72,6 +72,13 @@ build/
 .env.local
 .env.*.local
 *.env
+!.codex/.env
+.codex/activate_container.sh
+.codex/run_tests.sh
+.codex/run_container.sh
+.codex/test_container.sh
+.codex/make_test.sh
+.codex/stubs/
 diagnostics_history.json
 
 # macOS duplicate files
