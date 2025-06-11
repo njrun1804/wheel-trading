@@ -23,7 +23,7 @@ api_key = get_ofred_api_key()
 
 ### 2. **Unified Storage**
 
-FRED data is stored in the DuckDB cache with optional GCS backup:
+FRED data is stored in the DuckDB cache:
 
 ```python
 from src.unity_wheel.storage.storage import Storage
@@ -63,7 +63,6 @@ FRED data is stored in these DuckDB tables:
 ### Storage Locations
 
 - **Local Cache**: `~/.wheel_trading/cache/wheel_cache.duckdb`
-- **GCS Backup**: `gs://wheel-processed/fred_*` (if enabled)
 
 ### Data Series
 
@@ -185,5 +184,5 @@ If you have existing FRED data in SQLite:
 ## Cost
 
 - **FRED API**: Free (120 requests/minute limit)
-- **Storage**: <50MB local, optional GCS backup
-- **Estimated monthly cost**: $0 (local only) or <$0.01 (with GCS)
+- **Storage**: <50MB local
+- **Estimated monthly cost**: $0

@@ -76,7 +76,7 @@ databento:
   symbols: ["U"]  # Unity only by default
   storage:
     local_days: 30      # Recent data cached locally
-    cloud_enabled: false # Set true for GCS/BigQuery
+    cloud_enabled: false # Reserved for future use
   filters:
     min_volume: 10      # Skip illiquid options
     max_spread_pct: 0.5 # Skip wide spreads

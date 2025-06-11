@@ -8,8 +8,8 @@ The Wheel Trading Bot v2.0 uses a lean, cost-effective storage architecture opti
 
 1. **Pull-When-Asked Only** - No streaming, no continuous ingestion
 2. **Local-First Caching** - DuckDB for fast SQL queries on local data
-3. **Cold Backup Only** - GCS for archival, not hot queries
-4. **< $100/month Total** - Including all Google Cloud and API costs
+3. **Optional Local Backups** - Export data for offline archiving
+4. **< $100/month Total** - Including all API costs and minimal cloud usage
 
 ## Storage Layers
 
@@ -63,40 +63,7 @@ predictions_cache (
 - 5GB max size (configurable)
 - 30-day TTL with automatic cleanup
 - LRU eviction when approaching size limit
-- Export to Parquet for GCS backup
 
-### 2. Google Cloud Storage (Optional)
-
-Two buckets for cold storage only:
-
-```
-wheel-raw/
-├── schwab/
-│   └── {date}/
-│       └── {timestamp}_schwab.json
-├── databento/
-│   └── {date}/
-│       └── {timestamp}_databento.json
-└── fred/
-    └── {date}/
-        └── {timestamp}_fred.json
-
-wheel-processed/
-├── option_chains/
-│   └── year={YYYY}/month={MM}/
-│       └── option_chains_{YYYYMMDD}.parquet
-├── position_snapshots/
-│   └── year={YYYY}/month={MM}/
-│       └── positions_{YYYYMMDD}.parquet
-└── predictions/
-    └── year={YYYY}/month={MM}/
-        └── predictions_{YYYYMMDD}.parquet
-```
-
-**Lifecycle Policies:**
-- Standard → Nearline after 30 days
-- Delete raw after 365 days
-- Delete processed after 730 days
 
 ## Data Flow
 
@@ -130,13 +97,11 @@ async def fetch_schwab_positions(account_id):
         return {...}
 ```
 
-### 4. Store in Cache + Optional GCS
+### 4. Store in Cache
 
 ```python
 # Automatically handled by storage layer
-# 1. Store in DuckDB (primary)
-# 2. Upload raw JSON to GCS (if enabled)
-# 3. Periodic Parquet export to GCS
+# Data is stored in DuckDB as the primary cache
 ```
 
 ## Usage Examples
@@ -197,11 +162,6 @@ print(f"DB size: {stats['db_size_mb']} MB")
 ### Environment Variables
 
 ```bash
-# Optional GCS backup
-export GCP_PROJECT_ID=your-project
-export GCS_RAW_BUCKET=wheel-raw
-export GCS_PROCESSED_BUCKET=wheel-processed
-
 # Cache settings
 export WHEEL_CACHE__MAX_SIZE_GB=5.0
 export WHEEL_CACHE__TTL_DAYS=30
@@ -210,7 +170,7 @@ export WHEEL_CACHE__TTL_DAYS=30
 ### Storage Config
 
 ```python
-from src.unity_wheel.storage import StorageConfig, GCSConfig
+from src.unity_wheel.storage import StorageConfig
 
 config = StorageConfig(
     cache_config=CacheConfig(
@@ -218,13 +178,8 @@ config = StorageConfig(
         max_size_gb=5.0,
         ttl_days=30
     ),
-    gcs_config=GCSConfig(
-        project_id="your-project",
-        raw_bucket="wheel-raw",
-        processed_bucket="wheel-processed"
-    ),
-    enable_gcs_backup=True,
-    backup_interval_hours=24
+    enable_gcs_backup=False,
+    backup_interval_hours=None
 )
 ```
 
@@ -233,9 +188,6 @@ config = StorageConfig(
 | Component | Usage | Monthly Cost |
 |-----------|-------|--------------|
 | **Local Storage** | 5GB DuckDB | $0 |
-| **GCS Standard** | 10GB (first 30d) | ~$0.20 |
-| **GCS Nearline** | 190GB (30-365d) | ~$7.60 |
-| **GCS Operations** | 10K ops | ~$0.10 |
 | **Cloud Run Jobs** | 100 runs @ 30s | ~$2 |
 | **Databento API** | 100 chains | ~$40 |
 | **Total** | | **< $50/month** |
@@ -249,7 +201,6 @@ config = StorageConfig(
 await storage._vacuum()
 # - Deletes records older than TTL
 # - Reclaims disk space
-# - Exports old data to GCS
 ```
 
 ### Manual Maintenance
@@ -315,8 +266,7 @@ for _, row in positions.iterrows():
 1. **Cache Wisely** - Use appropriate max_age for different data types
 2. **Batch Fetches** - Fetch all needed data in one go
 3. **Monitor Size** - Check storage stats regularly
-4. **Enable GCS** - For production use, enable GCS backup
-5. **Clean Regularly** - Let automatic cleanup run daily
+4. **Clean Regularly** - Let automatic cleanup run daily
 
 ## Troubleshooting
 
@@ -339,9 +289,3 @@ export WHEEL_CACHE__MAX_SIZE_GB=10.0
 await storage.cache.clear_old_data()
 ```
 
-### GCS Errors
-
-```python
-# GCS is optional - disable if issues
-config = StorageConfig(enable_gcs_backup=False)
-```
