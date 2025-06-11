@@ -404,6 +404,106 @@ class WheelBacktester:
             "all_results": pd.DataFrame(results_grid),
         }
 
+    async def backtest_walk_forward(
+        self,
+        symbol: str,
+        start_date: datetime,
+        end_date: datetime,
+        window_size: timedelta,
+        step_size: timedelta,
+        delta_range: Tuple[float, float] = (0.20, 0.40),
+        dte_range: Tuple[int, int] = (30, 60),
+        optimization_metric: str = "sharpe",
+        initial_capital: float = 100000,
+        contracts_per_trade: Optional[int] = None,
+    ) -> pd.DataFrame:
+        """Run walk-forward backtests over rolling windows.
+
+        For each window between ``start_date`` and ``end_date`` the method first
+        optimizes parameters using :meth:`optimize_parameters` and then calls
+        :meth:`backtest_strategy` with the best parameters.  Metrics for each
+        period are collected and returned as a :class:`pandas.DataFrame`.
+
+        Parameters
+        ----------
+        symbol : str
+            Underlying symbol to test.
+        start_date : datetime
+            Beginning of historical data to use.
+        end_date : datetime
+            Final date of historical data to use.
+        window_size : timedelta
+            Size of each walk-forward window.
+        step_size : timedelta
+            Distance to move the window for the next iteration.
+        delta_range : Tuple[float, float], optional
+            Range of deltas to evaluate during optimization.
+        dte_range : Tuple[int, int], optional
+            Range of DTE values to evaluate during optimization.
+        optimization_metric : str, optional
+            Which metric to optimize (``"sharpe"``, ``"return"`` or
+            ``"win_rate"``).
+        initial_capital : float, optional
+            Starting capital for each window.
+        contracts_per_trade : Optional[int], optional
+            Fixed contract size to pass to :meth:`backtest_strategy`.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Table with metrics for each walk-forward period.
+        """
+
+        results_rows = []
+        current_start = start_date
+
+        while current_start + window_size <= end_date:
+            current_end = current_start + window_size
+
+            optimization = await self.optimize_parameters(
+                symbol=symbol,
+                start_date=current_start,
+                end_date=current_end,
+                delta_range=delta_range,
+                dte_range=dte_range,
+                optimization_metric=optimization_metric,
+            )
+
+            best_delta = optimization.get("optimal_delta")
+            best_dte = optimization.get("optimal_dte")
+
+            params = WheelParameters(
+                target_delta=best_delta if best_delta is not None else delta_range[0],
+                target_dte=best_dte if best_dte is not None else dte_range[0],
+            )
+
+            backtest = await self.backtest_strategy(
+                symbol=symbol,
+                start_date=current_start,
+                end_date=current_end,
+                initial_capital=initial_capital,
+                contracts_per_trade=contracts_per_trade,
+                parameters=params,
+            )
+
+            results_rows.append(
+                {
+                    "start_date": current_start,
+                    "end_date": current_end,
+                    "delta": params.target_delta,
+                    "dte": params.target_dte,
+                    "return": backtest.annualized_return,
+                    "sharpe": backtest.sharpe_ratio,
+                    "max_dd": backtest.max_drawdown,
+                    "trades": backtest.total_trades,
+                    "win_rate": backtest.win_rate,
+                }
+            )
+
+            current_start += step_size
+
+        return pd.DataFrame(results_rows)
+
     # Private helper methods
 
     async def _load_price_data(

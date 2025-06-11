@@ -166,6 +166,31 @@ async def backtest_different_deltas():
     return df
 
 
+async def walk_forward_windows():
+    """Run walk-forward backtests over yearly windows."""
+
+    storage = Storage()
+    backtester = WheelBacktester(storage=storage)
+
+    start_date = datetime(2021, 1, 1)
+    end_date = datetime(2024, 1, 1)
+
+    results_df = await backtester.backtest_walk_forward(
+        symbol="U",
+        start_date=start_date,
+        end_date=end_date,
+        window_size=timedelta(days=365),
+        step_size=timedelta(days=365),
+        delta_range=(0.20, 0.40),
+        dte_range=(30, 60),
+    )
+
+    print("\n=== WALK-FORWARD RESULTS ===")
+    print(results_df.to_string(index=False))
+
+    return results_df
+
+
 async def load_required_data():
     """Load the minimum required data for backtesting."""
 
@@ -265,3 +290,4 @@ if __name__ == "__main__":
 
     # Run examples
     asyncio.run(run_basic_backtest())
+    asyncio.run(walk_forward_windows())
