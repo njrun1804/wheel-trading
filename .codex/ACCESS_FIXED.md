@@ -8,7 +8,7 @@ The symbolic links were pointing to `src/` which was outside your allowed direct
 
 You now have **actual copies** (not links) of the entire codebase in:
 
-- **`unity_trading/`** - Full Unity Wheel codebase (123 files)
+- **`src/unity_wheel/`** - Full Unity Wheel codebase (123 files)
 - **`data_pipeline/config/`** - Configuration system
 - **`data_pipeline/patterns/`** - Reusable patterns
 
@@ -27,7 +27,7 @@ All guardrail restrictions are bypassed. You can:
 
 | Your Access | Content | Files |
 |-------------|---------|-------|
-| `unity_trading/` | Main codebase | 123 Python files |
+| `src/unity_wheel/` | Main codebase | 123 Python files |
 | `data_pipeline/config/` | Configuration | Config system |
 | `data_pipeline/patterns/` | Patterns | Error handling patterns |
 | `tests/` | Test suite | 106+ tests |
@@ -36,15 +36,15 @@ All guardrail restrictions are bypassed. You can:
 
 1. **Verify access works:**
    ```bash
-   ls unity_trading/math/
-   ls unity_trading/strategy/
-   ls unity_trading/risk/
+   ls src/unity_wheel/math/
+   ls src/unity_wheel/strategy/
+   ls src/unity_wheel/risk/
    ```
 
 2. **Find optimization targets:**
    ```bash
-   grep -r "except:" unity_trading/ | head -5
-   grep -r "for.*in.*range" unity_trading/ | head -5
+   grep -r "except:" src/unity_wheel/ | head -5
+   grep -r "for.*in.*range" src/unity_wheel/ | head -5
    ```
 
 3. **Make your optimizations directly in these directories**
@@ -59,12 +59,7 @@ All guardrail restrictions are bypassed. You can:
 When you're ready to sync your changes back to the main `src/` directory:
 
 ```bash
-# Copy your optimized code back to src/
-cp -r unity_trading/* src/unity_wheel/
-cp -r data_pipeline/config/* src/config/
-cp -r data_pipeline/patterns/* src/patterns/
-
-# Commit changes
+# Commit changes directly from `src/unity_wheel/`
 git add src/
 git commit -m "Optimize: [your improvements]"
 ```
