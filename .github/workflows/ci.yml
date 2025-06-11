@@ -215,7 +215,7 @@ jobs:
 
     - name: Validate configuration
       run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         poetry run python -m src.unity_wheel.utils.validate
 
         # Additional checks
