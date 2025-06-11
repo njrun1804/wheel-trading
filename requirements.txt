@@ -25,7 +25,7 @@ pytz~=2024.1         # Consider migrating to zoneinfo
 rich~=13.9.0         # Terminal formatting
 
 # Machine Learning & Statistics
-scikit-learn~=1.4.0  # Used for regime detection and anomaly detection
+scikit-learn~=1.5.0  # Used for regime detection and anomaly detection
 statsmodels~=0.14.0  # Statistical modeling and testing
 
 # API & External Services
