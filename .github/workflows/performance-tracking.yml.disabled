@@ -1,0 +1,109 @@
+# Track CI/CD performance over time
+name: CI Performance Tracking
+
+on:
+  workflow_run:
+    workflows: ["CI", "Fast Checks", "Security"]
+    types:
+      - completed
+  schedule:
+    # Weekly performance report
+    - cron: '0 9 * * 1'
+
+jobs:
+  track-performance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Collect workflow metrics
+      id: metrics
+      run: |
+        # Get recent workflow runs
+        echo "## CI/CD Performance Report" > performance-report.md
+        echo "Generated: $(date)" >> performance-report.md
+        echo "" >> performance-report.md
+
+        # Analyze each workflow
+        for workflow in "CI" "Fast Checks" "Security"; do
+          echo "### $workflow" >> performance-report.md
+
+          # Get last 50 runs
+          gh run list --workflow="$workflow" --limit=50 --json databaseId,conclusion,startedAt,updatedAt | \
+          jq -r '
+            map(select(.conclusion != null)) |
+            {
+              total: length,
+              success: map(select(.conclusion == "success")) | length,
+              failure: map(select(.conclusion == "failure")) | length,
+              avg_duration: (
+                map(
+                  ((.updatedAt | fromdateiso8601) - (.startedAt | fromdateiso8601)) / 60
+                ) | add / length
+              ),
+              min_duration: (
+                map(
+                  ((.updatedAt | fromdateiso8601) - (.startedAt | fromdateiso8601)) / 60
+                ) | min
+              ),
+              max_duration: (
+                map(
+                  ((.updatedAt | fromdateiso8601) - (.startedAt | fromdateiso8601)) / 60
+                ) | max
+              )
+            }
+          ' | jq -r '
+            "- Total runs: \(.total)",
+            "- Success rate: \((.success / .total * 100) | round)%",
+            "- Average duration: \(.avg_duration | round) minutes",
+            "- Min/Max duration: \(.min_duration | round)-\(.max_duration | round) minutes",
+            ""
+          ' >> performance-report.md || echo "No data available for $workflow" >> performance-report.md
+        done
+
+        # Add recommendations
+        echo "### Recommendations" >> performance-report.md
+
+        # Check if CI is taking too long
+        avg_ci_time=$(gh run list --workflow="CI" --limit=20 --json startedAt,updatedAt | \
+          jq -r 'map(select(.updatedAt != null)) |
+            map(((.updatedAt | fromdateiso8601) - (.startedAt | fromdateiso8601)) / 60) |
+            add / length' || echo "0")
+
+        if [ $(echo "$avg_ci_time > 5" | bc -l) -eq 1 ] 2>/dev/null; then
+          echo "- ⚠️ CI taking >5 minutes on average. Consider:" >> performance-report.md
+          echo "  - Splitting tests further" >> performance-report.md
+          echo "  - Using larger runners for heavy jobs" >> performance-report.md
+          echo "  - Improving test parallelization" >> performance-report.md
+        fi
+
+        # Check cache hit rates (if we start tracking them)
+        echo "" >> performance-report.md
+        echo "### Cache Performance" >> performance-report.md
+        echo "- Poetry cache: Check workflow logs for hit rate" >> performance-report.md
+        echo "- Dependency cache: Monitor restoration time" >> performance-report.md
+
+    - name: Create or update issue
+      if: github.event_name == 'schedule'
+      run: |
+        # Check if performance issue exists
+        ISSUE_NUMBER=$(gh issue list --label "ci-performance" --limit 1 --json number -q '.[0].number' || echo "")
+
+        if [ -z "$ISSUE_NUMBER" ]; then
+          # Create new issue
+          gh issue create \
+            --title "CI/CD Performance Report - $(date +%Y-%m-%d)" \
+            --body-file performance-report.md \
+            --label "ci-performance,automation"
+        else
+          # Update existing issue
+          gh issue comment $ISSUE_NUMBER --body-file performance-report.md
+        fi
+
+    - name: Output summary
+      run: |
+        cat performance-report.md >> $GITHUB_STEP_SUMMARY
