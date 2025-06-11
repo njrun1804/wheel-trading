@@ -18,7 +18,7 @@ sys.path.insert(0, project_root)
 
 import logging
 
-from src.config.loader import get_config
+from src.config import get_config
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.secrets.manager import SecretManager
 from src.unity_wheel.utils.logging import StructuredLogger

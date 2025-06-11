@@ -11,7 +11,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from src.config.loader import get_config
+from src.config import get_config
 from src.unity_wheel.utils.logging import StructuredLogger
 
 from ..math import CalculationResult

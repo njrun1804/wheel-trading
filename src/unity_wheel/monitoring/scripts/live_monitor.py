@@ -14,7 +14,8 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.config.loader import get_config, get_config_loader
+from src.config import get_config
+from src.config.loader import get_config_loader
 from src.unity_wheel.analytics import IntegratedDecisionEngine
 from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
 from src.unity_wheel.risk.limits import RiskLimitChecker, TradingLimits

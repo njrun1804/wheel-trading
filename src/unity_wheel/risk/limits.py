@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
-from src.config.loader import get_config
+from src.config import get_config
 
 from ..utils import get_logger
 

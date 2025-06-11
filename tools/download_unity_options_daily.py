@@ -24,7 +24,7 @@ except ImportError as e:
     print("Please install: pip install duckdb databento")
     sys.exit(1)
 
-from src.config.loader import get_config
+from src.config import get_config
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.secrets.integration import get_databento_api_key
 from src.unity_wheel.utils.logging import StructuredLogger

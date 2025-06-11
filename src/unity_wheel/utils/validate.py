@@ -13,7 +13,7 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 
-from src.config.loader import get_config
+from src.config import get_config
 
 # Set up logging
 logging.basicConfig(

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
-from src.config.loader import get_config
+from src.config import get_config
 
 from ..utils import get_logger, timed_operation
 

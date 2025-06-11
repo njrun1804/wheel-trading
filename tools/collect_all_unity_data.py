@@ -21,7 +21,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.config.loader import get_config
+from src.config import get_config
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,

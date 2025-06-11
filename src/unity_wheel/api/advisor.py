@@ -27,29 +27,8 @@ from ..utils import (
 )
 from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
 
-# Lazy imports to avoid circular dependency
-_market_validator = None
-_anomaly_detector = None
-
-
-def _get_market_validator():
-    """Lazy import market validator."""
-    global _market_validator
-    if _market_validator is None:
-        from ..data_providers.base import get_market_validator
-
-        _market_validator = get_market_validator()
-    return _market_validator
-
-
-def _get_anomaly_detector():
-    """Lazy import anomaly detector."""
-    global _anomaly_detector
-    if _anomaly_detector is None:
-        from ..data_providers.base import get_anomaly_detector
-
-        _anomaly_detector = get_anomaly_detector()
-    return _anomaly_detector
+# Import dependency injection
+from .dependencies import AdvisorDependencies, get_default_dependencies
 
 
 logger = get_logger(__name__)
@@ -62,7 +41,7 @@ class TradingConstraints:
 
     def __init__(self):
         """Initialize constraints from config."""
-        from src.config.loader import get_config
+        from src.config import get_config
 
         config = get_config()
 
@@ -89,18 +68,42 @@ class WheelAdvisor:
         self,
         wheel_params: Optional[WheelParameters] = None,
         risk_limits: Optional[RiskLimits] = None,
+        dependencies: Optional[AdvisorDependencies] = None,
     ):
-        """Initialize advisor with strategy and risk components."""
+        """
+        Initialize advisor with strategy and risk components.
+        
+        Parameters
+        ----------
+        wheel_params : Optional[WheelParameters]
+            Wheel strategy parameters
+        risk_limits : Optional[RiskLimits]
+            Risk limit configuration
+        dependencies : Optional[AdvisorDependencies]
+            Dependency container for all components
+        """
         self.constraints = TradingConstraints()
-        self.wheel_params = wheel_params or WheelParameters()
-        self.risk_limits = risk_limits or RiskLimits()
-
-        # Initialize components
-        self.strategy = WheelStrategy(self.wheel_params)
-        self.risk_analyzer = RiskAnalyzer(self.risk_limits)
-        self.assignment_model = UnityAssignmentModel()
-        self.borrowing_analyzer = BorrowingCostAnalyzer()
-        self.financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
+        
+        # Use dependency injection
+        if dependencies is None:
+            dependencies = get_default_dependencies()
+        
+        # Override specific components if provided
+        if wheel_params:
+            dependencies._wheel_parameters = wheel_params
+        if risk_limits:
+            dependencies._risk_limits = risk_limits
+            
+        self.dependencies = dependencies
+        
+        # Get components from dependencies
+        self.wheel_params = self.dependencies.wheel_parameters
+        self.risk_limits = self.dependencies.risk_limits
+        self.strategy = self.dependencies.wheel_strategy
+        self.risk_analyzer = self.dependencies.risk_analyzer
+        self.assignment_model = self.dependencies.assignment_model
+        self.borrowing_analyzer = self.dependencies.borrowing_analyzer
+        self.financial_modeler = self.dependencies.financial_modeler
 
         logger.info(
             "WheelAdvisor initialized",
@@ -146,7 +149,7 @@ class WheelAdvisor:
 
         try:
             # Validate market data with comprehensive data quality checks
-            validator = _get_market_validator()
+            validator = self.dependencies.market_validator
             validation_result = validator.validate(market_snapshot)
 
             if not validation_result.is_valid:
@@ -161,7 +164,7 @@ class WheelAdvisor:
                 return self._create_hold_recommendation(error_msg)
 
             # Check for anomalies
-            anomaly_detector = _get_anomaly_detector()
+            anomaly_detector = self.dependencies.anomaly_detector
             anomalies = anomaly_detector.detect_market_anomalies(market_snapshot)
             if anomalies:
                 logger.info(

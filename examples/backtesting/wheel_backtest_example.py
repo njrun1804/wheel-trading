@@ -34,7 +34,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.config.loader import get_config
+from src.config import get_config
 from src.unity_wheel.backtesting import WheelBacktester
 from src.unity_wheel.data_providers.databento import DatabentoClient, PriceHistoryLoader
 from src.unity_wheel.storage import Storage

@@ -17,7 +17,7 @@ from urllib.parse import parse_qs, urlencode
 import aiohttp
 from aiohttp import web
 
-from src.config.loader import get_config
+from src.config import get_config
 
 from ..utils.logging import get_logger
 from .exceptions import AuthError, InvalidCredentialsError

@@ -13,7 +13,7 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 from scipy.stats import norm
 
-from src.config.loader import get_config
+from src.config import get_config
 
 from ..math.options import CalculationResult, probability_itm_validated
 from ..utils import get_logger, timed_operation, with_recovery

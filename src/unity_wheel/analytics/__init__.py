@@ -1,8 +1,10 @@
 """Analytics module for Unity Wheel Trading Bot."""
 
+# Note: DynamicOptimizer is in adaptive module, not analytics
+# Importing from adaptive module instead
+from ..adaptive.dynamic_optimizer import DynamicOptimizer, MarketState, OptimizationResult
 from .anomaly_detector import AnomalyDetector, AnomalyType, MarketAnomaly
 from .decision_engine import IntegratedDecisionEngine, WheelRecommendation
-from .dynamic_optimizer import DynamicOptimizer, MarketState, OptimizationResult
 from .event_analyzer import EventImpact, EventImpactAnalyzer, EventType, UpcomingEvent
 from .iv_surface import IVMetrics, IVSurfaceAnalyzer, SkewMetrics
 from .market_calibrator import MarketCalibrator, OptimalParameters

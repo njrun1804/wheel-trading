@@ -488,7 +488,3 @@ def get_config_loader(config_path: Union[str, Path] = "config.yaml") -> Configur
         _config_loader = ConfigurationLoader(config_path)
     return _config_loader
 
-
-def get_config() -> WheelConfig:
-    """Get current configuration."""
-    return get_config_loader().config

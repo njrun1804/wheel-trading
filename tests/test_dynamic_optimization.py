@@ -13,7 +13,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.analytics.dynamic_optimizer import (
+from src.unity_wheel.adaptive.dynamic_optimizer import (
     DynamicOptimizer,
     MarketState,
     OptimizationResult,

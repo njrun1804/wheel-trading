@@ -11,7 +11,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 
-from src.config.loader import get_config
+from src.config import get_config
 
 from ..data_providers.base import FREDDataManager
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader

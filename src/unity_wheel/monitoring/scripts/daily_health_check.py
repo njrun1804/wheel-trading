@@ -12,7 +12,7 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.config.loader import get_config
+from src.config import get_config
 from src.unity_wheel.analytics import IntegratedDecisionEngine
 from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
 from src.unity_wheel.data_providers.databento import DatabentoClient
@@ -50,7 +50,7 @@ async def check_data_freshness(storage: UnifiedStorage) -> dict:
 
 def check_configuration() -> dict:
     """Check configuration health."""
-    from src.config.loader import get_config_loader
+    from src.config import get_config_loader
 
     results = {"status": "✅", "issues": []}
 
