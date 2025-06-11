@@ -12,6 +12,7 @@ import pandas as pd
 from src.config.loader import get_config
 
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader
+from .exceptions import InsufficientDataError
 from ..math.options import black_scholes_price_validated
 from ..math import CalculationResult
 from ..storage import Storage
@@ -425,11 +426,21 @@ class WheelBacktester:
             ).fetchall()
 
         if not result:
-            return pd.DataFrame()
+            raise InsufficientDataError(
+                f"No price data available for {symbol}. Minimum {PriceHistoryLoader.MINIMUM_DAYS} days required"
+            )
 
-        df = pd.DataFrame(result, columns=["date", "open", "high", "low", "close", "volume"])
+        df = pd.DataFrame(
+            result,
+            columns=["date", "open", "high", "low", "close", "volume"],
+        )
         df["date"] = pd.to_datetime(df["date"])
         df.set_index("date", inplace=True)
+
+        if len(df) < PriceHistoryLoader.MINIMUM_DAYS:
+            raise InsufficientDataError(
+                f"Only {len(df)} days of data found for {symbol}; {PriceHistoryLoader.MINIMUM_DAYS} required"
+            )
 
         return df
 

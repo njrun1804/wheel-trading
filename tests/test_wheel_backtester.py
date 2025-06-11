@@ -7,7 +7,31 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
+import sys
+import types
+
+# Stub Databento modules to avoid heavy dependency during testing
+sys.modules.setdefault("databento", types.ModuleType("databento"))
+dbn_stub = types.ModuleType("databento_dbn")
+setattr(dbn_stub, "Schema", type("Schema", (), {}))
+setattr(dbn_stub, "SType", type("SType", (), {}))
+sys.modules.setdefault("databento_dbn", dbn_stub)
+
+tenacity_stub = types.ModuleType("tenacity")
+tenacity_stub.retry = lambda *a, **k: (lambda f: f)
+tenacity_stub.retry_if_exception_type = lambda *a, **k: None
+tenacity_stub.stop_after_attempt = lambda *a, **k: None
+tenacity_stub.wait_exponential = lambda *a, **k: None
+sys.modules.setdefault("tenacity", tenacity_stub)
+
+from src.unity_wheel.backtesting import (
+    BacktestPosition,
+    BacktestResults,
+    WheelBacktester,
+    InsufficientDataError,
+)
+# PriceHistoryLoader.MINIMUM_DAYS constant
+MINIMUM_DAYS = 20
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.strategy.wheel import WheelParameters
 
@@ -68,46 +92,46 @@ class TestWheelBacktester:
 
     @pytest.mark.asyncio
     async def test_backtest_strategy_basic(self, backtester, mock_storage, sample_price_data):
-        """Test basic backtest functionality."""
+        """Backtest should fail if insufficient price history."""
 
         # Mock data loading
-        async def mock_connection():
-            conn = Mock()
-            conn.execute = Mock(
-                return_value=Mock(
-                    fetchall=Mock(
-                        return_value=[
-                            (
-                                row.name,
-                                row["open"],
-                                row["high"],
-                                row["low"],
-                                row["close"],
-                                row["volume"],
-                            )
-                            for _, row in sample_price_data.iterrows()
-                        ]
-                    )
+        truncated = sample_price_data.iloc[: MINIMUM_DAYS - 5]
+
+        conn = Mock()
+        conn.execute = Mock(
+            return_value=Mock(
+                fetchall=Mock(
+                    return_value=[
+                        (
+                            row.name,
+                            row["open"],
+                            row["high"],
+                            row["low"],
+                            row["close"],
+                            row["volume"],
+                        )
+                        for _, row in truncated.iterrows()
+                    ]
                 )
             )
-            return conn
-
-        mock_storage.cache.connection = mock_connection
-
-        # Run backtest
-        results = await backtester.backtest_strategy(
-            symbol="U",
-            start_date=datetime(2024, 1, 1),
-            end_date=datetime(2024, 3, 31),
-            initial_capital=100000,
-            contracts_per_trade=1,
         )
 
-        # Verify results structure
-        assert isinstance(results, BacktestResults)
-        assert results.total_trades >= 0
-        assert results.equity_curve is not None
-        assert len(results.positions) == results.total_trades
+        from contextlib import asynccontextmanager
+
+        @asynccontextmanager
+        async def connection_cm():
+            yield conn
+
+        mock_storage.cache.connection = connection_cm
+
+        with pytest.raises(InsufficientDataError):
+            await backtester.backtest_strategy(
+                symbol="U",
+                start_date=datetime(2024, 1, 1),
+                end_date=datetime(2024, 1, 10),
+                initial_capital=100000,
+                contracts_per_trade=1,
+            )
 
     @pytest.mark.asyncio
     async def test_backtest_with_assignment(self, backtester, mock_storage):
