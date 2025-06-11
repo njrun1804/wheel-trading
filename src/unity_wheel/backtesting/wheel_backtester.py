@@ -445,19 +445,24 @@ class WheelBacktester:
             result = conn.execute(
                 """
                 SELECT
-                    date,
-                    open,
-                    high,
-                    low,
-                    close,
-                    volume,
-                    returns,
-                    volatility_20d,
-                    volatility_250d,
-                    risk_free_rate
-                FROM backtest_features
-                WHERE symbol = ? AND date BETWEEN ? AND ?
-                ORDER BY date
+                    bf.date,
+                    COALESCE(md.open, bf.stock_price) as open,
+                    COALESCE(md.high, bf.stock_price) as high,
+                    COALESCE(md.low, bf.stock_price) as low,
+                    COALESCE(md.close, bf.stock_price) as close,
+                    COALESCE(md.volume, bf.volume) as volume,
+                    bf.returns,
+                    bf.volatility_20d,
+                    bf.volatility_250d,
+                    bf.risk_free_rate
+                FROM backtest_features bf
+                LEFT JOIN market_data md
+                    ON bf.date = md.date
+                    AND bf.symbol = md.symbol
+                    AND md.data_type = 'stock'
+                WHERE bf.symbol = ?
+                AND bf.date BETWEEN ? AND ?
+                ORDER BY bf.date
                 """,
                 [symbol, start_date.date(), end_date.date()],
             ).fetchall()
@@ -480,6 +485,22 @@ class WheelBacktester:
                         "risk_free_rate",
                     ],
                 )
+
+                # Convert decimal types to float for calculations
+                numeric_cols = [
+                    "open",
+                    "high",
+                    "low",
+                    "close",
+                    "volume",
+                    "returns",
+                    "volatility_20d",
+                    "volatility_250d",
+                    "risk_free_rate",
+                ]
+                for col in numeric_cols:
+                    df[col] = pd.to_numeric(df[col], errors="coerce")
+
                 df["date"] = pd.to_datetime(df["date"])
                 df.set_index("date", inplace=True)
                 return df
