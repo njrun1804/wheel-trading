@@ -5,10 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-from ..math.options import (
-    black_scholes_price_validated,
-    probability_itm_validated,
-)
+from ..math.options import black_scholes_price_validated, probability_itm_validated
 from ..models.position import Position, PositionType
 from ..utils.logging import get_logger
 

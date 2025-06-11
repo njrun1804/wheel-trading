@@ -11,7 +11,6 @@ from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional, Tuple
 
 from ..math import CalculationResult
-
 from .trading_calendar import SimpleTradingCalendar
 
 
