@@ -18,7 +18,7 @@ def test_eviction_by_size(tmp_path):
             await cache.store_option_chain("TST", datetime.utcnow(), datetime.utcnow(), 1.0, sample)
             await cache.store_positions("ACC", [{"s": i}], {"cash": i})
 
-        size_limit = config.max_size_gb * 1024 ** 3
+        size_limit = config.max_size_gb * 1024**3
         assert cache.db_path.stat().st_size <= size_limit
 
     asyncio.run(_run())
