@@ -21,7 +21,7 @@ python3 -m pip install numpy pandas scipy pydantic 2>/dev/null && echo "✓ Pack
 cd - >/dev/null
 
 # 3. Set PYTHONPATH after packages
-export PYTHONPATH="$(pwd):$(pwd)/unity_trading:$PYTHONPATH"
+export PYTHONPATH="$(pwd):$PYTHONPATH"
 
 # 4. Create directories
 mkdir -p /tmp/.wheel/cache /tmp/.wheel/secrets 2>/dev/null
