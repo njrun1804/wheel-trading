@@ -14,31 +14,60 @@ permissions:
   security-events: write
 
 jobs:
-  # CodeQL - Optimized for Python
-  codeql:
+  # Combined security checks for efficiency
+  security-scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Prevent hanging
+    timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for comprehensive scanning
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+
+    # Run all security checks in parallel
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: python
         config-file: ./.github/codeql/codeql-config.yml
-        # Use pre-compiled queries for speed
         queries: security-and-quality
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+    - name: Install security tools
+      run: |
+        pip install bandit safety semgrep
 
-    - name: Perform CodeQL Analysis
+    - name: Run security scans in parallel
+      run: |
+        # Start all scans in background
+        bandit -r src/ -ll -f json -o bandit-report.json &
+        BANDIT_PID=$!
+
+        # Export requirements for safety check
+        pip install poetry
+        poetry export -f requirements.txt --without-hashes | safety check --stdin --json > safety-report.json 2>&1 &
+        SAFETY_PID=$!
+
+        # Run semgrep for additional patterns
+        semgrep --config=auto src/ --json -o semgrep-report.json 2>/dev/null &
+        SEMGREP_PID=$!
+
+        # Build for CodeQL
+        python -m compileall src/ &
+        BUILD_PID=$!
+
+        # Wait for all to complete
+        wait $BANDIT_PID $SAFETY_PID $SEMGREP_PID $BUILD_PID || true
+
+    - name: Analyze CodeQL results
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:python"
         upload: true
-        # Only fail on high severity
-        sarif-category-filter: "error"
 
   # Dependency scanning
   dependency-check:

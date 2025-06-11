@@ -1,4 +1,4 @@
-# Optimized CodeQL configuration for faster scans
+# Simplified CodeQL configuration for compatibility
 name: "Unity Wheel CodeQL config"
 
 # Only scan relevant paths
@@ -13,6 +13,6 @@ paths-ignore:
   - '**/__pycache__'
   - '**/*.pyc'
 
-# Use standard security queries
+# Use standard queries
 queries:
   - uses: security-and-quality

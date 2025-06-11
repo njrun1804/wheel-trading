@@ -1,0 +1,278 @@
+# Unified CI/CD Pipeline - Optimized for speed and reliability
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Python optimization
+  PYTHONUNBUFFERED: 1
+  PIP_NO_COMPILE: true
+  PIP_DISABLE_PIP_VERSION_CHECK: true
+
+  # Poetry optimization
+  POETRY_VERSION: 1.8.2
+  POETRY_VIRTUALENVS_IN_PROJECT: true
+  POETRY_NO_CACHE_DIR: true
+
+  # Test optimization
+  PYTEST_XDIST_WORKER_COUNT: auto
+  WHEEL_SECRETS_PROVIDER: local
+  DATABENTO_SKIP_VALIDATION: true
+
+jobs:
+  # 1. Quick change detection
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          code:
+            - 'src/**'
+            - 'tests/**'
+            - 'pyproject.toml'
+            - 'poetry.lock'
+            - '.github/workflows/**'
+          docs:
+            - '**/*.md'
+            - 'docs/**'
+
+  # 2. Fast syntax & security checks (parallel)
+  fast-checks:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    name: Fast Checks
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+
+    - name: Cache pre-commit
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+    - name: Install tools
+      run: |
+        pip install pre-commit bandit
+        pre-commit install-hooks
+
+    - name: Run pre-commit
+      run: pre-commit run --all-files --show-diff-on-failure
+
+    - name: Security scan
+      run: |
+        bandit -r src/ -ll -i -x tests/ -f json -o bandit-report.json || true
+        python -c "
+        import json
+        with open('bandit-report.json') as f:
+            data = json.load(f)
+        high = [i for i in data.get('results', []) if i['issue_severity'] == 'HIGH']
+        if high:
+            print(f'⚠️ {len(high)} high severity issues found')
+            for i in high[:3]:
+                print(f\"  {i['filename']}:{i['line_number']}\")
+            exit(1)
+        print('✅ No high severity issues')
+        "
+
+  # 3. Test matrix (optimized grouping)
+  test:
+    needs: [changes, fast-checks]
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # Critical tests on multiple OS
+          - os: ubuntu-latest
+            group: critical
+            python: "3.12"
+          - os: macos-latest
+            group: critical
+            python: "3.12"
+          # Full tests on Ubuntu only
+          - os: ubuntu-latest
+            group: full
+            python: "3.12"
+          # Python compatibility
+          - os: ubuntu-latest
+            group: critical
+            python: "3.11"
+
+    name: "${{ matrix.os }} / py${{ matrix.python }} / ${{ matrix.group }}"
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Get Poetry cache
+      id: poetry-cache
+      run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local
+          ~/.cache/pypoetry
+          ${{ steps.poetry-cache.outputs.dir }}
+          .venv
+        key: ${{ runner.os }}-py${{ matrix.python }}-poetry-${{ hashFiles('poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-py${{ matrix.python }}-poetry-
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        poetry config virtualenvs.in-project true
+
+    - name: Install dependencies
+      run: |
+        # Optimize installation based on OS
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          sudo apt-get update -qq && sudo apt-get install -y -qq libopenblas-dev > /dev/null
+        fi
+
+        # Install with appropriate extras
+        if [[ "${{ matrix.group }}" == "full" ]]; then
+          poetry install --no-interaction --extras "ml storage gcp"
+        else
+          poetry install --no-interaction
+        fi
+
+    - name: Run tests
+      run: |
+        if [[ "${{ matrix.group }}" == "critical" ]]; then
+          # Critical tests only (fast)
+          poetry run pytest \
+            tests/test_math*.py \
+            tests/test_options*.py \
+            tests/test_unified_provider.py \
+            tests/test_performance_benchmarks.py \
+            -v --tb=short --maxfail=3 -n auto
+        else
+          # Full test suite with coverage
+          poetry run pytest \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term:skip-covered \
+            -v --tb=short -n auto
+        fi
+
+    - name: Upload coverage
+      if: matrix.group == 'full' && matrix.os == 'ubuntu-latest'
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  # 4. Performance validation
+  performance:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        poetry config virtualenvs.in-project true
+        poetry install --no-interaction
+
+    - name: Run benchmarks
+      run: |
+        poetry run pytest tests/test_performance_benchmarks.py \
+          --benchmark-only \
+          --benchmark-json=benchmark.json \
+          --benchmark-max-time=0.5
+
+    - name: Validate SLAs
+      run: |
+        python3 -c "
+        import json
+        violations = []
+
+        with open('benchmark.json') as f:
+            data = json.load(f)
+
+        for bench in data.get('benchmarks', []):
+            name = bench.get('name', '')
+            mean = bench.get('stats', {}).get('mean', 0) * 1000  # Convert to ms
+
+            if 'black_scholes' in name and mean > 0.2:
+                violations.append(f'Black-Scholes: {mean:.2f}ms (SLA: 0.2ms)')
+            elif 'vectorized' in name and mean > 10.0:
+                violations.append(f'Vectorized: {mean:.2f}ms (SLA: 10ms)')
+            elif 'recommendation' in name and mean > 200.0:
+                violations.append(f'Recommendation: {mean:.2f}ms (SLA: 200ms)')
+
+        if violations:
+            print('⚠️ Performance SLA violations:')
+            for v in violations:
+                print(f'  - {v}')
+            exit(1)
+        else:
+            print('✅ All performance SLAs met')
+        "
+
+  # 5. Final status
+  ci-success:
+    needs: [fast-checks, test, performance]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: CI Summary
+      run: |
+        echo "## CI Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Check job results
+        if [[ "${{ needs.fast-checks.result }}" == "success" &&
+              "${{ needs.test.result }}" == "success" ]]; then
+          echo "### ✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
+          exit 0
+        else
+          echo "### ❌ CI Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- Fast checks: ${{ needs.fast-checks.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tests: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: ${{ needs.performance.result }}" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
