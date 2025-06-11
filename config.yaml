@@ -205,7 +205,7 @@ databento:
 
   # Data loader configuration
   loader:
-    max_workers: 8                  # Parallel processing workers
+    max_workers: 12                 # Parallel processing workers (M4 Pro)
     chunk_size: 250                 # Symbols per chunk
     max_requests_per_second: 100    # Rate limit
     retry_delays: [1, 2, 5, 10]     # Retry delays in seconds

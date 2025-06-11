@@ -25,6 +25,34 @@ python run.py --performance
 ./scripts/health_check.sh
 ```
 
+## 🍎 M4 MacBook Pro Setup
+
+The project includes optimizations specifically for macOS 15.5 on the 12‑core M4 Pro MacBook. To enable them:
+
+1. **Run the tuning script once** (requires sudo):
+   ```bash
+   ./scripts/mac-optimize.sh
+   ```
+2. **Use the optimized data loader** when fetching history:
+   ```bash
+   python tools/data/fetch_unity_data_optimized.py
+   ```
+3. **Increase parallelism** to match your hardware by setting:
+   ```bash
+   export WHEEL_DATABENTO__LOADER__MAX_WORKERS=12
+   ```
+   (the default in `config.yaml` is already 12)
+4. **Confirm compiled libraries** and disable pure Python mode for best performance:
+   ```bash
+   export USE_PURE_PYTHON=false
+   ```
+5. **Validate the environment** before running any commands:
+   ```bash
+   source .codex/.container_env
+   python .codex/check_environment.py
+   ```
+
+
 ## 💰 Cost Efficiency
 
 - **< $50/month** total operational cost
