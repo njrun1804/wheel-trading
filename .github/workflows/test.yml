@@ -1,0 +1,316 @@
+name: Test Suite
+# Comprehensive test execution with optimal parallelization
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Enable debug logging'
+        required: false
+        default: false
+
+# Cancel in-progress runs for the same PR/branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  POETRY_VERSION: 1.7.1
+  PYTHON_VERSION: '3.12'
+  PYTEST_XDIST_WORKERS: auto  # Automatic parallel test execution
+  
+jobs:
+  # Detect which files changed to skip unnecessary tests
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      tests: ${{ steps.filter.outputs.tests }}
+      docs: ${{ steps.filter.outputs.docs }}
+      config: ${{ steps.filter.outputs.config }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          code:
+            - 'src/**'
+            - 'tests/**'
+            - 'pyproject.toml'
+            - 'poetry.lock'
+          tests:
+            - 'tests/**'
+            - 'conftest.py'
+          docs:
+            - 'docs/**'
+            - '*.md'
+          config:
+            - 'config.yaml'
+            - '.github/workflows/**'
+
+  # Main test matrix
+  test:
+    name: Test ${{ matrix.test-group }} (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || needs.changes.outputs.tests == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.12']
+        test-group: 
+          - unit-fast
+          - unit-slow
+          - integration
+        exclude:
+          # Skip expensive integration tests on macOS
+          - os: macos-latest
+            test-group: integration
+            
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Optimize runner (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        # Disable unnecessary services to free up resources
+        sudo systemctl stop postgresql || true
+        sudo systemctl stop mysql || true
+        
+    - name: Load cached dependencies
+      uses: actions/cache@v4
+      id: cache
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.cache/pypoetry
+          ~/.local/share/virtualenvs
+          .venv
+        key: ${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-py${{ matrix.python-version }}-
+          ${{ runner.os }}-
+          
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+    - name: Install dependencies
+      run: |
+        poetry config virtualenvs.create true
+        poetry config virtualenvs.in-project true
+        poetry install --no-interaction --no-root
+        
+    - name: Install project
+      run: poetry install --no-interaction
+      
+    - name: Define test groups
+      id: test-split
+      run: |
+        case "${{ matrix.test-group }}" in
+          unit-fast)
+            echo "tests=tests/test_math.py tests/test_options_properties.py tests/test_config.py tests/test_greeks.py tests/test_position.py tests/test_random_utils.py" >> $GITHUB_OUTPUT
+            echo "markers=not slow and not integration" >> $GITHUB_OUTPUT
+            ;;
+          unit-slow)
+            echo "tests=tests/test_analytics.py tests/test_risk_limit_breach.py tests/test_wheel.py tests/test_adaptive_system.py tests/test_dynamic_optimization.py tests/test_performance_tracker.py" >> $GITHUB_OUTPUT
+            echo "markers=not integration" >> $GITHUB_OUTPUT
+            ;;
+          integration)
+            echo "tests=tests/test_e2e_recommendation_flow.py tests/test_autonomous_flow.py tests/test_integrated_system.py tests/test_complete_integration.py tests/test_databento*.py tests/test_schwab*.py" >> $GITHUB_OUTPUT
+            echo "markers=" >> $GITHUB_OUTPUT
+            ;;
+        esac
+        
+    - name: Run tests
+      env:
+        DATABENTO_SKIP_VALIDATION: true
+        USE_MOCK_DATA: true
+        OFFLINE_MODE: true
+        LOG_LEVEL: ${{ github.event.inputs.debug_enabled == 'true' && 'DEBUG' || 'WARNING' }}
+      run: |
+        poetry run pytest ${{ steps.test-split.outputs.tests }} \
+          -v \
+          --tb=short \
+          --cov=src/unity_wheel \
+          --cov-report=xml \
+          --cov-report=term-missing:skip-covered \
+          --junit-xml=test-results-${{ matrix.os }}-${{ matrix.test-group }}.xml \
+          ${{ steps.test-split.outputs.markers && format('-m "{0}"', steps.test-split.outputs.markers) || '' }} \
+          --maxfail=5
+          
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.test-group }}
+        path: |
+          test-results-*.xml
+          coverage.xml
+          .coverage.*
+        retention-days: 7
+        
+  # Aggregate coverage from all test runs
+  coverage:
+    name: Coverage Report
+    needs: test
+    if: always() && needs.test.result != 'cancelled'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install coverage tools
+      run: |
+        pip install coverage[toml] coverage-badge
+        
+    - name: Download all coverage reports
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-results-*
+        merge-multiple: true
+        
+    - name: Combine coverage data
+      run: |
+        # Find all coverage files
+        coverage combine .coverage.* || echo "No coverage files to combine"
+        coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+        coverage html
+        
+    - name: Generate coverage badge
+      run: |
+        coverage-badge -o coverage.svg -f
+        
+    - name: Upload coverage to Codecov
+      if: github.event_name == 'push'
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: unittests
+        name: unity-wheel
+        fail_ci_if_error: false
+        
+  # Performance benchmarks (main branch only)
+  benchmarks:
+    name: Performance Benchmarks
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest-4-cores  # Use larger runner for consistent results
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install Poetry and dependencies
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        poetry install --no-interaction
+        
+    - name: Run performance benchmarks
+      run: |
+        poetry run pytest tests/test_performance_benchmarks.py \
+          -v \
+          --benchmark-only \
+          --benchmark-json=benchmark-results.json \
+          --benchmark-autosave
+          
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'pytest'
+        output-file-path: benchmark-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        alert-threshold: '150%'
+        comment-on-alert: true
+        
+  # Configuration validation
+  validate-config:
+    name: Validate Configuration
+    needs: changes
+    if: needs.changes.outputs.config == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install minimal dependencies
+      run: |
+        pip install pyyaml jsonschema pydantic
+        
+    - name: Validate configuration
+      run: |
+        python -c "
+import yaml
+import sys
+try:
+    with open('config.yaml') as f:
+        config = yaml.safe_load(f)
+    print('✓ config.yaml is valid YAML')
+    
+    # Basic structure validation
+    required_keys = ['strategy', 'risk', 'operations']
+    missing = [k for k in required_keys if k not in config]
+    if missing:
+        print(f'✗ Missing required keys: {missing}')
+        sys.exit(1)
+    print('✓ All required configuration sections present')
+except Exception as e:
+    print(f'✗ Configuration error: {e}')
+    sys.exit(1)
+        "
+        
+  # Final status check
+  status-check:
+    name: CI Status
+    needs: [test, coverage, validate-config]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check status
+      run: |
+        if [[ "${{ needs.test.result }}" == "failure" ]]; then
+          echo "❌ Tests failed"
+          exit 1
+        elif [[ "${{ needs.test.result }}" == "cancelled" ]]; then
+          echo "⚠️ Tests cancelled"
+          exit 1
+        else
+          echo "✅ All checks passed"
+        fi

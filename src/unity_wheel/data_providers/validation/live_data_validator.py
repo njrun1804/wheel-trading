@@ -81,11 +81,15 @@ class LiveDataValidator:
                 "Unset this environment variable immediately."
             )
 
-        # Check for API key
-        if not os.getenv("DATABENTO_API_KEY"):
+        # Check for API key using SecretManager
+        try:
+            from src.unity_wheel.secrets.integration import get_databento_api_key
+            get_databento_api_key()  # Will raise if not configured
+        except Exception:
             raise ValueError(
-                "CRITICAL: DATABENTO_API_KEY not set! "
-                "Cannot fetch real market data without API credentials."
+                "CRITICAL: Databento API key not configured! "
+                "Cannot fetch real market data without API credentials. "
+                "Run: python scripts/setup-secrets.py"
             )
 
         # Check for any test/mock environment variables
