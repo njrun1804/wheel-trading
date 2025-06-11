@@ -223,7 +223,7 @@ python -c "from src.unity_wheel.math.options import black_scholes_price_validate
 ./.codex/container_test.sh
 
 # Quick commit
-./.codex/container_commit.sh "commit message"
+./.codex/container_commit.sh "commit message"  # stages and commits all changes
 ```
 
 ## Environment Variables
