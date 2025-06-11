@@ -25,7 +25,7 @@ python3 .codex/verify_setup.py
 
 ### Math Module Conflict
 
-This project has a `unity_trading.math` module that conflicts with Python's standard library `math` module. This can prevent pip from working properly.
+This project has a `src.unity_wheel.math` module that conflicts with Python's standard library `math` module. This can prevent pip from working properly.
 
 **The setup scripts handle this automatically by:**
 1. Installing packages BEFORE adding the project to PYTHONPATH

@@ -116,8 +116,8 @@ for pkg in optional:
 ### When numpy is not available
 ```python
 # Pure Python math implementations available in:
-# unity_trading/math/options.py - has fallback math
-# unity_trading/utils/position_sizing.py - pure Python calculations
+# src/unity_wheel/math/options.py - has fallback math
+# src/unity_wheel/utils/position_sizing.py - pure Python calculations
 
 # Enable fallback mode
 export USE_PURE_PYTHON=true
@@ -143,13 +143,13 @@ export USE_MEMORY_ONLY=true
 ### Test Basic Functionality
 ```bash
 # Test core imports
-python -c "from unity_trading.math.options import black_scholes_price_validated; print('✅ Math module works')"
+python -c "from src.unity_wheel.math.options import black_scholes_price_validated; print('✅ Math module works')"
 
 # Test strategy module
-python -c "from unity_trading.strategy.wheel import WheelStrategy; print('✅ Strategy module works')"
+python -c "from src.unity_wheel.strategy.wheel import WheelStrategy; print('✅ Strategy module works')"
 
 # Test with fallback data
-DATABENTO_SKIP_VALIDATION=true python -c "from unity_trading.api.advisor import WheelAdvisor; print('✅ API module works')"
+DATABENTO_SKIP_VALIDATION=true python -c "from src.unity_wheel.api.advisor import WheelAdvisor; print('✅ API module works')"
 ```
 
 ### Run with Minimal Dependencies
@@ -161,7 +161,7 @@ export DATABENTO_SKIP_VALIDATION=true
 
 # Try a basic recommendation
 python -c "
-from unity_trading.api.advisor_simple import WheelAdvisorSimple
+from src.unity_wheel.api.advisor_simple import WheelAdvisorSimple
 advisor = WheelAdvisorSimple()
 print('✅ Simple advisor works')
 "
@@ -217,7 +217,7 @@ python run.py --portfolio 100000
 ```bash
 # Basic packages only
 export USE_PURE_PYTHON=true
-python -c "from unity_trading.api.advisor_simple import WheelAdvisorSimple; print('Limited mode ready')"
+python -c "from src.unity_wheel.api.advisor_simple import WheelAdvisorSimple; print('Limited mode ready')"
 ```
 
 ### Profile 3: Offline Environment
@@ -226,7 +226,7 @@ python -c "from unity_trading.api.advisor_simple import WheelAdvisorSimple; prin
 export OFFLINE_MODE=true
 export USE_MOCK_DATA=true
 export USE_PURE_PYTHON=true
-python -c "from unity_trading.strategy.wheel import WheelStrategy; print('Offline mode ready')"
+python -c "from src.unity_wheel.strategy.wheel import WheelStrategy; print('Offline mode ready')"
 ```
 
 ---
@@ -250,11 +250,11 @@ python .codex/test_config.py
 ### Pre-configured Commands
 ```bash
 # Safe commands that work in any environment
-python -c "from unity_trading.math import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
+python -c "from src.unity_wheel.math import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))"
 
-python -c "from unity_trading.utils.position_sizing import calculate_position_size; print('Position sizing available')"
+python -c "from src.unity_wheel.utils.position_sizing import calculate_position_size; print('Position sizing available')"
 
-python -c "from unity_trading.strategy.wheel import WheelStrategy; w = WheelStrategy(); print('Strategy available')"
+python -c "from src.unity_wheel.strategy.wheel import WheelStrategy; w = WheelStrategy(); print('Strategy available')"
 ```
 
 ---
@@ -291,7 +291,7 @@ python -c "import sys; print('\\n'.join(sys.path))"
 
 # Add current directory to path
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-python -c "from unity_trading import __version__; print(f'Unity Wheel v{__version__}')"
+python -c "from src/unity_wheel import __version__; print(f'Unity Wheel v{__version__}')"
 ```
 
 ---
@@ -305,9 +305,9 @@ import sys
 print(f'Python: {sys.version}')
 
 try:
-    from unity_trading.strategy.wheel import WheelStrategy
-    from unity_trading.math.options import black_scholes_price_validated
-    from unity_trading.utils.position_sizing import calculate_position_size
+    from src.unity_wheel.strategy.wheel import WheelStrategy
+    from src.unity_wheel.math.options import black_scholes_price_validated
+    from src.unity_wheel.utils.position_sizing import calculate_position_size
     print('✅ Unity Wheel Trading Bot is ready!')
 except ImportError as e:
     print(f'❌ Setup incomplete: {e}')

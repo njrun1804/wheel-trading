@@ -1,17 +1,17 @@
 # Codex Optimization Guide
 
 ## 🎯 **IMMEDIATE CONTEXT**
-You have full access to the Unity Wheel Trading Bot codebase through symbolic links in the restricted directories. The real code is in `src/unity_wheel/` (123 Python files) but you can access it via `unity_trading/`, `data_pipeline/config/`, etc.
+You have full access to the Unity Wheel Trading Bot codebase through symbolic links in the restricted directories. The real code is in `src/unity_wheel/` (123 Python files) but you can access it via `src/unity_wheel/`, `data_pipeline/config/`, etc.
 
 ## 🔥 **CRITICAL SUCCESS PATTERNS**
 
 ### ✅ **What Works for You:**
-1. **File Access**: Use `unity_trading/` instead of `src/unity_wheel/`
+1. **File Access**: Use `src/unity_wheel/` (the old `unity_trading/` directory has been removed)
 2. **Testing**: Run `pytest tests/test_*.py -v` - all 106+ tests pass
-3. **Type Checking**: `mypy --strict unity_trading data_pipeline app --ignore-missing-imports`
+3. **Type Checking**: `mypy --strict src/unity_wheel data_pipeline app --ignore-missing-imports`
 4. **Quick Validation**: `./scripts/housekeeping.sh --unity-check` (2 seconds)
 5. **Auto-Fix**: `./scripts/housekeeping.sh --fix` resolves file placement issues
-6. Legacy packages `ml_engine`, `risk_engine`, and `strategy_engine` have been removed; use modules under `unity_trading`.
+6. Legacy packages `ml_engine`, `risk_engine`, and `strategy_engine` have been removed; use modules under `src/unity_wheel`.
 
 ### ❌ **What Blocks You:**
 1. **Execution Code**: Never add `execute_trade()`, `place_order()`, `broker.execute()`
@@ -40,8 +40,8 @@ except (ValueError, ConnectionError) as e:
 **Search locations for bare excepts:**
 ```bash
 # Find bare exception handlers
-rg "except\s*:" unity_trading/ data_pipeline/ --type py
-rg "except\s+Exception\s*:" unity_trading/ data_pipeline/ --type py
+rg "except\s*:" src/unity_wheel/ data_pipeline/ --type py
+rg "except\s+Exception\s*:" src/unity_wheel/ data_pipeline/ --type py
 ```
 
 ### **Performance Optimization Patterns**
@@ -79,7 +79,7 @@ max_position = config.risk.position_limits.max_position_size
 
 | Codex Access | Real Location | Purpose |
 |--------------|---------------|---------|
-| `unity_trading/` | `src/unity_wheel/` | Main codebase (123 files) |
+| `src/unity_wheel/` | `src/unity_wheel/` | Main codebase (123 files) |
 | `data_pipeline/config/` | `src/config/` | Configuration system |
 | `data_pipeline/patterns/` | `src/patterns/` | Reusable patterns |
 | `tests/` | `tests/` | Test suite (106+ tests) |
@@ -106,7 +106,7 @@ pytest tests/test_performance_benchmarks.py -v
 ### 1. **Replace Bare Exceptions**
 ```bash
 # Find them
-rg "except:" unity_trading/ --type py -A 2 -B 2
+rg "except:" src/unity_wheel/ --type py -A 2 -B 2
 
 # Replace pattern
 except ValueError as e:
@@ -178,8 +178,8 @@ pytest tests/test_wheel.py -v              # Test core functionality
 ./scripts/housekeeping.sh --unity-check
 
 # 2. Find optimization targets
-rg "except:" unity_trading/ --type py
-rg "for.*in.*range" unity_trading/ --type py | grep -v test
+rg "except:" src/unity_wheel/ --type py
+rg "for.*in.*range" src/unity_wheel/ --type py | grep -v test
 
 # 3. Make changes using patterns above
 

@@ -16,7 +16,7 @@ When importing from within the project directory, you may see:
 Error importing numpy: you should not try to import numpy from its source directory
 ```
 
-This is because `unity_trading.math` conflicts with numpy's internal imports.
+This is because `src.unity_wheel.math` conflicts with numpy's internal imports.
 
 ## Solutions
 
