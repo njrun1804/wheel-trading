@@ -569,8 +569,7 @@ class WheelAdvisor:
 
         # Margin requirement
         margin_required = strike * self.constraints.CONTRACTS_PER_TRADE * contracts * 0.20
-
-        return RiskMetrics(
+        metrics = RiskMetrics(
             max_loss=max_loss,
             probability_assignment=probability_itm,
             expected_return=expected_return,
@@ -578,6 +577,8 @@ class WheelAdvisor:
             var_95=position_var,
             margin_required=margin_required,
         )
+        metrics_collector.record_risk_metrics(metrics)
+        return metrics
 
     def _calculate_edge(
         self,
