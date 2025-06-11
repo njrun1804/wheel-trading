@@ -27,7 +27,7 @@ def check_python_version() -> Tuple[bool, str]:
     version = sys.version_info
     version_str = f"{version.major}.{version.minor}.{version.micro}"
 
-    if version.major == 3 and version.minor >= 8:
+    if version.major == 3 and version.minor >= 9:
         return True, version_str
     else:
         return False, version_str
@@ -56,12 +56,12 @@ def check_package(package_name: str, import_path: str = None) -> Tuple[bool, str
 def check_unity_wheel_modules() -> Dict[str, Tuple[bool, str]]:
     """Check Unity Wheel specific modules."""
     modules_to_check = {
-        "unity_trading": "unity_trading",
-        "unity_trading.math": "unity_trading.math.options",
-        "unity_trading.strategy": "unity_trading.strategy.wheel",
-        "unity_trading.api": "unity_trading.api.advisor",
-        "unity_trading.utils": "unity_trading.utils.position_sizing",
-        "unity_trading.risk": "unity_trading.risk.analytics",
+        "src.unity_wheel": "src.unity_wheel",
+        "src.unity_wheel.math": "src.unity_wheel.math.options",
+        "src.unity_wheel.strategy": "src.unity_wheel.strategy.wheel",
+        "src.unity_wheel.api": "src.unity_wheel.api.advisor",
+        "src.unity_wheel.utils": "src.unity_wheel.utils.position_sizing",
+        "src.unity_wheel.risk": "src.unity_wheel.risk.analytics",
     }
 
     results = {}
@@ -93,7 +93,7 @@ def test_core_functionality() -> List[Tuple[str, bool, str]]:
 
     # Test 1: Basic math operations
     try:
-        from unity_trading.math.options import black_scholes_price_validated
+        from src.unity_wheel.math.options import black_scholes_price_validated
 
         result = black_scholes_price_validated(100, 100, 1, 0.05, 0.2, "call")
         if result.confidence > 0.9:
@@ -113,7 +113,7 @@ def test_core_functionality() -> List[Tuple[str, bool, str]]:
 
     # Test 2: Strategy module
     try:
-        from unity_trading.strategy.wheel import WheelStrategy
+        from src.unity_wheel.strategy.wheel import WheelStrategy
 
         strategy = WheelStrategy()
         tests.append(("Wheel strategy creation", True, "Strategy object created"))
@@ -122,7 +122,7 @@ def test_core_functionality() -> List[Tuple[str, bool, str]]:
 
     # Test 3: Position sizing
     try:
-        from unity_trading.utils.position_sizing import calculate_position_size
+        from src.unity_wheel.utils.position_sizing import calculate_position_size
 
         tests.append(("Position sizing import", True, "Module imported successfully"))
     except Exception as e:
@@ -149,7 +149,7 @@ def main():
     if python_ok:
         print(f"✅ Python version: {colored(python_version, GREEN)}")
     else:
-        print(f"❌ Python version: {colored(python_version, RED)} (requires 3.8+)")
+        print(f"❌ Python version: {colored(python_version, RED)} (requires 3.9+)")
 
     print(f"📁 Python executable: {sys.executable}")
     print(f"📁 Current working directory: {os.getcwd()}")

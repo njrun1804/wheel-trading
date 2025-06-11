@@ -38,7 +38,7 @@ echo "✅ Environment file created: .codex/.env"
 # Test Python availability
 echo "🐍 Testing Python environment..."
 if ! command -v python &> /dev/null; then
-    echo "❌ Python not found! Please ensure Python 3.8+ is available."
+    echo "❌ Python not found! Please ensure Python 3.9+ is available."
     exit 1
 fi
 
@@ -99,7 +99,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
 python -c "
 try:
-    from unity_trading.math.options import black_scholes_price_validated
+    from src.unity_wheel.math.options import black_scholes_price_validated
     print('✅ Math module imported successfully')
 except ImportError as e:
     print(f'❌ Math module import failed: {e}')
@@ -108,7 +108,7 @@ except ImportError as e:
 
 python -c "
 try:
-    from unity_trading.strategy.wheel import WheelStrategy
+    from src.unity_wheel.strategy.wheel import WheelStrategy
     print('✅ Strategy module imported successfully')
 except ImportError as e:
     print(f'❌ Strategy module import failed: {e}')
@@ -117,7 +117,7 @@ except ImportError as e:
 
 python -c "
 try:
-    from unity_trading.utils.position_sizing import calculate_position_size
+    from src.unity_wheel.utils.position_sizing import calculate_position_size
     print('✅ Position sizing module imported successfully')
 except ImportError as e:
     print(f'❌ Position sizing module import failed: {e}')
@@ -127,7 +127,7 @@ except ImportError as e:
 # Test core functionality
 echo "🧪 Testing core functionality..."
 python -c "
-from unity_trading.math.options import black_scholes_price_validated as bs
+from src.unity_wheel.math.options import black_scholes_price_validated as bs
 result = bs(100, 100, 1, 0.05, 0.2, 'call')
 if result.confidence > 0.9:
     print(f'✅ Options pricing works: ${result.value:.2f} (confidence: {result.confidence:.1%})')
@@ -154,7 +154,7 @@ echo "📁 Added $(pwd) to PYTHONPATH"
 
 # Verify setup
 python -c "
-from unity_trading import __version__
+from src.unity_wheel import __version__
 print(f'✅ Unity Wheel Trading Bot v{__version__} ready!')
 " 2>/dev/null || echo "⚠️  Unity Wheel import issues - check setup"
 
@@ -176,7 +176,7 @@ echo "🔧 To activate in new sessions:"
 echo "   source .codex/activate.sh"
 echo ""
 echo "🚀 Quick test commands:"
-echo "   python -c \"from unity_trading.math import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))\""
-echo "   python -c \"from unity_trading.strategy.wheel import WheelStrategy; print('Strategy ready')\""
+echo "   python -c \"from src.unity_wheel.math import black_scholes_price_validated as bs; print(bs(100, 100, 1, 0.05, 0.2, 'call'))\""
+echo "   python -c \"from src.unity_wheel.strategy.wheel import WheelStrategy; print('Strategy ready')\""
 echo ""
 echo "📖 For full documentation: .codex/ENVIRONMENT_SETUP.md"
