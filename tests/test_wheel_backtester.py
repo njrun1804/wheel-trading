@@ -269,7 +269,8 @@ class TestWheelBacktester:
         max_dd = backtester._calculate_max_drawdown(equity)
 
         # Max drawdown from 110k to 102k = -7.27%
-        assert -0.08 < max_dd < -0.07
+        assert -0.08 < max_dd.value < -0.07
+        assert max_dd.confidence > 0
 
     def test_sharpe_ratio_calculation(self, backtester):
         """Test Sharpe ratio calculation."""
@@ -281,7 +282,8 @@ class TestWheelBacktester:
         # With no volatility, Sharpe should be very high
         # 0.1% daily = 25.2% annual, 0 vol = infinite Sharpe
         # But we handle division by zero
-        assert sharpe == 0.0 or sharpe > 10
+        assert sharpe.value == 0.0 or sharpe.value > 10
+        assert sharpe.confidence > 0
 
     def test_backtest_strike_selection(self, backtester):
         """Test strike selection in backtest."""
@@ -299,7 +301,8 @@ class TestWheelBacktester:
         premium = backtester._calculate_backtest_premium(spot=35.0, strike=35.0, dte=45)
 
         # Should be reasonable for Unity
-        assert 0.5 < premium < 3.0  # $0.50 to $3.00
+        assert 0.5 < premium.value < 3.0  # $0.50 to $3.00
+        assert premium.confidence > 0
 
     def test_position_sizing(self, backtester):
         """Test position size limits."""
