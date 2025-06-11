@@ -2,6 +2,27 @@
 
 Unity Wheel Trading Bot v2.2 - File organization rules for autonomous operation.
 
+## Agent Quick Start
+
+- **No execution code** – only recommendations.
+- **Return confidence scores** from all calculations.
+- **Never hardcode** ticker "U"; use `config.unity.ticker`.
+
+**Start each session**
+```bash
+./scripts/housekeeping.sh --unity-check
+```
+
+**Before committing**
+```bash
+./scripts/housekeeping.sh --check-staged
+```
+
+**Detailed violations**
+```bash
+./scripts/housekeeping.sh --explain --json
+```
+
 ## Session Start Checklist
 
 ```bash
