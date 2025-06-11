@@ -150,6 +150,8 @@ No additional configuration needed! The system automatically:
 3. **Monte Carlo**: Shows ~73% win rate with typical Unity premiums
 4. **Sharpe Impact**: Borrowing reduces Sharpe from 0.8 to 0.6 typically
 5. **Correlation**: Unity shows -0.3 correlation with interest rates
+6. **Portfolio Greek Aggregation**: Correlation-adjusted exposures prevent
+   double-counting risk
 
 ## Risk Management
 
