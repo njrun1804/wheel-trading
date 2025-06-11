@@ -37,6 +37,7 @@
 
 ### 5. Portfolio-Wide Analysis
 - Multiple position optimization
+- **NEW**: Implemented permutation optimizer to search debt/position mixes for best Sharpe ratio
 - Cross-margining benefits
 - Diversification impact on borrowing capacity
 - Portfolio margin vs Reg T calculations

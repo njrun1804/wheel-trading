@@ -34,6 +34,7 @@ class MonteCarloResult:
     max_drawdown: float
     paths: Optional[np.ndarray] = None  # Sample paths for visualization
     confidence_interval: Tuple[float, float] = None  # 95% CI
+    returns: Optional[np.ndarray] = None  # Raw return series
 
 
 @dataclass
@@ -132,7 +133,7 @@ class AdvancedFinancialModeling:
         daily_borrow_cost = 0
         if borrowed_amount > 0:
             # Use Schwab margin rate
-            loan = self.borrowing_analyzer.loans.get("schwab_margin")
+            loan = self.borrowing_analyzer.sources.get("schwab_margin")
             if loan:
                 daily_borrow_cost = loan.daily_rate * borrowed_amount
 
@@ -212,6 +213,7 @@ class AdvancedFinancialModeling:
                 np.mean(returns) - 1.96 * np.std(returns) / np.sqrt(n_simulations),
                 np.mean(returns) + 1.96 * np.std(returns) / np.sqrt(n_simulations),
             ),
+            returns=returns,
         )
 
     def calculate_risk_adjusted_metrics(
@@ -245,7 +247,7 @@ class AdvancedFinancialModeling:
 
         # Calculate borrowing cost impact
         leverage_ratio = total_capital / (total_capital - borrowed_capital)
-        daily_borrow_rate = self.borrowing_analyzer.loans["schwab_margin"].daily_rate
+        daily_borrow_rate = self.borrowing_analyzer.sources["schwab_margin"].daily_rate
         daily_borrow_cost = daily_borrow_rate * borrowed_capital / total_capital
 
         # Adjusted returns (after borrowing costs)
@@ -351,7 +353,7 @@ class AdvancedFinancialModeling:
         results = []
 
         # Get borrowing rate
-        borrow_rate = self.borrowing_analyzer.loans["schwab_margin"].annual_rate
+        borrow_rate = self.borrowing_analyzer.sources["schwab_margin"].annual_rate
 
         for leverage in leverage_points:
             # Leveraged return = L * (R_asset - R_debt) + R_debt
@@ -434,7 +436,7 @@ class AdvancedFinancialModeling:
 
                 # Borrowing cost
                 if borrow > 0:
-                    loan = self.borrowing_analyzer.loans["schwab_margin"]
+                    loan = self.borrowing_analyzer.sources["schwab_margin"]
                     borrow_cost = loan.compound_interest(period["days"], borrow)
                 else:
                     borrow_cost = 0
@@ -489,7 +491,7 @@ class AdvancedFinancialModeling:
             gross_profit = position * period_return
 
             if borrow > 0:
-                loan = self.borrowing_analyzer.loans["schwab_margin"]
+                loan = self.borrowing_analyzer.sources["schwab_margin"]
                 borrow_cost = loan.compound_interest(period["days"], borrow)
             else:
                 borrow_cost = 0
@@ -614,7 +616,7 @@ class AdvancedFinancialModeling:
         leveraged_returns = returns_distribution * leverage_ratio
 
         # Account for borrowing costs
-        loan = self.borrowing_analyzer.loans["schwab_margin"]
+        loan = self.borrowing_analyzer.sources["schwab_margin"]
         daily_borrow_cost = loan.daily_rate * borrowed_amount / position_size
         net_returns = leveraged_returns - daily_borrow_cost * time_horizon
 
@@ -680,9 +682,7 @@ class AdvancedFinancialModeling:
         weights = np.array([p.get("weight", 1.0) for p in portfolio], dtype=float)
         weights /= weights.sum()
 
-        expected = float(
-            sum(w * p["expected_return"] for w, p in zip(weights, portfolio))
-        )
+        expected = float(sum(w * p["expected_return"] for w, p in zip(weights, portfolio)))
         volatility = float(
             np.sqrt(sum((w * p["volatility"]) ** 2 for w, p in zip(weights, portfolio)))
         )

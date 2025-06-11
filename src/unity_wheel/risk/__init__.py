@@ -7,6 +7,7 @@ from .borrowing_cost_analyzer import (
     CapitalAllocationResult,
     analyze_borrowing_decision,
 )
+from .portfolio_permutation_optimizer import PortfolioLeg, PortfolioPermutationOptimizer
 from .unity_margin import MarginResult, UnityMarginCalculator, calculate_unity_margin_requirement
 
 __all__ = [
@@ -22,4 +23,6 @@ __all__ = [
     "UnityMarginCalculator",
     "MarginResult",
     "calculate_unity_margin_requirement",
+    "PortfolioLeg",
+    "PortfolioPermutationOptimizer",
 ]
