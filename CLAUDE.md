@@ -25,7 +25,7 @@ pytest tests/test_databento_unity.py tests/test_position_sizing.py -v
 - "Rate limit" → Wait 60s
 - "No liquid strikes" → `export DATABENTO_SKIP_VALIDATION=true`
 
-**Quick Navigation:** [Commands](#quick-reference) • [Files](#key-file-locations) • [Errors](#troubleshooting) • [Config](#configuration-system) • [Architecture](#architecture) • [Workflows](#common-workflows)
+**Quick Navigation:** [Commands](#quick-reference) • [AI Tools](#ai-development-tools) • [Files](#key-file-locations) • [Errors](#troubleshooting) • [Config](#configuration-system) • [Architecture](#architecture) • [Workflows](#common-workflows)
 
 ---
 
@@ -39,6 +39,9 @@ Unity Wheel Trading Bot v2.2 - An autonomous options wheel strategy recommendati
 - **Enhanced Safety**: All calculations now return confidence scores
 - **Unified Position Sizing**: Single implementation via `DynamicPositionSizer`
 - **Better Error Handling**: No bare except clauses, specific exceptions only
+- **AI Development Tools**: Autonomous workflow automation for Claude Code & Codex
+- **Unified Data Provider**: Single interface for all market data with automatic fallback
+- **Enhanced Caching**: Memory-aware LRU caching with performance monitoring
 
 ## Quick Reference
 
@@ -77,6 +80,12 @@ python run.py --diagnose             # System health
 pre-commit run --all-files                   # Run all checks
 ./scripts/commit-workflow.sh -y              # Auto-commit
 
+# AI Development Tools (NEW)
+python scripts/ai-api-server.py              # Start AI development API server
+./scripts/ai-dev-assistant.py health         # System health check for AI
+./scripts/autonomous-workflow.py pre-commit  # Autonomous pre-commit workflow
+./scripts/autonomous-workflow.py ci          # Full CI workflow
+
 # Testing
 pytest tests/test_autonomous_flow.py -v      # Integration test
 pytest tests/test_math.py::test_black_scholes_edge_cases -v  # Specific test
@@ -85,6 +94,80 @@ pytest tests/test_math.py::test_black_scholes_edge_cases -v  # Specific test
 python src/unity_wheel/monitoring/scripts/live_monitor.py      # Real-time dashboard
 python src/unity_wheel/monitoring/scripts/daily_health_check.py  # Morning checks
 ```
+
+## AI Development Tools
+
+**For Autonomous AI Developers (Claude Code & Codex)**
+
+### AI Development Assistant
+```bash
+# System health check with structured output
+python scripts/ai-dev-assistant.py health
+
+# Code quality analysis with actionable items
+python scripts/ai-dev-assistant.py quality
+
+# Test coverage analysis with gap identification
+python scripts/ai-dev-assistant.py coverage
+
+# Performance profiling with bottleneck detection
+python scripts/ai-dev-assistant.py performance
+
+# Create optimization plan based on current state
+python scripts/ai-dev-assistant.py optimize
+
+# Execute all automated fixes
+python scripts/ai-dev-assistant.py fix
+
+# Export complete system state for AI analysis
+python scripts/ai-dev-assistant.py export
+```
+
+### Autonomous Workflows
+```bash
+# Pre-commit workflow (health + fixes + fast tests)
+python scripts/autonomous-workflow.py pre-commit
+
+# Full CI workflow (coverage + performance + quality gates)
+python scripts/autonomous-workflow.py ci
+
+# Optimization workflow (automated improvements)
+python scripts/autonomous-workflow.py optimization
+
+# Continuous health monitoring
+python scripts/autonomous-workflow.py health-monitoring --continuous
+
+# Export workflow execution history
+python scripts/autonomous-workflow.py export-history
+```
+
+### AI Development API Server
+```bash
+# Start API server for programmatic access
+python scripts/ai-api-server.py --port 8000
+
+# API endpoints available at http://localhost:8000:
+# GET  /health           - System health status
+# GET  /quality          - Code quality metrics
+# GET  /tests            - Execute test suite
+# GET  /coverage         - Test coverage analysis
+# GET  /performance      - Performance profiling
+# POST /workflows/pre-commit   - Execute pre-commit workflow
+# POST /workflows/ci           - Execute CI workflow
+# POST /workflows/optimization - Execute optimization workflow
+# POST /fixes/auto             - Apply automated fixes
+# GET  /state/export           - Export system state
+```
+
+### AI-Optimized Features
+- **Structured JSON Output**: All tools return machine-readable JSON for AI parsing
+- **Automated Fix Detection**: Identifies and executes safe automated improvements
+- **Performance Monitoring**: Tracks SLA violations and performance regressions
+- **Health Scoring**: Composite health scores for decision-making
+- **Workflow Automation**: End-to-end autonomous development workflows
+- **API Interface**: RESTful endpoints for programmatic integration
+- **Error Recovery**: Graceful degradation and fallback strategies
+- **Progress Tracking**: Structured logging for workflow monitoring
 
 ### Key File Locations
 ```python
@@ -114,6 +197,18 @@ src/unity_wheel/schwab/client.py                       # Schwab API client
 src/unity_wheel/data_providers/databento/client.py     # Databento client
 src/unity_wheel/data_providers/fred/                   # FRED data
 src/unity_wheel/data_providers/schwab/                 # Schwab data modules
+src/unity_wheel/data_providers/unified_provider.py     # Unified data provider (NEW)
+src/unity_wheel/data_providers/factory.py              # Data provider factory (NEW)
+
+# Performance Optimization (NEW)
+src/unity_wheel/utils/performance_cache.py             # Memory-aware LRU caching
+src/unity_wheel/math/vectorized_options.py             # Vectorized Black-Scholes
+src/unity_wheel/utils/memory_optimizer.py              # Memory monitoring & optimization
+
+# AI Development Tools (NEW)
+scripts/ai-dev-assistant.py                            # AI development assistant
+scripts/autonomous-workflow.py                         # Autonomous workflows
+scripts/ai-api-server.py                               # AI development API server
 ```
 
 ### Critical Constants & Performance SLAs

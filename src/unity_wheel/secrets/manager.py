@@ -25,6 +25,7 @@ class SecretProvider(str, Enum):
     LOCAL = "local"
     GCP = "gcp"
     ENVIRONMENT = "environment"
+    KEYCHAIN = "keychain"
 
 
 class BaseSecretBackend(ABC):
