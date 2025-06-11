@@ -24,3 +24,23 @@ When you need details, read these:
 
 ## Critical Values
 Unity (U) | Delta: 0.30 | Max position: 100% | Min confidence: 0.30
+
+## MCP Toolkits & Retrieval Policy
+
+You have five toolkits:
+
+1. `mcp__fs__*` – my whole local drive
+2. `mcp__vscode__*` – the open workspace (preferred for edits)
+3. `mcp__github__*` – public repos & issues
+4. `mcp__web__*` – live news & the wider web
+5. `mcp__wiki__*` – encyclopaedia facts
+
+**Priority:** 1 → 2 → 3 → 4 → 5.
+**Never paste >2,000 tokens from any single file; summarise instead.**
+
+## Large Repo Optimizations
+
+- Output limited to 8k tokens for faster responses
+- Use ripgrep (`rg`) for efficient code searching
+- When searching code, request specific patterns with context
+- Prefer reading specific functions/classes over entire files

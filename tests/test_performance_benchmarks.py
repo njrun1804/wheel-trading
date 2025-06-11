@@ -28,7 +28,7 @@ from src.unity_wheel.math.options import (
     probability_itm_validated,
 )
 from src.unity_wheel.models.account import Account
-from src.unity_wheel.models.position import OptionType, Position, PositionType
+from src.unity_wheel.models.position import Position, PositionType
 from src.unity_wheel.risk.analytics import RiskAnalytics
 
 

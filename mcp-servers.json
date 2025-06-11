@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "fs": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "~"]
+    },
+    "github": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
+    },
+    "web": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-web-search"]
+    },
+    "wiki": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "wikipedia-mcp"]
+    },
+    "vscode": {
+      "transport": "sse",
+      "command": "http://localhost:3000/mcp"
+    }
+  }
+}
