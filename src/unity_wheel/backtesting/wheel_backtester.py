@@ -12,6 +12,7 @@ import pandas as pd
 from src.config.loader import get_config
 
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader
+from ..data_providers.base import FREDDataManager
 from ..math.options import black_scholes_price_validated
 from ..math import CalculationResult
 from ..storage import Storage
@@ -84,10 +85,12 @@ class WheelBacktester:
         self,
         storage: Storage,
         price_loader: Optional[PriceHistoryLoader] = None,
+        fred_manager: Optional[FREDDataManager] = None,
     ):
         """Initialize backtester."""
         self.storage = storage
         self.price_loader = price_loader
+        self.fred_manager = fred_manager
         self.config = get_config()
         self.strategy = WheelStrategy()
         self.position_sizer = DynamicPositionSizer()
@@ -185,8 +188,21 @@ class WheelBacktester:
                 # Simulate finding optimal strike
                 strike = self._find_backtest_strike(current_price, params.target_delta)
 
-                # Calculate realistic premium
-                premium_result = self._calculate_backtest_premium(current_price, strike, params.target_dte)
+                # Calculate realistic premium using dynamic risk-free rate if available
+                risk_free_rate = 0.05
+                if self.fred_manager:
+                    dte_months = max(1, round(params.target_dte / 30))
+                    try:
+                        risk_free_rate, _ = await self.fred_manager.get_risk_free_rate(dte_months)
+                    except Exception as e:
+                        logger.error("Failed to fetch risk-free rate", extra={"error": str(e)})
+
+                premium_result = self._calculate_backtest_premium(
+                    current_price,
+                    strike,
+                    params.target_dte,
+                    risk_free_rate=risk_free_rate,
+                )
 
                 if contracts_per_trade is None:
                     contracts = self.position_sizer.contracts_for_trade(
@@ -515,6 +531,7 @@ class WheelBacktester:
         spot: float,
         strike: float,
         dte: int,
+        risk_free_rate: float = 0.05,
     ) -> CalculationResult:
         """Calculate realistic option premium for backtest."""
         # Use simplified IV model for Unity
@@ -539,7 +556,7 @@ class WheelBacktester:
             S=spot,
             K=strike,
             T=dte / 365.0,
-            r=0.05,
+            r=risk_free_rate,
             sigma=iv,
             option_type="put",
         )

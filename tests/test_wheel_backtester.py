@@ -2,6 +2,24 @@
 
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
+import sys
+from types import SimpleNamespace
+
+# Provide minimal stubs for optional dependencies
+sys.modules.setdefault("databento", SimpleNamespace())
+sys.modules.setdefault(
+    "databento_dbn",
+    SimpleNamespace(Schema=SimpleNamespace(OHLCV_1D=1), SType=None),
+)
+sys.modules.setdefault("tenacity", SimpleNamespace())
+sys.modules.setdefault(
+    "src.unity_wheel.data_providers.databento.price_history_loader",
+    SimpleNamespace(PriceHistoryLoader=object),
+)
+sys.modules.setdefault(
+    "src.unity_wheel.data_providers.base",
+    SimpleNamespace(FREDDataManager=object),
+)
 
 import numpy as np
 import pandas as pd
@@ -10,6 +28,7 @@ import pytest
 from src.unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.strategy.wheel import WheelParameters
+from src.unity_wheel.data_providers.base import FREDDataManager
 
 
 class TestWheelBacktester:
@@ -311,3 +330,15 @@ class TestWheelBacktester:
         # Position size should respect limits in backtest
         # This is implicitly tested in backtest_strategy
         assert params.max_position_size == 0.20
+
+    def test_fred_rate_injection_changes_premium(self, backtester):
+        """Premiums should adjust when a different risk-free rate is used."""
+
+        premium_low = backtester._calculate_backtest_premium(
+            spot=35.0, strike=35.0, dte=30, risk_free_rate=0.01
+        )
+        premium_high = backtester._calculate_backtest_premium(
+            spot=35.0, strike=35.0, dte=30, risk_free_rate=0.10
+        )
+
+        assert premium_low.value != premium_high.value
