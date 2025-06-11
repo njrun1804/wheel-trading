@@ -88,6 +88,7 @@ diagnostics_history.json
 
 # macOS duplicate files
 * [0-9].py
+
 # Temporary and cache directories
 .DS_Store
 .mypy_cache/
@@ -97,3 +98,27 @@ __pycache__/
 .env.local
 .claude/
 .mcp.json
+
+# Performance and analysis outputs
+performance_results/
+*.csv
+database_validation_report.json
+audit_report.json
+clean_data_validation_results.json
+diagnostics_history.json
+
+# Session files
+SESSION_*.txt
+SESSION_*.md
+
+# Test files in root
+test_*.py
+
+# MCP configuration with tokens
+.env-mcp
+mcp-servers-*.json
+!mcp-servers.json
+
+# Large data files
+*.duckdb
+*.parquet

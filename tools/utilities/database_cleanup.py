@@ -68,14 +68,14 @@ def cleanup_database():
             print(f"\n❌ Error removing {table}: {e}")
 
     # Vacuum to reclaim space
-    print(f"\nVacuuming database to reclaim space...")
+    print("\nVacuuming database to reclaim space...")
     conn.execute("VACUUM")
 
     # Check final database size
     db_size_after = db_path.stat().st_size / (1024 * 1024)
     space_saved = db_size_before - db_size_after
 
-    print(f"\n" + "=" * 60)
+    print("\n" + "=" * 60)
     print("CLEANUP COMPLETE")
     print("=" * 60)
     print(f"Records removed: {total_records_removed:,}")
@@ -84,7 +84,7 @@ def cleanup_database():
     print(f"Space saved: {space_saved:.1f} MB ({space_saved/db_size_before*100:.1f}%)")
 
     # Show remaining tables
-    print(f"\nRemaining tables:")
+    print("\nRemaining tables:")
     remaining_tables = [
         "price_history",
         "unity_options_daily",
@@ -111,7 +111,7 @@ def cleanup_database():
 
     conn.close()
 
-    print(f"\n💾 Database optimized and ready for trading analysis!")
+    print("\n💾 Database optimized and ready for trading analysis!")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from src.unity_wheel.models.position import Position
-from src.unity_wheel.portfolio.broker_parser import parse_broker_paste
 
 
 def main():
@@ -179,16 +178,16 @@ $212,001.67    +$1,350.00    +0.64%    $135,589.45    +$35,410.55    +26.12%"""
         print(f"   Cash: ${cash:,.2f}")
         print(f"   Buying Power: ${buying_power:,.2f}")
 
-        print(f"\n📈 Positions:")
+        print("\n📈 Positions:")
         for pos in positions:
             print(f"   {pos}")
 
         print("\n🎯 Unity Exposure:")
-        print(f"   Shares: 7,500")
-        print(f"   Short Calls: 75")
-        print(f"   Current Price: $24.84")
-        print(f"   Stock Value: $186,600")
-        print(f"   Short Call Value: -$15,600")
+        print("   Shares: 7,500")
+        print("   Short Calls: 75")
+        print("   Current Price: $24.84")
+        print("   Stock Value: $186,600")
+        print("   Short Call Value: -$15,600")
 
         print("\n✅ Data parsed successfully!")
         print("\n💡 To get a recommendation, run:")

@@ -4,8 +4,7 @@ Statistical validation on CLEAN data after integrity fixes.
 Critical for verifying our strategy parameters remain valid.
 """
 
-import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import duckdb
@@ -13,7 +12,6 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.mixture import GaussianMixture
-from sklearn.model_selection import KFold
 from statsmodels.stats.multitest import multipletests
 
 
@@ -101,7 +99,7 @@ def run_clean_walk_forward():
         [train_end],
     ).fetchone()
 
-    print(f"\nTraining data (CLEAN):")
+    print("\nTraining data (CLEAN):")
     print(f"  Avg volatility: {train_stats[0]:.1%}")
     print(f"  Annual return: {train_stats[2]:.1%}")
     print(f"  Days: {train_stats[3]}")
@@ -133,7 +131,7 @@ def run_clean_walk_forward():
 
     sharpe = test_perf[1] / test_perf[2] if test_perf[2] > 0 else 0
 
-    print(f"\nTest period performance (CLEAN DATA):")
+    print("\nTest period performance (CLEAN DATA):")
     print(f"  Total return: {test_perf[0]*100:.1f}%")
     print(f"  Annualized return: {test_perf[1]:.1%}")
     print(f"  Annualized volatility: {test_perf[2]:.1%}")

@@ -6,7 +6,6 @@ Tracks completion of all audit items before production.
 
 import json
 import subprocess
-import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -241,7 +240,7 @@ class AuditChecklist:
                     annual_return, annual_vol, days = q2_perf
                     sharpe = annual_return / annual_vol if annual_vol > 0 else 0
 
-                    print(f"\n   📊 Q2 2025 Clean Data Performance:")
+                    print("\n   📊 Q2 2025 Clean Data Performance:")
                     print(f"      Annualized Return: {annual_return:.1%}")
                     print(f"      Annualized Vol: {annual_vol:.1%}")
                     print(f"      Sharpe Ratio: {sharpe:.2f}")
@@ -251,9 +250,9 @@ class AuditChecklist:
                     self.results["clean_return"] = annual_return
 
                     if sharpe >= 1.2:
-                        print(f"      ✅ Sharpe > 1.2 threshold")
+                        print("      ✅ Sharpe > 1.2 threshold")
                     else:
-                        print(f"      ❌ Sharpe < 1.2 threshold")
+                        print("      ❌ Sharpe < 1.2 threshold")
 
             except Exception as e:
                 print(f"   ❌ Could not calculate clean metrics: {e}")

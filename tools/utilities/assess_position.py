@@ -4,7 +4,6 @@ Simple on-demand position assessment for Unity Wheel Trading.
 Run this anytime to check current market conditions and get recommendations.
 """
 
-import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -87,7 +86,7 @@ def assess_trading_conditions():
 
     # Check volatility regime
     vol = market["volatility"]
-    print(f"\n🎯 VOLATILITY REGIME")
+    print("\n🎯 VOLATILITY REGIME")
     print("-" * 30)
 
     if vol > 1.20:
@@ -113,7 +112,7 @@ def assess_trading_conditions():
 
     # Check current positions
     positions = check_current_positions()
-    print(f"\n📈 CURRENT POSITIONS")
+    print("\n📈 CURRENT POSITIONS")
     print("-" * 30)
     print(f"Open Puts: {len(positions)}")
 
@@ -133,7 +132,7 @@ def assess_trading_conditions():
         print("No open positions")
 
     # Trading recommendations based on regime
-    print(f"\n💡 RECOMMENDATIONS")
+    print("\n💡 RECOMMENDATIONS")
     print("-" * 30)
 
     if regime == "extreme":
@@ -161,7 +160,7 @@ def assess_trading_conditions():
         print("4. Position size: up to 25%")
 
     # Earnings check
-    print(f"\n📅 EARNINGS CHECK")
+    print("\n📅 EARNINGS CHECK")
     print("-" * 30)
 
     # Unity earnings dates (update quarterly)
@@ -188,7 +187,7 @@ def assess_trading_conditions():
         print("✅ Safe distance from earnings")
 
     # Summary
-    print(f"\n📋 SUMMARY")
+    print("\n📋 SUMMARY")
     print("-" * 30)
 
     can_trade = vol <= 1.20 and days_to_earnings > 7

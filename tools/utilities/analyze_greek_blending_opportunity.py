@@ -4,9 +4,7 @@ Analyze the opportunity for greek blending across strikes and dates.
 Shows why single-strike selection leaves money on the table.
 """
 
-from datetime import datetime, timedelta
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -36,7 +34,7 @@ def simulate_greek_profiles():
     single_gamma = 0.04
     single_vega = 0.12
 
-    print(f"\nTraditional Approach (Single Strike):")
+    print("\nTraditional Approach (Single Strike):")
     print(f"  Strike: ${single_strike}, DTE: {single_dte}")
     print(f"  Delta: {single_delta:.2f}")
     print(f"  Theta: ${single_theta*100:.2f}/day")
@@ -80,11 +78,11 @@ def simulate_greek_profiles():
     blended_gamma = sum(b["gamma"] * b["weight"] for b in blend)
     blended_vega = sum(b["vega"] * b["weight"] for b in blend)
 
-    print(f"\nBlended Approach (3 Strikes/Dates):")
+    print("\nBlended Approach (3 Strikes/Dates):")
     for i, b in enumerate(blend):
         print(f"  Position {i+1}: ${b['strike']} @ {b['dte']}d ({b['weight']:.0%} weight)")
 
-    print(f"\n  Blended Greeks:")
+    print("\n  Blended Greeks:")
     print(f"  Delta: {blended_delta:.2f}")
     print(f"  Theta: ${blended_theta*100:.2f}/day")
     print(f"  Gamma: {blended_gamma:.3f}")

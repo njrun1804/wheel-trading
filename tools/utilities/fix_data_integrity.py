@@ -5,12 +5,9 @@ Addresses look-ahead bias, extreme strikes, and liquidity filters.
 """
 
 import sys
-from datetime import datetime, timedelta
 from pathlib import Path
 
 import duckdb
-import numpy as np
-import pandas as pd
 
 
 def fix_lookahead_bias(conn):
@@ -254,7 +251,7 @@ def add_liquidity_filters(conn):
         min_oi = 250  # Minimum open interest
         max_spread_pct = 0.04  # Maximum 4% effective spread
 
-        print(f"\n   Applying filters:")
+        print("\n   Applying filters:")
         print(f"   • Minimum open interest: {min_oi}")
         print(f"   • Maximum spread: {max_spread_pct:.1%}")
 
@@ -383,7 +380,7 @@ def update_backtest_features(conn):
     """
     ).fetchone()
 
-    print(f"   Clean backtest data:")
+    print("   Clean backtest data:")
     print(f"   • Days: {stats[0]}")
     print(f"   • Average volatility: {stats[1]:.1%}")
     print(f"   • Period: {stats[2]} to {stats[3]}")
@@ -409,7 +406,7 @@ def generate_integrity_report(conn):
     """
     ).fetchone()[0]
 
-    print(f"\nOption Records:")
+    print("\nOption Records:")
     print(f"   Before: {before_options:,}")
     print(f"   After:  {after_options:,}")
     print(
@@ -444,7 +441,7 @@ def generate_integrity_report(conn):
     """
     ).fetchone()
 
-    print(f"\nClean Data Quality Metrics:")
+    print("\nClean Data Quality Metrics:")
     print(f"   DTE range: {quality_metrics[0]} to {quality_metrics[1]} days")
     print(f"   Average DTE: {quality_metrics[2]:.0f} days")
     print(f"   Max strike distance: {quality_metrics[3]:.1%}")

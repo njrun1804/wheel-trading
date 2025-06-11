@@ -4,11 +4,10 @@ Operational Monitoring Setup
 Configures automated monitoring, alerts, and position tracking.
 """
 
-import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -443,7 +442,7 @@ def setup_crontab():
 
     print(f"   ✅ Created: {crontab_file}")
     print("\n   To install:")
-    print(f"   $ crontab -e")
+    print("   $ crontab -e")
     print(f"   # Then paste contents of {crontab_file}")
 
     # Check current crontab

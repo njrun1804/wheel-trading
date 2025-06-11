@@ -21,7 +21,7 @@ try:
         """
         ).fetchone()
 
-        print(f"\n📊 STOCK DATA: ✅ COMPLETE")
+        print("\n📊 STOCK DATA: ✅ COMPLETE")
         print(f"   Records: {stock[0]:,}")
         print(f"   Period: {stock[1]} to {stock[2]}")
         print(f"   Price range: ${stock[3]:.2f} - ${stock[4]:.2f}")
@@ -43,25 +43,25 @@ try:
         """
         ).fetchone()
 
-        print(f"\n📈 OPTIONS DATA: ⚠️  REAL DATA (Limited Coverage)")
+        print("\n📈 OPTIONS DATA: ⚠️  REAL DATA (Limited Coverage)")
         print(f"   Records: {options[0]:,}")
         print(f"   Trading days: {options[1]} (only days with trades)")
         print(f"   Unique options: {options[2]:,}")
         print(f"   Period: {options[3]} to {options[4]}")
         print(f"   Total volume: {options[5]:,}")
-        print(f"   ℹ️  Note: OHLCV data only includes options that traded")
+        print("   ℹ️  Note: OHLCV data only includes options that traded")
     except Exception as e:
         print(f"\n📈 OPTIONS DATA: ❌ Error - {e}")
 
     # Data quality notes
-    print(f"\n📋 DATA QUALITY NOTES:")
-    print(f"   ✅ All data is REAL from Databento OPRA.PILLAR")
-    print(f"   ⚠️  Limited to days with actual trades (26 days)")
-    print(f"   ✅ No synthetic data in the system")
-    print(f"   ℹ️  This is normal for options - only liquid strikes trade")
+    print("\n📋 DATA QUALITY NOTES:")
+    print("   ✅ All data is REAL from Databento OPRA.PILLAR")
+    print("   ⚠️  Limited to days with actual trades (26 days)")
+    print("   ✅ No synthetic data in the system")
+    print("   ℹ️  This is normal for options - only liquid strikes trade")
 
-    print(f"\n✅ STATUS: Real market data available for backtesting")
-    print(f"   Use only actively traded options for realistic results")
+    print("\n✅ STATUS: Real market data available for backtesting")
+    print("   Use only actively traded options for realistic results")
 
     conn.close()
 

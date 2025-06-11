@@ -5,13 +5,10 @@ Following the provided playbook for OPRA.PILLAR statistics schema.
 """
 
 import os
-import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import databento as db
-import numpy as np
-import pandas as pd
 
 
 def pull_unity_options_liquidity():
@@ -32,7 +29,7 @@ def pull_unity_options_liquidity():
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=3 * 365)
 
-    print(f"\n1. Fetching Unity option symbols")
+    print("\n1. Fetching Unity option symbols")
     print(f"   Period: {start_date} to {end_date}")
 
     try:

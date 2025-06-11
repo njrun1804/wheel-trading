@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Analyze existing options data for liquidity patterns."""
 
-import numpy as np
 import pandas as pd
 
 # Load our options data

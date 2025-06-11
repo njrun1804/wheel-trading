@@ -46,7 +46,7 @@ stock_check = conn.execute(
 """
 ).fetchone()
 
-print(f"\n   📊 Stock Data:")
+print("\n   📊 Stock Data:")
 print(f"      Records: {stock_check[0]:,}")
 print(f"      Period: {stock_check[2]} to {stock_check[3]}")
 print(f"      Data Quality: {'✅ PERFECT' if stock_check[4] == 0 else '❌ Issues found'}")
@@ -66,7 +66,7 @@ options_check = conn.execute(
 """
 ).fetchone()
 
-print(f"\n   📈 Options Data:")
+print("\n   📈 Options Data:")
 print(f"      Records: {options_check[0]:,}")
 print(f"      Period: {options_check[4]} to {options_check[5]}")
 print(f"      Inverted Spreads: {options_check[2]}")

@@ -39,7 +39,7 @@ def quick_assessment():
     """
     ).fetchone()
 
-    print(f"price_history table:")
+    print("price_history table:")
     print(f"  ✅ Records: {stock_data[0]:,}")
     print(f"  ✅ Symbols: {stock_data[1]} (Unity only)")
     print(f"  ✅ Date range: {stock_data[2]} to {stock_data[3]}")
@@ -65,7 +65,7 @@ def quick_assessment():
     if gaps > 0:
         print(f"  ⚠️  Trading day gaps: {gaps} (possible missing data)")
     else:
-        print(f"  ✅ No significant data gaps")
+        print("  ✅ No significant data gaps")
 
     # Unity minute data
     minute_data = conn.execute(
@@ -75,7 +75,7 @@ def quick_assessment():
     """
     ).fetchone()
 
-    print(f"\nunity_stock_1min table:")
+    print("\nunity_stock_1min table:")
     print(f"  Records: {minute_data[0]:,}")
     print(f"  Trading days: {minute_data[1]}")
 
@@ -99,7 +99,7 @@ def quick_assessment():
     """
     ).fetchone()
 
-    print(f"unity_options_daily table (PRIMARY OPTIONS DATA):")
+    print("unity_options_daily table (PRIMARY OPTIONS DATA):")
     print(f"  ✅ Records: {options_data[0]:,}")
     print(f"  ✅ Trading days: {options_data[1]} (days with actual trades)")
     print(f"  ✅ Unique contracts: {options_data[2]:,}")
@@ -117,7 +117,7 @@ def quick_assessment():
         "options_ticks",
     ]
 
-    print(f"\nRedundant options tables:")
+    print("\nRedundant options tables:")
     for table in old_tables:
         try:
             count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
@@ -144,7 +144,7 @@ def quick_assessment():
     """
     ).fetchone()
 
-    print(f"fred_series table:")
+    print("fred_series table:")
     print(f"  ✅ Economic indicators: {fred_data[0]}")
     print(f"  ✅ Frequencies: {fred_data[1]} (daily, monthly, etc.)")
     print(f"  ✅ Data coverage: {fred_data[2]} to {fred_data[3]}")
@@ -162,7 +162,7 @@ def quick_assessment():
     """
     ).fetchone()
 
-    print(f"\nfred_observations table:")
+    print("\nfred_observations table:")
     print(f"  ✅ Observations: {fred_obs[0]:,}")
     print(f"  ✅ Series tracked: {fred_obs[1]}")
     print(f"  ✅ Date range: {fred_obs[2]} to {fred_obs[3]}")
@@ -170,7 +170,7 @@ def quick_assessment():
         print(f"  ⚠️  Null values: {fred_obs[4]} (normal for economic data)")
 
     # Sample indicators
-    print(f"\n  Key economic indicators:")
+    print("\n  Key economic indicators:")
     indicators = conn.execute(
         """
         SELECT series_id, title, frequency, observation_end
@@ -257,7 +257,7 @@ def quick_assessment():
     print("  ⚠️  Multiple redundant tables should be cleaned up")
 
     # Calculate database size reduction
-    print(f"\n💾 CLEANUP IMPACT:")
+    print("\n💾 CLEANUP IMPACT:")
     total_records = sum(
         [
             conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
@@ -269,7 +269,7 @@ def quick_assessment():
         ]
     )
     print(f"  Removing ~{total_records:,} redundant records")
-    print(f"  Keeping essential data in core tables")
+    print("  Keeping essential data in core tables")
 
     conn.close()
 

@@ -51,6 +51,12 @@ ignore = [
 "investigate_greek_issues.py" = ["F841"]  # Temporary analysis file
 "validate_database_comprehensive.py" = ["F841", "B007"]  # Temporary validation file
 "scripts/analyze_data_structure.py" = ["E722"]  # Temporary analysis file
+"duckdb_performance_analysis.py" = ["F841", "B023", "B007", "B904", "SIM117"]  # Performance analysis
+"optimization_integration_test.py" = ["E402", "F841"]  # Test file
+"standalone_optimization_test.py" = ["F841", "B007"]  # Test file
+"wheel_optimization_analysis.py" = ["F841", "B007", "F402"]  # Analysis file
+"src/unity_wheel/optimization/*.py" = ["F841"]  # Optimization module
+"tools/**/*.py" = ["E722", "F841", "B007"]  # Utility scripts
 
 [tool.pytest.ini_options]
 minversion = "6.0"

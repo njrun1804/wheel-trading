@@ -61,7 +61,7 @@ def display_dashboard():
         print(f"UNITY WHEEL TRADING MONITOR - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("=" * 60)
 
-        print(f"\nMARKET DATA:")
+        print("\nMARKET DATA:")
         print(f"  Unity Price:  ${metrics.get('unity_price', 0):.2f}")
         print(f"  Volatility:   {metrics.get('volatility', 0):.1%}")
 
@@ -79,19 +79,19 @@ def display_dashboard():
             vol_status = "🟢 LOW - INCREASE SIZE"
         print(f"  Status:       {vol_status}")
 
-        print(f"\nPOSITION STATUS:")
+        print("\nPOSITION STATUS:")
         print(f"  Open Puts:    {metrics.get('open_puts', 0)}/3")
         print(f"  Cash Free:    ${metrics.get('cash_available', 0):,.0f}")
 
-        print(f"\nRECOMMENDED PARAMETERS:")
+        print("\nRECOMMENDED PARAMETERS:")
         if vol > 0.80:
-            print(f"  Delta:        0.40")
-            print(f"  DTE:          21-30")
-            print(f"  Position:     10%")
+            print("  Delta:        0.40")
+            print("  DTE:          21-30")
+            print("  Position:     10%")
         else:
-            print(f"  Delta:        0.35")
-            print(f"  DTE:          30-45")
-            print(f"  Position:     15-20%")
+            print("  Delta:        0.35")
+            print("  DTE:          30-45")
+            print("  Position:     15-20%")
 
         print("\n" + "=" * 60)
         print("Press Ctrl+C to exit | Refreshing in 30s...")
