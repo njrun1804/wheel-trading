@@ -7,7 +7,8 @@ that automatically retrieves credentials from SecretManager.
 
 from typing import Any, Dict, Optional
 
-from ..secrets.integration import SecretInjector, get_schwab_credentials
+from ..secrets.integration import SecretInjector
+from ..secrets import SecretManager
 from ..utils.logging import get_logger
 from .auth_client import AuthClient as BaseAuthClient
 
@@ -46,11 +47,12 @@ class AuthClient(BaseAuthClient):
         """
         # Get credentials from SecretManager if not provided
         if use_secret_manager and (not client_id or not client_secret):
-            logger.info("Retrieving Schwab credentials from SecretManager")
+            logger.info("Retrieving credentials from SecretManager")
             try:
-                creds = get_schwab_credentials()
-                client_id = client_id or creds["client_id"]
-                client_secret = client_secret or creds["client_secret"]
+                manager = SecretManager()
+                creds = manager.get_credentials("schwab")
+                client_id = client_id or creds.get("client_id")
+                client_secret = client_secret or creds.get("client_secret")
             except Exception as e:
                 logger.error(f"Failed to retrieve credentials from SecretManager: {e}")
                 if not client_id or not client_secret:

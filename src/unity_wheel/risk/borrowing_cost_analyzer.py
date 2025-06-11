@@ -7,7 +7,9 @@ when considering positions.
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
+
+from ..math import CalculationResult
 
 import numpy as np
 
@@ -85,10 +87,21 @@ class BorrowingCostAnalyzer:
     CONFIDENCE_MULTIPLIER = 1.0  # No safety factor
     TAX_ADJUSTMENT = 1.0  # Tax-free environment
 
-    def __init__(self):
-        """Initialize with configuration."""
+    def __init__(self, rate_fetcher: Optional[Callable[[str], float]] = None, auto_update: bool = False):
+        """Initialize with configuration.
+
+        Parameters
+        ----------
+        rate_fetcher : Callable[[str], float] or None
+            Optional callback to fetch real-time borrowing rates.
+        auto_update : bool
+            If ``True`` the analyzer fetches fresh rates before each
+            allocation analysis.
+        """
         self.config = get_config()
         self.sources: Dict[str, BorrowingSource] = {}
+        self.rate_fetcher = rate_fetcher
+        self.auto_update = auto_update
         self._setup_default_sources()
 
     def _setup_default_sources(self):
@@ -127,9 +140,32 @@ class BorrowingCostAnalyzer:
             },
         )
 
+    def update_rates(self) -> Dict[str, float]:
+        """Update borrowing rates using the configured fetcher."""
+        if not self.rate_fetcher:
+            return {}
+
+        updates: Dict[str, float] = {}
+        for name, source in self.sources.items():
+            try:
+                new_rate = self.rate_fetcher(name)
+                if new_rate is not None and new_rate > 0:
+                    source.annual_rate = new_rate
+                    updates[name] = new_rate
+            except Exception as exc:  # pragma: no cover - defensive
+                logger.warning(
+                    "rate_update_failed",
+                    extra={"source": name, "error": str(exc)},
+                )
+
+        if updates:
+            logger.info("rates_updated", extra={"updates": updates})
+
+        return updates
+
     def calculate_hurdle_rate(
         self, borrowing_source: str, holding_period_days: int = 45, include_tax: bool = True
-    ) -> float:
+    ) -> CalculationResult:
         """
         Calculate the minimum return needed to justify borrowing.
 
@@ -158,8 +194,12 @@ class BorrowingCostAnalyzer:
             },
         )
 
-        # Pure borrowing rate (no adjustments in tax-free environment)
-        return base_rate
+        hurdle = base_rate * self.CONFIDENCE_MULTIPLIER
+
+        if include_tax and self.TAX_ADJUSTMENT != 0:
+            hurdle /= self.TAX_ADJUSTMENT
+
+        return CalculationResult(hurdle, 0.95, [])
 
     def analyze_position_allocation(
         self,
@@ -182,6 +222,10 @@ class BorrowingCostAnalyzer:
         Returns:
             CapitalAllocationResult with recommendation
         """
+        # Optionally refresh borrowing rates
+        if self.auto_update:
+            self.update_rates()
+
         # Adjust expected return by confidence
         adjusted_return = expected_annual_return * confidence
 

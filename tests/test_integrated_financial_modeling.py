@@ -294,3 +294,22 @@ class TestAdvancedFinancialModeling:
         # Leveraged VaR should be higher
         assert var_result["var_leveraged"] > var_result["var_basic"]
         assert var_result["cvar_leveraged"] > var_result["cvar_basic"]
+
+    def test_portfolio_leverage_optimization(self, modeler):
+        """Portfolio-wide leverage optimization using Monte Carlo."""
+
+        portfolio = [
+            {"expected_return": 0.20, "volatility": 0.50, "weight": 0.6},
+            {"expected_return": 0.15, "volatility": 0.30, "weight": 0.4},
+        ]
+
+        result = modeler.optimize_portfolio_leverage(
+            portfolio=portfolio,
+            max_leverage=1.5,
+            n_points=5,
+            n_simulations=500,
+            random_seed=42,
+        )
+
+        assert 1.0 <= result.optimal_leverage <= 1.5
+        assert len(result.leverage_curve) == 5

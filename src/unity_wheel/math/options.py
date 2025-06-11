@@ -11,11 +11,25 @@ from typing import Literal, NamedTuple, Optional, Tuple, Union, overload
 import numpy as np
 import numpy.typing as npt
 from scipy.stats import norm
+from functools import lru_cache
 
 from ..storage.cache.general_cache import cached
 from ..utils import RecoveryStrategy, get_feature_flags, get_logger, timed_operation, with_recovery
 
 logger = get_logger(__name__)
+
+# Cache frequently used values of the normal CDF for scalar inputs
+@lru_cache(maxsize=100)
+def _cached_norm_cdf_scalar(x: float) -> float:
+    """Cached wrapper around scipy's norm.cdf for scalar values."""
+    return float(norm.cdf(x))
+
+
+def norm_cdf_cached(x: FloatOrArray) -> FloatOrArray:
+    """Compute norm.cdf with a small LRU cache for scalar inputs."""
+    if np.ndim(x) == 0:
+        return _cached_norm_cdf_scalar(float(x))
+    return norm.cdf(x)
 
 # Type aliases
 FloatArray = npt.NDArray[np.float64]
@@ -251,10 +265,10 @@ def black_scholes_price_validated(
 
         # Calculate prices
         if option_type == "call":
-            call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+            call_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d2)
             value = call_price
         else:
-            put_price = K * np.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+            put_price = K * np.exp(-r * T) * norm_cdf_cached(-d2) - S * norm_cdf_cached(-d1)
             value = put_price
 
         # Validate bounds
@@ -272,8 +286,8 @@ def black_scholes_price_validated(
         # Put-call parity check (if we can)
         if T > 0 and sigma > 0:
             # Calculate both prices for parity check
-            call_val = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
-            put_val = K * np.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+            call_val = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d2)
+            put_val = K * np.exp(-r * T) * norm_cdf_cached(-d2) - S * norm_cdf_cached(-d1)
 
             # Put-call parity: C - P = S - K*exp(-rT)
             parity_lhs = call_val - put_val
@@ -387,9 +401,9 @@ def calculate_all_greeks(
 
         # Delta
         if option_type == "call":
-            greeks["delta"] = norm.cdf(d1)
+            greeks["delta"] = norm_cdf_cached(d1)
         else:
-            greeks["delta"] = norm.cdf(d1) - 1
+            greeks["delta"] = norm_cdf_cached(d1) - 1
 
         # Gamma
         greeks["gamma"] = norm.pdf(d1) / (S * sigma * sqrt_T)
@@ -397,10 +411,10 @@ def calculate_all_greeks(
         # Theta
         term1 = -S * norm.pdf(d1) * sigma / (2 * sqrt_T)
         if option_type == "call":
-            term2 = -r * K * np.exp(-r * T) * norm.cdf(d2)
+            term2 = -r * K * np.exp(-r * T) * norm_cdf_cached(d2)
             greeks["theta"] = (term1 + term2) / 365  # Convert to per day
         else:
-            term2 = r * K * np.exp(-r * T) * norm.cdf(-d2)
+            term2 = r * K * np.exp(-r * T) * norm_cdf_cached(-d2)
             greeks["theta"] = (term1 + term2) / 365
 
         # Vega
@@ -408,9 +422,9 @@ def calculate_all_greeks(
 
         # Rho
         if option_type == "call":
-            greeks["rho"] = K * T * np.exp(-r * T) * norm.cdf(d2) / 100  # Per 1% change
+            greeks["rho"] = K * T * np.exp(-r * T) * norm_cdf_cached(d2) / 100  # Per 1% change
         else:
-            greeks["rho"] = -K * T * np.exp(-r * T) * norm.cdf(-d2) / 100
+            greeks["rho"] = -K * T * np.exp(-r * T) * norm_cdf_cached(-d2) / 100
 
         # Advanced Greeks (if feature enabled)
         feature_flags = get_feature_flags()
@@ -571,9 +585,9 @@ def implied_volatility_validated(
         vega = S * norm.pdf(d1) * sqrt_T
 
         if option_type == "call":
-            bs_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d1 - sigma * sqrt_T)
+            bs_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d1 - sigma * sqrt_T)
         else:
-            bs_price = K * np.exp(-r * T) * norm.cdf(-(d1 - sigma * sqrt_T)) - S * norm.cdf(-d1)
+            bs_price = K * np.exp(-r * T) * norm_cdf_cached(-(d1 - sigma * sqrt_T)) - S * norm_cdf_cached(-d1)
 
         price_diff = bs_price - option_price
 
@@ -696,9 +710,9 @@ def probability_itm_validated(
 
         # Risk-neutral probability
         if option_type == "call":
-            prob = norm.cdf(d2)
+            prob = norm_cdf_cached(d2)
         else:
-            prob = norm.cdf(-d2)
+            prob = norm_cdf_cached(-d2)
 
         # Validate probability
         if prob < 0 or prob > 1:

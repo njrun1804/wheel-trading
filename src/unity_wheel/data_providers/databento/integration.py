@@ -120,57 +120,62 @@ class DatabentoIntegration:
 
         market_timestamp = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
 
-        for expiry in expirations:
-            try:
-                # Fetch option chain with historical timestamp
-                chain = await self.client.get_option_chain(
-                    underlying=underlying, expiration=expiry, timestamp=market_timestamp
-                )
+        semaphore = asyncio.Semaphore(3)
 
-                # Get definitions
-                definitions = await self.client._get_definitions(underlying, expiry)
-
-                # Create lookup
-                def_map = {d.instrument_id: d for d in definitions}
-
-                # Analyze puts for wheel entry
-                for put_quote in chain.puts:
-                    if put_quote.instrument_id not in def_map:
-                        continue
-
-                    defn = def_map[put_quote.instrument_id]
-
-                    # Calculate Greeks and metrics
-                    metrics = await self._calculate_option_metrics(
-                        quote=put_quote, definition=defn, spot_price=spot_price, option_type="put"
+        async def analyze_expiry(expiry: datetime) -> List[Dict]:
+            local_candidates: List[Dict] = []
+            async with semaphore:
+                try:
+                    chain = await self.client.get_option_chain(
+                        underlying=underlying, expiration=expiry, timestamp=market_timestamp
                     )
 
-                    # Filter by criteria
-                    if (
-                        abs(metrics["delta"] - target_delta) < 0.05
-                        and metrics["premium_pct"] >= min_premium_pct
-                    ):
+                    definitions = await self.client._get_definitions(underlying, expiry)
+                    def_map = {d.instrument_id: d for d in definitions}
 
-                        candidates.append(
-                            {
-                                "instrument_id": put_quote.instrument_id,
-                                "symbol": defn.raw_symbol,
-                                "strike": float(defn.strike_price),
-                                "expiration": defn.expiration,
-                                "dte": defn.days_to_expiry,
-                                "bid": float(put_quote.bid_price),
-                                "ask": float(put_quote.ask_price),
-                                "mid": float(put_quote.mid_price),
-                                "spread_pct": float(put_quote.spread_pct),
-                                **metrics,
-                            }
+                    for put_quote in chain.puts:
+                        if put_quote.instrument_id not in def_map:
+                            continue
+
+                        defn = def_map[put_quote.instrument_id]
+
+                        metrics = await self._calculate_option_metrics(
+                            quote=put_quote,
+                            definition=defn,
+                            spot_price=spot_price,
+                            option_type="put",
                         )
 
-            except Exception as e:
-                logger.error(
-                    "chain_analysis_error",
-                    extra={"expiration": expiry.isoformat(), "error": str(e)},
-                )
+                        if (
+                            abs(metrics["delta"] - target_delta) < 0.05
+                            and metrics["premium_pct"] >= min_premium_pct
+                        ):
+                            local_candidates.append(
+                                {
+                                    "instrument_id": put_quote.instrument_id,
+                                    "symbol": defn.raw_symbol,
+                                    "strike": float(defn.strike_price),
+                                    "expiration": defn.expiration,
+                                    "dte": defn.days_to_expiry,
+                                    "bid": float(put_quote.bid_price),
+                                    "ask": float(put_quote.ask_price),
+                                    "mid": float(put_quote.mid_price),
+                                    "spread_pct": float(put_quote.spread_pct),
+                                    **metrics,
+                                }
+                            )
+                except Exception as e:  # noqa: BLE001
+                    logger.error(
+                        "chain_analysis_error",
+                        extra={"expiration": expiry.isoformat(), "error": str(e)},
+                    )
+            return local_candidates
+
+        tasks = [asyncio.create_task(analyze_expiry(exp)) for exp in expirations]
+        results = await asyncio.gather(*tasks)
+
+        for cand_list in results:
+            candidates.extend(cand_list)
 
         # Sort by expected return
         candidates.sort(key=lambda x: x["expected_return"], reverse=True)
