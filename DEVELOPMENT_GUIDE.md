@@ -465,9 +465,9 @@ python -m unity_wheel.validate
 
 # Check configuration
 python -c "
-from src.config.loader import get_config_loader
-loader = get_config_loader()
-print(loader.generate_health_report())
+from src.config import get_config_service
+service = get_config_service()
+print(service.get_health_report())
 "
 
 # Test integrations

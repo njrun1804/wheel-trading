@@ -236,7 +236,7 @@ Once dependencies are fixed, implement these test optimizations:
    @pytest.mark.timeout(120)
    def test_backtest_optimization():
        pass
-   
+
    @pytest.mark.unit
    @pytest.mark.timeout(10)
    def test_black_scholes():
@@ -253,7 +253,7 @@ Once dependencies are fixed, implement these test optimizations:
    ```python
    # conftest.py
    from hypothesis import settings, Verbosity
-   
+
    settings.register_profile("ci", max_examples=10, verbosity=Verbosity.normal)
    settings.register_profile("dev", max_examples=100, verbosity=Verbosity.verbose)
    settings.register_profile("debug", max_examples=1000, verbosity=Verbosity.debug)

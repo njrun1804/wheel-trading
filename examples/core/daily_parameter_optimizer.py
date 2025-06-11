@@ -17,7 +17,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.analytics.dynamic_optimizer import DynamicOptimizer, MarketState
+from src.unity_wheel.adaptive import DynamicOptimizer, MarketState
 from src.unity_wheel.backtesting import WheelBacktester
 from src.unity_wheel.data_providers.databento import DatabentoClient, PriceHistoryLoader
 from src.unity_wheel.risk.advanced_financial_modeling import AdvancedFinancialModeling

@@ -180,39 +180,39 @@ else
 fi
 ```
 
-## Known Issues & Solutions
+## Recent Architectural Improvements (Resolved Issues)
 
-### Issue 1: File System Artifacts
-**Problem**: 20+ duplicate files with " 2" suffix (macOS/iCloud sync issues)
-**Impact**: Confusion, potential import errors, cluttered structure
-**Solution**:
-```bash
-# Clean all duplicate files
-find . -name "* 2.*" -type f -delete
-# Remove redundant directories
-rm -rf ml_engine/ risk_engine/ strategy_engine/
-# Remove nested duplicate
-rm -rf Documents/com~apple~CloudDocs/
-```
+### ✅ File System Cleanup (Completed)
+**Previous Issue**: 20+ duplicate files with " 2" suffix
+**Resolution**: All duplicate files removed, redundant directories deleted
 
-### Issue 2: Mixed Async/Sync Patterns
-**Problem**: Some modules async (databento), others sync (calculations)
-**Impact**: Complex error handling, harder testing
-**Solution**: Define clear async boundaries at data provider level
+### ✅ Async/Sync Boundaries (Completed)
+**Previous Issue**: Mixed async/sync patterns
+**Resolution**: Clear boundaries defined in `data_providers/base/interfaces.py`
+- Async for I/O operations
+- Sync for calculations
+- CachedDataProvider bridges the gap
 
-### Issue 3: Lazy Import Overuse
-**Problem**: Lazy imports scattered throughout codebase
-**Impact**: Runtime overhead, poor IDE support
-**Solution**: Replace with proper dependency injection pattern
+### ✅ Dependency Injection (Completed)
+**Previous Issue**: Lazy imports causing circular dependencies
+**Resolution**: Proper DI via `AdvisorDependencies` in `api/dependencies.py`
+- No more lazy imports
+- Better testability with mocks
+- Clear dependency graph
 
-### Issue 4: Configuration Access
-**Problem**: Config loaded in multiple places
-**Impact**: Hard to mock for testing, inconsistent behavior
-**Solution**: Create centralized ConfigurationService
+### ✅ Centralized Configuration (Completed)
+**Previous Issue**: Config loaded in multiple places
+**Resolution**: Thread-safe `ConfigurationService` singleton in `config/service.py`
+- Single point of access
+- Performance tracking
+- Health monitoring
 
-### Issue 5: Python Version Compatibility
-**Problem**: pyproject.toml may require Python ^3.12
-**Solution**: Verify supports `python = "^3.8"` for broader compatibility
+### ✅ Consolidated Adaptive Logic (Completed)
+**Previous Issue**: Adaptive code scattered across modules
+**Resolution**: All adaptive logic now in `adaptive/` module
+- RegimeDetector moved from risk/
+- DynamicOptimizer moved from analytics/
+- Convenience functions in __init__.py
 
 ## Agent Capabilities
 
@@ -277,15 +277,27 @@ USE_PURE_PYTHON=true  # or false if packages available
 CONTAINER_MODE=true
 ```
 
-## File Structure Priority
+## File Structure (Current - Clean)
 ```
-src/unity_wheel/          # Primary codebase - USE THIS
-├── api/advisor.py         # Main recommendation logic
+src/unity_wheel/          # Primary codebase
+├── api/
+│   ├── advisor.py         # Main recommendation logic
+│   └── dependencies.py    # Dependency injection (NEW)
+├── adaptive/              # All adaptive logic (CONSOLIDATED)
+│   ├── adaptive_base.py   # Base classes
+│   ├── adaptive_wheel.py  # Unity implementation
+│   ├── regime_detector.py # Moved from risk/
+│   └── dynamic_optimizer.py # Moved from analytics/
+├── config/
+│   ├── service.py         # ConfigurationService singleton (NEW)
+│   ├── loader.py          # Config loading
+│   └── schema.py          # Config schemas
+├── data_providers/
+│   └── base/
+│       └── interfaces.py  # Async/sync interfaces (NEW)
 ├── math/options.py        # Options calculations
 ├── risk/analytics.py      # Risk management
 └── strategy/wheel.py      # Wheel strategy
-
-unity_trading/             # DUPLICATE - SHOULD BE REMOVED
 ```
 
 ## Agent Best Practices

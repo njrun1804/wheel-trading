@@ -45,7 +45,7 @@ python run.py --version
 python run.py --export-metrics
 
 # View configuration health
-python -c "from src.config.loader import get_config_loader; print(get_config_loader().generate_health_report())"
+python -c "from src.config import get_config_service; print(get_config_service().get_health_report())"
 
 # Check feature flags
 python -c "from unity_wheel.utils import get_feature_flags; f = get_feature_flags(); print(f.get_status_report()['summary'])"

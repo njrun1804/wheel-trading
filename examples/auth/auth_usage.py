@@ -14,7 +14,7 @@ import os
 from datetime import datetime
 from typing import Any, Dict
 
-from src.config import get_config_loader
+from src.config import get_config
 from src.unity_wheel.auth.client_v2 import AuthClient
 from src.unity_wheel.utils.logging import get_logger
 
@@ -50,7 +50,7 @@ async def demo_api_usage():
     logger.info("Starting API usage demo")
 
     # Load config
-    config = get_config_loader().load()
+    config = get_config()
 
     # Create auth client
     auth_client = AuthClient(
@@ -138,7 +138,7 @@ async def demo_error_recovery():
     # 2. Rate limit handling
     # 3. Cache fallback on errors
 
-    config = get_config_loader().load()
+    config = get_config()
     auth_client = AuthClient(
         client_id=config.auth.client_id.get_secret_value(),
         client_secret=config.auth.client_secret.get_secret_value(),

@@ -40,6 +40,10 @@ Unity Wheel Trading Bot v2.2 - An autonomous options wheel strategy recommendati
 - **Unified Position Sizing**: Single implementation via `DynamicPositionSizer`
 - **Better Error Handling**: No bare except clauses, specific exceptions only
 - **Backtest Validated**: 27-30% annual returns with optimized params (delta=0.40, DTE=30)
+- **Centralized Configuration**: Thread-safe ConfigurationService singleton
+- **Dependency Injection**: Replaced lazy imports for better testability
+- **Consolidated Adaptive Logic**: All adaptive code now in `adaptive/` module
+- **Clear Async/Sync Boundaries**: Documented architecture with proper interfaces
 
 ### ⚠️ Known File System Issues (Clean these up!)
 ```bash
@@ -124,7 +128,15 @@ src/unity_wheel/utils/trading_calendar_enhancements.py # Early closes & earnings
 # Configuration
 src/config/schema.py:924                    # All config schemas
 src/config/loader.py                        # Config loading & tracking
+src/config/service.py                        # ConfigurationService singleton (NEW!)
 config.yaml                                  # Main config file
+
+# Adaptive System
+src/unity_wheel/adaptive/__init__.py        # Convenience functions & exports
+src/unity_wheel/adaptive/adaptive_base.py   # Base adaptive classes
+src/unity_wheel/adaptive/adaptive_wheel.py  # Unity-specific implementation
+src/unity_wheel/adaptive/regime_detector.py # Volatility regime detection
+src/unity_wheel/adaptive/dynamic_optimizer.py # Parameter optimization
 
 # Data Integration
 src/unity_wheel/schwab/client.py                       # Schwab API client
@@ -439,12 +451,12 @@ src/
 └── tests/           # Property-based tests
 ```
 
-### Architectural Improvements Needed
-1. **Centralize Configuration**: Create ConfigurationService singleton
-2. **Define Async Boundaries**: Clear async/sync module separation
-3. **Consolidate Adaptive Logic**: All adaptive code → adaptive/ module
-4. **Replace Lazy Imports**: Use proper dependency injection
-5. **Standardize Data Providers**: Align provider structures
+### Architecture Features
+1. **Centralized Configuration**: ConfigurationService singleton provides thread-safe access
+2. **Clear Async/Sync Boundaries**: All I/O is async, all calculations are sync
+3. **Consolidated Adaptive Logic**: All adaptive code in `adaptive/` module
+4. **Dependency Injection**: No lazy imports, proper DI via `AdvisorDependencies`
+5. **Standardized Data Providers**: Common interfaces in `data_providers/base/interfaces.py`
 
 ### Design Principles & Guidelines
 
@@ -488,15 +500,20 @@ pytest tests/test_performance_benchmarks.py::test_black_scholes_performance -v
 
 ### Quick Config Access
 ```python
-# Get config value
-from src.config.loader import get_config
+# Get config value (now using centralized service)
+from src.config import get_config
 config = get_config()
 delta = config.strategy.greeks.delta_target      # 0.30
 max_pos = config.risk.position_limits.max_position_size  # 0.20
 
-# Check config health
-from src.config.loader import get_config_loader
-print(get_config_loader().generate_health_report())
+# Using the ConfigurationService directly
+from src.config import get_config_service
+service = get_config_service()
+print(service.get_health_report())  # View access stats and health
+
+# Reload configuration
+from src.config import reload_config
+reload_config()  # Reload from disk
 
 # Override via environment
 export WHEEL_STRATEGY__GREEKS__DELTA_TARGET=0.25
@@ -525,11 +542,11 @@ operations:
 
 ### Unity Adaptive System (Key Feature)
 
-The project includes a Unity-specific adaptive system at `src/unity_wheel/strategy/adaptive_base.py:221` that adjusts position sizing based on market conditions.
+The project includes a Unity-specific adaptive system in the `src/unity_wheel/adaptive/` module that adjusts position sizing based on market conditions. All adaptive logic is now centralized in this module.
 
 #### Quick Usage:
 ```python
-from src.unity_wheel.strategy.adaptive_wheel import create_adaptive_wheel_strategy
+from src.unity_wheel.adaptive import create_adaptive_wheel_strategy
 
 # Simple usage
 strategy = create_adaptive_wheel_strategy(portfolio_value=200000)
@@ -555,13 +572,18 @@ if rec['should_trade']:
 
 #### Quick Volatility Check:
 ```python
+# Import convenience functions from adaptive module
+from src.unity_wheel.adaptive import get_volatility_tier, should_trade_unity, get_position_size_multiplier
+
 # Check current Unity volatility tier
-from src.unity_wheel.adaptive import get_volatility_tier
-tier = get_volatility_tier(current_vol=0.65)  # Returns: 'caution'
+tier = get_volatility_tier(current_vol=0.65)  # Returns: 'elevated'
 
 # Check if should trade
-from src.unity_wheel.adaptive import should_trade_unity
-can_trade = should_trade_unity(vol=0.85, drawdown=-0.15, days_to_earnings=10)  # Returns: (False, "High volatility")
+can_trade, reason = should_trade_unity(volatility=0.85, drawdown=-0.15, days_to_earnings=10)
+# Returns: (True, "Conditions acceptable") or (False, "Volatility 85% exceeds 150% limit")
+
+# Get position size adjustment
+multiplier = get_position_size_multiplier(volatility=0.85, drawdown=-0.05)  # Returns: 0.5
 ```
 
 #### Usage Examples:
@@ -665,6 +687,24 @@ Maximize: **CAGR - 0.20 × |CVaR₉₅|** with **½-Kelly** position sizing
 2. **Managed through 38 gap events** (>10% moves)
 3. **Optimized parameters**: Delta 0.40, DTE 30
 4. **Conservative sizing**: 20% max position
+
+## Dependency Injection
+
+Use dependency injection for testing and customization:
+
+```python
+from src.unity_wheel.api.dependencies import create_dependencies
+from src.unity_wheel.api.advisor import WheelAdvisor
+
+# Create custom dependencies for testing
+deps = create_dependencies(
+    wheel_parameters=WheelParameters(target_delta=0.40),
+    market_validator=MockValidator()  # Use mock for testing
+)
+
+# Create advisor with custom dependencies
+advisor = WheelAdvisor(dependencies=deps)
+```
 
 ## Common Workflows
 

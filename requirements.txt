@@ -24,8 +24,18 @@ python-dotenv~=1.0.1
 pytz~=2024.1         # Consider migrating to zoneinfo
 rich~=13.9.0         # Terminal formatting
 
-# Machine Learning
+# Machine Learning & Statistics
 scikit-learn~=1.4.0  # Used for regime detection and anomaly detection
+statsmodels~=0.14.0  # Statistical modeling and testing
+
+# API & External Services
+databento~=0.48.0    # Market data API client
+tenacity~=9.0.0      # Retry logic for API calls
+
+# CLI & Utils
+click~=8.1.7         # CLI framework
+python-dateutil~=2.9.0  # Date parsing utilities
+typing-extensions~=4.12.2  # Python typing backports
 
 # Cloud Integration
 google-cloud-secret-manager~=2.20.2
