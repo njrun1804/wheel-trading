@@ -266,3 +266,39 @@ class TestBorrowingCostAnalyzer:
         # Longer holding period = higher borrowing cost
         if short_result.borrowing_cost > 0 and long_result.borrowing_cost > 0:
             assert long_result.borrowing_cost > short_result.borrowing_cost
+
+    def test_real_time_rate_update(self, analyzer):
+        """Rates can be updated from a live provider."""
+
+        def fake_provider(name: str) -> float:
+            if name == "schwab_margin":
+                return 0.08  # new rate
+            return analyzer.sources[name].annual_rate
+
+        analyzer.rate_fetcher = fake_provider
+        updates = analyzer.update_rates()
+
+        assert updates["schwab_margin"] == 0.08
+        assert analyzer.sources["schwab_margin"].annual_rate == 0.08
+
+    def test_auto_update_on_analysis(self, analyzer):
+        """Auto update triggers during analysis."""
+
+        calls = []
+
+        def provider(name: str) -> float:
+            calls.append(name)
+            return 0.09 if name == "schwab_margin" else analyzer.sources[name].annual_rate
+
+        analyzer.rate_fetcher = provider
+        analyzer.auto_update = True
+
+        analyzer.analyze_position_allocation(
+            position_size=5000,
+            expected_annual_return=0.15,
+            confidence=0.9,
+            available_cash=0,
+        )
+
+        assert "schwab_margin" in calls
+        assert analyzer.sources["schwab_margin"].annual_rate == 0.09
