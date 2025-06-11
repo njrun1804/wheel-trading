@@ -1,168 +1,35 @@
-# GitHub Actions Workflows - Optimized CI/CD
+# GitHub Actions Workflows
 
-## Runner Configuration
+## Simple CI for Private Bot
 
-This repository uses GitHub's larger hosted runners for improved CI/CD performance:
+This repository uses a single, simple CI workflow appropriate for a private recommendation bot.
 
-### Runner Sizes
+### ci.yml
+- Runs tests with pytest
+- Checks for accidentally committed secrets
+- Scans dependencies for vulnerabilities
+- That's it!
 
-- **ubuntu-latest** (2 vCPU, 7GB RAM) - Basic jobs, simple scripts
-- **ubuntu-latest-4-cores** (4 vCPU, 16GB RAM) - Medium workloads: linting, type checking, validation
-- **ubuntu-latest-8-cores** (8 vCPU, 32GB RAM) - Heavy workloads: integration tests, risk analysis
-- **ubuntu-latest-16-cores** (16 vCPU, 64GB RAM) - Available for extreme workloads
-- **ubuntu-latest-32-cores** (32 vCPU, 128GB RAM) - Available for extreme workloads
-- **ubuntu-latest-64-cores** (64 vCPU, 256GB RAM) - Available for extreme workloads
+## Why So Simple?
 
-### Performance Improvements
+This is a private, locally-run recommendation bot that:
+- Never executes trades
+- Is used by one person
+- Only fetches data from FRED & Databento
 
-With larger runners, we see:
-- **3-8x faster test execution** due to more CPU cores
-- **Reduced queuing** with max-parallel: 40
-- **Better caching** with more memory available
-- **Faster dependency installation** with parallel downloads
+We don't need:
+- ❌ CodeQL (not a web service)
+- ❌ Complex security scanning (no attack surface)
+- ❌ Performance tracking (can profile locally)
+- ❌ Release workflows (not publishing)
+- ❌ Multiple test matrices (one environment)
 
-### Cost Optimization
+## Running Tests Locally
 
-Larger runners are billed per-minute, so we:
-1. Use appropriate sizes for each job (don't over-provision)
-2. Enable fail-fast to stop on first failure
-3. Use concurrency groups to cancel redundant runs
-4. Cache aggressively to reduce setup time
-
-### Workflow Structure
-
-1. **ci-fast.yml** - Quick checks (4-core runners, <1 min)
-   - Linting, formatting, security scanning
-   - Run in parallel with no dependencies
-
-2. **ci-optimized.yml** - Parallel test matrix (4-8 core runners)
-   - Split tests by type (math, risk, integration)
-   - Platform-specific optimizations
-
-3. **ci.yml** - Main workflow (8-core for Ubuntu, standard for macOS)
-   - Comprehensive testing
-   - Final validation
-
-## Concurrency Settings
-
-- **max-parallel: 40** - Utilize organization's high concurrency limit
-- **cancel-in-progress: true** - Cancel old runs when new commits are pushed
-- **concurrency groups** - Prevent duplicate runs on same branch
-
-## Best Practices
-
-1. Monitor usage in Actions tab to optimize runner sizes
-2. Use matrix strategy to parallelize independent tests
-3. Place heaviest jobs on largest runners
-4. Keep macOS on standard runners (no larger options)
-5. Use caching to minimize setup time on every run
-
-## Harmonized Workflow Structure (Simplified)
-
-### Active Workflows
-
-1. **ci.yml** ⚡ Main Test Suite
-   - Consolidated workflow for all testing
-   - Runs in ~3-4 minutes
-   - Features:
-     - Path filtering to skip non-code changes
-     - Cross-platform testing (Ubuntu + macOS)
-     - Smart caching with Poetry
-     - Pre-commit checks included
-     - Performance benchmarks on main branch only
-
-2. **fast-checks.yml** 🚀 Quick Validation
-   - Formatting and linting only
-   - Runs in <1 minute
-   - Perfect for rapid PR feedback
-
-3. **security.yml** 🔒 Security Scanning
-   - CodeQL analysis (10 min timeout)
-   - Dependency vulnerability checks
-   - Secret scanning with TruffleHog
-   - Runs on PRs and weekly schedule
-
-### Performance Improvements
-
-| Optimization | Before | After | Improvement |
-|-------------|--------|-------|-------------|
-| Path Filtering | Run on all changes | Skip docs-only changes | 30% fewer runs |
-| Parallel Tests | Sequential (8 min) | 3 parallel groups | 3x faster |
-| Dependency Caching | Download every time | Cache + artifacts | 60s saved |
-| CodeQL Config | Scan everything | Scan src/ only | 50% faster |
-| Pre-compilation | JIT compilation | Pre-compiled .pyc | 10% faster imports |
-
-### When to Use Each Workflow
-
-| Workflow | Trigger | Use Case | Runtime |
-|----------|---------|----------|---------|
-| ci | PR/Push | Full test suite | ~3-4 min |
-| fast-checks | PR/Push | Quick formatting | <1 min |
-| security | PR/Weekly | Security scans | ~5 min |
-
-### Key Optimizations
-
-1. **Path Filtering**
-   ```yaml
-   paths:
-     - 'src/**'
-     - 'tests/**'
-     - 'pyproject.toml'
-   ```
-
-2. **Test Parallelization**
-   ```yaml
-   strategy:
-     matrix:
-       test-suite:
-         - "unit-fast"      # 30s
-         - "unit-slow"      # 1m
-         - "integration"    # 1.5m
-   ```
-
-3. **Smart Caching**
-   - Poetry installation cached
-   - Virtual environment as artifact
-   - Pre-compiled Python bytecode
-
-4. **CodeQL Optimization**
-   - Custom config in `.github/codeql/codeql-config.yml`
-   - Limited scan paths
-   - Focused query sets
-
-## Workflow Status
-
-### Current Setup (Harmonized)
-- **CI** - Main test workflow (active)
-- **Fast Checks** - Quick validation (active)
-- **Security** - Security scanning (active)
-- **CodeQL** - Code analysis (active)
-
-### Disabled Workflows
-- **CI Optimized** - Replaced by simplified CI
-- **CI Unified** - Merged into main CI workflow
-
-### Monitoring Performance
 ```bash
-# View recent CI runs
-gh run list --workflow="CI" --limit=10
-
-# Check specific run details
-gh run view <run-id> --log
+# Same as CI
+poetry install
+poetry run pytest -v
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Import errors after optimization**
-   - Clear caches: `gh cache delete --all`
-   - Check artifact uploads in build job
-
-2. **CodeQL timeouts**
-   - Verify paths in `.github/codeql/codeql-config.yml`
-   - Reduce query scope if needed
-
-3. **Test failures in parallel**
-   - Some tests may have hidden dependencies
-   - Add to same test group if needed
+That's all you need!

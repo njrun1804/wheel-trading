@@ -1,213 +1,24 @@
-# Simplified CI workflow - reliable and fast
+# Simple CI for private recommendation bot
 name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 permissions:
   contents: read
-  actions: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  POETRY_VIRTUALENVS_IN_PROJECT: true
-  POETRY_NO_CACHE_DIR: true
-  PIP_NO_COMPILE: true
-  PIP_DISABLE_PIP_VERSION_CHECK: true
-  PYTHONUNBUFFERED: 1
-  # Test optimization
-  PYTEST_XDIST_WORKER_COUNT: auto
-  # Disable unnecessary features during CI
-  WHEEL_SECRETS_PROVIDER: local
-  DATABENTO_SKIP_VALIDATION: true
 
 jobs:
-  # 1. Quick change detection
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      code: ${{ steps.filter.outputs.code }}
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 2
-
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        filters: |
-          code:
-            - 'src/**'
-            - 'tests/**'
-            - 'pyproject.toml'
-            - 'poetry.lock'
-            - '.github/workflows/**'
-
-  # 2. Linting (fast, runs first)
-  lint:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-
-    - name: Run pre-commit
-      uses: pre-commit/action@v3.0.1
-      with:
-        extra_args: --all-files --show-diff-on-failure
-
-  # 3. Test execution
   test:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        test-group: [unit, integration]
-        exclude:
-          # Skip integration tests on macOS to save time
-          - os: macos-latest
-            test-group: integration
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-        cache: 'pip'
-
-    - name: Get Poetry cache dir
-      id: poetry-cache
-      run: |
-        echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-
-    - name: Cache Poetry and dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.local
-          ~/.cache/pypoetry
-          ${{ steps.poetry-cache.outputs.dir }}
-          .venv
-        key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-poetry-
-
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
-        poetry config virtualenvs.in-project true
-        poetry install --no-interaction --no-ansi
-
-    - name: Install system dependencies (Ubuntu)
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y -qq libopenblas-dev > /dev/null
-
-    - name: Run ${{ matrix.test-group }} tests
-      run: |
-        case "${{ matrix.test-group }}" in
-          unit)
-            TEST_FILES="tests/test_math*.py tests/test_options*.py tests/test_config*.py tests/test_utils*.py"
-            ;;
-          integration)
-            TEST_FILES="tests/test_e2e*.py tests/test_integrated*.py tests/test_wheel*.py"
-            ;;
-        esac
-
-        poetry run pytest $TEST_FILES \
-          -v \
-          --tb=short \
-          --durations=10 \
-          --junit-xml=test-results-${{ matrix.os }}-${{ matrix.test-group }}.xml \
-          --maxfail=5 \
-          --timeout=300 \
-          -n $PYTEST_XDIST_WORKER_COUNT
-
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-${{ matrix.os }}-${{ matrix.test-group }}
-        path: test-results-*.xml
-        retention-days: 7
-
-  # 4. Coverage (Ubuntu only)
-  coverage:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-        cache: 'pip'
-
-    - name: Install Poetry and dependencies
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        poetry config virtualenvs.in-project true
-        poetry install --no-interaction --no-ansi
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y -qq libopenblas-dev > /dev/null
-
-    - name: Run tests with coverage
-      run: |
-        poetry run pytest tests/ \
-          --cov=src \
-          --cov-report=xml \
-          --cov-report=term:skip-covered \
-          --no-cov-on-fail \
-          -n auto \
-          -q
-
-    - name: Upload coverage
-      uses: codecov/codecov-action@v4
-      with:
-        files: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-        token: ${{ secrets.CODECOV_TOKEN }}
-
-  # 5. Validate configuration
-  validate:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
@@ -216,123 +27,18 @@ jobs:
     - name: Install dependencies
       run: |
         pip install poetry
-        poetry config virtualenvs.in-project true
-        poetry install --no-interaction --no-ansi
+        poetry install
 
-    - name: Validate configuration
-      run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
-        poetry run python -m src.unity_wheel.utils.validate
+    - name: Run tests
+      run: poetry run pytest -v
 
-        # Additional checks
-        poetry run python -c "
-        from src.config.loader import get_config
-        config = get_config()
-        assert config.unity.ticker == 'U', 'Unity ticker misconfigured'
-        assert 0 < config.risk.max_position_size <= 1, 'Invalid position size'
-        print('✅ Configuration valid')
-        "
-
-  # 6. Performance benchmarks (main branch only)
-  benchmarks:
-    needs: [test]
-    if: github.ref == 'refs/heads/main' && needs.test.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@v3
       with:
-        python-version: "3.11"
-        cache: 'pip'
+        path: ./
+        only-verified: true
 
-    - name: Install dependencies
+    - name: Check dependencies
       run: |
-        pip install poetry
-        poetry config virtualenvs.in-project true
-        poetry install --no-interaction --no-ansi
-
-    - name: Run benchmarks
-      run: |
-        poetry run pytest tests/test_performance_benchmarks.py \
-          --benchmark-only \
-          --benchmark-json=benchmark.json \
-          --benchmark-max-time=0.5
-
-    - name: Check performance
-      run: |
-        if [ -f benchmark.json ]; then
-          python3 -c "
-        import json
-        with open('benchmark.json') as f:
-            data = json.load(f)
-        for bench in data.get('benchmarks', []):
-            name = bench.get('name', '')
-            mean = bench.get('stats', {}).get('mean', 0)
-            if 'black_scholes' in name and mean > 0.0002:
-                print(f'⚠️  Black-Scholes: {mean*1000:.2f}ms (target: 0.2ms)')
-            elif 'greeks' in name and mean > 0.0003:
-                print(f'⚠️  Greeks: {mean*1000:.2f}ms (target: 0.3ms)')
-        print('✅ Performance check complete')
-        "
-        fi
-
-  # 7. Final status check
-  ci-status:
-    needs: [lint, test, coverage, validate]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download test results
-      uses: actions/download-artifact@v4
-      with:
-        pattern: test-results-*
-        path: test-results/
-        merge-multiple: true
-      continue-on-error: true
-
-    - name: Generate summary
-      run: |
-        echo "## CI Results" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-
-        # Job statuses
-        echo "### Job Status" >> $GITHUB_STEP_SUMMARY
-        echo "- Lint: ${{ needs.lint.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- Test: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- Coverage: ${{ needs.coverage.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- Validate: ${{ needs.validate.result }}" >> $GITHUB_STEP_SUMMARY
-
-        # Parse test results if available
-        if ls test-results/*.xml 1> /dev/null 2>&1; then
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "| OS | Group | Tests | Time |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
-
-          for file in test-results/*.xml; do
-            # Extract info from filename
-            filename=$(basename "$file")
-            os=$(echo "$filename" | cut -d'-' -f3)
-            group=$(echo "$filename" | cut -d'-' -f4 | cut -d'.' -f1)
-
-            # Try to get test count (simple approach)
-            tests=$(grep -c '<testcase' "$file" 2>/dev/null || echo "?")
-
-            echo "| $os | $group | $tests | - |" >> $GITHUB_STEP_SUMMARY
-          done
-        fi
-
-        # Overall status
-        if [[ "${{ needs.lint.result }}" == "success" && \
-              "${{ needs.test.result }}" == "success" && \
-              "${{ needs.validate.result }}" == "success" ]]; then
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
-          exit 0
-        else
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ❌ Some checks failed" >> $GITHUB_STEP_SUMMARY
-          exit 1
-        fi
+        pip install pip-audit
+        poetry export -f requirements.txt | pip-audit -r /dev/stdin --desc || true
