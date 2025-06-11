@@ -21,8 +21,8 @@ python run.py --diagnose
 # View performance metrics
 python run.py --performance
 
-# Continuous monitoring
-./scripts/monitor.sh
+# Quick health check
+./scripts/health_check.sh
 ```
 
 ## 💰 Cost Efficiency
@@ -167,8 +167,8 @@ python run.py --performance
 # Export metrics dashboard
 python run.py --export-metrics
 
-# Continuous monitoring
-./scripts/monitor.sh
+# Run a health check
+./scripts/health_check.sh
 
 # Run all autonomous checks
 ./scripts/autonomous-checks.sh
