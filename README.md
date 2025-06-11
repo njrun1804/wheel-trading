@@ -30,7 +30,7 @@ python run.py --performance
 - **< $50/month** total operational cost
 - No streaming subscriptions
 - Intelligent caching reduces API calls by 90%+
-- Optional cloud backup (GCS) for long-term analysis
+- Uses Google Cloud Secret Manager for credentials (only GCP dependency)
 
 ## 🏗️ Architecture
 
@@ -56,10 +56,6 @@ Store in cache → Generate recommendation
    - 30-day automatic cleanup
    - < 5GB typical usage
 
-2. **Optional GCS Backup**
-   - Raw API responses
-   - Parquet exports for analysis
-   - Lifecycle policies for cost control
 
 ## 📁 Project Structure
 
@@ -102,6 +98,8 @@ pip install -r requirements-dev.txt
 
 # Set up credentials
 python scripts/setup-secrets.py
+# This stores your API keys in Google Cloud Secret Manager or
+# local encrypted storage depending on the environment.
 
 # Verify installation
 python -m unity_wheel.validate
@@ -301,6 +299,8 @@ poetry run pre-commit run --all-files
 - OAuth tokens auto-refresh
 - No credentials in code or config
 - Machine-specific encryption keys
+- Google Cloud Secret Manager stores credentials securely
+  (the project's only Google Cloud dependency)
 
 ## 📝 Documentation
 
