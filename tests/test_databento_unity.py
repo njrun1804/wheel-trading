@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.unity_wheel.data_providers.databento.unity_utils import (
+from src.unity_wheel.data_providers.databento.integration import (
     chain,
     get_equity_bars,
     get_wheel_candidates,

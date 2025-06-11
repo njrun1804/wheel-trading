@@ -29,7 +29,7 @@ from src.unity_wheel.math.options import (
 )
 from src.unity_wheel.models.account import Account
 from src.unity_wheel.models.position import Position, PositionType
-from src.unity_wheel.risk.analytics import RiskAnalytics
+from src.unity_wheel.risk.analytics import RiskAnalyzer
 
 
 class TestMathPerformance:

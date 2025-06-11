@@ -24,6 +24,11 @@
     "vscode": {
       "transport": "sse",
       "command": "http://localhost:3000/mcp"
+    },
+    "python_analysis": {
+      "transport": "stdio",
+      "command": "python3",
+      "args": ["scripts/python-mcp-server.py"]
     }
   }
 }
