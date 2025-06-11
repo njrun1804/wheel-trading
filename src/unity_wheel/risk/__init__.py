@@ -1,5 +1,6 @@
 """Risk measurement and analytics."""
 
+from .advanced_financial_modeling import AdvancedFinancialModeling
 from .analytics import RiskAnalyzer, RiskLevel, RiskLimitBreach, RiskLimits, RiskMetrics
 from .borrowing_cost_analyzer import (
     BorrowingCostAnalyzer,
@@ -10,6 +11,7 @@ from .borrowing_cost_analyzer import (
 from .unity_margin import MarginResult, UnityMarginCalculator, calculate_unity_margin_requirement
 
 __all__ = [
+    "AdvancedFinancialModeling",
     "RiskAnalyzer",
     "RiskLevel",
     "RiskLimitBreach",

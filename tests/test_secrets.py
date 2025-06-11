@@ -14,9 +14,8 @@ from src.unity_wheel.secrets.exceptions import (
     SecretProviderError,
 )
 from src.unity_wheel.secrets.integration import (
-    SecretInjector,
     get_databento_api_key,
-    get_ofred_api_key,
+    get_fred_api_key,
     migrate_env_to_secrets,
 )
 from src.unity_wheel.secrets.manager import EnvironmentSecretBackend, LocalSecretBackend

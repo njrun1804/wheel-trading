@@ -17,7 +17,14 @@ from decimal import Decimal
 import numpy as np
 import psutil
 import pytest
-from memory_profiler import memory_usage
+
+try:
+    from memory_profiler import memory_usage
+
+    HAS_MEMORY_PROFILER = True
+except ImportError:
+    HAS_MEMORY_PROFILER = False
+    memory_usage = None
 
 from src.unity_wheel.api.advisor import WheelAdvisor
 from src.unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
@@ -28,8 +35,8 @@ from src.unity_wheel.math.options import (
     probability_itm_validated,
 )
 from src.unity_wheel.models.account import Account
-from src.unity_wheel.models.position import OptionType, Position, PositionType
-from src.unity_wheel.risk.analytics import RiskAnalytics
+from src.unity_wheel.models.position import Position, PositionType
+from src.unity_wheel.risk.analytics import RiskAnalyzer
 
 
 class TestMathPerformance:
@@ -124,7 +131,7 @@ class TestRiskAnalyticsPerformance:
         np.random.seed(42)
         returns = np.random.normal(0.001, 0.02, 1000)
 
-        analytics = RiskAnalytics()
+        analytics = RiskAnalyzer()
 
         # Warm up
         for _ in range(10):
@@ -150,24 +157,12 @@ class TestRiskAnalyticsPerformance:
         for i in range(20):  # 20 positions
             positions.append(
                 Position(
-                    symbol=f"U  250117P000{40+i}000",
+                    symbol=f"U250117P00{40+i}000",  # Proper OCC format
                     quantity=-5,
-                    position_type=PositionType.OPTION,
-                    option_type=OptionType.PUT,
-                    strike=Decimal(str(40 + i)),
-                    expiration=datetime.now() + timedelta(days=45),
-                    underlying="U",
-                    cost_basis=Decimal("5.00"),
-                    current_price=Decimal("1.00"),
-                    multiplier=100,
-                    delta=Decimal("-0.30"),
-                    gamma=Decimal("0.015"),
-                    theta=Decimal("-0.08"),
-                    vega=Decimal("0.12"),
                 )
             )
 
-        analytics = RiskAnalytics()
+        analytics = RiskAnalyzer()
 
         # Time portfolio calculations
         start = time.perf_counter()
@@ -197,20 +192,8 @@ class TestRecommendationPerformance:
 
         positions = [
             Position(
-                symbol="U  241220P00040000",
+                symbol="U241220P00040000",  # Proper OCC format
                 quantity=-5,
-                position_type=PositionType.OPTION,
-                option_type=OptionType.PUT,
-                strike=Decimal("40"),
-                expiration=datetime.now() + timedelta(days=45),
-                underlying="U",
-                cost_basis=Decimal("6.00"),
-                current_price=Decimal("1.20"),
-                multiplier=100,
-                delta=Decimal("-0.28"),
-                gamma=Decimal("0.015"),
-                theta=Decimal("-0.08"),
-                vega=Decimal("0.12"),
             )
         ]
 
@@ -267,6 +250,7 @@ class TestRecommendationPerformance:
 class TestMemoryUsage:
     """Test memory usage stays within bounds."""
 
+    @pytest.mark.skipif(not HAS_MEMORY_PROFILER, reason="memory_profiler not installed")
     def test_typical_portfolio_memory(self):
         """Test memory usage for typical portfolio operations."""
 
@@ -276,16 +260,8 @@ class TestMemoryUsage:
             for i in range(50):
                 positions.append(
                     Position(
-                        symbol=f"U  250117P000{40+i}000",
+                        symbol=f"U250117P00{40+i}000",  # Proper OCC format
                         quantity=-5,
-                        position_type=PositionType.OPTION,
-                        option_type=OptionType.PUT,
-                        strike=Decimal(str(40 + i)),
-                        expiration=datetime.now() + timedelta(days=45),
-                        underlying="U",
-                        cost_basis=Decimal("5.00"),
-                        current_price=Decimal("1.00"),
-                        multiplier=100,
                     )
                 )
 
@@ -317,7 +293,7 @@ class TestMemoryUsage:
                 market_data[underlying] = chains
 
             # Run analytics
-            analytics = RiskAnalytics()
+            analytics = RiskAnalyzer()
             analytics.calculate_portfolio_metrics(
                 positions=positions,
                 account_value=Decimal("1000000"),

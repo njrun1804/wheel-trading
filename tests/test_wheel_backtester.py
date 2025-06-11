@@ -90,28 +90,34 @@ class TestWheelBacktester:
         """Test basic backtest functionality."""
 
         # Mock data loading
-        async def mock_connection():
-            conn = Mock()
-            conn.execute = Mock(
-                return_value=Mock(
-                    fetchall=Mock(
-                        return_value=[
-                            (
-                                row.name,
-                                row["open"],
-                                row["high"],
-                                row["low"],
-                                row["close"],
-                                row["volume"],
-                            )
-                            for _, row in sample_price_data.iterrows()
-                        ]
-                    )
+        mock_conn = Mock()
+        mock_conn.execute = Mock(
+            return_value=Mock(
+                fetchall=Mock(
+                    return_value=[
+                        (
+                            row.name,
+                            row["open"],
+                            row["high"],
+                            row["low"],
+                            row["close"],
+                            row["volume"],
+                        )
+                        for _, row in sample_price_data.iterrows()
+                    ]
                 )
             )
-            return conn
+        )
 
-        mock_storage.cache.connection = mock_connection
+        # Create async context manager
+        class MockConnectionContext:
+            async def __aenter__(self):
+                return mock_conn
+
+            async def __aexit__(self, *args):
+                pass
+
+        mock_storage.cache.connection = Mock(return_value=MockConnectionContext())
 
         # Run backtest
         results = await backtester.backtest_strategy(
@@ -137,12 +143,18 @@ class TestWheelBacktester:
 
         price_data = [(date, p, p + 1, p - 1, p, 1000000) for date, p in zip(dates, prices)]
 
-        async def mock_connection():
-            conn = Mock()
-            conn.execute = Mock(return_value=Mock(fetchall=Mock(return_value=price_data)))
-            return conn
+        mock_conn = Mock()
+        mock_conn.execute = Mock(return_value=Mock(fetchall=Mock(return_value=price_data)))
 
-        mock_storage.cache.connection = mock_connection
+        # Create async context manager
+        class MockConnectionContext:
+            async def __aenter__(self):
+                return mock_conn
+
+            async def __aexit__(self, *args):
+                pass
+
+        mock_storage.cache.connection = Mock(return_value=MockConnectionContext())
 
         # Run backtest
         results = await backtester.backtest_strategy(
@@ -309,8 +321,8 @@ class TestWheelBacktester:
         # Test delta 0.30 strike selection
         strike = backtester._find_backtest_strike(current_price=35.0, target_delta=0.30)
 
-        # Should be about 3-5% OTM
-        assert 33.0 <= strike <= 34.0
+        # Should be about 7-10% OTM for delta 0.30
+        assert 31.0 <= strike <= 33.0
         # Should round to $2.50 for Unity
         assert strike % 2.5 == 0
 

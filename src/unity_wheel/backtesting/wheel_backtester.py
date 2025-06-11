@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+import duckdb
 import numpy as np
 import pandas as pd
 
@@ -172,6 +174,10 @@ class WheelBacktester:
             if self._is_near_earnings(date):
                 earnings_avoided += 1
                 daily_equity.append(capital)
+                if len(daily_equity) > 1:
+                    daily_returns.append((daily_equity[-1] - daily_equity[-2]) / daily_equity[-2])
+                else:
+                    daily_returns.append(0)
                 continue
 
             # Manage active position
@@ -183,8 +189,8 @@ class WheelBacktester:
                     positions.append(active_position)
                     active_position = None
 
-            # Enter new position if none active
-            elif capital > params.max_position_size * initial_capital:
+            # Enter new position if none active and have sufficient capital
+            elif capital > 0 and not self._is_near_earnings(date):
                 # Simulate finding optimal strike
                 strike = self._find_backtest_strike(current_price, params.target_delta)
 
@@ -428,7 +434,57 @@ class WheelBacktester:
         start_date: datetime,
         end_date: datetime,
     ) -> pd.DataFrame:
-        """Load historical price data."""
+        """Load historical price data from unified database."""
+        # Use unified database for backtesting
+        unified_db_path = Path("data/unified_wheel_trading.duckdb")
+
+        if unified_db_path.exists():
+            # Use analytical database with pre-calculated features
+            conn = duckdb.connect(str(unified_db_path), read_only=True)
+
+            result = conn.execute(
+                """
+                SELECT
+                    date,
+                    open,
+                    high,
+                    low,
+                    close,
+                    volume,
+                    returns,
+                    volatility_20d,
+                    volatility_250d,
+                    risk_free_rate
+                FROM backtest_features
+                WHERE symbol = ? AND date BETWEEN ? AND ?
+                ORDER BY date
+                """,
+                [symbol, start_date.date(), end_date.date()],
+            ).fetchall()
+
+            conn.close()
+
+            if result:
+                df = pd.DataFrame(
+                    result,
+                    columns=[
+                        "date",
+                        "open",
+                        "high",
+                        "low",
+                        "close",
+                        "volume",
+                        "returns",
+                        "volatility_20d",
+                        "volatility_250d",
+                        "risk_free_rate",
+                    ],
+                )
+                df["date"] = pd.to_datetime(df["date"])
+                df.set_index("date", inplace=True)
+                return df
+
+        # Fallback to operational database
         async with self.storage.cache.connection() as conn:
             result = conn.execute(
                 """

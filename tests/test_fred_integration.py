@@ -6,7 +6,8 @@ from datetime import date as Date
 from datetime import timedelta
 
 from src.unity_wheel.data_providers.base import FREDDataManager
-from src.unity_wheel.secrets.integration import SecretNotFoundError, get_ofred_api_key
+from src.unity_wheel.secrets.exceptions import SecretNotFoundError
+from src.unity_wheel.secrets.integration import get_fred_api_key
 from src.unity_wheel.storage.storage import Storage
 from src.unity_wheel.utils import setup_structured_logging as setup_logging
 
@@ -21,7 +22,7 @@ async def test_integration():
     # Test 1: Secret Management
     print("\n1. Testing Secret Management:")
     try:
-        api_key = get_ofred_api_key()
+        api_key = get_fred_api_key()
         print("   ✅ FRED API key loaded successfully")
     except SecretNotFoundError:
         print("   ❌ FRED API key not found")
