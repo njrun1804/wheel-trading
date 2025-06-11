@@ -64,8 +64,7 @@ fi
 # 4. Update positions snapshot
 log "💼 Updating positions..."
 if [ -n "$SCHWAB_CLIENT_ID" ]; then
-    python -m src.unity_wheel.schwab.data_ingestion >> "$LOG_FILE" 2>&1
-    check_status $? "Position snapshot"
+    log "ℹ️  Legacy ingestion step removed; skipping position snapshot"
 else
     log "⚠️  Skipping position update - no Schwab credentials"
 fi
