@@ -3,6 +3,7 @@ import os
 import pytest
 
 from src.unity_wheel.utils import validate
+from tests.helpers import has_fred_api_key
 
 
 def test_check_python_version() -> None:
@@ -22,8 +23,8 @@ def test_check_imports() -> None:
 
 
 @pytest.mark.skipif(
-    not os.environ.get("FRED_API_KEY"),
-    reason="FRED_API_KEY not set",
+    not has_fred_api_key(),
+    reason="FRED API key not configured in SecretManager",
 )
 def test_run_all_checks_partial(monkeypatch) -> None:
     """run_all_checks should aggregate failures."""

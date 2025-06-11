@@ -1,0 +1,236 @@
+name: Performance Monitor
+# Tracks CI/CD performance and creates optimization reports
+
+on:
+  workflow_run:
+    workflows: ["Test Suite", "Quick Checks", "Security"]
+    types:
+      - completed
+  schedule:
+    # Weekly performance review
+    - cron: '0 9 * * 1'  # Monday 9 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  collect-metrics:
+    name: Collect Performance Metrics
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Collect workflow metrics
+      id: metrics
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const days = 7;
+          const since = new Date();
+          since.setDate(since.getDate() - days);
+          
+          // Get all workflow runs
+          const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            created: `>=${since.toISOString()}`,
+            per_page: 100
+          });
+          
+          // Calculate metrics by workflow
+          const metrics = {};
+          
+          for (const run of runs) {
+            const workflow = run.name;
+            if (!metrics[workflow]) {
+              metrics[workflow] = {
+                total: 0,
+                success: 0,
+                failure: 0,
+                cancelled: 0,
+                durations: [],
+                queueTimes: []
+              };
+            }
+            
+            metrics[workflow].total++;
+            metrics[workflow][run.conclusion]++;
+            
+            if (run.conclusion === 'success' || run.conclusion === 'failure') {
+              const duration = new Date(run.updated_at) - new Date(run.created_at);
+              metrics[workflow].durations.push(duration / 1000 / 60); // minutes
+              
+              const queueTime = new Date(run.run_started_at) - new Date(run.created_at);
+              metrics[workflow].queueTimes.push(queueTime / 1000); // seconds
+            }
+          }
+          
+          // Calculate statistics
+          const report = {};
+          for (const [workflow, data] of Object.entries(metrics)) {
+            if (data.total === 0) continue;
+            
+            const avgDuration = data.durations.length > 0 
+              ? data.durations.reduce((a, b) => a + b, 0) / data.durations.length 
+              : 0;
+            const avgQueueTime = data.queueTimes.length > 0 
+              ? data.queueTimes.reduce((a, b) => a + b, 0) / data.queueTimes.length 
+              : 0;
+            
+            report[workflow] = {
+              total: data.total,
+              successRate: ((data.success || 0) / data.total * 100).toFixed(1),
+              avgDuration: avgDuration.toFixed(1),
+              avgQueueTime: avgQueueTime.toFixed(1),
+              p95Duration: data.durations.length > 0 
+                ? data.durations.sort((a, b) => a - b)[Math.floor(data.durations.length * 0.95)]?.toFixed(1) || 'N/A'
+                : 'N/A'
+            };
+          }
+          
+          return report;
+          
+    - name: Check for performance issues
+      id: issues
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const metrics = ${{ steps.metrics.outputs.result }};
+          const issues = [];
+          
+          // Define thresholds
+          const thresholds = {
+            'Test Suite': { maxDuration: 10, minSuccessRate: 90 },
+            'Quick Checks': { maxDuration: 5, minSuccessRate: 95 },
+            'Security': { maxDuration: 10, minSuccessRate: 85 }
+          };
+          
+          for (const [workflow, data] of Object.entries(metrics)) {
+            const threshold = thresholds[workflow];
+            if (!threshold) continue;
+            
+            if (parseFloat(data.avgDuration) > threshold.maxDuration) {
+              issues.push(`⚠️ ${workflow}: Average duration ${data.avgDuration}min exceeds ${threshold.maxDuration}min`);
+            }
+            
+            if (parseFloat(data.successRate) < threshold.minSuccessRate) {
+              issues.push(`❌ ${workflow}: Success rate ${data.successRate}% below ${threshold.minSuccessRate}%`);
+            }
+            
+            if (parseFloat(data.avgQueueTime) > 60) {
+              issues.push(`🐌 ${workflow}: High queue time ${data.avgQueueTime}s`);
+            }
+          }
+          
+          return issues;
+          
+    - name: Generate performance report
+      if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const metrics = ${{ steps.metrics.outputs.result }};
+          const issues = ${{ steps.issues.outputs.result }};
+          
+          let body = `# 📊 CI/CD Performance Report
+          
+          **Period**: Last 7 days  
+          **Generated**: ${new Date().toISOString()}
+          
+          ## Workflow Performance
+          
+          | Workflow | Runs | Success Rate | Avg Duration | P95 Duration | Avg Queue Time |
+          |----------|------|--------------|--------------|--------------|----------------|
+          `;
+          
+          for (const [workflow, data] of Object.entries(metrics)) {
+            body += `| ${workflow} | ${data.total} | ${data.successRate}% | ${data.avgDuration}min | ${data.p95Duration}min | ${data.avgQueueTime}s |\n`;
+          }
+          
+          if (issues.length > 0) {
+            body += `\n## ⚠️ Performance Issues\n\n`;
+            for (const issue of issues) {
+              body += `- ${issue}\n`;
+            }
+          } else {
+            body += `\n## ✅ All workflows performing within thresholds\n`;
+          }
+          
+          body += `\n## Optimization Recommendations\n\n`;
+          
+          // Add recommendations based on data
+          const testSuite = metrics['Test Suite'];
+          if (testSuite && parseFloat(testSuite.avgDuration) > 8) {
+            body += `- Consider parallelizing more test groups to reduce Test Suite duration\n`;
+          }
+          
+          if (Object.values(metrics).some(m => parseFloat(m.avgQueueTime) > 30)) {
+            body += `- High queue times detected - consider using larger runners or reducing concurrent jobs\n`;
+          }
+          
+          // Check cache usage
+          try {
+            const cacheUsage = await github.rest.actions.getActionsCacheUsage({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            const cachePercentage = (cacheUsage.data.active_caches_size_in_bytes / (10 * 1024 * 1024 * 1024) * 100).toFixed(1);
+            body += `\n## Cache Usage\n\n`;
+            body += `- Active caches: ${cacheUsage.data.active_caches_count}\n`;
+            body += `- Cache size: ${(cacheUsage.data.active_caches_size_in_bytes / 1024 / 1024).toFixed(0)} MB (${cachePercentage}% of 10GB limit)\n`;
+            
+            if (parseFloat(cachePercentage) > 80) {
+              body += `- ⚠️ Cache usage is high - consider cleaning old caches\n`;
+            }
+          } catch (e) {
+            console.log('Could not fetch cache usage:', e.message);
+          }
+          
+          // Create or update issue
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'ci-performance',
+            state: 'open'
+          });
+          
+          if (issues.data.length > 0) {
+            // Update existing issue
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issues.data[0].number,
+              body: body
+            });
+            console.log(`Updated issue #${issues.data[0].number}`);
+          } else {
+            // Create new issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📊 CI/CD Performance Report',
+              body: body,
+              labels: ['ci-performance', 'automated']
+            });
+            console.log('Created new performance report issue');
+          }
+          
+    - name: Post metrics summary
+      if: always()
+      run: |
+        echo "## 📊 Performance Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Workflow performance metrics have been collected and analyzed." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "View the full report in the repository issues with label: \`ci-performance\`" >> $GITHUB_STEP_SUMMARY
