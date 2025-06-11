@@ -280,6 +280,19 @@ poetry run mypy src/ --strict
 poetry run pre-commit run --all-files
 ```
 
+### Container Quick Commands
+
+```bash
+# Setup container environment
+./.codex/container_setup.sh
+
+# Run container tests
+./.codex/container_test.sh
+
+# Commit changes quickly
+./.codex/container_commit.sh "your commit message"
+```
+
 ## 📈 Performance
 
 ### Calculation Benchmarks

@@ -68,7 +68,7 @@ Tests that everything is working:
 ```
 
 ### 💾 container_commit.sh
-Quick git commit for container changes:
+Stage and commit all changes in one step:
 ```bash
 ./.codex/container_commit.sh "your commit message"
 ```
