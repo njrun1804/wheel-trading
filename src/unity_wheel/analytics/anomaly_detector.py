@@ -4,17 +4,15 @@ Identifies when current market deviates from historical norms.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from datetime import datetime
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.ensemble import IsolationForest
 
-from ...config.loader import get_config
-from ..utils import get_logger, timed_operation, with_recovery
-from ..utils.recovery import RecoveryStrategy
+from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
 
@@ -34,7 +32,7 @@ class MarketAnomaly:
 
     anomaly_type: AnomalyType
     timestamp: datetime
-    metrics: Dict[str, float]
+    metrics: dict[str, float]
     z_score: float
     percentile: float
     historical_frequency: float  # How often this occurs
@@ -51,8 +49,8 @@ class AnomalyDetector:
         sensitivity: float = 2.5,  # Z-score threshold
     ):
         if symbol is None:
-            config = get_config()
-            symbol = config.unity.ticker
+            # Default to Unity ticker
+            symbol = "U"
         self.symbol = symbol
         self.lookback_days = lookback_days
         self.sensitivity = sensitivity
@@ -109,10 +107,10 @@ class AnomalyDetector:
     @timed_operation(threshold_ms=100)
     def detect_anomalies(
         self,
-        current_data: Dict[str, float],
+        current_data: dict[str, float],
         historical_data: pd.DataFrame,
-        option_data: Optional[Dict] = None,
-    ) -> List[MarketAnomaly]:
+        option_data: dict | None = None,
+    ) -> list[MarketAnomaly]:
         """
         Detect all types of anomalies in current market data.
 
@@ -163,8 +161,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_price_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect price-related anomalies."""
         anomalies = []
 
@@ -215,8 +213,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_volatility_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect volatility-related anomalies."""
         anomalies = []
 
@@ -246,8 +244,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_correlation_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect correlation breaks with market/sector."""
         anomalies = []
 
@@ -272,8 +270,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_option_anomalies(
-        self, option_data: Dict, historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, option_data: dict, historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect anomalies in options data."""
         anomalies = []
 
@@ -332,8 +330,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_ml_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Use ML to detect multi-factor anomalies."""
         anomalies = []
 
@@ -365,7 +363,7 @@ class AnomalyDetector:
 
         return anomalies
 
-    def _prepare_ml_features(self, current: Dict[str, float]) -> Optional[np.ndarray]:
+    def _prepare_ml_features(self, current: dict[str, float]) -> np.ndarray | None:
         """Prepare feature vector for ML anomaly detection."""
         feature_names = [
             "returns",
@@ -430,7 +428,7 @@ class AnomalyDetector:
 
         return rsi.iloc[-1] if len(rsi) > 0 else 50.0
 
-    def generate_anomaly_report(self, anomalies: List[MarketAnomaly]) -> List[str]:
+    def generate_anomaly_report(self, anomalies: list[MarketAnomaly]) -> list[str]:
         """Generate human-readable anomaly report."""
         report = ["=== MARKET ANOMALY REPORT ===", ""]
 

@@ -8,13 +8,11 @@ from dataclasses import dataclass
 
 import numpy as np
 from scipy import optimize, stats
-from unity_wheel.risk.pure_borrowing_analyzer import PureBorrowingAnalyzer
-
-from src.config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 from ..utils.random_utils import set_seed
 from .borrowing_cost_analyzer import BorrowingCostAnalyzer
+from .pure_borrowing_analyzer import PureBorrowingAnalyzer
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -89,9 +87,22 @@ class AdvancedFinancialModeling:
 
     def __init__(self, borrowing_analyzer: BorrowingCostAnalyzer | None = None):
         """Initialize with borrowing analyzer."""
-        self.config = get_config()
+        # TODO: Pass config through constructor
+        self.config = self._get_default_config()
         self.borrowing_analyzer = borrowing_analyzer or BorrowingCostAnalyzer()
         self.pure_analyzer = PureBorrowingAnalyzer()
+
+    def _get_default_config(self):
+        """Get default configuration."""
+
+        class DefaultConfig:
+            class unity:
+                ticker = "U"
+
+            class risk:
+                max_position_size = 0.20
+
+        return DefaultConfig()
 
     def monte_carlo_simulation(
         self,
@@ -678,9 +689,13 @@ class AdvancedFinancialModeling:
         weights = np.array([p.get("weight", 1.0) for p in portfolio], dtype=float)
         weights /= weights.sum()
 
-        expected = float(sum(w * p["expected_return"] for w, p in zip(weights, portfolio, strict=False)))
+        expected = float(
+            sum(w * p["expected_return"] for w, p in zip(weights, portfolio, strict=False))
+        )
         volatility = float(
-            np.sqrt(sum((w * p["volatility"]) ** 2 for w, p in zip(weights, portfolio, strict=False)))
+            np.sqrt(
+                sum((w * p["volatility"]) ** 2 for w, p in zip(weights, portfolio, strict=False))
+            )
         )
         horizon = max(int(p.get("time_horizon", 252)) for p in portfolio)
 
