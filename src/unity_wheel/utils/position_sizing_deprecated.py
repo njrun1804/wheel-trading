@@ -9,10 +9,7 @@ This module provides intelligent position sizing based on:
 import logging
 from dataclasses import dataclass
 
-from unity_wheel.utils.logging import StructuredLogger
-
-from src.config.loader import get_config
-
+from .logging import StructuredLogger
 from ..risk.unity_margin import UnityMarginCalculator
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -39,11 +36,24 @@ class PositionSizeResult:
 class DynamicPositionSizer:
     """Calculate dynamic position sizes based on multiple factors."""
 
-    def __init__(self):
+    def __init__(self, config=None):
         """Initialize with configuration."""
-        self.config = get_config()
+        # TODO: Fix config import - for now use defaults
+        self.config = config or self._get_default_config()
         self.margin_calculator = UnityMarginCalculator()
         self._load_limits()
+    
+    def _get_default_config(self):
+        """Get default configuration."""
+        class DefaultConfig:
+            class risk:
+                max_position_size = 0.20
+                max_margin_percent = 0.50
+                kelly_fraction = 0.25
+                class limits:
+                    max_contracts_per_trade = 100
+                    max_notional_percent = 0.50
+        return DefaultConfig()
 
     def _load_limits(self) -> None:
         """Load risk limits from configuration."""
