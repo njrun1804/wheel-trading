@@ -716,7 +716,7 @@ class WheelAdvisor:
         except Exception:  # pragma: no cover - duckdb optional in some envs
             return None
 
-        db_path = Path(os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb"))
+        db_path = Path(os.path.expanduser(config.storage.database_path))
         if not db_path.exists():
             return None
 

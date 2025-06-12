@@ -24,7 +24,7 @@ class ConfigurationLoader:
     change tracking, and self-tuning capabilities.
     """
 
-    def __init__(self, config_path: Union[str, Path] = "config.yaml"):
+    def __init__(self, config_path: Union[str, Path] = os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml")):
         self.config_path = Path(config_path)
         self.config: Optional[WheelConfig] = None
         self.raw_config: Dict[str, Any] = {}
@@ -481,7 +481,7 @@ class ConfigurationLoader:
 _config_loader: Optional[ConfigurationLoader] = None
 
 
-def get_config_loader(config_path: Union[str, Path] = "config.yaml") -> ConfigurationLoader:
+def get_config_loader(config_path: Union[str, Path] = os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml")) -> ConfigurationLoader:
     """Get or create configuration loader singleton."""
     global _config_loader
     if _config_loader is None:

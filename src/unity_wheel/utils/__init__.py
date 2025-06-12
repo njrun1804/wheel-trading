@@ -1,4 +1,3 @@
-# Temporary import from deprecated file for backward compatibility
 from .feature_flags import FeatureFlags, FeatureStatus, get_feature_flags
 from .logging import (
     DecisionLogger,
@@ -8,9 +7,7 @@ from .logging import (
     setup_structured_logging,
     timed_operation,
 )
-from .position_sizing_deprecated import PositionSizer
 
-# Temporary import from deprecated file for backward compatibility
 from .random_utils import set_seed
 from .recovery import (
     CircuitBreaker,

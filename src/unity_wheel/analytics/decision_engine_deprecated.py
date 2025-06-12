@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from unity_wheel.analytics.seasonality import SeasonalityDetector
 
-from ...config.loader import get_config
+from unity_wheel.config.loader import get_config
 from ..models.position import Position
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy

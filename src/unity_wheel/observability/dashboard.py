@@ -20,6 +20,10 @@ from ..metrics import metrics_collector
 from ..monitoring import get_performance_monitor
 from ..utils import StructuredLogger, get_feature_flags, get_logger
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(__name__)
 
@@ -107,7 +111,7 @@ class ObservabilityExporter:
 
         # Use unified DuckDB storage
         if storage_path is None:
-            storage_path = Path.home() / ".wheel_trading" / "cache" / "wheel_cache.duckdb"
+            storage_path = Path.home() / ".wheel_trading" / "cache" / Path(config.storage.database_path).name
         self.db_path = storage_path
 
     def _ensure_metrics_tables(self, conn: duckdb.DuckDBPyConnection) -> None:

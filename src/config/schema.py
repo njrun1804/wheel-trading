@@ -12,6 +12,10 @@ import yaml
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import SecretStr
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 class RollTriggers(BaseModel):
     """Roll trigger configuration."""
@@ -433,12 +437,12 @@ class AdaptiveConfig(BaseModel):
         default_factory=lambda: {
             "normal": RegimeParams(),
             "volatile": RegimeParams(
-                put_delta=0.25, target_dte=28, roll_profit_target=0.25, position_size_factor=0.7
+                put_delta=0.25, target_dte = config.trading.target_dte, roll_profit_target=0.25, position_size_factor=0.7
             ),
             "stressed": RegimeParams(
-                put_delta=0.20, target_dte=21, roll_profit_target=0.25, position_size_factor=0.5
+                put_delta=0.20, target_dte = config.trading.target_dte, roll_profit_target=0.25, position_size_factor=0.5
             ),
-            "low_volatility": RegimeParams(put_delta=0.35, target_dte=42, position_size_factor=1.2),
+            "low_volatility": RegimeParams(put_delta=0.35, target_dte = config.trading.target_dte, position_size_factor=1.2),
         }
     )
 
@@ -703,7 +707,7 @@ class DatabasePaths(BaseModel):
 
     performance: str = Field("~/.wheel_trading/performance.db", description="Performance DB")
     schwab_data: str = Field("~/.wheel_trading/schwab_data.db", description="Schwab data DB")
-    cache: str = Field("~/.wheel_trading/cache/wheel_cache.duckdb", description="Cache DB")
+    cache: str = Field(config.storage.database_path, description="Cache DB")
 
 
 class StorageConfig(BaseModel):

@@ -130,7 +130,7 @@ class DynamicPositionSizer:
         --------
         >>> sizer = DynamicPositionSizer(config)
         >>> result = sizer.calculate_position_size(
-        ...     portfolio_value=100000,
+        ...     portfolio_value = config.trading.portfolio_value,
         ...     buying_power=200000,
         ...     strike_price=45.0,
         ...     option_premium=1.50,

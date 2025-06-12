@@ -213,7 +213,7 @@ async def check_for_opportunities(
 
         # Check risk limits
         breaches = risk_checker.check_all_limits(
-            recommendation._asdict(), portfolio_value=100000, market_data=current_prices  # Default
+            recommendation._asdict(), portfolio_value = config.trading.portfolio_value, market_data=current_prices  # Default
         )
 
         # Log if interesting opportunity

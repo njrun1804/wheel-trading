@@ -37,6 +37,10 @@ from src.unity_wheel.risk import RiskLimits
 from src.unity_wheel.secrets.integration import SecretInjector
 from src.unity_wheel.strategy import WheelParameters
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Configure simple logging to avoid conflicts with StructuredLogger
 logging.basicConfig(
     level=logging.INFO,
@@ -102,8 +106,8 @@ def generate_recommendation(
 
     # Create risk limits (could be from config)
     risk_limits = RiskLimits(
-        max_var_95=0.05,
-        max_cvar_95=0.075,
+        max_var_95 = config.risk.max_var_95,
+        max_cvar_95 = config.risk.max_cvar_95,
         max_margin_utilization=0.5,
     )
     # Scale limits based on volatility regime

@@ -356,7 +356,7 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int):
 
 def main():
     """Main monitoring loop."""
-    db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+    db_path = os.path.expanduser(config.storage.database_path)
 
     if not os.path.exists(db_path):
         print(f"{Colors.RED}❌ Database not found at {db_path}{Colors.RESET}")

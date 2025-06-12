@@ -199,7 +199,7 @@ class EnvironmentValidator:
             from src.unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits
 
             # Create analyzer
-            limits = RiskLimits(max_var_95=0.05, max_cvar_95=0.075)
+            limits = RiskLimits(max_var_95 = config.risk.max_var_95, max_cvar_95 = config.risk.max_cvar_95)
             analyzer = RiskAnalyzer(limits)
 
             # Test VaR calculation

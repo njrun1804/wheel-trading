@@ -33,6 +33,10 @@ import pandas as pd
 
 from ..utils import get_logger
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 logger = get_logger(__name__)
 
 # Valid table names for security
@@ -66,7 +70,7 @@ class DuckDBCache:
     def __init__(self, config: Optional[CacheConfig] = None):
         self.config = config or CacheConfig()
         self.config.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.db_path = self.config.cache_dir / "wheel_cache.duckdb"
+        self.db_path = self.config.cache_dir / Path(config.storage.database_path).name
         self._conn: Optional[duckdb.DuckDBPyConnection] = None
         self._last_vacuum = datetime.min
 

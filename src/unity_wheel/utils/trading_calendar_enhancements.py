@@ -14,6 +14,10 @@ from ..math import CalculationResult
 
 from .trading_calendar import SimpleTradingCalendar
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 class EnhancedTradingCalendar(SimpleTradingCalendar):
     """Enhanced trading calendar with additional features.
@@ -255,7 +259,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
             Suggested entry date
         """
         # Calculate target DTE
-        target_dte = 45
+        target_dte = config.trading.target_dte
 
         # Work backwards from expiry
         entry_date = target_expiry - timedelta(days=target_dte)

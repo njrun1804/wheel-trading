@@ -14,6 +14,10 @@ from typing import Any
 
 import numpy as np
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 try:
     from ..models.greeks import Greeks
     from ..models.position import Position
@@ -467,7 +471,7 @@ def run_optimization_demo():
     """Demo of the optimization engine"""
 
     constraints = OptimizationConstraints(
-        max_position_size=0.30, target_return=0.15, risk_tolerance=0.12
+        max_position_size = config.trading.max_position_size, target_return=0.15, risk_tolerance=0.12
     )
 
     optimizer = PortfolioOptimizer(constraints)

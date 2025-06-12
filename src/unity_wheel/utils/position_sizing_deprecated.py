@@ -12,6 +12,10 @@ from dataclasses import dataclass
 from ..risk.unity_margin import UnityMarginCalculator
 from .logging import StructuredLogger
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 logger = StructuredLogger(logging.getLogger(__name__))
 
 
@@ -48,7 +52,7 @@ class DynamicPositionSizer:
 
         class DefaultConfig:
             class risk:
-                max_position_size = 0.20
+                max_position_size = config.trading.max_position_size
                 max_margin_percent = 0.50
                 kelly_fraction = 0.25
 
@@ -142,7 +146,7 @@ class DynamicPositionSizer:
         --------
         >>> sizer = DynamicPositionSizer(config)
         >>> result = sizer.calculate_position_size(
-        ...     portfolio_value=100000,
+        ...     portfolio_value = config.trading.portfolio_value,
         ...     buying_power=200000,
         ...     strike_price=45.0,
         ...     option_premium=1.50,
