@@ -1,3 +1,5 @@
+"""options_deprecated module."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,7 +10,8 @@ from typing import Literal, NamedTuple, Union, overload
 import numpy as np
 import numpy.typing as npt
 from scipy.stats import norm
-from unity_wheel.utils import (
+
+from ..utils import (
     RecoveryStrategy,
     get_feature_flags,
     get_logger,
