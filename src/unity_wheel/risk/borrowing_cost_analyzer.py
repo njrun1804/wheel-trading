@@ -14,7 +14,7 @@ from ..math import CalculationResult
 import numpy as np
 
 from src.config.loader import get_config
-from src.unity_wheel.utils.logging import StructuredLogger
+from unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

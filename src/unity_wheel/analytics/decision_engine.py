@@ -9,7 +9,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from unity_wheel.config.loader import get_config
+from ..config.loader import get_config
 from ..models.position import Position
 from ..utils import get_logger, timed_operation, with_recovery
 from ..utils.recovery import RecoveryStrategy

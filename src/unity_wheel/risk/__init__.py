@@ -10,6 +10,16 @@ from .ev_analytics import EVRiskAnalyzer
 from .stress_testing import StressTestScenarios
 from .unity_margin import MarginResult, UnityMarginCalculator, calculate_unity_margin_requirement
 
+# Import from analytics.py for compatibility
+from .analytics import (
+    RiskAnalyzer,
+    RiskLevel,
+    RiskLimitBreach,
+    RiskLimits,
+    RiskMetrics,
+)
+from .advanced_financial_modeling import AdvancedFinancialModeling
+
 __all__ = [
     "BorrowingCostAnalyzer",
     "BorrowingSource",

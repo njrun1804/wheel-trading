@@ -5,6 +5,7 @@ from .event_analyzer import EventImpact, EventImpactAnalyzer, EventType, Upcomin
 from .iv_surface import IVMetrics, IVSurfaceAnalyzer, SkewMetrics
 from .market_calibrator import MarketCalibrator, OptimalParameters
 from .seasonality import PatternMetrics, SeasonalityDetector, SeasonalPattern
+from .simple_decision_tracker import DecisionTracker
 
 __all__ = [
     # Dynamic Optimization
@@ -34,4 +35,6 @@ __all__ = [
     # Unity Assignment Model
     "UnityAssignmentModel",
     "AssignmentProbability",
+    # Decision Tracking
+    "DecisionTracker",
 ]

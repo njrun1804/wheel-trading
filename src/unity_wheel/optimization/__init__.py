@@ -1,25 +1,8 @@
-"""
-Portfolio Optimization Module
+"""Optimization components for Unity Wheel Trading Bot."""
 
-Provides sophisticated optimization algorithms for wheel strategy portfolios.
-"""
-
-from .engine import (
-    HeuristicOptimizer,
-    IntelligentBucketingOptimizer,
-    OptimizationConstraints,
-    OptimizationMethod,
-    OptimizationResult,
-    PortfolioOptimizer,
-    PositionSpace,
-)
+from .intelligent_bucketing import IntelligentBucketing, StrikeBucket
 
 __all__ = [
-    "PortfolioOptimizer",
-    "OptimizationMethod",
-    "OptimizationConstraints",
-    "OptimizationResult",
-    "HeuristicOptimizer",
-    "IntelligentBucketingOptimizer",
-    "PositionSpace",
+    "IntelligentBucketing",
+    "StrikeBucket",
 ]

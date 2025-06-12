@@ -13,12 +13,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from src.config.loader import get_config
-from src.unity_wheel.analytics import IntegratedDecisionEngine
-from src.unity_wheel.analytics.performance_tracker import PerformanceTracker
-from src.unity_wheel.data_providers.databento import DatabentoClient
-from src.unity_wheel.secrets import SecretManager
-from src.unity_wheel.storage import UnifiedStorage
-from src.unity_wheel.utils import get_logger
+from unity_wheel.analytics import IntegratedDecisionEngine
+from unity_wheel.analytics.performance_tracker import PerformanceTracker
+from unity_wheel.data_providers.databento import DatabentoClient
+from unity_wheel.secrets import SecretManager
+from unity_wheel.storage import UnifiedStorage
+from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -112,8 +112,8 @@ async def test_decision_engine() -> dict:
 
         # Try to fetch real Unity data from Databento
         try:
-            from src.unity_wheel.cli.databento_integration import get_market_data_sync
-            from src.unity_wheel.data_providers.databento import DatabentoClient
+            from unity_wheel.cli.databento_integration import get_market_data_sync
+            from unity_wheel.data_providers.databento import DatabentoClient
 
             # Get real market data
             market_data, confidence = get_market_data_sync(100000, config.unity.ticker)

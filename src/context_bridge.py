@@ -142,7 +142,7 @@ CRITICAL_FILES = {
 CODING_PATTERNS = {
     "imports": """
     # Always use absolute imports
-    from src.unity_wheel.math.options import black_scholes_price_validated
+    from unity_wheel.math.options import black_scholes_price_validated
     # NEVER use relative imports like:
     # from ..math import options  # DON'T DO THIS
     """,
@@ -182,7 +182,7 @@ CODING_PATTERNS = {
 GOTCHAS = {
     "math_module_conflict": """
     PROBLEM: 'from math import sqrt' conflicts with our math module
-    SOLUTION: Always use 'import math' or 'from src.unity_wheel.math import ...'
+    SOLUTION: Always use 'import math' or 'from unity_wheel.math import ...'
     """,
     "confidence_propagation": """
     PROBLEM: Forgetting to propagate confidence through calculations

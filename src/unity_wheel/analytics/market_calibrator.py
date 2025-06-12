@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from unity_wheel.config.loader import get_config
+from ..config.loader import get_config
 from ..risk.regime_detector import RegimeDetector, RegimeInfo
 from ..utils import get_logger
 

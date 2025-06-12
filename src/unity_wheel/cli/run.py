@@ -18,24 +18,24 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-import src.unity_wheel as unity_wheel
+import unity_wheel as unity_wheel
 from src.config import get_settings
 from src.config.unity import COMPANY_NAME, TICKER
-from src.unity_wheel import __version__, get_version_string
-from src.unity_wheel.__version__ import API_VERSION
-from src.unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
-from src.unity_wheel.data_providers.databento.client import DatabentoClient
-from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
-from src.unity_wheel.data_providers.validation import validate_market_data
-from src.unity_wheel.data_providers.base import FREDDataManager
-from src.unity_wheel.storage.storage import Storage
-from src.unity_wheel.monitoring import get_performance_monitor
-from src.unity_wheel.monitoring.diagnostics import SelfDiagnostics
-from src.unity_wheel.observability import get_observability_exporter
-from src.unity_wheel.metrics import metrics_collector
-from src.unity_wheel.risk import RiskLimits
-from src.unity_wheel.secrets.integration import SecretInjector
-from src.unity_wheel.strategy import WheelParameters
+from unity_wheel import __version__, get_version_string
+from unity_wheel.__version__ import API_VERSION
+from unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
+from unity_wheel.data_providers.databento.client import DatabentoClient
+from unity_wheel.data_providers.databento.integration import DatabentoIntegration
+from unity_wheel.data_providers.validation import validate_market_data
+from unity_wheel.data_providers.base import FREDDataManager
+from unity_wheel.storage.storage import Storage
+from unity_wheel.monitoring import get_performance_monitor
+from unity_wheel.monitoring.diagnostics import SelfDiagnostics
+from unity_wheel.observability import get_observability_exporter
+from unity_wheel.metrics import metrics_collector
+from unity_wheel.risk import RiskLimits
+from unity_wheel.secrets.integration import SecretInjector
+from unity_wheel.strategy import WheelParameters
 
 from unity_wheel.config.unified_config import get_config
 config = get_config()

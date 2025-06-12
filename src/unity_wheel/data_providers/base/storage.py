@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from src.unity_wheel.utils import get_logger, timed_operation
+from unity_wheel.utils import get_logger, timed_operation
 
 from ..fred.fred_models import (
     FREDDataPoint,
