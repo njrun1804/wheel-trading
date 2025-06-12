@@ -1,4 +1,4 @@
-from unity_wheel.analytics.unity_assignment import AssignmentProbability, UnityAssignmentModel
+from .unity_assignment import AssignmentProbability, UnityAssignmentModel
 
 from .anomaly_detector import AnomalyDetector, AnomalyType, MarketAnomaly
 from .decision_tracker import DecisionTracker
