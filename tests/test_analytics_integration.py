@@ -9,7 +9,6 @@ from unittest.mock import AsyncMock, Mock
 import numpy as np
 import pandas as pd
 import pytest
-
 from unity_wheel.analytics import (
     AnomalyDetector,
     DynamicOptimizer,
@@ -53,7 +52,7 @@ class TestDynamicOptimizer:
 
         # Create result with negative objective
         result = optimizer.OptimizationResult(
-            delta_target=0.25,
+            delta_target = config.trading.target_delta,
             dte_target=35,
             kelly_fraction=0.5,
             expected_cagr=-0.10,
@@ -386,11 +385,11 @@ class TestIntegratedDecisionEngine:
         # Mock recommendation
         recommendation = WheelRecommendation(
             action="SELL_PUT",
-            symbol="U",
+            symbol = config.trading.symbol,
             strike=22.5,
             expiration=datetime.now() + timedelta(35),
             contracts=4,
-            delta_target=0.25,
+            delta_target = config.trading.target_delta,
             dte_target=35,
             position_size=9000,
             kelly_fraction=0.45,

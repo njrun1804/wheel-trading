@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from unity_wheel.analytics import EventType, IntegratedDecisionEngine
 
-DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+DB_PATH = os.path.expanduser(config.storage.database_path)
 
 
 def load_unity_data():
@@ -28,7 +28,7 @@ def load_unity_data():
         """
         SELECT date, open, high, low, close, volume, returns
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         ORDER BY date
     """
     ).fetchall()
@@ -236,7 +236,7 @@ async def main():
         "realized_vol": float(historical_data["returns"].iloc[-20:].std() * np.sqrt(252)),
     }
 
-    print(f"\n📈 Current Market Data:")
+    print("\n📈 Current Market Data:")
     print(f"   Price: ${current_prices['close']:.2f}")
     print(f"   Volume: {current_prices['volume']:,.0f}")
     print(f"   Realized Vol: {current_prices['realized_vol']:.1%}")
@@ -262,7 +262,7 @@ async def main():
     # Initialize decision engine
     print("\n🧠 Initializing Integrated Decision Engine...")
     engine = IntegratedDecisionEngine(
-        symbol="U", portfolio_value=100000, config={"max_contracts": 10, "min_confidence": 0.30}
+        symbol = config.trading.symbol, portfolio_value = config.trading.portfolio_value, config={"max_contracts": 10, "min_confidence": 0.30}
     )
 
     # Fit anomaly detector on historical data

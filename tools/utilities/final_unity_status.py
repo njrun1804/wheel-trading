@@ -4,7 +4,11 @@ import os
 
 import duckdb
 
-db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
+db_path = os.path.expanduser(config.storage.database_path)
 
 try:
     conn = duckdb.connect(db_path, read_only=True)
@@ -17,7 +21,7 @@ try:
         stock = conn.execute(
             """
             SELECT COUNT(*), MIN(date), MAX(date), MIN(close), MAX(close)
-            FROM price_history WHERE symbol = 'U'
+            FROM price_history WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 

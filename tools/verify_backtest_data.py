@@ -52,7 +52,7 @@ def verify_data_structure():
             ON bf.date = md.date
             AND bf.symbol = md.symbol
             AND md.data_type = 'stock'
-        WHERE bf.symbol = 'U'
+        WHERE bf.symbol = config.trading.symbol
         ORDER BY bf.date DESC
         LIMIT 5
     """
@@ -100,7 +100,7 @@ def verify_data_structure():
             s.close as spot_price
         FROM market_data md
         JOIN options_metadata om ON md.symbol = om.symbol
-        JOIN market_data s ON md.date = s.date AND s.symbol = 'U' AND s.data_type = 'stock'
+        JOIN market_data s ON md.date = s.date AND s.symbol = config.trading.symbol AND s.data_type = 'stock'
         WHERE om.option_type = 'P'
         AND om.underlying = 'U'
         AND md.close > 0
@@ -126,7 +126,7 @@ def verify_data_structure():
             MIN(date) as start_date,
             MAX(date) as end_date
         FROM backtest_features
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
 
         UNION ALL
 

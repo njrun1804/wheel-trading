@@ -6,6 +6,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def fix_returns_and_volatility():
     """Fix the returns calculation by updating data types."""
@@ -78,7 +82,7 @@ def fix_returns_and_volatility():
                 AVG(returns) as avg_return,
                 STDDEV(returns) as std_return
             FROM market_data
-            WHERE symbol = 'U' AND data_type = 'stock'
+            WHERE symbol = config.trading.symbol AND data_type = 'stock'
         """
         ).fetchone()
 
@@ -160,7 +164,7 @@ def fix_returns_and_volatility():
             LEFT JOIN economic_indicators vix
                 ON s.date = vix.date
                 AND vix.indicator = 'VIXCLS'
-            WHERE s.symbol = 'U'  -- Focus on Unity for now
+            WHERE s.symbol = config.trading.symbol  -- Focus on Unity for now
         """
         )
 

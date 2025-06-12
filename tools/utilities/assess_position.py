@@ -10,6 +10,10 @@ from pathlib import Path
 import duckdb
 import yaml
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def check_current_market():
     """Check current Unity market conditions."""
@@ -30,7 +34,7 @@ def check_current_market():
             volatility_20d,
             volume
         FROM backtest_features_clean
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         ORDER BY date DESC
         LIMIT 1
     """

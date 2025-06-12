@@ -96,7 +96,7 @@ class TestWheelBacktester:
 
         # Run backtest
         results = await backtester.backtest_strategy(
-            symbol="U",
+            symbol = config.trading.symbol,
             start_date=datetime(2024, 1, 1),
             end_date=datetime(2024, 3, 31),
             initial_capital=100000,
@@ -116,13 +116,7 @@ class TestWheelBacktester:
         dates = pd.date_range("2024-01-01", "2024-02-28", freq="D")
         prices = [35.0] * 30 + [30.0] * len(dates[30:])  # Drop below strike
 
-<<<<<<< Updated upstream
         price_data = [(date, p, p + 1, p - 1, p, 1000000) for date, p in zip(dates, prices)]
-=======
-        price_data = [
-            (date, p, p + 1, p - 1, p, 1000000) for date, p in zip(dates, prices, strict=False)
-        ]
->>>>>>> Stashed changes
 
         async def mock_connection():
             conn = Mock()
@@ -133,7 +127,7 @@ class TestWheelBacktester:
 
         # Run backtest
         results = await backtester.backtest_strategy(
-            symbol="U",
+            symbol = config.trading.symbol,
             start_date=datetime(2024, 1, 1),
             end_date=datetime(2024, 2, 28),
             initial_capital=100000,
@@ -172,7 +166,7 @@ class TestWheelBacktester:
 
         # Run optimization
         results = await backtester.optimize_parameters(
-            symbol="U",
+            symbol = config.trading.symbol,
             start_date=datetime(2024, 1, 1),
             end_date=datetime(2024, 3, 31),
             delta_range=(0.25, 0.35),
@@ -190,7 +184,7 @@ class TestWheelBacktester:
         """Test Unity-specific gap risk tracking."""
         # Create position with gap move
         position = BacktestPosition(
-            symbol="U",
+            symbol = config.trading.symbol,
             position_type="stock",  # After assignment
             strike=35.0,
             expiration=datetime(2024, 2, 1),
@@ -235,7 +229,7 @@ class TestWheelBacktester:
         """Test position lifecycle management."""
         # Create short put position
         position = BacktestPosition(
-            symbol="U",
+            symbol = config.trading.symbol,
             position_type="put",
             strike=35.0,
             expiration=datetime(2024, 2, 15),
@@ -294,7 +288,7 @@ class TestWheelBacktester:
     def test_backtest_strike_selection(self, backtester):
         """Test strike selection in backtest."""
         # Test delta 0.30 strike selection
-        strike = backtester._find_backtest_strike(current_price=35.0, target_delta=0.30)
+        strike = backtester._find_backtest_strike(current_price=35.0, target_delta = config.trading.target_delta)
 
         # Should be about 3-5% OTM
         assert 33.0 <= strike <= 34.0
@@ -312,7 +306,7 @@ class TestWheelBacktester:
 
     def test_position_sizing(self, backtester):
         """Test position size limits."""
-        params = WheelParameters(max_position_size=0.20)  # 20% max
+        params = WheelParameters(max_position_size = config.trading.max_position_size)  # 20% max
 
         # Position size should respect limits in backtest
         # This is implicitly tested in backtest_strategy

@@ -3,7 +3,6 @@
 from unittest.mock import Mock, patch
 
 import pytest
-
 from unity_wheel.risk.borrowing_cost_analyzer import (
     BorrowingCostAnalyzer,
     BorrowingSource,

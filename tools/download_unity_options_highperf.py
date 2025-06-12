@@ -18,6 +18,10 @@ import duckdb
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -65,7 +69,7 @@ class HighPerfUnityDownloader:
         import threading
 
         self.client = get_db_client()
-        self.db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+        self.db_path = Path(config.storage.database_path).expanduser()
         self.conn = duckdb.connect(str(self.db_path))
 
         # Thread-local storage for database connections
@@ -138,7 +142,7 @@ class HighPerfUnityDownloader:
             result = self.conn.execute(
                 """
                 SELECT close FROM price_history
-                WHERE symbol = 'U' AND date = ?
+                WHERE symbol = config.trading.symbol AND date = ?
             """,
                 (date.date(),),
             ).fetchone()

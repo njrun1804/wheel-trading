@@ -10,8 +10,12 @@ import duckdb
 import numpy as np
 import pandas as pd
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Connect to database
-db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+db_path = Path(config.storage.database_path).expanduser()
 conn = duckdb.connect(str(db_path))
 
 print("=" * 60)
@@ -24,7 +28,7 @@ recent = conn.execute(
     """
     SELECT date, open, high, low, close, volume
     FROM price_history
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
     ORDER BY date DESC
     LIMIT 10
 """
@@ -48,7 +52,7 @@ stats = conn.execute(
         MAX(date) as end_date,
         COUNT(*) as trading_days
     FROM price_history
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 """
 ).fetchone()
 
@@ -63,7 +67,7 @@ df = conn.execute(
     """
     SELECT date, open, high, low, close, volume
     FROM price_history
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
     ORDER BY date
 """
 ).df()

@@ -1,7 +1,6 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-
 from unity_wheel.cli.databento_integration import (
     create_databento_market_snapshot,
     get_market_data_sync,

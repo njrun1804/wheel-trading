@@ -5,6 +5,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 db_path = Path("data/unified_wheel_trading.duckdb")
 conn = duckdb.connect(str(db_path))
 
@@ -23,7 +27,7 @@ returns_check = conn.execute(
         AVG(returns) as avg_return,
         STDDEV(returns) as std_return
     FROM market_data
-    WHERE symbol = 'U' AND data_type = 'stock'
+    WHERE symbol = config.trading.symbol AND data_type = 'stock'
 """
 ).fetchone()
 
@@ -43,7 +47,7 @@ sample_returns = conn.execute(
            LAG(close) OVER (ORDER BY date) as prev_close,
            (close - LAG(close) OVER (ORDER BY date)) / LAG(close) OVER (ORDER BY date) as calc_return
     FROM market_data
-    WHERE symbol = 'U' AND data_type = 'stock'
+    WHERE symbol = config.trading.symbol AND data_type = 'stock'
     AND returns IS NOT NULL
     ORDER BY date DESC
     LIMIT 10
@@ -67,7 +71,7 @@ vol_check = conn.execute(
         MAX(volatility_20d) as max_vol,
         AVG(volatility_20d) as avg_vol
     FROM backtest_features
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 """
 ).fetchone()
 
@@ -89,7 +93,7 @@ manual_vol = conn.execute(
             COUNT(returns) OVER (ORDER BY date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) as count_returns,
             STDDEV(returns) OVER (ORDER BY date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) as rolling_std
         FROM market_data
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         AND data_type = 'stock'
         AND returns IS NOT NULL
         ORDER BY date DESC
@@ -151,7 +155,7 @@ conn.execute(
                 ELSE NULL
             END as volatility_250d
         FROM market_data
-        WHERE symbol = 'U' AND data_type = 'stock'
+        WHERE symbol = config.trading.symbol AND data_type = 'stock'
         AND close IS NOT NULL
     )
     SELECT

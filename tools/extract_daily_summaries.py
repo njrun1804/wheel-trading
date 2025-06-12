@@ -9,8 +9,12 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Database path
-db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+db_path = Path(config.storage.database_path).expanduser()
 
 
 def extract_daily_summaries():
@@ -55,14 +59,14 @@ def extract_daily_summaries():
             volume,
             1 as record_count
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
     """
     ).fetchone()
 
     stock_days = conn.execute(
         """
         SELECT COUNT(*) FROM unity_daily_summary_real
-        WHERE symbol = 'U' AND data_type = 'STOCK'
+        WHERE symbol = config.trading.symbol AND data_type = 'STOCK'
     """
     ).fetchone()[0]
 

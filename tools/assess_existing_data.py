@@ -13,10 +13,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 async def assess_database():
     """Comprehensive assessment of existing Unity data."""
-    db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+    db_path = os.path.expanduser(config.storage.database_path)
 
     if not os.path.exists(db_path):
         print("❌ Database does not exist at:", db_path)
@@ -60,7 +64,7 @@ async def assess_database():
                     AVG(close) as avg_price,
                     AVG(volume) as avg_volume
                 FROM databento_stock_data
-                WHERE symbol = 'U'
+                WHERE symbol = config.trading.symbol
             """
             ).fetchone()
 
@@ -76,8 +80,8 @@ async def assess_database():
                     """
                     WITH date_series AS (
                         SELECT generate_series(
-                            (SELECT MIN(date) FROM databento_stock_data WHERE symbol = 'U'),
-                            (SELECT MAX(date) FROM databento_stock_data WHERE symbol = 'U'),
+                            (SELECT MIN(date) FROM databento_stock_data WHERE symbol = config.trading.symbol),
+                            (SELECT MAX(date) FROM databento_stock_data WHERE symbol = config.trading.symbol),
                             '1 day'::interval
                         )::date as date
                     ),
@@ -88,7 +92,7 @@ async def assess_database():
                     SELECT COUNT(*)
                     FROM trading_days td
                     LEFT JOIN databento_stock_data sd
-                        ON td.date = sd.date AND sd.symbol = 'U'
+                        ON td.date = sd.date AND sd.symbol = config.trading.symbol
                     WHERE sd.date IS NULL
                 """
                 ).fetchone()
@@ -100,7 +104,7 @@ async def assess_database():
                     """
                     SELECT COUNT(*)
                     FROM databento_stock_data
-                    WHERE symbol = 'U'
+                    WHERE symbol = config.trading.symbol
                     AND (
                         close = ROUND(close) OR  -- Exactly round numbers
                         volume = 0 OR            -- No volume
@@ -136,7 +140,7 @@ async def assess_database():
                     AVG(ask - bid) as avg_spread,
                     SUM(CASE WHEN bid = 0 OR ask = 0 THEN 1 ELSE 0 END) as zero_quotes
                 FROM databento_option_chains
-                WHERE symbol = 'U'
+                WHERE symbol = config.trading.symbol
             """
             ).fetchone()
 
@@ -160,7 +164,7 @@ async def assess_database():
                         SUM(CASE WHEN implied_volatility IS NOT NULL THEN 1 ELSE 0 END) as has_iv,
                         SUM(CASE WHEN delta IS NOT NULL THEN 1 ELSE 0 END) as has_greeks
                     FROM databento_option_chains
-                    WHERE symbol = 'U'
+                    WHERE symbol = config.trading.symbol
                 """
                 ).fetchone()
 
@@ -186,7 +190,7 @@ async def assess_database():
                         COUNT(*) as count,
                         AVG(ask - bid) as avg_spread
                     FROM databento_option_chains
-                    WHERE symbol = 'U' AND option_type = 'PUT'
+                    WHERE symbol = config.trading.symbol AND option_type = 'PUT'
                     GROUP BY category
                     ORDER BY
                         CASE category
@@ -213,7 +217,7 @@ async def assess_database():
                 """
                 SELECT COUNT(*), MIN(date), MAX(date)
                 FROM price_history
-                WHERE symbol = 'U'
+                WHERE symbol = config.trading.symbol
             """
             ).fetchone()
 

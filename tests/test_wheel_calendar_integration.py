@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from unity_wheel.strategy.wheel import WheelParameters, WheelStrategy
 from unity_wheel.utils import SimpleTradingCalendar
 from unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
@@ -26,7 +25,7 @@ class TestWheelCalendarIntegration:
     @pytest.fixture
     def wheel_strategy(self):
         """Create wheel strategy instance."""
-        params = WheelParameters(target_delta=0.30, target_dte=45, min_premium_pct=0.01)
+        params = WheelParameters(target_delta = config.trading.target_delta, target_dte = config.trading.target_dte, min_premium_pct=0.01)
         return WheelStrategy(params)
 
     def test_dte_calculation_with_trading_days(self, calendar):

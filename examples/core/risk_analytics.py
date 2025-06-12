@@ -10,6 +10,10 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.unity_wheel.risk.analytics import (
+
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
     RiskAnalyzer,
     calculate_cvar,
     calculate_sharpe_ratio,
@@ -61,7 +65,7 @@ def main():
     # 3. Position Risk Assessment
     print("3. Position Risk Assessment:")
 
-    portfolio_value = 100000
+    portfolio_value = config.trading.portfolio_value
     position_value = 10000
     position_delta = 0.30
 

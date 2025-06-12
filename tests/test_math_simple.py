@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-
 from unity_wheel.math import (
     black_scholes_price_validated,
     calculate_all_greeks,

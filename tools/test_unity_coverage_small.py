@@ -100,7 +100,7 @@ def test_recent_month():
     logger.info("UNITY STOCK DATA FOR COMPARISON")
     logger.info("=" * 40)
 
-    db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+    db_path = Path(config.storage.database_path).expanduser()
     conn = duckdb.connect(str(db_path))
 
     # Check Unity stock data
@@ -108,7 +108,7 @@ def test_recent_month():
         """
         SELECT COUNT(*) as total_days, MIN(date), MAX(date)
         FROM price_history
-        WHERE symbol = 'U' AND date >= '2025-05-01'
+        WHERE symbol = config.trading.symbol AND date >= '2025-05-01'
     """
     ).fetchone()
 
@@ -120,7 +120,7 @@ def test_recent_month():
         """
         SELECT COUNT(*) as total_days, MIN(date), MAX(date)
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
     """
     ).fetchone()
 

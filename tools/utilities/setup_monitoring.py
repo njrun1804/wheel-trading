@@ -51,7 +51,7 @@ class DailyHealthCheck:
         current_vol = conn.execute(\"\"\"
             SELECT volatility_20d
             FROM backtest_features_clean
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date DESC
             LIMIT 1
         \"\"\").fetchone()[0]
@@ -86,7 +86,7 @@ class DailyHealthCheck:
                     AVG(volume) OVER (ORDER BY date ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING) as avg_vol,
                     STDDEV(volume) OVER (ORDER BY date ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING) as std_vol
                 FROM market_data_clean
-                WHERE symbol = 'U'
+                WHERE symbol = config.trading.symbol
                 AND data_type = 'stock'
                 ORDER BY date DESC
                 LIMIT 1
@@ -546,6 +546,10 @@ from pathlib import Path
 import duckdb
 import yaml
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -561,7 +565,7 @@ def get_current_metrics():
         vol = conn.execute(\"\"\"
             SELECT volatility_20d, stock_price
             FROM backtest_features_clean
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date DESC
             LIMIT 1
         \"\"\").fetchone()

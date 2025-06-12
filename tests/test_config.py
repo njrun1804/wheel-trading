@@ -156,7 +156,7 @@ def valid_config_dict():
 @pytest.fixture
 def valid_config_yaml(valid_config_dict, tmp_path):
     """Create a valid configuration YAML file."""
-    config_file = tmp_path / "config.yaml"
+    config_file = tmp_path / os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml")
     with open(config_file, "w") as f:
         yaml.dump(valid_config_dict, f)
     return config_file

@@ -9,6 +9,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def fix_data_quality():
     """Fix NULL/zero values and data quality issues in unified database."""
@@ -51,7 +55,7 @@ def fix_data_quality():
             AND open IS NOT NULL
             AND high IS NOT NULL
             AND low IS NOT NULL
-            AND symbol = 'U'
+            AND symbol = config.trading.symbol
         """
         ).rowcount
         print(f"Fixed {fixed} stock price records using OHLC average")
@@ -70,11 +74,11 @@ def fix_data_quality():
                 FROM market_data m2
                 WHERE m2.symbol = m1.symbol
                 AND m2.date < m1.date
-                AND m1.symbol = 'U'
+                AND m1.symbol = config.trading.symbol
                 ORDER BY m2.date DESC
                 LIMIT 1
             )
-            WHERE m1.symbol = 'U' AND m1.close IS NOT NULL;
+            WHERE m1.symbol = config.trading.symbol AND m1.close IS NOT NULL;
         """
         )
         print("Calculated returns for stock data")
@@ -164,7 +168,7 @@ def fix_data_quality():
                     ROWS BETWEEN 249 PRECEDING AND CURRENT ROW
                 ) * SQRT(252) as volatility_250d
             FROM market_data
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             AND close IS NOT NULL
             AND returns IS NOT NULL
         """
@@ -179,7 +183,7 @@ def fix_data_quality():
                 COUNT(CASE WHEN close IS NULL OR close = 0 THEN 1 END) as null_close,
                 COUNT(CASE WHEN returns IS NULL THEN 1 END) as null_returns
             FROM market_data
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 

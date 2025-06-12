@@ -9,6 +9,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def fix_lookahead_bias(conn):
     """Remove any option data with negative DTE (look-ahead bias)."""
@@ -170,7 +174,7 @@ def fix_extreme_strikes(conn):
                     stock_price as close,
                     volatility_20d
                 FROM backtest_features
-                WHERE symbol = 'U'
+                WHERE symbol = config.trading.symbol
             ) s ON om.underlying = s.symbol
                 AND s.date = (
                     SELECT MAX(date)
@@ -333,7 +337,7 @@ def update_backtest_features(conn):
                 LAG(close) OVER (PARTITION BY symbol ORDER BY date) as prev_close
             FROM market_data_clean
             WHERE data_type = 'stock'
-            AND symbol = 'U'
+            AND symbol = config.trading.symbol
         )
         SELECT
             md.symbol,
@@ -362,7 +366,7 @@ def update_backtest_features(conn):
         JOIN price_pairs pp ON md.symbol = pp.symbol AND md.date = pp.date
         LEFT JOIN backtest_features bf ON md.symbol = bf.symbol AND md.date = bf.date
         WHERE md.data_type = 'stock'
-        AND md.symbol = 'U'
+        AND md.symbol = config.trading.symbol
         ORDER BY md.date
     """
     )
@@ -376,7 +380,7 @@ def update_backtest_features(conn):
             MIN(date) as start_date,
             MAX(date) as end_date
         FROM backtest_features_clean
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
     """
     ).fetchone()
 
@@ -428,7 +432,7 @@ def generate_integrity_report(conn):
             FROM tradeable_options md
             JOIN options_metadata_clean om ON md.symbol = om.symbol
             JOIN market_data_clean s ON md.date = s.date
-                AND s.symbol = 'U'
+                AND s.symbol = config.trading.symbol
                 AND s.data_type = 'stock'
         )
         SELECT

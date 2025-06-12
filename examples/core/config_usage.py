@@ -24,7 +24,7 @@ def main():
     # Load configuration
     print("1. Loading configuration...")
     try:
-        loader = get_config_loader("config.yaml")
+        loader = get_config_loader(os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml"))
         config = loader.config
         print("✓ Configuration loaded successfully")
     except Exception as e:
@@ -40,7 +40,7 @@ def main():
     os.environ["WHEEL_STRATEGY__DELTA_TARGET"] = "0.25"
 
     # Reload to apply override
-    loader = get_config_loader("config.yaml")
+    loader = get_config_loader(os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml"))
     config = loader.config
     print(f"   New delta_target: {config.strategy.delta_target}")
     print(f"   Overrides applied: {len(loader.overrides)}")

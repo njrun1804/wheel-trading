@@ -17,6 +17,10 @@ from src.unity_wheel.databento.optimized_price_loader import OptimizedPriceHisto
 from src.unity_wheel.storage import Storage, StorageConfig
 from src.unity_wheel.utils import setup_structured_logging
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 async def fetch_unity_data_optimized():
     """Fetch Unity data with optimized settings."""
@@ -126,7 +130,7 @@ async def show_risk_metrics(storage):
                 AVG(CASE WHEN returns < 0 THEN returns ELSE 0 END) as avg_loss,
                 COUNT(CASE WHEN returns < -0.05 THEN 1 END) as big_loss_days
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 

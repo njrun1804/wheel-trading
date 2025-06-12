@@ -3,7 +3,6 @@
 from datetime import date, datetime, time
 
 import pytest
-
 from unity_wheel.utils.trading_calendar_enhancements import (
     EnhancedTradingCalendar,
     calculate_theta_decay,

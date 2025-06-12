@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.stats import norm
-
 from unity_wheel.math.options import (
     black_scholes_price_validated,
     calculate_all_greeks,
@@ -443,7 +442,7 @@ class TestNormCdfCache:
     """Ensure normal CDF caching operates correctly."""
 
     def test_norm_cdf_caching(self) -> None:
-        from unity_wheel.math.options import norm_cdf_cached, _cached_norm_cdf_scalar
+        from unity_wheel.math.options import _cached_norm_cdf_scalar, norm_cdf_cached
 
         _cached_norm_cdf_scalar.cache_clear()
         info_start = _cached_norm_cdf_scalar.cache_info()

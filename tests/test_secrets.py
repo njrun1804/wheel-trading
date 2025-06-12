@@ -6,7 +6,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from unity_wheel.secrets import SecretManager, SecretProvider
 from unity_wheel.secrets.exceptions import (
     SecretConfigError,

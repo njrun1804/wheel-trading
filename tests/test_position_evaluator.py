@@ -1,13 +1,8 @@
 """Test position evaluation and comparison framework."""
 
 import pytest
-
 from unity_wheel.models.position import Position
-from unity_wheel.strategy.position_evaluator import (
-    PositionEvaluator,
-    PositionValue,
-    SwitchAnalysis,
-)
+from unity_wheel.strategy.position_evaluator import PositionEvaluator, PositionValue, SwitchAnalysis
 
 
 class TestPositionEvaluator:
@@ -152,7 +147,7 @@ class TestPositionEvaluator:
             current_price=35.0,
             risk_free_rate=0.05,
             volatility=0.50,
-            days_to_expiry=30,
+            days_to_expiry = config.trading.target_dte,
             bid=2.00,
             ask=2.10,
             contracts=1,

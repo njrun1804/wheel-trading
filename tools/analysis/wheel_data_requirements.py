@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def calculate_data_requirements():
     """Calculate minimum data requirements for wheel strategy validation."""
@@ -12,7 +16,7 @@ def calculate_data_requirements():
     print("=" * 60)
 
     # Strategy parameters
-    target_dte = 45  # Days to expiry
+    target_dte = config.trading.target_dte  # Days to expiry
     trades_per_year = 365 / target_dte  # ~8 trades/year
     min_trades_for_significance = 30  # Statistical significance
 

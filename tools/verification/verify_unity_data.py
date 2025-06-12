@@ -7,7 +7,11 @@ from datetime import datetime, timedelta
 import duckdb
 import numpy as np
 
-DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
+DB_PATH = os.path.expanduser(config.storage.database_path)
 
 
 def main():
@@ -32,7 +36,7 @@ def main():
             MIN(returns) as worst_day,
             MAX(returns) as best_day
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         GROUP BY symbol
     """
     ).fetchone()
@@ -56,7 +60,7 @@ def main():
             """
             SELECT date, open, high, low, close, volume, returns
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date DESC
             LIMIT 10
         """
@@ -80,7 +84,7 @@ def main():
             """
             SELECT returns
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             AND date >= CURRENT_DATE - INTERVAL '250 days'
             ORDER BY date
         """

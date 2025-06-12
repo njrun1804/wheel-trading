@@ -4,7 +4,6 @@ import sys
 from datetime import datetime
 
 import pytest
-
 from unity_wheel.utils.data_validator import DataValidator, die
 
 

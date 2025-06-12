@@ -14,6 +14,10 @@ from scipy import stats
 from sklearn.mixture import GaussianMixture
 from statsmodels.stats.multitest import multipletests
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def validate_data_cleanliness():
     """Verify data fixes were applied correctly."""
@@ -49,10 +53,10 @@ def validate_data_cleanliness():
                 s.stock_price as spot,
                 ABS(om.strike - s.stock_price) / s.stock_price as distance
             FROM options_metadata_clean om
-            JOIN backtest_features_clean s ON s.symbol = 'U'
+            JOIN backtest_features_clean s ON s.symbol = config.trading.symbol
                 AND s.date = (
                     SELECT MAX(date) FROM backtest_features_clean
-                    WHERE symbol = 'U'
+                    WHERE symbol = config.trading.symbol
                 )
             WHERE om.underlying = 'U'
         )
@@ -93,7 +97,7 @@ def run_clean_walk_forward():
             AVG(returns) * 252 as annual_return,
             COUNT(*) as days
         FROM backtest_features_clean
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         AND date <= ?
     """,
         [train_end],
@@ -116,7 +120,7 @@ def run_clean_walk_forward():
                 0.10 as position_size,  -- 10% for high vol
                 0.40 as delta_target
             FROM backtest_features_clean
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             AND date >= ?
         )
         SELECT
@@ -161,7 +165,7 @@ def test_parameter_significance():
             """
         SELECT returns
         FROM backtest_features_clean
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         AND returns IS NOT NULL
         ORDER BY date
     """
@@ -246,7 +250,7 @@ def test_regime_stability():
         """
         SELECT returns, volatility_20d
         FROM backtest_features_clean
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         AND returns IS NOT NULL
         ORDER BY date
     """

@@ -13,7 +13,6 @@ from decimal import Decimal
 import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
-
 from unity_wheel.math.options import (
     black_scholes_price_validated,
     calculate_all_greeks,

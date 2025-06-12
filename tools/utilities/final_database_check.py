@@ -4,7 +4,11 @@ import os
 
 import duckdb
 
-db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
+db_path = os.path.expanduser(config.storage.database_path)
 conn = duckdb.connect(db_path, read_only=True)
 
 print("✅ FINAL DATABASE VERIFICATION")
@@ -42,7 +46,7 @@ stock_check = conn.execute(
         MAX(date) as end_date,
         SUM(CASE WHEN close <= 0 OR close IS NULL THEN 1 ELSE 0 END) as bad_prices
     FROM price_history
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 """
 ).fetchone()
 
@@ -62,7 +66,7 @@ options_check = conn.execute(
         MIN(DATE(timestamp)) as start_date,
         MAX(DATE(timestamp)) as end_date
     FROM databento_option_chains
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 """
 ).fetchone()
 

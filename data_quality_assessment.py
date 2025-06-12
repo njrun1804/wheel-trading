@@ -9,10 +9,14 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def assess_data_quality():
     """Run comprehensive data quality assessment."""
-    db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+    db_path = Path(config.storage.database_path).expanduser()
     conn = duckdb.connect(str(db_path))
 
     print("=" * 80)
@@ -269,7 +273,7 @@ def assess_data_quality():
     unity_comparison = conn.execute(
         """
         SELECT
-            (SELECT COUNT(*) FROM price_history WHERE symbol = 'U') as price_history_unity,
+            (SELECT COUNT(*) FROM price_history WHERE symbol = config.trading.symbol) as price_history_unity,
             (SELECT COUNT(*) FROM unity_price_history) as unity_price_history_count,
             (SELECT COUNT(*) FROM unity_daily_stock) as unity_daily_stock_count,
             (SELECT COUNT(DISTINCT date) FROM unity_stock_1min) as unity_1min_days

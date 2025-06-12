@@ -4,7 +4,6 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 import pytest
-
 from unity_wheel.api import WheelAdvisor
 from unity_wheel.risk import AdvancedFinancialModeling, BorrowingCostAnalyzer, RiskLimits
 from unity_wheel.strategy import WheelParameters
@@ -16,8 +15,8 @@ class TestIntegratedFinancialModeling:
     @pytest.fixture
     def advisor(self):
         """Create advisor with all components."""
-        wheel_params = WheelParameters(target_delta=0.30, target_dte=45, max_position_size=0.20)
-        risk_limits = RiskLimits(max_var_95=0.05, max_cvar_95=0.075, max_margin_utilization=0.5)
+        wheel_params = WheelParameters(target_delta = config.trading.target_delta, target_dte = config.trading.target_dte, max_position_size = config.trading.max_position_size)
+        risk_limits = RiskLimits(max_var_95 = config.risk.max_var_95, max_cvar_95 = config.risk.max_cvar_95, max_margin_utilization=0.5)
         return WheelAdvisor(wheel_params, risk_limits)
 
     @pytest.fixture

@@ -16,6 +16,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -24,7 +28,7 @@ logger = logging.getLogger(__name__)
 def main():
     """Download Unity options daily data."""
     client = DatabentoClient()
-    db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+    db_path = Path(config.storage.database_path).expanduser()
     conn = duckdb.connect(str(db_path))
 
     # Test with a specific date range

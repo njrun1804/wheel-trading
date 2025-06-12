@@ -188,6 +188,10 @@ from datetime import datetime, timedelta
 
 import pytest
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 class TestEarningsRisk:
     """Test new earnings risk check."""
@@ -200,7 +204,7 @@ class TestEarningsRisk:
         earnings_date = datetime.now() + timedelta(days=5)
 
         passed, msg, conf = limits.check_earnings_risk(
-            ticker="U", days_to_expiry=10, earnings_date=earnings_date
+            ticker = config.trading.symbol, days_to_expiry=10, earnings_date=earnings_date
         )
 
         assert not passed  # Should fail
@@ -215,7 +219,7 @@ class TestEarningsRisk:
         earnings_date = datetime.now() + timedelta(days=30)
 
         passed, msg, conf = limits.check_earnings_risk(
-            ticker="U", days_to_expiry=15, earnings_date=earnings_date
+            ticker = config.trading.symbol, days_to_expiry=15, earnings_date=earnings_date
         )
 
         assert passed  # Should pass
@@ -237,7 +241,7 @@ class TestEarningsRisk:
 
         earnings_date = datetime.now() + timedelta(days=days_to_earnings)
         passed, _, _ = limits.check_earnings_risk(
-            ticker="U", days_to_expiry=days_to_expiry, earnings_date=earnings_date
+            ticker = config.trading.symbol, days_to_expiry=days_to_expiry, earnings_date=earnings_date
         )
 
         assert passed == should_pass

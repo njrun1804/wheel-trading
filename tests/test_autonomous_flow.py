@@ -4,18 +4,14 @@ from __future__ import annotations
 
 import json
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-
 from unity_wheel.api import WheelAdvisor
 from unity_wheel.api.types import MarketSnapshot
-from unity_wheel.data_providers.base.validation import (
-    get_anomaly_detector,
-    get_market_validator,
-)
+from unity_wheel.data_providers.base.validation import get_anomaly_detector, get_market_validator
 from unity_wheel.monitoring.diagnostics import SelfDiagnostics
 from unity_wheel.monitoring.performance import get_performance_monitor
 from unity_wheel.risk.analytics import RiskLimits
@@ -55,8 +51,8 @@ def reset_singletons():
 def valid_market_snapshot():
     """Create a valid market snapshot for testing."""
     return MarketSnapshot(
-        timestamp=datetime.now(timezone.utc),
-        ticker="U",
+        timestamp=datetime.now(UTC),
+        ticker = config.trading.symbol,
         current_price=35.50,
         buying_power=100000.0,
         margin_used=0.0,
@@ -117,9 +113,9 @@ class TestAutonomousFlow:
         """Test complete decision flow with data validation."""
         # Initialize components
         wheel_params = WheelParameters(
-            target_delta=0.30,
-            target_dte=45,
-            max_position_size=0.20,
+            target_delta = config.trading.target_delta,
+            target_dte = config.trading.target_dte,
+            max_position_size = config.trading.max_position_size,
         )
         risk_limits = RiskLimits()
 
@@ -143,8 +139,8 @@ class TestAutonomousFlow:
         """Test that poor quality data is rejected."""
         # Create invalid market snapshot (stale data)
         stale_snapshot = MarketSnapshot(
-            timestamp=datetime.now(timezone.utc) - timedelta(hours=2),
-            ticker="U",
+            timestamp=datetime.now(UTC) - timedelta(hours=2),
+            ticker = config.trading.symbol,
             current_price=35.50,
             buying_power=100000.0,
             margin_used=0.0,
@@ -318,9 +314,9 @@ class TestAutonomousFlow:
         """Test that configuration changes affect behavior."""
         # Test with conservative parameters
         conservative_params = WheelParameters(
-            target_delta=0.20,  # More conservative
-            target_dte=60,  # Longer expiry
-            max_position_size=0.10,  # Smaller positions
+            target_delta = config.trading.target_delta,  # More conservative
+            target_dte = config.trading.target_dte,  # Longer expiry
+            max_position_size = config.trading.max_position_size,  # Smaller positions
         )
 
         advisor1 = WheelAdvisor(conservative_params)
@@ -328,9 +324,9 @@ class TestAutonomousFlow:
 
         # Test with aggressive parameters
         aggressive_params = WheelParameters(
-            target_delta=0.40,  # More aggressive
-            target_dte=30,  # Shorter expiry
-            max_position_size=0.30,  # Larger positions
+            target_delta = config.trading.target_delta,  # More aggressive
+            target_dte = config.trading.target_dte,  # Shorter expiry
+            max_position_size = config.trading.max_position_size,  # Larger positions
         )
 
         advisor2 = WheelAdvisor(aggressive_params)
@@ -351,8 +347,8 @@ class TestEndToEndScenarios:
 
         # Normal market
         normal_snapshot = MarketSnapshot(
-            timestamp=datetime.now(timezone.utc),
-            ticker="U",
+            timestamp=datetime.now(UTC),
+            ticker = config.trading.symbol,
             current_price=35.0,
             buying_power=100000.0,
             margin_used=0.0,
@@ -380,8 +376,8 @@ class TestEndToEndScenarios:
 
         # Market crash - high volatility, wide spreads
         crash_snapshot = MarketSnapshot(
-            timestamp=datetime.now(timezone.utc),
-            ticker="U",
+            timestamp=datetime.now(UTC),
+            ticker = config.trading.symbol,
             current_price=25.0,  # 28% drop
             buying_power=100000.0,
             margin_used=0.0,
@@ -428,7 +424,7 @@ class TestEndToEndScenarios:
             # Occasionally introduce issues
             if i == 3:
                 # Stale data
-                snapshot["timestamp"] = datetime.now(timezone.utc) - timedelta(minutes=30)
+                snapshot["timestamp"] = datetime.now(UTC) - timedelta(minutes=30)
             elif i == 7:
                 # Missing option data
                 snapshot["option_chain"] = {}

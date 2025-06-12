@@ -3,7 +3,6 @@
 from unittest.mock import Mock, patch
 
 import pytest
-
 from unity_wheel.utils.position_sizing import DynamicPositionSizer, PositionSizeResult
 
 
@@ -17,7 +16,7 @@ class TestDynamicPositionSizer:
     def test_basic_position_sizing(self):
         """Test basic position size calculation."""
         result = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=2.50,
             strike_price=35.0,
             buying_power=100000,
@@ -36,7 +35,7 @@ class TestDynamicPositionSizer:
         """Test Kelly criterion constraint."""
         # High Kelly fraction should limit position
         result = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=2.50,
             strike_price=35.0,
             buying_power=100000,
@@ -51,7 +50,7 @@ class TestDynamicPositionSizer:
         """Test margin requirement constraint."""
         # Limited buying power should constrain position
         result = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=2.50,
             strike_price=35.0,
             buying_power=10000,  # Only 10k available
@@ -67,7 +66,7 @@ class TestDynamicPositionSizer:
         """Test maximum position size constraint."""
         # Try to size a very large position
         result = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=0.50,  # Very cheap option
             strike_price=10.0,  # Low strike
             buying_power=100000,
@@ -97,7 +96,7 @@ class TestDynamicPositionSizer:
         """Test confidence score calculation."""
         # Normal conditions - high confidence
         result1 = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=2.50,
             strike_price=35.0,
             buying_power=100000,
@@ -107,7 +106,7 @@ class TestDynamicPositionSizer:
 
         # Constrained position - lower confidence
         result2 = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=2.50,
             strike_price=35.0,
             buying_power=5000,  # Very limited
@@ -132,7 +131,7 @@ class TestDynamicPositionSizer:
     def test_zero_price_handling(self):
         """Test handling of zero/invalid prices."""
         result = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=0,  # Invalid
             strike_price=35.0,
             buying_power=100000,
@@ -147,7 +146,7 @@ class TestDynamicPositionSizer:
         """Test position sizing under extreme volatility."""
         # Extreme Kelly fraction (high volatility scenario)
         result = self.sizer.calculate_position_size(
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
             option_price=5.00,  # High premium (high vol)
             strike_price=35.0,
             buying_power=100000,

@@ -11,7 +11,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import aiohttp
 import pytest
 from aiohttp import web
-
 from unity_wheel.auth import AuthClient, AuthError, RateLimitError, TokenExpiredError
 from unity_wheel.auth.rate_limiter import RateLimiter
 from unity_wheel.storage.auth_storage import SecureTokenStorage

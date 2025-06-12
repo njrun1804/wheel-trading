@@ -12,6 +12,10 @@ from pathlib import Path
 import duckdb
 import yaml
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 class AuditChecklist:
     def __init__(self):
@@ -81,11 +85,11 @@ class AuditChecklist:
                     s.close,
                     ABS(om.strike - s.close) / s.close as distance
                 FROM options_metadata_clean om
-                JOIN market_data_clean s ON s.symbol = 'U'
+                JOIN market_data_clean s ON s.symbol = config.trading.symbol
                     AND s.data_type = 'stock'
                     AND s.date = (
                         SELECT MAX(date) FROM market_data_clean
-                        WHERE symbol = 'U' AND data_type = 'stock'
+                        WHERE symbol = config.trading.symbol AND data_type = 'stock'
                     )
                 WHERE om.underlying = 'U'
             )
@@ -184,7 +188,7 @@ class AuditChecklist:
         print("-" * 50)
 
         # Check for event monitoring
-        config_file = Path("config.yaml")
+        config_file = Path(os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml"))
         if config_file.exists():
             with open(config_file) as f:
                 config = yaml.safe_load(f)
@@ -225,7 +229,7 @@ class AuditChecklist:
                             returns,
                             volatility_20d
                         FROM backtest_features_clean
-                        WHERE symbol = 'U'
+                        WHERE symbol = config.trading.symbol
                         AND date >= '2025-04-01'
                     )
                     SELECT

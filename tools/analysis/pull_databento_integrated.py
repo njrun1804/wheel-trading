@@ -19,6 +19,10 @@ from src.unity_wheel.databento.validation import DataValidator
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.utils import setup_structured_logging
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 async def pull_wheel_data_integrated():
     """Pull options data using integrated storage with get_or_fetch pattern."""
@@ -157,7 +161,7 @@ async def pull_wheel_data_integrated():
         # Get wheel candidates using integration
         print(f"\n🎯 Finding wheel candidates...")
         candidates = await integration.get_wheel_candidates(
-            underlying=TICKER, target_delta=0.30, dte_range=(30, 60), min_premium_pct=1.0
+            underlying=TICKER, target_delta = config.trading.target_delta, dte_range=(30, 60), min_premium_pct=1.0
         )
 
         print(f"\n📊 Found {len(candidates)} wheel candidates")

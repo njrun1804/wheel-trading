@@ -11,6 +11,10 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 class CalculationResult(NamedTuple):
     """Result of a calculation with confidence score."""
@@ -307,7 +311,7 @@ def main():
 
     # Generate recommendation for $100k portfolio
     rec = advisor.generate_recommendation(
-        portfolio_value=100000, underlying_price=25.0, days_to_expiry=45, implied_volatility=0.35
+        portfolio_value = config.trading.portfolio_value, underlying_price=25.0, days_to_expiry=45, implied_volatility=0.35
     )
 
     print(f"   Action: {rec.action}")

@@ -27,9 +27,13 @@ import logging
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.utils.logging import StructuredLogger
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 logger = StructuredLogger(logging.getLogger(__name__))
 
-DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+DB_PATH = os.path.expanduser(config.storage.database_path)
 
 
 class RealDataCollector:
@@ -69,7 +73,7 @@ class RealDataCollector:
         # Check what synthetic data exists
         synthetic_count = self.conn.execute(
             """
-            SELECT COUNT(*) FROM databento_option_chains WHERE symbol = 'U'
+            SELECT COUNT(*) FROM databento_option_chains WHERE symbol = config.trading.symbol
         """
         ).fetchone()[0]
 
@@ -80,7 +84,7 @@ class RealDataCollector:
             # Delete all Unity options data (it was synthetic)
             self.conn.execute(
                 """
-                DELETE FROM databento_option_chains WHERE symbol = 'U'
+                DELETE FROM databento_option_chains WHERE symbol = config.trading.symbol
             """
             )
             self.conn.commit()
@@ -292,7 +296,7 @@ class RealDataCollector:
                 MAX(timestamp) as latest,
                 AVG(CASE WHEN bid IS NOT NULL AND ask IS NOT NULL THEN ask - bid END) as avg_spread
             FROM databento_option_chains
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 
@@ -319,7 +323,7 @@ class RealDataCollector:
         suspicious = self.conn.execute(
             """
             SELECT COUNT(*) FROM databento_option_chains
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             AND (
                 implied_volatility IS NOT NULL  -- IVs should be null since we calculate them
                 OR delta IS NOT NULL           -- Greeks should be null since we calculate them

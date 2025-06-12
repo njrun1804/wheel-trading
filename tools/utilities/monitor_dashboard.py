@@ -9,6 +9,10 @@ from pathlib import Path
 import duckdb
 import yaml
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def clear_screen():
     os.system("clear" if os.name == "posix" else "cls")
@@ -27,7 +31,7 @@ def get_current_metrics():
             """
             SELECT volatility_20d, stock_price
             FROM backtest_features_clean
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date DESC
             LIMIT 1
         """

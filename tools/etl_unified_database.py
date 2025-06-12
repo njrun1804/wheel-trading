@@ -9,6 +9,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def create_etl_pipeline():
     """Create ETL pipeline to prepare unified database for backtesting."""
@@ -167,7 +171,7 @@ def create_etl_pipeline():
                 ON s.symbol = s2.symbol
                 AND s2.date <= s.date
                 AND s2.date >= s.date - INTERVAL '250 days'
-            WHERE s.symbol = 'U'  -- Focus on Unity for now
+            WHERE s.symbol = config.trading.symbol  -- Focus on Unity for now
         """
         )
 
@@ -279,7 +283,7 @@ def create_etl_pipeline():
                 MIN(date) as start_date,
                 MAX(date) as end_date
             FROM market_data
-            WHERE symbol = 'U' AND data_type = 'stock'
+            WHERE symbol = config.trading.symbol AND data_type = 'stock'
 
             UNION ALL
 

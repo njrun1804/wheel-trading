@@ -5,7 +5,6 @@ import tempfile
 from datetime import datetime, timedelta
 
 import pytest
-
 from unity_wheel.analytics.performance_tracker import PerformanceTracker, UnityOutcome
 
 

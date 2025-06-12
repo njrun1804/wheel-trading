@@ -2,7 +2,6 @@ import logging
 
 import duckdb
 import pytest
-
 from unity_wheel.data_providers.base.validation import MarketDataValidator
 from unity_wheel.monitoring.scripts import data_quality_monitor as dq
 from unity_wheel.risk.pure_borrowing_analyzer import PureBorrowingAnalyzer

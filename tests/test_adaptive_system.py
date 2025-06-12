@@ -11,7 +11,7 @@ import pytest
 # Test the core adaptive logic directly
 def test_volatility_scaling():
     """Test that position size scales correctly with volatility."""
-    portfolio = 200000
+    portfolio = config.trading.portfolio_value
     base_pct = 0.20
 
     # Test volatility factors
@@ -83,7 +83,7 @@ def test_parameter_adaptation():
 
 def test_position_size_calculation():
     """Test complete position size calculation."""
-    portfolio = 200000
+    portfolio = config.trading.portfolio_value
     base_pct = 0.20
 
     # Scenario 1: Normal conditions

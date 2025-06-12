@@ -1,4 +1,5 @@
 import sys
+
 sys.modules.setdefault("google", type(sys)("google"))
 sys.modules.setdefault("google.cloud", type(sys)("google.cloud"))
 sys.modules.setdefault("google.cloud.storage", type(sys)("google.cloud.storage"))
@@ -6,14 +7,16 @@ sys.modules.setdefault("google.cloud.exceptions", type(sys)("google.cloud.except
 sys.modules["google.cloud.exceptions"].NotFound = Exception
 sys.modules.setdefault("databento", type(sys)("databento"))
 import types
+
 dbn = types.ModuleType("databento_dbn")
 dbn.Schema = object
 dbn.SType = object
 sys.modules.setdefault("databento_dbn", dbn)
-from unity_wheel.monitoring import performance_monitored, get_performance_monitor
-from unity_wheel.storage.cache.general_cache import cached, invalidate_cache
 from unity_wheel.metrics import metrics_collector
+from unity_wheel.monitoring import get_performance_monitor, performance_monitored
 from unity_wheel.risk.analytics import RiskMetrics
+from unity_wheel.storage.cache.general_cache import cached, invalidate_cache
+
 
 @performance_monitored("sample_func")
 @cached(ttl=1)
@@ -64,5 +67,3 @@ def test_performance_report_generation() -> None:
     assert "operations_tracked" in json_report
     metrics_output = metrics_collector.generate_report()
     assert "DECISION METRICS REPORT" in metrics_output
-
-

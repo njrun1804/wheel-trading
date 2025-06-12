@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from typing import Any
 
 import pytest
 from hypothesis import assume, given
 from hypothesis import strategies as st
-
 from unity_wheel.models.account import Account
 
 
@@ -17,7 +16,7 @@ class TestAccountBasic:
 
     def test_account_creation_basic(self) -> None:
         """Test creating a basic account."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         account = Account(
             cash_balance=50000.0,
             buying_power=100000.0,
@@ -63,9 +62,9 @@ class TestAccountBasic:
 
     def test_default_timestamp(self) -> None:
         """Test that default timestamp is set correctly."""
-        before = datetime.now(timezone.utc)
+        before = datetime.now(UTC)
         account = Account(cash_balance=10000.0, buying_power=10000.0)
-        after = datetime.now(timezone.utc)
+        after = datetime.now(UTC)
 
         assert before <= account.timestamp <= after
         assert account.timestamp.tzinfo is not None
@@ -156,7 +155,7 @@ class TestAccountBasic:
 
     def test_account_serialization(self) -> None:
         """Test converting Account to/from dictionary."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         account = Account(
             cash_balance=50000.0,
             buying_power=100000.0,
@@ -264,7 +263,7 @@ class TestAccountPropertyBased:
                 "cash_balance": st.floats(min_value=0, max_value=1e6),
                 "buying_power": st.floats(min_value=0, max_value=1e6),
                 "margin_used": st.floats(min_value=0, max_value=1e6),
-                "timestamp": st.datetimes(timezones=st.just(timezone.utc)),
+                "timestamp": st.datetimes(timezones=st.just(UTC)),
             }
         )
     )
@@ -352,7 +351,7 @@ class TestAccountEdgeCases:
         assert account1.timestamp.tzinfo is not None
 
         # Already a datetime object
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         data2 = {**base_data, "timestamp": now}
         account2 = Account.from_dict(data2)
         assert account2.timestamp == now

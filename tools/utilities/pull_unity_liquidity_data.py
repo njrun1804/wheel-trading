@@ -242,6 +242,10 @@ from scipy.optimize import minimize
 from typing import List, Tuple, Dict
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 class GreekOptimizer:
     """Optimize put selection across multiple strikes and dates."""
@@ -452,7 +456,7 @@ def main():
     # Current market parameters
     spot_price = 25.68
     current_volatility = 0.87
-    portfolio_value = 100000
+    portfolio_value = config.trading.portfolio_value
 
     optimizer = GreekOptimizer(target_delta=-0.40, max_positions=3)
 

@@ -65,7 +65,7 @@ async def test_spy_options():
         print("\n3. Finding wheel candidates for SPY...")
         candidates = await integration.get_wheel_candidates(
             underlying="SPY",
-            target_delta=0.30,
+            target_delta = config.trading.target_delta,
             dte_range=(20, 50),
             min_premium_pct=0.5,  # Lower for SPY since it's less volatile
         )

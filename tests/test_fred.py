@@ -4,15 +4,14 @@ import asyncio
 import json
 import os
 import sqlite3
+from datetime import UTC, datetime, timedelta, timezone
 from datetime import date as Date
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import List
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp import ClientError
-
 from unity_wheel.data_providers.base import (
     FREDClient,
     FREDDataManager,
@@ -46,7 +45,7 @@ class TestFREDModels:
             frequency="D",
             units="Percent",
             seasonal_adjustment="Not Applicable",
-            last_updated=datetime.now(timezone.utc),
+            last_updated=datetime.now(UTC),
             popularity=80,
             notes="Test series",
         )
@@ -81,7 +80,7 @@ class TestFREDModels:
             frequency="D",
             units="Units",
             seasonal_adjustment="NA",
-            last_updated=datetime.now(timezone.utc),
+            last_updated=datetime.now(UTC),
         )
 
         observations = [
@@ -294,7 +293,7 @@ class TestFREDStorage:
             frequency="D",
             units="Units",
             seasonal_adjustment="NA",
-            last_updated=datetime.now(timezone.utc),
+            last_updated=datetime.now(UTC),
             popularity=50,
         )
 
@@ -363,7 +362,7 @@ class TestFREDStorage:
             frequency="D",
             units="Units",
             seasonal_adjustment="NA",
-            last_updated=datetime.now(timezone.utc),
+            last_updated=datetime.now(UTC),
         )
         temp_db.save_series_metadata(series)
 
@@ -454,7 +453,7 @@ class TestFREDDataManager:
             frequency="D",
             units="Percent",
             seasonal_adjustment="NA",
-            last_updated=datetime.now(timezone.utc),
+            last_updated=datetime.now(UTC),
         )
         temp_manager.storage.save_series_metadata(series)
 

@@ -33,6 +33,10 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Try importing optional dependencies
 REDIS_AVAILABLE = False
 POSTGRES_AVAILABLE = False
@@ -829,7 +833,7 @@ class DuckDBBackend(StorageBackend):
         return conn.execute(
             """
             SELECT * FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN ? AND ?
         """,
             [min_delta, max_delta],
@@ -842,7 +846,7 @@ class DuckDBBackend(StorageBackend):
         return conn.execute(
             """
             SELECT * FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN ? AND ?
         """,
@@ -858,7 +862,7 @@ class DuckDBBackend(StorageBackend):
                    (bid + ask) / 2.0 as premium_received,
                    abs(delta) * 100 as delta_pct
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
         """
@@ -889,7 +893,7 @@ class DuckDBBackend(StorageBackend):
                    (bid + ask) / 2.0 * 100 * 365.0 / days_to_expiry / (strike * 100) as expected_return_annualized,
                    row_number() OVER (ORDER BY {order_by}) as rank
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
             ORDER BY {order_by}
@@ -908,7 +912,7 @@ class DuckDBBackend(StorageBackend):
                 avg(implied_volatility) as avg_iv,
                 count(*) as option_count
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
         """
@@ -1017,7 +1021,7 @@ class SQLiteBackend(StorageBackend):
         return pd.read_sql(
             """
             SELECT * FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN ? AND ?
         """,
             conn,
@@ -1031,7 +1035,7 @@ class SQLiteBackend(StorageBackend):
         return pd.read_sql(
             """
             SELECT * FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN ? AND ?
         """,
@@ -1048,7 +1052,7 @@ class SQLiteBackend(StorageBackend):
                    (bid + ask) / 2.0 as premium_received,
                    abs(delta) * 100 as delta_pct
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
         """,
@@ -1062,7 +1066,7 @@ class SQLiteBackend(StorageBackend):
             SELECT *,
                    (bid + ask) / 2.0 * 100 * 365.0 / days_to_expiry / (strike * 100) as expected_return_annualized
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
             ORDER BY expected_return_annualized DESC
@@ -1082,7 +1086,7 @@ class SQLiteBackend(StorageBackend):
                 avg(implied_volatility) as avg_iv,
                 count(*) as option_count
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
         """
@@ -1257,7 +1261,7 @@ class PostgreSQLBackend(StorageBackend):
         return pd.read_sql(
             """
             SELECT * FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN %s AND %s
         """,
             self.conn,
@@ -1270,7 +1274,7 @@ class PostgreSQLBackend(StorageBackend):
         return pd.read_sql(
             """
             SELECT * FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN %s AND %s
         """,
@@ -1286,7 +1290,7 @@ class PostgreSQLBackend(StorageBackend):
                    (bid + ask) / 2.0 as premium_received,
                    abs(delta) * 100 as delta_pct
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
         """,
@@ -1299,7 +1303,7 @@ class PostgreSQLBackend(StorageBackend):
             SELECT *,
                    (bid + ask) / 2.0 * 100 * 365.0 / days_to_expiry / (strike * 100) as expected_return_annualized
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
             ORDER BY expected_return_annualized DESC
@@ -1319,7 +1323,7 @@ class PostgreSQLBackend(StorageBackend):
                 avg(implied_volatility) as avg_iv,
                 count(*) as option_count
             FROM options
-            WHERE symbol = 'U' AND option_type = 'put'
+            WHERE symbol = config.trading.symbol AND option_type = 'put'
             AND delta BETWEEN -0.40 AND -0.20
             AND days_to_expiry BETWEEN 30 AND 60
         """

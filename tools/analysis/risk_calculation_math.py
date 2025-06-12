@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def show_risk_calculation_requirements():
     """Demonstrate why 250 days is enough for VaR/CVaR calculations."""
@@ -153,7 +157,7 @@ def demonstrate_var_calculation():
         print(f"  Difference: {abs(var_95 - var_95_param):.2%}")
 
         # Position sizing impact
-        portfolio = 100_000
+        portfolio = config.trading.portfolio_value_000
         max_loss = abs(var_95) * portfolio
         print(f"  Max daily loss (95%): ${max_loss:,.0f}")
 

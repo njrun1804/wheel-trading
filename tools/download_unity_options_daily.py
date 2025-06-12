@@ -44,7 +44,7 @@ class UnityOptionsDownloader:
         # Set up paths
         self.cache_dir = Path.home() / ".wheel_trading" / "cache"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.db_path = self.cache_dir / "wheel_cache.duckdb"
+        self.db_path = self.cache_dir / Path(config.storage.database_path).name
 
         # Get API key
         api_key = os.getenv("DATABENTO_API_KEY")

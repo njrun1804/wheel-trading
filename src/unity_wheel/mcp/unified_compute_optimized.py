@@ -19,6 +19,7 @@ from .filesystem_index import FilesystemIndex, search_codebase
 from .sequential_thinking_config import SequentialThinkingEngine
 from .adaptive_config import AdaptiveConfig
 from .unified_cache import UnifiedCache
+from .graph_mcp import GraphMCP
 
 
 @dataclass
@@ -48,6 +49,7 @@ class OptimizedUnifiedCompute:
         self.cache = UnifiedCache()
         self.filesystem_index = FilesystemIndex(project_root)
         self.sequential_engine = SequentialThinkingEngine()
+        self.graph_mcp = GraphMCP(project_root)  # NEW: Graph MCP
         
         # Performance tracking
         self.metrics = ExecutionMetrics(
@@ -63,13 +65,26 @@ class OptimizedUnifiedCompute:
         self.cpu_cores = multiprocessing.cpu_count()
         self.executor = ThreadPoolExecutor(max_workers=min(8, self.cpu_cores))
         
-        # Initialize filesystem index
-        asyncio.create_task(self._init_filesystem_index())
+        # Initialize indexes in parallel
+        asyncio.create_task(self._init_all_indexes())
+        
+    async def _init_all_indexes(self):
+        """Initialize all indexes in parallel."""
+        # Run filesystem and graph indexing concurrently
+        tasks = [
+            self._init_filesystem_index(),
+            self._init_graph_index()
+        ]
+        await asyncio.gather(*tasks, return_exceptions=True)
         
     async def _init_filesystem_index(self):
         """Initialize filesystem index in background."""
         self.filesystem_index.connect()
         await self.filesystem_index.build_index(force_rebuild=False)
+        
+    async def _init_graph_index(self):
+        """Initialize code graph in background."""
+        await self.graph_mcp.build_or_load(force_rebuild=False)
         
     def analyze_query_complexity(self, query: str) -> str:
         """

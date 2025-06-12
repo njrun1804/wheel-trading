@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from unity_wheel.risk.analytics import RiskAnalyzer
 
 # Note: The individual functions may not exist anymore

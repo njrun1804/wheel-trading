@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from unity_wheel.models.position import Position
 from unity_wheel.strategy.wheel import WheelStrategy
 
@@ -73,9 +72,9 @@ class TestWheelStrategy:
         """Test position sizing calculation."""
         # With 20% max allocation and $100k portfolio
         size = wheel.calculate_position_size(
-            symbol="U",
+            symbol = config.trading.symbol,
             current_price=35,
-            portfolio_value=100000,
+            portfolio_value = config.trading.portfolio_value,
         )
 
         # Max allocation: $20k / $3.5k per contract = 5.7, rounds to 5
@@ -83,9 +82,9 @@ class TestWheelStrategy:
 
         # Test with larger portfolio
         size = wheel.calculate_position_size(
-            symbol="U",
+            symbol = config.trading.symbol,
             current_price=35,
-            portfolio_value=1000000,
+            portfolio_value = config.trading.portfolio_value0,
         )
         # Max allocation: $200k / $3.5k per contract = 57
         assert size == 57
@@ -93,7 +92,7 @@ class TestWheelStrategy:
     def test_should_roll_position_expiry(self, wheel):
         """Test rolling decision based on expiry."""
         position = Position(
-            symbol="U",
+            symbol = config.trading.symbol,
             qty=-1,
             avg_price=2.50,
             option_type="put",
@@ -112,7 +111,7 @@ class TestWheelStrategy:
     def test_should_roll_position_deep_itm_put(self, wheel):
         """Test rolling deep ITM put."""
         position = Position(
-            symbol="U",
+            symbol = config.trading.symbol,
             qty=-1,
             avg_price=2.50,
             option_type="put",
@@ -131,7 +130,7 @@ class TestWheelStrategy:
     def test_should_roll_position_deep_itm_call(self, wheel):
         """Test rolling deep ITM call."""
         position = Position(
-            symbol="U",
+            symbol = config.trading.symbol,
             qty=-1,
             avg_price=2.50,
             option_type="call",
@@ -150,7 +149,7 @@ class TestWheelStrategy:
     def test_should_not_roll_position(self, wheel):
         """Test when position should not be rolled."""
         position = Position(
-            symbol="U",
+            symbol = config.trading.symbol,
             qty=-1,
             avg_price=2.50,
             option_type="put",
@@ -161,7 +160,7 @@ class TestWheelStrategy:
         should_roll = wheel.should_roll_position(
             position=position,
             current_price=38,
-            days_to_expiry=30,
+            days_to_expiry = config.trading.target_dte,
             current_delta=-0.3,  # Target delta
         )
         assert should_roll is False

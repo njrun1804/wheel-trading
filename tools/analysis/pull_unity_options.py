@@ -11,6 +11,10 @@ from datetime import datetime, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.unity_wheel.utils.databento_unity import (
+
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
     cost_estimate,
     get_equity_bars,
     get_wheel_candidates,
@@ -46,11 +50,11 @@ async def main():
         # Store in DuckDB
         import duckdb
 
-        db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+        db_path = os.path.expanduser(config.storage.database_path)
         conn = duckdb.connect(db_path)
 
         # Update price history
-        conn.execute("DELETE FROM price_history WHERE symbol = 'U'")
+        conn.execute("DELETE FROM price_history WHERE symbol = config.trading.symbol")
 
         for _, row in bars.iterrows():
             conn.execute(
@@ -81,7 +85,7 @@ async def main():
 
     # Get wheel candidates
     candidates = get_wheel_candidates(
-        target_delta=0.30, dte_range=(30, 60), moneyness_range=0.15  # ±15% from ATM
+        target_delta = config.trading.target_delta, dte_range=(30, 60), moneyness_range=0.15  # ±15% from ATM
     )
 
     if candidates.empty:

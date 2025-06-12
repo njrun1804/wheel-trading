@@ -9,6 +9,10 @@ from datetime import datetime
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def daily_health_check():
     """Perform essential daily health checks."""
@@ -121,7 +125,7 @@ def daily_health_check():
             """
             SELECT close, volume, date
             FROM stock_prices
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date DESC
             LIMIT 1
         """

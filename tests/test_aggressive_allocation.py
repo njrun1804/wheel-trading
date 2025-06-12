@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
-
-from src.config.loader import ConfigurationLoader
 from unity_wheel.api.advisor import WheelAdvisor
 from unity_wheel.data_providers.databento.types import OptionType
 from unity_wheel.models.account import Account
@@ -17,6 +15,8 @@ from unity_wheel.models.position import Position, PositionType
 from unity_wheel.risk.analytics import RiskAnalyzer
 from unity_wheel.risk.limits import TradingLimits
 from unity_wheel.strategy.wheel import WheelStrategy
+
+from src.config.loader import ConfigurationLoader
 
 
 class TestAggressiveAllocation:

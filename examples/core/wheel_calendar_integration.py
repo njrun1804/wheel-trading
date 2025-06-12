@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 
 from src.unity_wheel.utils import SimpleTradingCalendar
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def find_optimal_expiration(target_dte: int = 45) -> datetime:
     """Find the optimal expiration date for Unity options.
@@ -107,7 +111,7 @@ def main():
     print("=" * 50)
 
     # Find optimal expiration
-    target_dte = 45
+    target_dte = config.trading.target_dte
     optimal_expiry = find_optimal_expiration(target_dte)
     print(f"\nTarget DTE: {target_dte} days")
     print(f"Optimal expiry: {optimal_expiry.strftime('%Y-%m-%d %A')}")

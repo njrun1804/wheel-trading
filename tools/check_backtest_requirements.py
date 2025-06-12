@@ -26,7 +26,7 @@ def check_backtest_requirements():
             COUNT(CASE WHEN returns IS NOT NULL THEN 1 END) as days_with_returns,
             COUNT(CASE WHEN volatility_20d IS NOT NULL THEN 1 END) as days_with_vol
         FROM backtest_features
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
     """
     ).fetchone()
 
@@ -161,7 +161,7 @@ def check_backtest_requirements():
         )
         SELECT COUNT(*) as missing_days
         FROM trading_days t
-        LEFT JOIN backtest_features bf ON t.date = bf.date AND bf.symbol = 'U'
+        LEFT JOIN backtest_features bf ON t.date = bf.date AND bf.symbol = config.trading.symbol
         WHERE bf.date IS NULL
         AND t.date <= CURRENT_DATE
     """

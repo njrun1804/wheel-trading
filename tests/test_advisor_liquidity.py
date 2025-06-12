@@ -5,7 +5,6 @@ Validates that option liquidity checks work correctly.
 """
 
 import pytest
-
 from unity_wheel.api.advisor import WheelAdvisor
 
 

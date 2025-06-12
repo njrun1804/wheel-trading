@@ -8,6 +8,10 @@ import math
 
 import numpy as np
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def analyze_wheel_strategy_needs():
     """What does the wheel strategy actually use?"""
@@ -123,7 +127,7 @@ def show_actual_vol_calculations():
     print(f"From intraday data: {annual_vol_intraday:.0%} annual")
 
     # Impact on position sizing
-    portfolio = 100_000
+    portfolio = config.trading.portfolio_value_000
     target_risk = 0.02  # 2% daily risk
 
     position_size_daily = (target_risk * portfolio) / (annual_vol_daily / math.sqrt(252))

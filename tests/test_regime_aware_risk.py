@@ -16,7 +16,7 @@ from sklearn.mixture import GaussianMixture
 
 warnings.filterwarnings("ignore")
 
-DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+DB_PATH = os.path.expanduser(config.storage.database_path)
 
 
 class RegimeAwareRiskAnalyzer:
@@ -190,7 +190,7 @@ def main():
         """
         SELECT date, returns
         FROM price_history
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         AND returns IS NOT NULL
         ORDER BY date
     """

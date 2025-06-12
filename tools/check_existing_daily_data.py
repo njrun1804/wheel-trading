@@ -8,8 +8,12 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Database path
-db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+db_path = Path(config.storage.database_path).expanduser()
 
 
 def check_data():
@@ -30,7 +34,7 @@ def check_data():
                 MAX(date) as end_date,
                 AVG(close) as avg_price
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 

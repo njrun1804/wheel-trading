@@ -17,6 +17,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tools.download_unity_options_only import UnityOptionsOnlyDownloader
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
@@ -26,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 def check_download_progress():
     """Check current download progress."""
-    db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+    db_path = Path(config.storage.database_path).expanduser()
     conn = duckdb.connect(str(db_path))
 
     # Get summary

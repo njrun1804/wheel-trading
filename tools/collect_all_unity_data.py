@@ -174,7 +174,7 @@ async def store_stock_data(adapter: DatabentoStorageAdapter, df: pd.DataFrame) -
             """
             SELECT MIN(date), MAX(date), COUNT(*)
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 
@@ -189,7 +189,7 @@ async def store_stock_data(adapter: DatabentoStorageAdapter, df: pd.DataFrame) -
             exists = conn.execute(
                 """
                 SELECT 1 FROM price_history
-                WHERE symbol = 'U' AND date = ?
+                WHERE symbol = config.trading.symbol AND date = ?
             """,
                 [date],
             ).fetchone()
@@ -458,7 +458,7 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
                 COUNT(*) as total_days,
                 COUNT(DISTINCT EXTRACT(YEAR FROM date)) as years_covered
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 
@@ -473,7 +473,7 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
                 COUNT(*) as total_options,
                 AVG(ask - bid) as avg_spread
             FROM databento_option_chains
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             AND option_type = 'PUT'
         """
         ).fetchone()
@@ -491,7 +491,7 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
                 MIN(strike) as min_strike,
                 MAX(strike) as max_strike
             FROM databento_option_chains
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             AND option_type = 'PUT'
             GROUP BY price_range
         """
@@ -502,8 +502,8 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
             """
             WITH date_series AS (
                 SELECT generate_series(
-                    (SELECT MIN(date) FROM price_history WHERE symbol = 'U'),
-                    (SELECT MAX(date) FROM price_history WHERE symbol = 'U'),
+                    (SELECT MIN(date) FROM price_history WHERE symbol = config.trading.symbol),
+                    (SELECT MAX(date) FROM price_history WHERE symbol = config.trading.symbol),
                     '1 day'::interval
                 )::date as date
             ),
@@ -514,7 +514,7 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
             SELECT COUNT(*) as missing_days
             FROM trading_days td
             LEFT JOIN price_history ph
-                ON td.date = ph.date AND ph.symbol = 'U'
+                ON td.date = ph.date AND ph.symbol = config.trading.symbol
             WHERE ph.date IS NULL
         """
         ).fetchone()
@@ -557,7 +557,7 @@ async def main():
 
         # Initialize components
         config = get_config()
-        db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+        db_path = os.path.expanduser(config.storage.database_path)
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
         # Create storage stack
@@ -590,7 +590,7 @@ async def main():
                     """
                     SELECT date, open, high, low, close, volume
                     FROM price_history
-                    WHERE symbol = 'U'
+                    WHERE symbol = config.trading.symbol
                     ORDER BY date
                 """
                 ).fetchall()

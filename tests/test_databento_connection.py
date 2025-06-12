@@ -45,13 +45,9 @@ async def test_connection():
             count = 0
             for record in response:
                 count += 1
-<<<<<<< Updated upstream
                 print(
                     f"   Date: {datetime.fromtimestamp(record.ts_event / 1e9, tz=timezone.utc).date()}"
                 )
-=======
-                print(f"   Date: {datetime.fromtimestamp(record.ts_event / 1e9, tz=UTC).date()}")
->>>>>>> Stashed changes
                 print(f"   Close: ${float(record.close) / 1e9:.2f}")
                 print(f"   Volume: {record.volume:,}")
                 if count >= 2:  # Just show first 2 records

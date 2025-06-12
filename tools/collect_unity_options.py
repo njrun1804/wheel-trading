@@ -76,7 +76,7 @@ async def collect_historical_chains(
 
     # Initialize components
     config = get_config()
-    db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+    db_path = os.path.expanduser(config.storage.database_path)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
     # Create storage stack
@@ -299,7 +299,7 @@ async def validate_stored_data(symbol: str = "U") -> None:
 
     from src.unity_wheel.storage.duckdb_cache import CacheConfig
 
-    db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+    db_path = os.path.expanduser(config.storage.database_path)
     # Create cache config with the path
     cache_config = CacheConfig(cache_dir=Path(db_path).parent)
     cache = DuckDBCache(cache_config)

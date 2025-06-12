@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pytest
-
 from unity_wheel.analytics import AssignmentProbability, UnityAssignmentModel
 
 
@@ -21,7 +20,7 @@ class TestUnityAssignmentModel:
         result = model.probability_of_assignment(
             spot_price=35.0,
             strike_price=30.0,  # 14% OTM
-            days_to_expiry=30,
+            days_to_expiry = config.trading.target_dte,
             volatility=0.50,
             near_earnings=False,
         )
@@ -100,7 +99,7 @@ class TestUnityAssignmentModel:
         far_result = model.probability_of_assignment(
             spot_price=35.0,
             strike_price=34.5,  # Slightly ITM
-            days_to_expiry=30,
+            days_to_expiry = config.trading.target_dte,
             volatility=0.50,
             near_earnings=False,
         )
@@ -203,7 +202,7 @@ class TestUnityAssignmentModel:
         deep_otm = model.probability_of_assignment(
             spot_price=30.0,
             strike_price=40.0,  # 25% OTM
-            days_to_expiry=30,
+            days_to_expiry = config.trading.target_dte,
             volatility=0.50,
             near_earnings=False,
         )

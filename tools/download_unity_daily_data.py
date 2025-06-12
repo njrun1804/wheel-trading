@@ -22,6 +22,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout)
 logger = logging.getLogger(__name__)
@@ -32,7 +36,7 @@ class UnityDailyDataDownloader:
 
     def __init__(self):
         self.client = DatabentoClient()
-        self.db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+        self.db_path = Path(config.storage.database_path).expanduser()
         self.conn = duckdb.connect(str(self.db_path))
 
         # Create tables for daily data

@@ -481,7 +481,7 @@ class ConfigurationLoader:
 _config_loader: Optional[ConfigurationLoader] = None
 
 
-def get_config_loader(config_path: Union[str, Path] = os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml")) -> ConfigurationLoader:
+def get_config_loader(config_path: Union[str, Path] = os.getenv("WHEEL_CONFIG_PATH", "config_unified.yaml")) -> ConfigurationLoader:
     """Get or create configuration loader singleton."""
     global _config_loader
     if _config_loader is None:

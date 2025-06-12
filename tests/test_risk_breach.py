@@ -5,14 +5,14 @@ sys.modules.setdefault("google", types.ModuleType("google"))
 sys.modules.setdefault("google.cloud", types.ModuleType("google.cloud"))
 sys.modules.setdefault("google.cloud.storage", types.ModuleType("google.cloud.storage"))
 exc_mod = types.ModuleType("google.cloud.exceptions")
-setattr(exc_mod, "NotFound", type("NotFound", (), {}))
+exc_mod.NotFound = type("NotFound", (), {})
 sys.modules.setdefault("google.cloud.exceptions", exc_mod)
 
 from unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits, RiskMetrics
 
 
 def test_risk_limit_breach_detection():
-    limits = RiskLimits(max_var_95=0.05, max_cvar_95=0.07)
+    limits = RiskLimits(max_var_95 = config.risk.max_var_95, max_cvar_95 = config.risk.max_cvar_95)
     analyzer = RiskAnalyzer(limits=limits)
 
     metrics = RiskMetrics(

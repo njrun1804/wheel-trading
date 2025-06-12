@@ -18,7 +18,6 @@ import numpy as np
 import psutil
 import pytest
 from memory_profiler import memory_usage
-
 from unity_wheel.api.advisor import WheelAdvisor
 from unity_wheel.data_providers.databento.types import OptionChain, OptionQuote
 from unity_wheel.math.options import (

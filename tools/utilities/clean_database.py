@@ -4,7 +4,11 @@ import os
 
 import duckdb
 
-db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
+db_path = os.path.expanduser(config.storage.database_path)
 conn = duckdb.connect(db_path)
 
 print("🧹 DATABASE CLEANUP")
@@ -36,7 +40,7 @@ inverted = conn.execute(
     """
     SELECT COUNT(*)
     FROM databento_option_chains
-    WHERE symbol = 'U' AND bid > ask
+    WHERE symbol = config.trading.symbol AND bid > ask
 """
 ).fetchone()[0]
 
@@ -50,7 +54,7 @@ if inverted > 0:
         SET bid = ask,
             ask = bid,
             mid = (bid + ask) / 2
-        WHERE symbol = 'U' AND bid > ask
+        WHERE symbol = config.trading.symbol AND bid > ask
     """
     )
     print("   ✅ Fixed all inverted spreads")
@@ -102,7 +106,7 @@ unity_quality = conn.execute(
         COUNT(*) as records,
         0 as quality_issues
     FROM price_history
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 
     UNION ALL
 
@@ -111,7 +115,7 @@ unity_quality = conn.execute(
         COUNT(*) as records,
         SUM(CASE WHEN bid > ask OR bid < 0 OR ask < 0 THEN 1 ELSE 0 END) as quality_issues
     FROM databento_option_chains
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 """
 ).fetchall()
 

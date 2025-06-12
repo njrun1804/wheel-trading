@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 from unity_wheel.utils.recovery import RecoveryStrategy, validate_and_recover, with_recovery
 
 

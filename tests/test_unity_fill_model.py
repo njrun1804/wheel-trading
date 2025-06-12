@@ -1,7 +1,6 @@
 """Test Unity-specific fill model."""
 
 import pytest
-
 from unity_wheel.execution.unity_fill_model import FillEstimate, UnityFillModel
 
 

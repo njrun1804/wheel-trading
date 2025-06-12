@@ -60,7 +60,7 @@ async def run_basic_backtest():
 
     # Run backtest with default parameters
     results = await backtester.backtest_strategy(
-        symbol="U",
+        symbol = config.trading.symbol,
         start_date=start_date,
         end_date=end_date,
         initial_capital=100000,
@@ -102,7 +102,7 @@ async def optimize_parameters():
 
     # Run optimization
     optimization_results = await backtester.optimize_parameters(
-        symbol="U",
+        symbol = config.trading.symbol,
         start_date=start_date,
         end_date=end_date,
         delta_range=(0.20, 0.40),  # Test 20-40 delta
@@ -140,7 +140,7 @@ async def backtest_different_deltas():
         params = WheelParameters(target_delta=delta)
 
         result = await backtester.backtest_strategy(
-            symbol="U",
+            symbol = config.trading.symbol,
             start_date=start_date,
             end_date=end_date,
             initial_capital=100000,

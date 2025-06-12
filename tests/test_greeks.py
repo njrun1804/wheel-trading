@@ -7,7 +7,6 @@ from typing import Any, Optional
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
-
 from unity_wheel.models.greeks import Greeks
 
 
@@ -191,11 +190,11 @@ class TestGreeksPropertyBased:
     )
     def test_greeks_valid_ranges(
         self,
-        delta: Optional[float],
-        gamma: Optional[float],
-        theta: Optional[float],
-        vega: Optional[float],
-        rho: Optional[float],
+        delta: float | None,
+        gamma: float | None,
+        theta: float | None,
+        vega: float | None,
+        rho: float | None,
     ) -> None:
         """Test Greeks with random valid inputs."""
         greeks = Greeks(
@@ -246,7 +245,7 @@ class TestGreeksPropertyBased:
             }
         )
     )
-    def test_greeks_dict_roundtrip(self, data: dict[str, Optional[float]]) -> None:
+    def test_greeks_dict_roundtrip(self, data: dict[str, float | None]) -> None:
         """Test that Greeks can roundtrip through dict."""
         greeks = Greeks.from_dict(data)
         data2 = greeks.to_dict()

@@ -20,6 +20,10 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 # Note: Using direct databento client to avoid import issues
 
 # Setup logging
@@ -282,7 +286,7 @@ class ParquetUnityDownloader:
         logger.info("LOADING PARQUET FILES TO DUCKDB")
         logger.info("=" * 60)
 
-        db_path = Path("~/.wheel_trading/cache/wheel_cache.duckdb").expanduser()
+        db_path = Path(config.storage.database_path).expanduser()
         conn = duckdb.connect(str(db_path))
 
         try:

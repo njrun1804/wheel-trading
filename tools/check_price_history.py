@@ -11,10 +11,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 async def check_price_history():
     """Check legacy price history data quality."""
-    db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+    db_path = os.path.expanduser(config.storage.database_path)
 
     cache_config = CacheConfig(cache_dir=Path(db_path).parent)
     cache = DuckDBCache(cache_config)
@@ -26,7 +30,7 @@ async def check_price_history():
             """
             SELECT date, open, high, low, close, volume
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date DESC
             LIMIT 10
         """
@@ -52,7 +56,7 @@ async def check_price_history():
                 MAX(close) as max_price,
                 AVG(volume) as avg_volume
             FROM price_history
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
         """
         ).fetchone()
 

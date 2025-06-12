@@ -6,6 +6,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def fix_returns_and_volatility():
     """Fix the returns calculation with a simpler approach."""
@@ -57,7 +61,7 @@ def fix_returns_and_volatility():
                 MAX(returns_calc) as max_return,
                 STDDEV(returns_calc) as daily_std
             FROM market_data
-            WHERE symbol = 'U' AND data_type = 'stock'
+            WHERE symbol = config.trading.symbol AND data_type = 'stock'
         """
         ).fetchone()
 
@@ -113,7 +117,7 @@ def fix_returns_and_volatility():
                         ROWS BETWEEN 249 PRECEDING AND CURRENT ROW
                     ) as avg_return_250d
                 FROM market_data
-                WHERE symbol = 'U'
+                WHERE symbol = config.trading.symbol
                 AND data_type = 'stock'
                 AND close IS NOT NULL
             )

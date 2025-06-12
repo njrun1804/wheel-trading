@@ -5,6 +5,10 @@ from pathlib import Path
 
 import duckdb
 
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
 
 def verify_data_coverage():
     """Check data coverage and gaps in our 3-year dataset."""
@@ -25,7 +29,7 @@ def verify_data_coverage():
             DATEDIFF('day', MIN(date), MAX(date)) as calendar_days,
             COUNT(*) as total_records
         FROM backtest_features
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
     """
     ).fetchone()
 
@@ -46,7 +50,7 @@ def verify_data_coverage():
                 LAG(date) OVER (ORDER BY date) as prev_date,
                 DATEDIFF('day', LAG(date) OVER (ORDER BY date), date) as gap_days
             FROM backtest_features
-            WHERE symbol = 'U'
+            WHERE symbol = config.trading.symbol
             ORDER BY date
         )
         SELECT
@@ -77,7 +81,7 @@ def verify_data_coverage():
             AVG(CASE WHEN volatility_20d IS NOT NULL THEN 1 ELSE 0 END) as pct_with_vol,
             AVG(volatility_20d) as avg_volatility
         FROM backtest_features
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         GROUP BY EXTRACT(YEAR FROM date)
         ORDER BY year
     """
@@ -136,7 +140,7 @@ def verify_data_coverage():
             COUNT(*) as days,
             COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () as percentage
         FROM backtest_features
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
         AND volatility_20d IS NOT NULL
         GROUP BY regime
         ORDER BY

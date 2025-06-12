@@ -22,7 +22,7 @@ from src.unity_wheel.secrets import SecretManager
 config = get_config()
 TICKER = config.unity.ticker
 REQUIRED_DAYS = 750
-DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+DB_PATH = os.path.expanduser(config.storage.database_path)
 
 
 async def main():

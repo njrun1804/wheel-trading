@@ -1,12 +1,11 @@
 """Tests for Databento integration."""
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-
 from unity_wheel.data_providers.databento.client import DatabentoClient
 from unity_wheel.data_providers.databento.types import (
     DataQuality,
@@ -317,7 +316,7 @@ class TestDatabentoClient:
 
         with patch("src.unity_wheel.databento.client.datetime") as mock_datetime:
             # Mock now() to return our base_time with UTC timezone
-            mock_datetime.now.return_value = base_time.replace(tzinfo=tz.utc)
+            mock_datetime.now.return_value = base_time.replace(tzinfo=UTC)
             mock_datetime.timedelta = timedelta
             mock_datetime.timezone = tz
 

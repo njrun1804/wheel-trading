@@ -4,13 +4,12 @@
 import asyncio
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import databento as db
 from databento_dbn import Schema, SType
-
 from unity_wheel.data_providers.databento import DatabentoClient
 from unity_wheel.utils import setup_structured_logging
 
@@ -25,8 +24,8 @@ async def test_direct_options():
 
     try:
         # Get a valid date range
-        end = datetime(2025, 6, 5, 0, 0, 0, tzinfo=timezone.utc)  # Thursday
-        start = datetime(2025, 6, 4, 0, 0, 0, tzinfo=timezone.utc)  # Wednesday
+        end = datetime(2025, 6, 5, 0, 0, 0, tzinfo=UTC)  # Thursday
+        start = datetime(2025, 6, 4, 0, 0, 0, tzinfo=UTC)  # Wednesday
 
         print(f"Using date range: {start.date()} to {end.date()}")
 
@@ -57,7 +56,7 @@ async def test_direct_options():
                     print(f"   ✅ Found: {record.raw_symbol}")
 
                 if count == 0:
-                    print(f"   ❌ No results")
+                    print("   ❌ No results")
                 else:
                     print(f"   Total found: {count}")
 

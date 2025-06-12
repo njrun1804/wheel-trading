@@ -9,7 +9,6 @@ from typing import Any
 import pytest
 from hypothesis import assume, given
 from hypothesis import strategies as st
-
 from unity_wheel.models.position import Position, PositionType
 
 

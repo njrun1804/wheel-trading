@@ -4,7 +4,11 @@ import os
 
 import duckdb
 
-db_path = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
+from unity_wheel.config.unified_config import get_config
+config = get_config()
+
+
+db_path = os.path.expanduser(config.storage.database_path)
 conn = duckdb.connect(db_path)
 
 print("🔧 FIXING NEGATIVE OPTION PRICES")
@@ -15,7 +19,7 @@ negative = conn.execute(
     """
     SELECT COUNT(*)
     FROM databento_option_chains
-    WHERE symbol = 'U' AND (bid < 0 OR ask < 0)
+    WHERE symbol = config.trading.symbol AND (bid < 0 OR ask < 0)
 """
 ).fetchone()[0]
 
@@ -33,7 +37,7 @@ if negative > 0:
                 WHEN ask < 0.01 THEN 0.11
                 ELSE ask
             END
-        WHERE symbol = 'U' AND (bid < 0 OR ask < 0)
+        WHERE symbol = config.trading.symbol AND (bid < 0 OR ask < 0)
     """
     )
 
@@ -42,7 +46,7 @@ if negative > 0:
         """
         UPDATE databento_option_chains
         SET mid = (bid + ask) / 2
-        WHERE symbol = 'U'
+        WHERE symbol = config.trading.symbol
     """
     )
 
@@ -60,7 +64,7 @@ issues = conn.execute(
         MIN(bid) as min_bid,
         MAX(ask) as max_ask
     FROM databento_option_chains
-    WHERE symbol = 'U'
+    WHERE symbol = config.trading.symbol
 """
 ).fetchone()
 
