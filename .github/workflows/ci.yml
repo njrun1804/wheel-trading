@@ -1,4 +1,5 @@
 name: CI
+# Fixed pip install -e . for proper package installation
 
 on:
   push:
