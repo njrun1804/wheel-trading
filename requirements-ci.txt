@@ -1,9 +1,14 @@
 # Core dependencies for CI/CD
+aiohappyeyeballs
 aiohttp
+aiosignal
 annotated-types
 attrs
+cffi
 click
+colorama
 cryptography
+databento
 duckdb
 frozenlist
 idna
@@ -18,15 +23,18 @@ pycparser
 pydantic
 pydantic-core
 pydantic-settings
+pygments
 python-dateutil
 python-dotenv
 pytz
 pyyaml
 requests
 rich
+scikit-learn
 scipy
 six
 tenacity
+threadpoolctl
 tqdm
 typing-extensions
 tzdata
