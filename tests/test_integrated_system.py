@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.analytics import EventType, IntegratedDecisionEngine
+from unity_wheel.analytics import EventType, IntegratedDecisionEngine
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 

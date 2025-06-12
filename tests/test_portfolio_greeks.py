@@ -15,9 +15,9 @@ sys.modules.setdefault("google.cloud.exceptions", exceptions)
 sys.modules.setdefault("google", google)
 sys.modules.setdefault("google.cloud", cloud)
 
-from src.unity_wheel.risk.analytics import RiskAnalyzer
-from src.unity_wheel.models.position import Position
-from src.unity_wheel.models.greeks import Greeks
+from unity_wheel.risk.analytics import RiskAnalyzer
+from unity_wheel.models.position import Position
+from unity_wheel.models.greeks import Greeks
 
 
 def test_aggregate_greeks_default_correlation() -> None:

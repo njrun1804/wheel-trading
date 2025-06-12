@@ -5,13 +5,13 @@ from __future__ import annotations
 import numpy as np
 from scipy.stats import norm
 
-from src.unity_wheel.math.options import (
+from unity_wheel.math.options import (
     black_scholes_price_validated,
     calculate_all_greeks,
     implied_volatility_validated,
     probability_itm_validated,
 )
-from src.unity_wheel.risk.analytics import RiskAnalyzer
+from unity_wheel.risk.analytics import RiskAnalyzer
 
 
 class TestBlackScholesPrice:
@@ -443,7 +443,7 @@ class TestNormCdfCache:
     """Ensure normal CDF caching operates correctly."""
 
     def test_norm_cdf_caching(self) -> None:
-        from src.unity_wheel.math.options import norm_cdf_cached, _cached_norm_cdf_scalar
+        from unity_wheel.math.options import norm_cdf_cached, _cached_norm_cdf_scalar
 
         _cached_norm_cdf_scalar.cache_clear()
         info_start = _cached_norm_cdf_scalar.cache_info()

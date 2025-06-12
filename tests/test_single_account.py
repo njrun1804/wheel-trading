@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from src.unity_wheel.portfolio import SchwabAccount, SingleAccountManager
+from unity_wheel.portfolio import SchwabAccount, SingleAccountManager
 
 
 class TestSingleAccountManager:

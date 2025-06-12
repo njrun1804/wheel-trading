@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from src.unity_wheel.math import (
+from unity_wheel.math import (
     black_scholes_price_validated,
     calculate_all_greeks,
     implied_volatility_validated,

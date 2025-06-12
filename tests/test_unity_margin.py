@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.unity_wheel.risk.unity_margin import (
+from unity_wheel.risk.unity_margin import (
     MarginResult,
     UnityMarginCalculator,
     calculate_unity_margin_requirement,

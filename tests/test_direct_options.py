@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import databento as db
 from databento_dbn import Schema, SType
 
-from src.unity_wheel.data_providers.databento import DatabentoClient
-from src.unity_wheel.utils import setup_structured_logging
+from unity_wheel.data_providers.databento import DatabentoClient
+from unity_wheel.utils import setup_structured_logging
 
 
 async def test_direct_options():

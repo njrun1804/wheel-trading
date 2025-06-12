@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import databento as db
 
-from src.unity_wheel.data_providers.databento.client import DatabentoClient
-from src.unity_wheel.secrets.integration import SecretInjector
+from unity_wheel.data_providers.databento.client import DatabentoClient
+from unity_wheel.secrets.integration import SecretInjector
 
 
 async def test_connection():

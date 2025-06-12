@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import pytest
 
-from src.unity_wheel.analytics import AssignmentProbability, UnityAssignmentModel
+from unity_wheel.analytics import AssignmentProbability, UnityAssignmentModel
 
 
 class TestUnityAssignmentModel:

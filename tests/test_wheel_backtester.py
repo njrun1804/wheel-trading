@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
-from src.unity_wheel.storage import Storage
-from src.unity_wheel.strategy.wheel import WheelParameters
+from unity_wheel.backtesting import BacktestPosition, BacktestResults, WheelBacktester
+from unity_wheel.storage import Storage
+from unity_wheel.strategy.wheel import WheelParameters
 
 
 class TestWheelBacktester:

@@ -5,10 +5,10 @@ import asyncio
 from datetime import date as Date
 from datetime import timedelta
 
-from src.unity_wheel.data_providers.base import FREDDataManager
-from src.unity_wheel.secrets.integration import SecretNotFoundError, get_fred_api_key
-from src.unity_wheel.storage.storage import Storage
-from src.unity_wheel.utils import setup_structured_logging as setup_logging
+from unity_wheel.data_providers.base import FREDDataManager
+from unity_wheel.secrets.integration import SecretNotFoundError, get_fred_api_key
+from unity_wheel.storage.storage import Storage
+from unity_wheel.utils import setup_structured_logging as setup_logging
 
 
 async def test_integration():

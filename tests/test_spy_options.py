@@ -8,10 +8,10 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.data_providers.base.storage import DataStorage
-from src.unity_wheel.data_providers.databento import DatabentoClient
-from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
-from src.unity_wheel.utils import setup_structured_logging
+from unity_wheel.data_providers.base.storage import DataStorage
+from unity_wheel.data_providers.databento import DatabentoClient
+from unity_wheel.data_providers.databento.integration import DatabentoIntegration
+from unity_wheel.utils import setup_structured_logging
 
 
 async def test_spy_options():

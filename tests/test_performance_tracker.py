@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.unity_wheel.analytics.performance_tracker import PerformanceTracker, UnityOutcome
+from unity_wheel.analytics.performance_tracker import PerformanceTracker, UnityOutcome
 
 
 class TestPerformanceTracker:

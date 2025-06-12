@@ -14,7 +14,7 @@ import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
 
-from src.unity_wheel.math.options import (
+from unity_wheel.math.options import (
     black_scholes_price_validated,
     calculate_all_greeks,
     implied_volatility_validated,

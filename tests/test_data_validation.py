@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from src.unity_wheel.utils.data_validator import DataValidator, die
+from unity_wheel.utils.data_validator import DataValidator, die
 
 
 class TestDataValidator:

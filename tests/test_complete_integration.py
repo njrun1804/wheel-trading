@@ -9,13 +9,13 @@ from datetime import datetime, timedelta
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config.unity import TICKER
-from src.unity_wheel.data_providers.databento import DatabentoClient
-from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
+from unity_wheel.data_providers.databento import DatabentoClient
+from unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,
 )
-from src.unity_wheel.data_providers.databento.integration import DatabentoIntegration
-from src.unity_wheel.storage import Storage, StorageConfig
-from src.unity_wheel.utils import setup_structured_logging
+from unity_wheel.data_providers.databento.integration import DatabentoIntegration
+from unity_wheel.storage import Storage, StorageConfig
+from unity_wheel.utils import setup_structured_logging
 
 
 async def test_complete_integration():
