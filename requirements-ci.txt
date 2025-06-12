@@ -8,7 +8,6 @@ cffi
 click
 colorama
 cryptography
-databento
 duckdb
 frozenlist
 idna
@@ -41,8 +40,39 @@ tzdata
 urllib3
 yarl
 
+# Data providers
+databento
+fredapi
+yfinance
+alpaca-py
+
+# Analytics and ML
+matplotlib
+seaborn
+plotly
+mlflow
+
+# Trading calendars
+exchange-calendars
+pandas-market-calendars
+
+# Performance optimization
+pyarrow
+polars
+numba
+numexpr
+
+# Async support
+asyncio
+asyncpg
+aiofiles
+
 # Test dependencies
 pytest
 pytest-cov
+pytest-asyncio
+pytest-mock
 ruff
 hypothesis
+black
+isort
