@@ -5,21 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import timedelta
 from functools import lru_cache
-from typing import Literal, NamedTuple, Union, overload
+from typing import Literal, NamedTuple, overload
 
 import numpy as np
 import numpy.typing as npt
 from scipy.stats import norm
 
-from ..utils import (
-    RecoveryStrategy,
-    get_feature_flags,
-    get_logger,
-    timed_operation,
-    with_recovery,
-)
-
 from ..storage.cache.general_cache import cached
+from ..utils import RecoveryStrategy, get_feature_flags, get_logger, timed_operation, with_recovery
 
 logger = get_logger(__name__)
 
@@ -40,7 +33,7 @@ def norm_cdf_cached(x: FloatOrArray) -> FloatOrArray:
 
 # Type aliases
 FloatArray = npt.NDArray[np.float64]
-FloatOrArray = Union[float, FloatArray]
+FloatOrArray = float | FloatArray
 OptionType = Literal["call", "put"]
 
 
