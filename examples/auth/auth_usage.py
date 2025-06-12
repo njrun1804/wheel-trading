@@ -14,9 +14,9 @@ import os
 from datetime import datetime
 from typing import Any, Dict
 
-from src.config.loader import get_config_loader
-from src.unity_wheel.auth.client_v2 import AuthClient
-from src.unity_wheel.utils.logging import get_logger
+from config.loader import get_config_loader
+from unity_wheel.auth.client_v2 import AuthClient
+from unity_wheel.utils.logging import get_logger
 
 # Setup logging
 logger = get_logger(__name__)

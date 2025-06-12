@@ -9,8 +9,8 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.secrets import SecretManager, SecretProvider
-from src.unity_wheel.secrets.integration import (
+from unity_wheel.secrets import SecretManager, SecretProvider
+from unity_wheel.secrets.integration import (
     SecretInjector,
     get_databento_api_key,
     get_ofred_api_key,
@@ -97,7 +97,7 @@ async def demo_auth_client_integration():
 
     try:
         # Import the enhanced AuthClient
-        from src.unity_wheel.auth.client_v2 import AuthClient
+        from unity_wheel.auth.client_v2 import AuthClient
 
         # Create client without providing credentials (uses SecretManager)
         print("Creating AuthClient without explicit credentials...")
@@ -123,8 +123,8 @@ async def demo_schwab_client_integration():
     print("\n=== SchwabClient Integration ===\n")
 
     try:
-        from src.unity_wheel.schwab import SchwabClient
-        from src.unity_wheel.secrets.integration import SecretInjector
+        from unity_wheel.schwab import SchwabClient
+        from unity_wheel.secrets.integration import SecretInjector
 
         # Use SecretInjector to provide credentials via environment
         print("Creating SchwabClient with SecretInjector...")

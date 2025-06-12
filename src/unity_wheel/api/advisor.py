@@ -62,7 +62,7 @@ class TradingConstraints:
 
     def __init__(self):
         """Initialize constraints from config."""
-        from src.config.loader import get_config
+        from config.loader import get_config
 
         config = get_config()
 

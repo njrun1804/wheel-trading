@@ -4,8 +4,8 @@ import sys
 from dataclasses import dataclass
 from typing import Dict, List, NoReturn
 
-from src.config.loader import get_config
-from src.unity_wheel.models.position import Position, PositionType
+from config.loader import get_config
+from unity_wheel.models.position import Position, PositionType
 
 from ..utils.logging import get_logger
 

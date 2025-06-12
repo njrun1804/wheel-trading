@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.unity_wheel.utils.position_sizing import DynamicPositionSizer, PositionSizeResult
+from unity_wheel.utils.position_sizing import DynamicPositionSizer, PositionSizeResult
 
 
 class TestDynamicPositionSizer:

@@ -11,8 +11,8 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.api.advisor import advise_position
-from src.unity_wheel.api.types import MarketSnapshot
+from unity_wheel.api.advisor import advise_position
+from unity_wheel.api.types import MarketSnapshot
 
 
 def main() -> None:

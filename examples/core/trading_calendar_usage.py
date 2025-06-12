@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from src.unity_wheel.utils import (
+from unity_wheel.utils import (
     SimpleTradingCalendar,
     days_to_expiry,
     get_next_expiry_friday,

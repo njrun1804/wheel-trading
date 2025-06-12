@@ -35,7 +35,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 import duckdb
 import numpy as np
 import requests
-from src.unity_wheel.utils import is_trading_day
+from unity_wheel.utils import is_trading_day
 
 
 class DailyHealthCheck:
@@ -504,7 +504,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv('.env.monitoring')
 
-from src.unity_wheel.monitoring.scripts.daily_health_check import DailyHealthCheck
+from unity_wheel.monitoring.scripts.daily_health_check import DailyHealthCheck
 
 # Create test alert
 checker = DailyHealthCheck()

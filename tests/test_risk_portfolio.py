@@ -13,9 +13,9 @@ if 'google' not in sys.modules:
     sys.modules['google.cloud.storage'] = storage_mod
     sys.modules['google.cloud.exceptions'] = exceptions_mod
 
-from src.unity_wheel.models.position import Position
-from src.unity_wheel.models.greeks import Greeks
-from src.unity_wheel.risk.analytics import RiskAnalyzer
+from unity_wheel.models.position import Position
+from unity_wheel.models.greeks import Greeks
+from unity_wheel.risk.analytics import RiskAnalyzer
 
 
 @pytest.fixture

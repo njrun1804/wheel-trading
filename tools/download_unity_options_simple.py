@@ -14,7 +14,7 @@ import pytz
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.unity_wheel.data_providers.databento import DatabentoClient
+from unity_wheel.data_providers.databento import DatabentoClient
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")

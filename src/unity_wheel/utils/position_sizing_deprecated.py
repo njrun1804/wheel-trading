@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from unity_wheel.utils.logging import StructuredLogger
 
-from src.config.loader import get_config
+from config.loader import get_config
 
 from ..risk.unity_margin import UnityMarginCalculator
 

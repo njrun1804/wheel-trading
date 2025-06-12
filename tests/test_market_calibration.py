@@ -15,8 +15,8 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.analytics.market_calibrator import MarketCalibrator
-from src.unity_wheel.risk.regime_detector import RegimeDetector
+from unity_wheel.analytics.market_calibrator import MarketCalibrator
+from unity_wheel.risk.regime_detector import RegimeDetector
 
 DB_PATH = os.path.expanduser("~/.wheel_trading/cache/wheel_cache.duckdb")
 

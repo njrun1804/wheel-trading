@@ -93,7 +93,7 @@ def test_core_functionality() -> List[Tuple[str, bool, str]]:
 
     # Test 1: Basic math operations
     try:
-        from src.unity_wheel.math.options import black_scholes_price_validated
+        from unity_wheel.math.options import black_scholes_price_validated
 
         result = black_scholes_price_validated(100, 100, 1, 0.05, 0.2, "call")
         if result.confidence > 0.9:
@@ -113,7 +113,7 @@ def test_core_functionality() -> List[Tuple[str, bool, str]]:
 
     # Test 2: Strategy module
     try:
-        from src.unity_wheel.strategy.wheel import WheelStrategy
+        from unity_wheel.strategy.wheel import WheelStrategy
 
         strategy = WheelStrategy()
         tests.append(("Wheel strategy creation", True, "Strategy object created"))
@@ -122,7 +122,7 @@ def test_core_functionality() -> List[Tuple[str, bool, str]]:
 
     # Test 3: Position sizing
     try:
-        from src.unity_wheel.utils.position_sizing import calculate_position_size
+        from unity_wheel.utils.position_sizing import calculate_position_size
 
         tests.append(("Position sizing import", True, "Module imported successfully"))
     except Exception as e:

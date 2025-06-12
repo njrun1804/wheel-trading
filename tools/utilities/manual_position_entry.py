@@ -7,7 +7,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.unity_wheel.models.position import Position
+from unity_wheel.models.position import Position
 
 
 def main():

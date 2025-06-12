@@ -21,14 +21,14 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.config.loader import get_config
-from src.unity_wheel.data_providers.databento.client import DatabentoClient
-from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
+from config.loader import get_config
+from unity_wheel.data_providers.databento.client import DatabentoClient
+from unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,
 )
-from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
-from src.unity_wheel.storage.storage import Storage, StorageConfig
-from src.unity_wheel.utils.logging import StructuredLogger
+from unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
+from unity_wheel.storage.storage import Storage, StorageConfig
+from unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -530,7 +530,7 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
 async def main():
     """Main entry point for comprehensive data collection."""
     # Import SecretInjector to handle API key
-    from src.unity_wheel.secrets.integration import SecretInjector, get_databento_api_key
+    from unity_wheel.secrets.integration import SecretInjector, get_databento_api_key
 
     # Check if API key exists in secrets
     try:

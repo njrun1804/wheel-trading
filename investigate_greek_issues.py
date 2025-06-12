@@ -8,7 +8,7 @@ Focus on the put delta and theta calculation problems.
 
 import duckdb
 
-from src.unity_wheel.math.options import calculate_all_greeks
+from unity_wheel.math.options import calculate_all_greeks
 
 
 def investigate_greek_issues():

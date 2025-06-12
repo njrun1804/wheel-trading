@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from src.unity_wheel.utils.random_utils import set_seed
+from unity_wheel.utils.random_utils import set_seed
 
 
 def test_set_seed_reproducibility() -> None:

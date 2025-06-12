@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 
 import pytest
 
-from src.unity_wheel.utils.trading_calendar import (
+from unity_wheel.utils.trading_calendar import (
     SimpleTradingCalendar,
     get_next_expiry_friday,
     is_trading_day,

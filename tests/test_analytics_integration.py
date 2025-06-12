@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.unity_wheel.analytics import (
+from unity_wheel.analytics import (
     AnomalyDetector,
     DynamicOptimizer,
     EventImpactAnalyzer,

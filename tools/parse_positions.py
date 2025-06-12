@@ -7,8 +7,8 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.unity_wheel.portfolio.broker_parser import parse_broker_paste
-from src.unity_wheel.portfolio.single_account import SingleAccountManager
+from unity_wheel.portfolio.broker_parser import parse_broker_paste
+from unity_wheel.portfolio.single_account import SingleAccountManager
 
 
 def main():

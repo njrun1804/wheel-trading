@@ -94,7 +94,7 @@ else:
 print("\n🏗️ Testing Unity imports:")
 sys.path.insert(0, ".")
 try:
-    from src.unity_wheel.math.options import black_scholes_price_validated
+    from unity_wheel.math.options import black_scholes_price_validated
 
     print("   ✓ Unity trading imports successful")
 except ImportError as e:

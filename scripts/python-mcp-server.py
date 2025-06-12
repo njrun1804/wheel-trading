@@ -32,8 +32,8 @@ class PythonAnalysisMCP:
         try:
             # Import project modules
             sys.path.insert(0, self.project_root)
-            from src.unity_wheel.math.options import calculate_greeks
-            from src.unity_wheel.utils.position_sizing import PositionSizer
+            from unity_wheel.math.options import calculate_greeks
+            from unity_wheel.utils.position_sizing import PositionSizer
 
             result = {
                 "timestamp": datetime.now().isoformat(),

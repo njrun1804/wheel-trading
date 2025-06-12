@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.unity_wheel.models.position import Position
-from src.unity_wheel.strategy.position_evaluator import (
+from unity_wheel.models.position import Position
+from unity_wheel.strategy.position_evaluator import (
     PositionEvaluator,
     PositionValue,
     SwitchAnalysis,

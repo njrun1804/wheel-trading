@@ -24,8 +24,8 @@ sys.path.insert(0, project_root)
 
 import logging
 
-from src.unity_wheel.data_providers.databento.client import DatabentoClient
-from src.unity_wheel.utils.logging import StructuredLogger
+from unity_wheel.data_providers.databento.client import DatabentoClient
+from unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 

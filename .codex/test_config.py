@@ -59,21 +59,21 @@ def test_imports():
     # Test Unity Wheel modules
     try:
         sys.path.insert(0, os.getcwd())
-        from src.unity_wheel.math.options import black_scholes_price_validated
+        from unity_wheel.math.options import black_scholes_price_validated
 
         import_tests["unity_math"] = True
     except ImportError as e:
         import_tests["unity_math"] = f"Failed: {e}"
 
     try:
-        from src.unity_wheel.strategy.wheel import WheelStrategy
+        from unity_wheel.strategy.wheel import WheelStrategy
 
         import_tests["unity_strategy"] = True
     except ImportError as e:
         import_tests["unity_strategy"] = f"Failed: {e}"
 
     try:
-        from src.unity_wheel.utils.position_sizing import DynamicPositionSizer
+        from unity_wheel.utils.position_sizing import DynamicPositionSizer
 
         import_tests["unity_utils"] = True
     except ImportError as e:
@@ -88,7 +88,7 @@ def test_functionality():
 
     try:
         sys.path.insert(0, os.getcwd())
-        from src.unity_wheel.math.options import black_scholes_price_validated
+        from unity_wheel.math.options import black_scholes_price_validated
 
         result = black_scholes_price_validated(100, 100, 1, 0.05, 0.2, "call")
         tests["black_scholes"] = {

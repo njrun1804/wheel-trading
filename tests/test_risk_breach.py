@@ -8,7 +8,7 @@ exc_mod = types.ModuleType("google.cloud.exceptions")
 setattr(exc_mod, "NotFound", type("NotFound", (), {}))
 sys.modules.setdefault("google.cloud.exceptions", exc_mod)
 
-from src.unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits, RiskMetrics
+from unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits, RiskMetrics
 
 
 def test_risk_limit_breach_detection():

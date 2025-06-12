@@ -13,7 +13,7 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 
-from src.config.loader import get_config
+from config.loader import get_config
 
 # Set up logging
 logging.basicConfig(
@@ -105,7 +105,7 @@ class EnvironmentValidator:
     def _check_models(self) -> None:
         """Check model functionality."""
         try:
-            from src.unity_wheel.models import Account, Greeks, Position
+            from unity_wheel.models import Account, Greeks, Position
 
             # Get Unity ticker from config
             config = get_config()
@@ -148,7 +148,7 @@ class EnvironmentValidator:
     def _check_math_functions(self) -> None:
         """Check options math functionality."""
         try:
-            from src.unity_wheel.math.options import (
+            from unity_wheel.math.options import (
                 black_scholes_price_validated,
                 calculate_all_greeks,
                 implied_volatility_validated,
@@ -196,7 +196,7 @@ class EnvironmentValidator:
     def _check_risk_analytics(self) -> None:
         """Check risk analytics functionality."""
         try:
-            from src.unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits
+            from unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits
 
             # Create analyzer
             limits = RiskLimits(max_var_95=0.05, max_cvar_95=0.075)
@@ -292,7 +292,7 @@ def self_diagnostic_test() -> None:
     """Run self-diagnostic test of calculations."""
     console.print("\n[bold blue]Self-Diagnostic Test[/bold blue]\n")
 
-    from src.unity_wheel.math.options import black_scholes_price_validated
+    from unity_wheel.math.options import black_scholes_price_validated
 
     # Known test cases
     test_cases = [

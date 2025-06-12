@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
-from src.unity_wheel.utils import StructuredLogger, get_logger
+from unity_wheel.utils import StructuredLogger, get_logger
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(__name__)

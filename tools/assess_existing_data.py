@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
+from unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
 
 
 async def assess_database():

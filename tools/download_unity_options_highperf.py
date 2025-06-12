@@ -42,7 +42,7 @@ def get_db_client() -> db.Historical:
         # Get API key from env or secrets
         api_key = os.getenv("DATABENTO_API_KEY")
         if not api_key:
-            from src.unity_wheel.secrets.integration import get_databento_api_key
+            from unity_wheel.secrets.integration import get_databento_api_key
 
             api_key = get_databento_api_key()
 

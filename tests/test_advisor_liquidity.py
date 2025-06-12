@@ -6,7 +6,7 @@ Validates that option liquidity checks work correctly.
 
 import pytest
 
-from src.unity_wheel.api.advisor import WheelAdvisor
+from unity_wheel.api.advisor import WheelAdvisor
 
 
 class TestAdvisorLiquidity:

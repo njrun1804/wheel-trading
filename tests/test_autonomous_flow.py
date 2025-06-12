@@ -10,34 +10,34 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.unity_wheel.api import WheelAdvisor
-from src.unity_wheel.api.types import MarketSnapshot
-from src.unity_wheel.data_providers.base.validation import (
+from unity_wheel.api import WheelAdvisor
+from unity_wheel.api.types import MarketSnapshot
+from unity_wheel.data_providers.base.validation import (
     get_anomaly_detector,
     get_market_validator,
 )
-from src.unity_wheel.monitoring.diagnostics import SelfDiagnostics
-from src.unity_wheel.monitoring.performance import get_performance_monitor
-from src.unity_wheel.risk.analytics import RiskLimits
-from src.unity_wheel.strategy.wheel import WheelParameters
-from src.unity_wheel.utils.feature_flags import FeatureStatus, get_feature_flags
+from unity_wheel.monitoring.diagnostics import SelfDiagnostics
+from unity_wheel.monitoring.performance import get_performance_monitor
+from unity_wheel.risk.analytics import RiskLimits
+from unity_wheel.strategy.wheel import WheelParameters
+from unity_wheel.utils.feature_flags import FeatureStatus, get_feature_flags
 
 
 @pytest.fixture
 def reset_singletons():
     """Reset singleton instances for clean tests."""
     # Reset feature flags
-    from src.unity_wheel.utils import feature_flags
+    from unity_wheel.utils import feature_flags
 
     feature_flags._feature_flags = None
 
     # Reset performance monitor
-    from src.unity_wheel.monitoring import performance
+    from unity_wheel.monitoring import performance
 
     performance._performance_monitor = None
 
     # Reset validators
-    from src.unity_wheel.data_providers.base import validation
+    from unity_wheel.data_providers.base import validation
 
     validation._market_validator = None
     validation._anomaly_detector = None

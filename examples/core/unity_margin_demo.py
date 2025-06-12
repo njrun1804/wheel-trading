@@ -6,7 +6,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.risk.unity_margin import UnityMarginCalculator
+from unity_wheel.risk.unity_margin import UnityMarginCalculator
 
 
 def demo_unity_margin():

@@ -9,8 +9,8 @@ from typing import Dict, Tuple
 
 import duckdb
 
-from src.config.loader import get_config
-from src.unity_wheel.utils.logging import get_logger
+from config.loader import get_config
+from unity_wheel.utils.logging import get_logger
 
 # Get Unity ticker once
 _config = get_config()

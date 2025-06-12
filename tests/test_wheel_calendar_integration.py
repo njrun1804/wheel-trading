@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.unity_wheel.strategy.wheel import WheelParameters, WheelStrategy
-from src.unity_wheel.utils import SimpleTradingCalendar
-from src.unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
+from unity_wheel.strategy.wheel import WheelParameters, WheelStrategy
+from unity_wheel.utils import SimpleTradingCalendar
+from unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
 
 
 class TestWheelCalendarIntegration:

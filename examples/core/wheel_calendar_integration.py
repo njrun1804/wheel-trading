@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 
-from src.unity_wheel.utils import SimpleTradingCalendar
+from unity_wheel.utils import SimpleTradingCalendar
 
 
 def find_optimal_expiration(target_dte: int = 45) -> datetime:

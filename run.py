@@ -6,7 +6,7 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.unity_wheel.cli.run import main
+from unity_wheel.cli.run import main
 
 if __name__ == "__main__":
     main()

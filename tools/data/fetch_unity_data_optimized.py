@@ -12,10 +12,10 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.unity_wheel.databento import DatabentoClient
-from src.unity_wheel.databento.optimized_price_loader import OptimizedPriceHistoryLoader
-from src.unity_wheel.storage import Storage, StorageConfig
-from src.unity_wheel.utils import setup_structured_logging
+from unity_wheel.databento import DatabentoClient
+from unity_wheel.databento.optimized_price_loader import OptimizedPriceHistoryLoader
+from unity_wheel.storage import Storage, StorageConfig
+from unity_wheel.utils import setup_structured_logging
 
 
 async def fetch_unity_data_optimized():

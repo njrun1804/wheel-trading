@@ -9,7 +9,7 @@ import numpy as np
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.risk.analytics import (
+from unity_wheel.risk.analytics import (
     RiskAnalyzer,
     calculate_cvar,
     calculate_sharpe_ratio,

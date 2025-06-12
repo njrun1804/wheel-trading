@@ -34,11 +34,11 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.config.loader import get_config
-from src.unity_wheel.backtesting import WheelBacktester
-from src.unity_wheel.data_providers.databento import DatabentoClient, PriceHistoryLoader
-from src.unity_wheel.storage import Storage
-from src.unity_wheel.strategy.wheel import WheelParameters
+from config.loader import get_config
+from unity_wheel.backtesting import WheelBacktester
+from unity_wheel.data_providers.databento import DatabentoClient, PriceHistoryLoader
+from unity_wheel.storage import Storage
+from unity_wheel.strategy.wheel import WheelParameters
 
 
 async def run_basic_backtest():

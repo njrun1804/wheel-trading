@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import databento as db
 
-from src.unity_wheel.secrets.integration import SecretInjector, get_databento_api_key
+from unity_wheel.secrets.integration import SecretInjector, get_databento_api_key
 
 
 async def check_unity_options():

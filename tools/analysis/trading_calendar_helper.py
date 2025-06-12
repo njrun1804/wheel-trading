@@ -9,8 +9,8 @@ Useful for:
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
-from src.unity_wheel.utils import SimpleTradingCalendar
-from src.unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
+from unity_wheel.utils import SimpleTradingCalendar
+from unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
 
 
 def analyze_upcoming_expiries(months_ahead: int = 3) -> None:

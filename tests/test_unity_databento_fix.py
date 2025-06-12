@@ -14,8 +14,8 @@ from datetime import datetime, timedelta, timezone
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from src.unity_wheel.data_providers.databento.client import DatabentoClient
-from src.unity_wheel.utils.logging import setup_structured_logging
+from unity_wheel.data_providers.databento.client import DatabentoClient
+from unity_wheel.utils.logging import setup_structured_logging
 
 
 async def test_unity_options():

@@ -11,11 +11,11 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.config.unity import TICKER
-from src.unity_wheel.databento import DatabentoClient
-from src.unity_wheel.databento.price_history_loader import PriceHistoryLoader
-from src.unity_wheel.storage import Storage, StorageConfig
-from src.unity_wheel.utils import setup_structured_logging
+from config.unity import TICKER
+from unity_wheel.databento import DatabentoClient
+from unity_wheel.databento.price_history_loader import PriceHistoryLoader
+from unity_wheel.storage import Storage, StorageConfig
+from unity_wheel.utils import setup_structured_logging
 
 
 async def load_historical_data():

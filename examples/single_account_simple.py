@@ -7,9 +7,9 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.unity_wheel.api import SimpleWheelAdvisor
-from src.unity_wheel.execution import UnityFillModel
-from src.unity_wheel.portfolio import SingleAccountManager, die
+from unity_wheel.api import SimpleWheelAdvisor
+from unity_wheel.execution import UnityFillModel
+from unity_wheel.portfolio import SingleAccountManager, die
 
 
 def main():

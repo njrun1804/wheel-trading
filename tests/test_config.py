@@ -14,8 +14,8 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from src.config.loader import ConfigurationLoader, get_config, get_config_loader
-from src.config.schema import (
+from config.loader import ConfigurationLoader, get_config, get_config_loader
+from config.schema import (
     RiskConfig,
     StrategyConfig,
     WheelConfig,
