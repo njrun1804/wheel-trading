@@ -68,6 +68,7 @@ asyncpg
 aiofiles
 
 # Test dependencies
+psutil
 pytest
 pytest-cov
 pytest-asyncio
