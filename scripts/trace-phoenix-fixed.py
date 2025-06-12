@@ -263,5 +263,6 @@ def send_test_traces() -> str:
     return "Test traces sent:\n" + "\n".join(results)
 
 if __name__ == "__main__":
-    print(f"Phoenix trace server starting (base URL: {PHOENIX_BASE_URL})")
+    # Run without stdout output to avoid breaking JSON-RPC
+    # Phoenix base URL: {PHOENIX_BASE_URL}
     mcp.run()

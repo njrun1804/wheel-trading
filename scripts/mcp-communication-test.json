@@ -1,0 +1,80 @@
+[
+  {
+    "success": false,
+    "server": "dependency-graph-mcp-enhanced.py",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "success": false,
+    "server": "dependency-graph-mcp.py",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "success": true,
+    "server": "python-mcp-server.py",
+    "init_response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2025-03-26",
+        "capabilities": {
+          "experimental": {},
+          "prompts": {
+            "listChanged": false
+          },
+          "resources": {
+            "subscribe": false,
+            "listChanged": false
+          },
+          "tools": {
+            "listChanged": false
+          }
+        },
+        "serverInfo": {
+          "name": "python-analysis",
+          "version": "1.9.4"
+        }
+      }
+    },
+    "tools": []
+  },
+  {
+    "success": false,
+    "server": "ripgrep-mcp.py",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "success": true,
+    "server": "trace-mcp-server.py",
+    "init_response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2025-03-26",
+        "capabilities": {
+          "experimental": {},
+          "prompts": {
+            "listChanged": false
+          },
+          "resources": {
+            "subscribe": false,
+            "listChanged": false
+          },
+          "tools": {
+            "listChanged": false
+          }
+        },
+        "serverInfo": {
+          "name": "trace",
+          "version": "1.9.4"
+        }
+      }
+    },
+    "tools": []
+  },
+  {
+    "success": false,
+    "server": "trace-phoenix-mcp.py",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  }
+]

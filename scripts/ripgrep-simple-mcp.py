@@ -83,6 +83,5 @@ def list_files(pattern: str, path: str = ".") -> str:
         return f"Error: {str(e)}"
 
 if __name__ == "__main__":
-    # Run the server
-    print("Starting ripgrep MCP server...")
+    # Run the server - no stdout output to avoid breaking JSON-RPC
     mcp.run()

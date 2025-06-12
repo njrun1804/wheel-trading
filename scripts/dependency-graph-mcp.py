@@ -140,5 +140,5 @@ def generate_dependency_graph(directory: str) -> str:
         return f"Error: {str(e)}"
 
 if __name__ == "__main__":
-    print("Starting dependency-graph MCP server...")
+    # Run without stdout output to avoid breaking JSON-RPC
     mcp.run()

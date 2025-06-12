@@ -213,6 +213,6 @@ def get_recommendation(symbol: str = "U", capital: float = 100000) -> str:
     return analyze_position(symbol, capital)
 
 if __name__ == "__main__":
-    print(f"Starting simple Python MCP server...")
-    print(f"Workspace: {WORKSPACE_ROOT}")
+    # Run without stdout output to avoid breaking JSON-RPC
+    # Workspace: {WORKSPACE_ROOT}
     mcp.run()
