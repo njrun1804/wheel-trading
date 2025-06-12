@@ -17,6 +17,7 @@ propcache
 pycparser
 pydantic
 pydantic-core
+pydantic-settings
 python-dateutil
 python-dotenv
 pytz

@@ -1,7 +1,9 @@
-from unity_wheel.risk.advanced_financial_modeling_deprecated import AdvancedFinancialModeling
+# Temporarily commented out deprecated imports
+# from unity_wheel.risk.advanced_financial_modeling_deprecated import AdvancedFinancialModeling
 
 # Temporary imports from deprecated files for backward compatibility
 from .analytics_deprecated import RiskAnalyzer, RiskLevel, RiskLimitBreach, RiskLimits, RiskMetrics
+from .advanced_financial_modeling_deprecated import AdvancedFinancialModeling
 from .borrowing_cost_analyzer import (
     BorrowingCostAnalyzer,
     BorrowingSource,
