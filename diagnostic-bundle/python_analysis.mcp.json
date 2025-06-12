@@ -1,0 +1,12 @@
+{
+  "transport": "stdio",
+  "command": "/Users/mikeedwards/.pyenv/shims/python3",
+  "args": [
+    "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/python-mcp-server.py"
+  ],
+  "env": {
+    "PYTHONPATH": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading",
+    "DATABENTO_API_KEY": "${DATABENTO_API_KEY}",
+    "FRED_API_KEY": "${FRED_API_KEY}"
+  }
+}

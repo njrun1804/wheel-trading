@@ -1,0 +1,114 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+*.manifest
+*.spec
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.log
+.hypothesis/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.env
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+*~
+.ropeproject/
+
+# Large data directories
+data/cache/
+data/archive_*/
+data/unity-options/
+data/databento/
+*.duckdb
+!data/wheel_trading_master.duckdb
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+!scripts/README-logfire.md
+
+# MCP script duplicates (keep only essential ones)
+scripts/start-claude-full.sh
+scripts/start-claude-fixed.sh
+scripts/start-claude-local.sh
+scripts/start-claude-optimized.sh
+scripts/start-claude-ultra.sh
+scripts/start-claude-ultra-optimized.sh
+scripts/start-claude-ultimate.sh
+scripts/*-mcp-*.sh
+!scripts/setup-mcp-connection-pool.sh
+!scripts/validate-mcp-env.sh
+
+# Documentation generated files
+docs/_build/
+docs/.doctrees/
+site/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Security and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/workflows/
+.gitlab-ci.yml
+.travis.yml
+
+# Package files
+package-lock.json
+yarn.lock
+Pipfile.lock
+
+# Analysis outputs
+PIPELINE_OPTIMIZATION_ANALYSIS.json
+*_STATUS.md
+*_COMPLETE.md
+*_GUIDE.md
+!CLAUDE.md
+!README.md

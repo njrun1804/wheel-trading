@@ -1,0 +1,24 @@
+PYTHONOPTIMIZE=2
+PYTHONUNBUFFERED=1
+NODE_OPTIONS=--max-old-space-size=20480 --max-semi-space-size=256
+CLAUDE_CODE_THINKING_BUDGET_TOKENS=32000
+CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192
+OTEL_METRICS_EXPORTER=otlp
+OTEL_TRACES_EXPORTER=otlp
+NODE_ENV=development
+OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318
+GITHUB_TOKEN=****REDACTED****
+FRED_API_KEY=****REDACTED****
+BRAVE_API_KEY=****REDACTED****
+PYTHON_MEMORY_LIMIT=20G
+CLAUDE_CODE_SSE_PORT=54121
+PYTHONPATH=/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Unity/project_unity:/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/src
+CLAUDE_CODE_ALLOWED_TOOLS=mcp__fs__*,mcp__vscode__*,mcp__github__*,mcp__web__*,mcp__wiki__*,mcp__codeSearch__*,mcp__python_analysis__*
+CLAUDE_DEFAULT_MODEL=opus
+PYTHONDONTWRITEBYTECODE=1
+OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+CLAUDE_CODE_ENTRYPOINT=cli
+DATABENTO_API_KEY=****REDACTED****
+OTEL_SERVICE_NAME=wheel-trading-bot
+OTEL_LOGS_EXPORTER=otlp
+OTEL_PYTHON_LOG_LEVEL=INFO

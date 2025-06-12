@@ -1,0 +1,11 @@
+{
+  "transport": "stdio",
+  "command": "/Users/mikeedwards/.pyenv/shims/python3",
+  "args": [
+    "/Users/mikeedwards/mcp-servers/community/mlflowMCPServer/mlflow_server.py"
+  ],
+  "env": {
+    "MLFLOW_TRACKING_URI": "http://localhost:5000",
+    "PYTHONPATH": "/Users/mikeedwards/mcp-servers/community/mlflowMCPServer"
+  }
+}

@@ -1,0 +1,39 @@
+#!/bin/bash
+# Pre-commit hook to ensure data validation is properly implemented
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}🔍 Running pre-commit checks...${NC}"
+
+# Run housekeeping checks
+if ! ./scripts/housekeeping.sh --check --quiet; then
+    echo -e "${RED}❌ Housekeeping check failed!${NC}"
+    echo -e "${YELLOW}Run ./scripts/housekeeping.sh --check for details${NC}"
+    exit 1
+fi
+
+# Run data validation check specifically
+if ! ./scripts/check-data-validation.sh >/dev/null 2>&1; then
+    echo -e "${RED}❌ Data validation check failed!${NC}"
+    echo -e "${YELLOW}Run ./scripts/check-data-validation.sh for details${NC}"
+    exit 1
+fi
+
+# Check for print statements that should be logger calls
+PRINT_COUNT=$(grep -r "print(" src/unity_wheel --include="*.py" | grep -v "sys.stderr" | wc -l)
+if [ "$PRINT_COUNT" -gt 0 ]; then
+    echo -e "${YELLOW}⚠️  Found $PRINT_COUNT print() statements - consider using logger${NC}"
+fi
+
+# Check for TODO/FIXME comments
+TODO_COUNT=$(grep -r "TODO\|FIXME" src/unity_wheel --include="*.py" | wc -l)
+if [ "$TODO_COUNT" -gt 0 ]; then
+    echo -e "${YELLOW}⚠️  Found $TODO_COUNT TODO/FIXME comments${NC}"
+fi
+
+echo -e "${GREEN}✅ Pre-commit checks passed!${NC}"
+exit 0

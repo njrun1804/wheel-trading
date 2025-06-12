@@ -1,0 +1,10 @@
+{
+  "transport": "stdio",
+  "command": "/Users/mikeedwards/.pyenv/shims/python3",
+  "args": [
+    "/Users/mikeedwards/mcp-servers/community/mcp-server-scikit-learn/src/mcp_server_scikit_learn/server.py"
+  ],
+  "env": {
+    "PYTHONPATH": "/Users/mikeedwards/mcp-servers/community/mcp-server-scikit-learn/src"
+  }
+}

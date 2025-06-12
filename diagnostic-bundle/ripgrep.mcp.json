@@ -1,0 +1,7 @@
+{
+  "transport": "stdio",
+  "command": "/Users/mikeedwards/.pyenv/shims/python3",
+  "args": [
+    "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/ripgrep-mcp.py"
+  ]
+}

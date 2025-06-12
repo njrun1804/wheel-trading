@@ -1,0 +1,42 @@
+#\!/usr/bin/env bash
+# Pre-commit hook to check for import cycles
+
+exec 1>&2
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+# Check if dependency-graph MCP is available
+SCRIPT_PATH="/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/dependency-graph-mcp-enhanced.py"
+
+if [ \! -f "$SCRIPT_PATH" ]; then
+    echo -e "${RED}Warning: dependency-graph MCP not found${NC}"
+    echo "Skipping cycle detection"
+    exit 0
+fi
+
+# Run cycle detection
+echo "Checking for import cycles..."
+cycles=$(/Users/mikeedwards/.pyenv/shims/python3 -c "
+import sys
+sys.path.insert(0, '$(dirname "$SCRIPT_PATH")')
+from dependency_graph_mcp_enhanced import detect_cycles
+print(detect_cycles())
+" 2>/dev/null)
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Error running cycle detection${NC}"
+    # Don't block commit on error
+    exit 0
+fi
+
+if [ "$cycles" -gt 0 ]; then
+    echo -e "${RED}❌ Import cycles detected ($cycles). Commit aborted.${NC}"
+    echo "Run the following to see cycle details:"
+    echo "  python3 -c \"from scripts.dependency_graph_mcp_enhanced import detect_cycles; print(detect_cycles())\""
+    exit 1
+else
+    echo -e "${GREEN}✓ No import cycles detected${NC}"
+fi

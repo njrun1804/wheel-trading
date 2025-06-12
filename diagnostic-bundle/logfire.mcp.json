@@ -1,0 +1,12 @@
+{
+  "transport": "stdio",
+  "command": "uvx",
+  "args": [
+    "logfire-mcp",
+    "--read-token",
+    "pylf_v1_us_00l06NMSXxWp1V9cTNJWJLvjRPs5HPRVsFtmdTSS1YC2"
+  ],
+  "env": {
+    "LOGFIRE_READ_TOKEN": "pylf_v1_us_00l06NMSXxWp1V9cTNJWJLvjRPs5HPRVsFtmdTSS1YC2"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "transport": "stdio",
+  "command": "/Users/mikeedwards/.local/bin/mcp-server-duckdb",
+  "args": [
+    "--db-path",
+    "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/cache/wheel_cache.duckdb"
+  ]
+}

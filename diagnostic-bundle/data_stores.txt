@@ -1,0 +1,67 @@
+=== DuckDB Databases ===
+Path: /Users/mikeedwards/Library/Mobile
+Size:   0B
+Tables: unable to query
+---
+Path: Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/unified_trading.duckdb
+Size: 
+Tables: unable to query
+---
+Path: /Users/mikeedwards/Library/Mobile
+Size:   0B
+Tables: unable to query
+---
+Path: Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/cache/wheel_cache.duckdb
+Size: 
+Tables: unable to query
+---
+Path: /Users/mikeedwards/Library/Mobile
+Size:   0B
+Tables: unable to query
+---
+Path: Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/wheel_trading_master.duckdb
+Size: 
+Tables: unable to query
+---
+Path: /Users/mikeedwards/Library/Mobile
+Size:   0B
+Tables: unable to query
+---
+Path: Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive_20250611_185245/market_data.db
+Size: 
+Tables: unable to query
+---
+Path: /Users/mikeedwards/Library/Mobile
+Size:   0B
+Tables: unable to query
+---
+Path: Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive_20250611_185245/unified_trading.duckdb
+Size: 
+Tables: unable to query
+---
+Path: /Users/mikeedwards/Library/Mobile
+Size:   0B
+Tables: unable to query
+---
+Path: Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive_20250611_185245/unified_wheel_trading.duckdb
+Size: 
+Tables: unable to query
+---
+
+=== Parquet Files ===
+4.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.venv/lib/python3.12/site-packages/pyarrow/tests/data/parquet/v0.7.1.all-named-index.parquet
+4.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.venv/lib/python3.12/site-packages/pyarrow/tests/data/parquet/v0.7.1.column-metadata-handling.parquet
+4.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.venv/lib/python3.12/site-packages/pyarrow/tests/data/parquet/v0.7.1.some-named-index.parquet
+8.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.venv/lib/python3.12/site-packages/pyarrow/tests/data/parquet/v0.7.1.parquet
+4.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/venv/lib/python3.11/site-packages/pyarrow/tests/data/parquet/v0.7.1.all-named-index.parquet
+4.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/venv/lib/python3.11/site-packages/pyarrow/tests/data/parquet/v0.7.1.column-metadata-handling.parquet
+4.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/venv/lib/python3.11/site-packages/pyarrow/tests/data/parquet/v0.7.1.some-named-index.parquet
+8.0K	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/venv/lib/python3.11/site-packages/pyarrow/tests/data/parquet/v0.7.1.parquet
+1.6M	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/unity-options/processed/unity_ohlcv_daily_corrected.parquet
+8.9M	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/unity-options/processed/unity_ohlcv_3y.parquet
+
+=== CSV Files (>1MB) ===
+
+=== Cache Directory ===
+ 79M	/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/cache
+Files: 1

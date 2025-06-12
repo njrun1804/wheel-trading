@@ -1,0 +1,3 @@
+Repository root: /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading
+Total files:      453
+Git status:       93 modified files

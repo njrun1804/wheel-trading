@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "generated_at": "2025-06-12T18:54:15.771826",
+  "dag": {
+    "nodes": [
+      "scan_1",
+      "scan_2",
+      "mutate_1"
+    ],
+    "edges": [
+      [
+        "scan_1",
+        "mutate_1"
+      ],
+      [
+        "scan_2",
+        "mutate_1"
+      ]
+    ]
+  }
+}
