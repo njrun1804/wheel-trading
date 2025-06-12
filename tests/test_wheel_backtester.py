@@ -116,7 +116,13 @@ class TestWheelBacktester:
         dates = pd.date_range("2024-01-01", "2024-02-28", freq="D")
         prices = [35.0] * 30 + [30.0] * len(dates[30:])  # Drop below strike
 
+<<<<<<< Updated upstream
         price_data = [(date, p, p + 1, p - 1, p, 1000000) for date, p in zip(dates, prices)]
+=======
+        price_data = [
+            (date, p, p + 1, p - 1, p, 1000000) for date, p in zip(dates, prices, strict=False)
+        ]
+>>>>>>> Stashed changes
 
         async def mock_connection():
             conn = Mock()
