@@ -69,6 +69,7 @@ aiofiles
 
 # Test dependencies
 psutil
+memory_profiler
 pytest
 pytest-cov
 pytest-asyncio
