@@ -1,6 +1,7 @@
 """Options mathematics with self-validation."""
 
-from .options import (
+# Temporary import from deprecated file until migration is complete
+from .options_deprecated import (
     CalculationResult,
     black_scholes_price_validated,
     calculate_all_greeks,

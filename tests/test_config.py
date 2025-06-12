@@ -145,6 +145,11 @@ def valid_config_dict():
             "slippage_model": "fixed",
             "slippage_bps": 5,
         },
+        "metadata": {
+            "version": "1.0.0",
+            "last_updated": "2024-01-01",
+            "environment": "test",
+        },
     }
 
 
@@ -207,21 +212,21 @@ class TestConfigLoader:
 
     def test_nested_environment_override(self, valid_config_yaml, monkeypatch):
         """Test nested environment variable overrides."""
-        monkeypatch.setenv("WHEEL_RISK__LIMITS__MAX_VAR_95", "0.10")
+        monkeypatch.setenv("WHEEL_RISK__LIMITS__MAX_VAR_95", "0.03")
 
         loader = ConfigurationLoader(str(valid_config_yaml))
         config = loader.config
 
-        assert config.risk.limits.max_var_95 == 0.10
+        assert config.risk.limits.max_var_95 == 0.03
 
     def test_list_environment_override(self, valid_config_yaml, monkeypatch):
         """Test list environment variable overrides."""
-        monkeypatch.setenv("WHEEL_BROKER__SCOPES", '["read", "trade"]')
+        monkeypatch.setenv("WHEEL_TRADING__BROKER__SCOPES", '["read", "trade"]')
 
         loader = ConfigurationLoader(str(valid_config_yaml))
         config = loader.config
 
-        assert config.broker.scopes == ["read", "trade"]
+        assert config.trading.broker.scopes == ["read", "trade"]
 
     def test_invalid_environment_override(self, valid_config_yaml, monkeypatch):
         """Test that invalid environment overrides are handled."""

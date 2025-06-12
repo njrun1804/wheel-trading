@@ -1,4 +1,4 @@
-"""Utility modules for Unity wheel trading."""
+from unity_wheel.utils.position_sizing_deprecated import PositionSizer
 
 from .feature_flags import FeatureFlags, FeatureStatus, get_feature_flags
 from .logging import (
@@ -9,6 +9,8 @@ from .logging import (
     setup_structured_logging,
     timed_operation,
 )
+
+# Temporary import from deprecated file for backward compatibility
 from .random_utils import set_seed
 from .recovery import (
     CircuitBreaker,
@@ -52,4 +54,6 @@ __all__ = [
     "get_next_expiry_friday",
     "days_to_expiry",
     "set_seed",
+    # Deprecated but still exported
+    "PositionSizer",
 ]

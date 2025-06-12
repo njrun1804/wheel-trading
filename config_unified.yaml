@@ -1,0 +1,61 @@
+# Unified Wheel Trading Configuration
+# Single source of truth for all system settings
+
+wheel_system:
+  # Core settings
+  portfolio_value: 200000
+  symbol: "U"
+
+  # Enhanced features (all enabled)
+  enable_decision_tracking: true
+  enable_enhanced_options_math: true
+  enable_put_call_parity: true
+  enable_transaction_costs: true
+  enable_stress_testing: true
+  enable_intelligent_bucketing: true
+  enable_hot_data: true
+  enable_milp_solver: true
+  enable_archival: true
+
+  # Risk configuration (unified)
+  risk_method: "cvar_assignment"  # Primary risk measure
+  position_sizing: "kelly_criterion"  # Optimal sizing
+  decision_frequency: "daily"  # User preference
+
+  # Data configuration
+  database:
+    path: "data/wheel_trading_master.duckdb"
+    archival_retention_years: 7
+
+  # Performance settings
+  hot_data:
+    memory_limit_mb: 512
+    use_arrow: true
+    use_polars: true
+
+  # Optimization settings
+  bucketing:
+    cash_granularity: 1000  # $1k increments
+    position_granularity: 100  # 100-share increments
+    strike_granularity: 0.50  # $0.50 increments
+
+  milp:
+    solver: "CBC"  # Free solver
+    max_solve_time_seconds: 60
+
+  # Risk limits
+  limits:
+    max_position_size_pct: 0.25
+    min_cash_reserve_pct: 0.10
+    max_assignment_cvar: 0.15
+
+  # Transaction costs
+  costs:
+    commission_per_contract: 1.00
+    bid_ask_spread_factor: 0.02
+    early_assignment_penalty: 0.10
+
+metadata:
+  version: "1.0.0"
+  last_updated: "2024-01-01"
+  environment: "production"
