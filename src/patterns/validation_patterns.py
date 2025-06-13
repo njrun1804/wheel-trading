@@ -3,6 +3,8 @@
 This module demonstrates the standard validation patterns used throughout
 the codebase. Codex should follow these patterns for consistency.
 """
+from __future__ import annotations
+
 
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -262,7 +264,7 @@ def validate_portfolio_state(portfolio: dict) -> dict:
                 }
             )
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Invalid position at index {i}: {e}", extra={"position": pos})
             # Continue processing other positions
 

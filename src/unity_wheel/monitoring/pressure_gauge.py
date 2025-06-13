@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """Adaptive memory pressure monitoring with chunk fan-out control."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import asyncio
 import psutil
@@ -97,8 +103,8 @@ class AdaptiveMemoryMonitor:
                         'fanout_reduced_to': self._current_fanout
                     })
                 
-            except Exception as e:
-                print(f"Monitor error: {e}")
+            except (ValueError, KeyError, AttributeError) as e:
+                logger.info("Monitor error: {e}")
             
             time.sleep(self.sample_interval)
     
@@ -149,8 +155,8 @@ class AdaptiveMemoryMonitor:
         for callback in self.pressure_callbacks:
             try:
                 callback(reading)
-            except Exception as e:
-                print(f"Callback error: {e}")
+            except (ValueError, KeyError, AttributeError) as e:
+                logger.info("Callback error: {e}")
     
     @property
     def current_pressure(self) -> float:
@@ -231,6 +237,12 @@ class PressureChannel:
 async def create_pressure_channel():
     """Create MCP pressure channel at /sys/claude/pressure-gauge."""
     return PressureChannel()
+
+
+def check_memory_pressure() -> float:
+    """Check current memory pressure (0.0 to 1.0)."""
+    monitor = get_pressure_monitor()
+    return monitor.current_pressure
 
 if __name__ == "__main__":
     # Test/demo mode

@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Event impact analyzer for earnings and macro events.
 Quantifies historical impact and adjusts strategy parameters.
 """

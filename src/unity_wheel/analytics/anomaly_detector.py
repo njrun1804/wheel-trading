@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Anomaly detection system for market conditions.
 Identifies when current market deviates from historical norms.
 """

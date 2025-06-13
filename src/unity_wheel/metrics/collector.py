@@ -568,7 +568,7 @@ class MetricsCollector:
 
             logger.info(f"Saved {len(self.recent_decisions)} decisions to disk")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to save metrics: {e}")
 
     def _load_from_disk(self) -> None:
@@ -603,7 +603,7 @@ class MetricsCollector:
 
             logger.info(f"Loaded {len(self.recent_decisions)} historical decisions")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to load metrics: {e}")
 
 

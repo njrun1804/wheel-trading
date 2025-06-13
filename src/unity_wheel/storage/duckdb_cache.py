@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 DuckDB-based local cache for all market data.
 Provides SQL interface with automatic TTL and LRU eviction.
 """
@@ -33,7 +35,7 @@ import pandas as pd
 
 from ..utils import get_logger
 
-from unity_wheel.config.unified_config import get_config
+from ..config.unified_config import get_config
 config = get_config()
 
 

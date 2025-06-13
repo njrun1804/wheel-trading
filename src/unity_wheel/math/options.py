@@ -322,7 +322,7 @@ def black_scholes_price_validated(
             float(value) if np.ndim(value) == 0 else value, confidence, warnings_list
         )
 
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         logger.error(f"Error in Black-Scholes calculation: {e}")
         return CalculationResult(np.nan, 0.0, [f"Calculation error: {str(e)}"])
 
@@ -452,7 +452,7 @@ def calculate_all_greeks(
                 # Vomma (dVega/dVol)
                 greeks["vomma"] = greeks["vega"] * d1 * d2 / sigma
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.warning(f"Advanced Greeks calculation failed: {e}")
                 feature_flags.degrade("advanced_greeks", e)
 
@@ -492,7 +492,7 @@ def calculate_all_greeks(
 
         return greeks, confidence
 
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         logger.error(f"Error in Greeks calculation: {e}")
         return {
             "delta": np.nan,
@@ -753,6 +753,6 @@ def probability_itm_validated(
             float(prob) if np.ndim(prob) == 0 else prob, confidence, warnings_list
         )
 
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         logger.error(f"Error in probability calculation: {e}")
         return CalculationResult(np.nan, 0.0, [f"Calculation error: {str(e)}"])

@@ -1,8 +1,0 @@
-{
-  "transport": "stdio",
-  "command": "/Users/mikeedwards/.pyenv/shims/python3",
-  "args": [
-    "-m",
-    "mcp_py_repl"
-  ]
-}

@@ -6,12 +6,14 @@ This module provides intelligent position sizing based on:
 - Risk limits and volatility
 - Option premium and margin requirements
 """
+from __future__ import annotations
+
 
 import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..risk.unity_margin import UnityMarginCalculator
 from .logging import StructuredLogger

@@ -9,7 +9,7 @@ from typing import List, NamedTuple, Optional, Tuple
 
 import numpy as np
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..math import (
     CalculationResult,

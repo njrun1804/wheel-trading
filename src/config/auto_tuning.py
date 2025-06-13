@@ -461,7 +461,7 @@ class ConfigAutoTuner:
             with open(self.history_file, "w") as f:
                 json.dump(history, f, indent=2)
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to save tuning history: {e}")
 
     def _load_history(self) -> None:
@@ -507,7 +507,7 @@ class ConfigAutoTuner:
 
                     self.parameter_performance[param_name][value] = perf
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to load tuning history: {e}")
 
 

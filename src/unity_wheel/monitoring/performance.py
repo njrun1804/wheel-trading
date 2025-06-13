@@ -152,7 +152,7 @@ class PerformanceMonitor:
         for callback in self.alert_callbacks:
             try:
                 callback(f"SLA violation: {metric.operation}", metric)
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Alert callback failed: {e}")
 
     def _calculate_severity(self, actual: float, threshold: float) -> str:
@@ -419,7 +419,7 @@ def get_performance_monitor() -> PerformanceMonitor:
     return _performance_monitor
 
 
-def performance_monitored(operation: Optional[str] = None):
+def performance_monitored(operation: Optional[str] = None) -> None:
     """
     Decorator to monitor function performance.
 
@@ -446,7 +446,7 @@ def performance_monitored(operation: Optional[str] = None):
             try:
                 result = func(*args, **kwargs)
                 return result
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 success = False
                 raise
             finally:

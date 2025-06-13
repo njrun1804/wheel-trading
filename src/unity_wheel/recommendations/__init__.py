@@ -1,7 +1,7 @@
 """Wheel strategy recommendation system with autonomous operation."""
 
-from unity_wheel.models.position import Position
-from unity_wheel.recommendations.models import AccountState, Recommendation
+from ...models.position import Position
+from ...recommendations.models import AccountState, Recommendation
 
 from .engine import RecommendationEngine
 

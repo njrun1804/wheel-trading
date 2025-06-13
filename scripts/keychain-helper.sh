@@ -1,52 +1,151 @@
 #!/bin/bash
-# Helper script to retrieve secrets from macOS Keychain
+# Keychain helper for FRED and Databento API keys
 
-# Function to get password from keychain
-get_keychain_password() {
-    local service_name="$1"
-    local account_name="${2:-$USER}"
-    
-    security find-generic-password -a "$account_name" -s "$service_name" -w 2>/dev/null
-}
+set -e
 
-# Function to set environment variable from keychain
-export_from_keychain() {
-    local env_var="$1"
-    local service_name="$2"
-    local account_name="${3:-$USER}"
-    
-    local value=$(get_keychain_password "$service_name" "$account_name")
-    
-    if [ -n "$value" ]; then
-        export "$env_var"="$value"
-        echo "✓ Exported $env_var from keychain"
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to check if a keychain item exists
+check_keychain_item() {
+    local service="$1"
+    if security find-generic-password -a "$USER" -s "$service" >/dev/null 2>&1; then
+        echo -e "${GREEN}✓${NC} $service found in keychain"
         return 0
     else
-        echo "✗ Failed to retrieve $service_name from keychain" >&2
+        echo -e "${RED}✗${NC} $service not found in keychain"
         return 1
     fi
 }
 
-# Main script logic
-case "$1" in
+# Function to get a keychain value
+get_keychain_value() {
+    local service="$1"
+    security find-generic-password -a "$USER" -s "$service" -w 2>/dev/null || echo ""
+}
+
+# Function to set a keychain value
+set_keychain_value() {
+    local service="$1"
+    local value="$2"
+    security add-generic-password -a "$USER" -s "$service" -w "$value" -U
+    echo -e "${GREEN}✓${NC} Updated $service in keychain"
+}
+
+# Function to export a keychain value to environment
+export_keychain_value() {
+    local env_var="$1"
+    local service="$2"
+    local value=$(get_keychain_value "$service")
+    if [ -n "$value" ]; then
+        echo "export $env_var=\"$value\""
+    fi
+}
+
+# Main command handling
+case "${1:-help}" in
+    check)
+        echo "Checking keychain credentials..."
+        echo
+        check_keychain_item "databento"
+        check_keychain_item "fred-api"
+        echo
+        
+        # Check if they're also in environment
+        echo "Environment variables:"
+        if [ -n "$DATABENTO_API_KEY" ]; then
+            echo -e "${GREEN}✓${NC} DATABENTO_API_KEY is set"
+        else
+            echo -e "${YELLOW}!${NC} DATABENTO_API_KEY not in environment"
+        fi
+        
+        if [ -n "$FRED_API_KEY" ]; then
+            echo -e "${GREEN}✓${NC} FRED_API_KEY is set"
+        else
+            echo -e "${YELLOW}!${NC} FRED_API_KEY not in environment"
+        fi
+        ;;
+        
     get)
         if [ -z "$2" ]; then
-            echo "Usage: $0 get <service-name> [account-name]" >&2
+            echo "Usage: $0 get <service>"
+            echo "Services: databento, fred-api"
             exit 1
         fi
-        get_keychain_password "$2" "$3"
+        get_keychain_value "$2"
         ;;
+        
+    set)
+        if [ -z "$2" ] || [ -z "$3" ]; then
+            echo "Usage: $0 set <service> <value>"
+            echo "Services: databento, fred-api"
+            exit 1
+        fi
+        set_keychain_value "$2" "$3"
+        ;;
+        
     export)
         if [ -z "$2" ] || [ -z "$3" ]; then
-            echo "Usage: $0 export <env-var-name> <service-name> [account-name]" >&2
+            echo "Usage: $0 export <ENV_VAR> <service>"
+            echo "Example: $0 export DATABENTO_API_KEY databento"
             exit 1
         fi
-        export_from_keychain "$2" "$3" "$4"
+        export_keychain_value "$2" "$3"
         ;;
+        
+    setup)
+        echo "Setting up keychain credentials..."
+        echo
+        
+        # Databento
+        if ! check_keychain_item "databento"; then
+            echo -n "Enter Databento API key: "
+            read -s databento_key
+            echo
+            if [ -n "$databento_key" ]; then
+                set_keychain_value "databento" "$databento_key"
+            fi
+        fi
+        
+        # FRED
+        if ! check_keychain_item "fred-api"; then
+            echo -n "Enter FRED API key: "
+            read -s fred_key
+            echo
+            if [ -n "$fred_key" ]; then
+                set_keychain_value "fred-api" "$fred_key"
+            fi
+        fi
+        
+        echo
+        echo "Setup complete! Add these to your shell profile:"
+        echo
+        echo "# Wheel Trading API Keys"
+        export_keychain_value "DATABENTO_API_KEY" "databento"
+        export_keychain_value "FRED_API_KEY" "fred-api"
+        ;;
+        
     *)
-        echo "Usage: $0 {get|export} ..." >&2
-        echo "  get <service-name> [account-name]    - Retrieve password from keychain"
-        echo "  export <env-var> <service-name> [account-name] - Export as environment variable"
-        exit 1
+        echo "Keychain helper for FRED and Databento API keys"
+        echo
+        echo "Usage: $0 <command> [args]"
+        echo
+        echo "Commands:"
+        echo "  check              Check if credentials exist in keychain"
+        echo "  get <service>      Get a credential from keychain"
+        echo "  set <service> <value>  Store a credential in keychain"
+        echo "  export <VAR> <service> Generate export statement"
+        echo "  setup              Interactive setup wizard"
+        echo
+        echo "Services: databento, fred-api"
+        echo
+        echo "Examples:"
+        echo "  $0 check"
+        echo "  $0 get databento"
+        echo "  $0 set databento 'your-api-key'"
+        echo "  $0 export DATABENTO_API_KEY databento"
         ;;
 esac

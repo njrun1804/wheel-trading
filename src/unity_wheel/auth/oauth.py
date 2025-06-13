@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 OAuth2 flow implementation with automatic browser handling.
 """
 
@@ -17,7 +19,7 @@ from urllib.parse import parse_qs, urlencode
 import aiohttp
 from aiohttp import web
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils.logging import get_logger
 from .exceptions import AuthError, InvalidCredentialsError
@@ -144,7 +146,7 @@ class OAuth2Handler:
                 )
 
             ssl_context.load_cert_chain(str(cert_path), str(key_path))
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.warning(f"SSL setup failed, falling back to HTTP: {e}")
             ssl_context = None
 

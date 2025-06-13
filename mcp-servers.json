@@ -7,14 +7,21 @@
         "-y",
         "@modelcontextprotocol/server-filesystem@latest",
         "/Users/mikeedwards"
-      ]
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=2048",
+        "FILESYSTEM_CACHE_SIZE": "1GB",
+        "FILESYSTEM_WATCH_ENABLED": "false"
+      }
     },
     "github": {
       "transport": "stdio",
       "command": "mcp-server-github",
       "args": [],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+        "GITHUB_API_TIMEOUT": "30000",
+        "GITHUB_MAX_RETRIES": "3"
       }
     },
     "brave": {
@@ -34,7 +41,13 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-memory@latest"
-      ]
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=1024",
+        "MEMORY_MAX_NODES": "10000",
+        "MEMORY_CACHE_SIZE": "500MB",
+        "MEMORY_PERSISTENCE": "true"
+      }
     },
     "sequential-thinking": {
       "transport": "stdio",
@@ -42,7 +55,12 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-sequential-thinking@latest"
-      ]
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=512",
+        "THINKING_MAX_STEPS": "20",
+        "THINKING_TIMEOUT": "30000"
+      }
     },
     "puppeteer": {
       "transport": "stdio",
@@ -50,7 +68,12 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-puppeteer@latest"
-      ]
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=1024",
+        "PUPPETEER_HEADLESS": "true",
+        "PUPPETEER_TIMEOUT": "30000"
+      }
     },
     "statsource": {
       "transport": "stdio",
@@ -69,7 +92,13 @@
       "args": [
         "--db-path",
         "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/cache/wheel_cache.duckdb"
-      ]
+      ],
+      "env": {
+        "DUCKDB_MEMORY_LIMIT": "4GB",
+        "DUCKDB_THREADS": "8",
+        "DUCKDB_ENABLE_PROFILING": "false",
+        "DUCKDB_CHECKPOINT_THRESHOLD": "1GB"
+      }
     },
     "mlflow": {
       "transport": "stdio",
@@ -113,16 +142,19 @@
     },
     "python_analysis": {
       "transport": "stdio",
-      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "command": "/opt/homebrew/Caskroom/miniconda/base/bin/python3",
       "args": [
-        "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/python-mcp-server-simple.py"
+        "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/python-analysis-basic.py"
       ],
       "env": {
         "PYTHONPATH": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading",
         "WORKSPACE_ROOT": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading",
         "DATABENTO_API_KEY": "${DATABENTO_API_KEY}",
         "FRED_API_KEY": "${FRED_API_KEY}",
-        "PYTHONOPTIMIZE": "1"
+        "PYTHONOPTIMIZE": "2",
+        "NUMBA_NUM_THREADS": "8",
+        "ANALYSIS_CACHE_SIZE": "1GB",
+        "USE_GPU_ACCELERATION": "true"
       }
     },
     "logfire": {
@@ -160,7 +192,10 @@
         "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/trace-phoenix-fixed.py"
       ],
       "env": {
-        "PHOENIX_BASE_URL": "${PHOENIX_BASE_URL:-http://localhost:6006}"
+        "PHOENIX_BASE_URL": "${PHOENIX_BASE_URL:-http://localhost:6006}",
+        "TRACE_BATCH_SIZE": "100",
+        "TRACE_FLUSH_INTERVAL": "5000",
+        "TRACE_SAMPLING_RATE": "1.0"
       }
     },
     "ripgrep": {
@@ -168,14 +203,50 @@
       "command": "/Users/mikeedwards/.pyenv/shims/python3",
       "args": [
         "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/ripgrep-simple-mcp.py"
-      ]
+      ],
+      "env": {
+        "RG_MAX_COLUMNS": "500",
+        "RG_MAX_FILESIZE": "5M",
+        "RG_THREADS": "8",
+        "RG_MMAP": "true",
+        "RG_SMART_CASE": "true"
+      }
+    },
+    "python-code-helper": {
+      "transport": "stdio",
+      "command": "/opt/homebrew/Caskroom/miniconda/base/bin/python3",
+      "args": [
+        "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/python-code-helper-mcp.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading",
+        "PYTHONOPTIMIZE": "1"
+      }
+    },
+    "python-project-helper": {
+      "transport": "stdio",
+      "command": "/opt/homebrew/Caskroom/miniconda/base/bin/python3",
+      "args": [
+        "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/python-project-helper-mcp.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading",
+        "PROJECT_ROOT": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading"
+      }
     },
     "dependency-graph": {
       "transport": "stdio",
       "command": "/opt/homebrew/Caskroom/miniconda/base/bin/python3",
       "args": [
         "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/dependency-graph-mcp.py"
-      ]
+      ],
+      "env": {
+        "PYTHONOPTIMIZE": "2",
+        "PYTHONPATH": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading",
+        "GRAPH_CACHE_SIZE": "500MB",
+        "PARALLEL_WORKERS": "8",
+        "SYMBOL_INDEX_ENABLED": "true"
+      }
     }
   }
 }

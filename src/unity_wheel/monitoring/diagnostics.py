@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 import numpy as np
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..math import black_scholes_price_validated, calculate_all_greeks
 from ..models import Account, Greeks, Position
@@ -226,7 +226,7 @@ class SelfDiagnostics:
                     )
                 )
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results.append(
                 DiagnosticResult(
                     check_name="math_validation",
@@ -280,7 +280,7 @@ class SelfDiagnostics:
                 )
             )
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results.append(
                 DiagnosticResult(
                     check_name="model_integrity",
@@ -336,7 +336,7 @@ class SelfDiagnostics:
                     )
                 )
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results.append(
                 DiagnosticResult(
                     check_name="risk_calculations",
@@ -381,7 +381,7 @@ class SelfDiagnostics:
                     )
                 )
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results.append(
                 DiagnosticResult(
                     check_name="type_consistency",
@@ -514,7 +514,7 @@ class SelfDiagnostics:
                     message="Logging system operational",
                 )
             )
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results.append(
                 DiagnosticResult(
                     check_name="logging_system",
@@ -583,7 +583,7 @@ class SelfDiagnostics:
             with open(self.history_file, "w") as f:
                 json.dump(history, f, indent=2)
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.warning(f"Failed to save diagnostic history: {e}")
 
     def _generate_summary(self) -> Dict[str, Any]:

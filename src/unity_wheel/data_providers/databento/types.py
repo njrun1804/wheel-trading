@@ -5,6 +5,8 @@ These types map Databento's raw data to our internal models with:
 - UTC timestamp handling
 - Validation and confidence scoring
 """
+from __future__ import annotations
+
 
 import enum
 from dataclasses import dataclass

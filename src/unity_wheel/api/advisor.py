@@ -16,6 +16,8 @@ from ..risk import RiskMetrics as AnalyticsMetrics
 from ..risk import analyze_borrowing_decision
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
+from ..strategy.position_evaluator import PositionEvaluator
+# from .position_switch_integration import evaluate_position_switch  # TODO: File doesn't exist
 from ..utils import (
     DecisionLogger,
     RecoveryStrategy,
@@ -32,7 +34,7 @@ _market_validator = None
 _anomaly_detector = None
 
 
-def _get_market_validator():
+def _get_market_validator() -> None:
     """Lazy import market validator."""
     global _market_validator
     if _market_validator is None:
@@ -42,7 +44,7 @@ def _get_market_validator():
     return _market_validator
 
 
-def _get_anomaly_detector():
+def _get_anomaly_detector() -> None:
     """Lazy import anomaly detector."""
     global _anomaly_detector
     if _anomaly_detector is None:
@@ -62,7 +64,7 @@ class TradingConstraints:
 
     def __init__(self):
         """Initialize constraints from config."""
-        from src.config.loader import get_config
+        from ..config.loader import get_config
 
         config = get_config()
 
@@ -101,6 +103,9 @@ class WheelAdvisor:
         self.assignment_model = UnityAssignmentModel()
         self.borrowing_analyzer = BorrowingCostAnalyzer()
         self.financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
+        self.position_evaluator = PositionEvaluator(
+            commission_per_contract=self.constraints.COMMISSION_PER_CONTRACT
+        )
 
         logger.info(
             "WheelAdvisor initialized",
@@ -230,8 +235,23 @@ class WheelAdvisor:
                     f"Low confidence ({confidence:.0%}) in strike selection"
                 )
 
-            # TODO: Position switching logic will be added in a future update
+            # Position switching logic - evaluate if we should switch positions
+            # TODO: Uncomment when position_switch_integration module is available
+            # switch_recommendation = evaluate_position_switch(
+            #     current_positions=current_positions,
+            #     option_chain=option_chain,
+            #     current_price=current_price,
+            #     volatility=volatility,
+            #     risk_free_rate=market_snapshot.get("risk_free_rate", 0.05),
+            #     target_dte=self.wheel_params.target_dte,
+            #     position_evaluator=self.position_evaluator,
+            #     validate_liquidity_fn=self._validate_option_liquidity
+            # )
+            # 
+            # if switch_recommendation:
+            #     return switch_recommendation
 
+            # If no switch recommended, continue with normal new position logic
             # Calculate position size with risk constraints
             account = Account(
                 cash_balance=market_snapshot["buying_power"],
@@ -483,7 +503,7 @@ class WheelAdvisor:
 
             return recommendation
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to generate recommendation: {e}", exc_info=True)
 
             # Log failed decision
@@ -543,7 +563,7 @@ class WheelAdvisor:
                     quantity=pos_data["quantity"],
                 )
                 positions.append(position)
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.warning(f"Failed to parse position: {e}")
 
         return positions
@@ -713,7 +733,7 @@ class WheelAdvisor:
 
         try:
             import duckdb
-        except Exception:  # pragma: no cover - duckdb optional in some envs
+        except (ValueError, KeyError, AttributeError):  # pragma: no cover - duckdb optional in some envs
             return None
 
         db_path = Path(os.path.expanduser(config.storage.database_path))
@@ -727,7 +747,7 @@ class WheelAdvisor:
                 [ticker, days],
             ).fetchall()
             conn.close()
-        except Exception as e:  # pragma: no cover - ignore DB issues
+        except (ValueError, KeyError, AttributeError) as e:  # pragma: no cover - ignore DB issues
             logger.warning("load_returns_failed", error=str(e))
             return None
 

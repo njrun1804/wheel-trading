@@ -1,11 +1,17 @@
 """Single Schwab account portfolio management with hard failures on missing data."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import sys
 from dataclasses import dataclass
 from typing import Dict, List, NoReturn
 
-from src.config.loader import get_config
-from unity_wheel.models.position import Position, PositionType
+from ..config.loader import get_config
+from ..models.position import Position, PositionType
 
 from ..utils.logging import get_logger
 
@@ -134,7 +140,7 @@ class SingleAccountManager:
             try:
                 position = Position(symbol=symbol, quantity=quantity)
                 positions.append(position)
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 die(f"Failed to create position for {symbol}: {e}")
 
         return positions

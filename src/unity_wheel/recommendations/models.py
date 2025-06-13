@@ -1,4 +1,6 @@
 """Data models for wheel strategy recommendations with full type safety."""
+from __future__ import annotations
+
 
 import logging
 from dataclasses import dataclass, field

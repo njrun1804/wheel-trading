@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """Base MCP server with health check endpoints and lifecycle management."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import asyncio
 import os
@@ -117,18 +123,18 @@ class HealthCheckMCP(FastMCP):
                 
             # Atomic rename
             Path(tmp_path).replace(self._health_file)
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             # Ignore errors writing health file
             pass
             
     async def shutdown(self):
         """Graceful shutdown with cleanup."""
-        print(f"\n{self.name}: Shutting down gracefully...")
+        logger.info("\n{self.name}: Shutting down gracefully...")
         
         # Remove health file
         try:
             self._health_file.unlink(missing_ok=True)
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             pass
             
         # Give ongoing requests time to complete
@@ -171,9 +177,9 @@ class HealthCheckMCP(FastMCP):
                 
                 if age > max_age_seconds:
                     health_file.unlink()
-                    print(f"Cleaned up stale health file: {health_file.name}")
+                    logger.info("Cleaned up stale health file: {health_file.name}")
                     
-            except Exception:
+            except (ValueError, KeyError, AttributeError):
                 # If we can't read it, remove it
                 health_file.unlink(missing_ok=True)
 
@@ -190,7 +196,7 @@ if __name__ == "__main__":
         try:
             # Tool logic here
             return f"Processed: {input}"
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             mcp.track_error(str(e))
             raise
     

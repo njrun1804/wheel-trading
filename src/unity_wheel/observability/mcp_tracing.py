@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 OpenTelemetry tracing for MCP operations.
 Tracks: ripgrep scan, graph build, DuckDB query, embed call, LLM call.
 """
@@ -45,7 +47,7 @@ provider.add_span_processor(span_processor)
 tracer = trace.get_tracer("mcp.operations", "1.0.0")
 
 @contextmanager
-def trace_operation(operation: str, attributes: Optional[Dict[str, Any]] = None):
+def trace_operation(operation: str, attributes: Optional[Dict[str, Any]] = None) -> None:
     """Context manager for tracing MCP operations."""
     with tracer.start_as_current_span(operation) as span:
         # Add common attributes
@@ -63,13 +65,13 @@ def trace_operation(operation: str, attributes: Optional[Dict[str, Any]] = None)
             duration_ms = (time.time() - start_time) * 1000
             span.set_attribute("mcp.duration_ms", duration_ms)
             span.set_status(Status(StatusCode.OK))
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             # Error - record exception
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
             raise
 
-def trace_mcp_call(operation: str):
+def trace_mcp_call(operation: str) -> None:
     """Decorator for tracing MCP function calls."""
     def decorator(func: Callable):
         @functools.wraps(func)
@@ -107,7 +109,7 @@ trace_llm_call = trace_mcp_call("llm.inference")
 
 # Example spans for common patterns
 @contextmanager
-def trace_mcp_workflow(workflow_name: str, total_files: int = 0):
+def trace_mcp_workflow(workflow_name: str, total_files: int = 0) -> None:
     """Trace an entire MCP workflow with nested spans."""
     with tracer.start_as_current_span(f"mcp.workflow.{workflow_name}") as span:
         span.set_attribute("workflow.name", workflow_name)
@@ -138,19 +140,19 @@ def trace_mcp_workflow(workflow_name: str, total_files: int = 0):
                 span.set_attribute(f"workflow.step.{step}_ms", duration)
             
             span.set_status(Status(StatusCode.OK))
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
             raise
 
 # Utility functions for performance monitoring
-def record_token_usage(span: trace.Span, prompt_tokens: int, completion_tokens: int):
+def record_token_usage(span: trace.Span, prompt_tokens: int, completion_tokens: int) -> None:
     """Record token usage metrics on a span."""
     span.set_attribute("llm.prompt_tokens", prompt_tokens)
     span.set_attribute("llm.completion_tokens", completion_tokens)
     span.set_attribute("llm.total_tokens", prompt_tokens + completion_tokens)
 
-def record_db_metrics(span: trace.Span, rows_scanned: int, rows_returned: int, cache_hit: bool = False):
+def record_db_metrics(span: trace.Span, rows_scanned: int, rows_returned: int, cache_hit: bool = False) -> None:
     """Record database query metrics."""
     span.set_attribute("db.rows_scanned", rows_scanned)
     span.set_attribute("db.rows_returned", rows_returned)

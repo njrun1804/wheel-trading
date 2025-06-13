@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Optimized historical price loader for M4 Pro MacBook.
 Handles Databento API limitations and maximizes throughput.
 """
@@ -11,9 +13,9 @@ from typing import Dict, List, Optional
 import pandas as pd
 from databento_dbn import Schema
 
-from src.config.loader import get_config
-from unity_wheel.storage import Storage
-from unity_wheel.utils import get_logger
+from ..config.loader import get_config
+from ....storage import Storage
+from ....utils import get_logger
 
 from .auth_client import DatabentoClient
 
@@ -130,7 +132,7 @@ class OptimizedPriceHistoryLoader:
                     else:
                         logger.warning(f"  No data for chunk")
 
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     errors += 1
                     logger.error(f"Error fetching chunk {i+1}: {e}")
 
@@ -148,7 +150,7 @@ class OptimizedPriceHistoryLoader:
 
             return final_days >= self.MINIMUM_DAYS
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Critical error loading price history: {e}")
             return False
 
@@ -204,7 +206,7 @@ class OptimizedPriceHistoryLoader:
 
                 return bars
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             if attempt < len(self.RETRY_DELAYS):
                 delay = self.RETRY_DELAYS[attempt]
                 logger.warning(f"Retry {attempt + 1} after {delay}s: {e}")
@@ -272,7 +274,7 @@ class OptimizedPriceHistoryLoader:
                 conn.execute("COMMIT")
                 logger.info(f"Stored {len(records)} price records")
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 conn.execute("ROLLBACK")
                 raise
 

@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Dynamic Token Budget Allocation for Claude Code CLI
 Adaptively manages token budgets based on file complexity and MCP capabilities
 """
@@ -112,7 +118,7 @@ class TokenBudgetAllocator:
             self.complexity_cache[file_path] = complexity
             return complexity
             
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             # Return basic complexity for unreadable files
             return FileComplexity(
                 path=file_path,
@@ -302,9 +308,9 @@ if __name__ == "__main__":
     # Allocate budget for different task types
     for task in ['general', 'search', 'structure']:
         allocations = allocator.allocate_budget(test_files, task)
-        print(f"\nTask: {task}")
+        logger.info("\nTask: {task}")
         for file, alloc in allocations.items():
-            print(f"  {Path(file).name}: {alloc['tokens']} tokens via {alloc['mcp']} ({alloc['strategy']})")
+            logger.info("  {Path(file).name}: {alloc['tokens']} tokens via {alloc['mcp']} ({alloc['strategy']})")
     
     # Show usage report
-    print(f"\nUsage Report: {json.dumps(allocator.get_usage_report(), indent=2)}")
+    logger.info("\nUsage Report: {json.dumps(allocator.get_usage_report(), indent=2)}")

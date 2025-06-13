@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
-from unity_wheel.utils import StructuredLogger, get_logger
+from ....utils import StructuredLogger, get_logger
 
 logger = get_logger(__name__)
 structured_logger = StructuredLogger(__name__)
@@ -252,10 +252,10 @@ class MarketDataValidator:
                             data.update(corrected_data)
                             corrections.append(f"Applied correction for {rule.name}")
                             self.validation_stats["auto_corrected"] += 1
-                        except Exception as e:
+                        except (ValueError, KeyError, AttributeError) as e:
                             logger.error(f"Failed to apply correction for {rule.name}: {e}")
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Validation rule {rule_name} failed: {e}")
                 issues.append(
                     ValidationIssue(
@@ -387,7 +387,7 @@ class MarketDataValidator:
                 if iv <= 0 or iv > 5:  # 0% to 500%
                     issues.append(f"Strike {strike}: Unreasonable IV {iv}")
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 issues.append(f"Strike {strike_str}: Validation error {e}")
 
         if issues:

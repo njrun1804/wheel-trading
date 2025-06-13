@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Dynamic chunk sizing for optimal token usage in MCP servers.
 Adapts chunk size based on file size, complexity, and response time.
 """
@@ -297,7 +303,7 @@ class ChunkedFileReader:
             
         try:
             content = path.read_text(encoding='utf-8', errors='ignore')
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             return [{"error": str(e)}]
             
         # Choose chunking method
@@ -393,7 +399,7 @@ class ChunkedFileReader:
                 
             return chunks
             
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             return [{"error": str(e)}]
 
 
@@ -407,12 +413,12 @@ if __name__ == "__main__":
     # Test on this file
     chunks = reader.read_file_chunked(__file__, semantic=True)
     
-    print(f"Created {len(chunks)} chunks")
+    logger.info("Created {len(chunks)} chunks")
     for chunk in chunks:
         print(f"Chunk {chunk['chunk_id']}/{chunk['total_chunks']}: "
               f"Lines {chunk['start_line']}-{chunk['end_line']} "
               f"({chunk['tokens']} tokens)")
         
     # Show performance stats
-    print("\nPerformance Stats:")
+    logger.info("\nPerformance Stats:")
     print(json.dumps(reader.chunker.get_performance_stats(), indent=2))

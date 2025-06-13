@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Main authentication client with automatic token management.
 """
 
@@ -28,7 +30,7 @@ from .rate_limiter import RateLimiter
 logger = get_logger(__name__)
 
 
-def auth_retry(max_attempts: int = 3, backoff_factor: float = 2.0):
+def auth_retry(max_attempts: int = 3, backoff_factor: float = 2.0) -> None:
     """Decorator for automatic retry with exponential backoff."""
 
     def decorator(func: Callable) -> Callable:
@@ -74,7 +76,7 @@ def auth_retry(max_attempts: int = 3, backoff_factor: float = 2.0):
                     # Can't recover from invalid credentials
                     raise
 
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     logger.error(f"{func.__name__}", attempt=attempt + 1, error=str(e))
                     last_exception = e
                     if attempt < max_attempts - 1:
@@ -210,7 +212,7 @@ class AuthClient:
 
             logger.info("authenticate", status="success", expires_in=token_response["expires_in"])
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error("authenticate", error=str(e))
             raise InvalidCredentialsError(
                 f"Authentication failed: {e}. Please check your credentials and try again."
@@ -253,7 +255,7 @@ class AuthClient:
                     "refresh_token", status="success", expires_in=token_response["expires_in"]
                 )
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error("refresh_token", error=str(e))
                 raise InvalidCredentialsError(f"Token refresh failed: {e}. Please re-authenticate.")
 
@@ -414,7 +416,7 @@ class AuthClient:
                 try:
                     is_valid = await self.validate_token()
                     health["token_valid"] = is_valid
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     health["errors"].append(f"Token validation failed: {e}")
 
             # Overall status
@@ -427,7 +429,7 @@ class AuthClient:
             else:
                 health["status"] = "unconfigured"
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             health["status"] = "error"
             health["errors"].append(str(e))
 

@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Implied Volatility surface analyzer for options strategy optimization.
 Provides IV rank, percentile, term structure, and skew analysis.
 """

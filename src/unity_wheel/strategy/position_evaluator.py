@@ -501,7 +501,7 @@ class PositionEvaluator:
                     best_benefit = analysis.switch_benefit
                     best_analysis = analysis
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.warning(
                     f"Failed to analyze switch to {strike}/{dte}",
                     extra={"error": str(e), "strike": strike, "dte": dte},

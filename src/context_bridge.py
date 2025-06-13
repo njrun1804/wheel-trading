@@ -6,6 +6,8 @@ that must be maintained across the codebase.
 
 IMPORTANT: This file is specifically for AI/Codex consumption.
 """
+from __future__ import annotations
+
 
 # ============================================================================
 # ARCHITECTURE INVARIANTS (Never violate these)
@@ -290,7 +292,7 @@ When generating code for this project:
 6. ALWAYS validate inputs with die() or Pydantic models
 7. ALWAYS add type hints and docstrings
 8. ALWAYS write tests for new functionality
-9. ALWAYS use absolute imports from src.unity_wheel
+9. ALWAYS use absolute imports from .unity_wheel
 10. ALWAYS respect the performance SLAs listed above
 
 Refer to the pattern files in src/patterns/ for examples.

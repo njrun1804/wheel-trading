@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """Port-aware quota manager to prevent file descriptor exhaustion."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import os
 import socket
@@ -234,7 +240,7 @@ class QuotaAwareSocket(socket.socket):
         super().bind(address)
 
 # Monkey-patch socket for quota awareness (optional)
-def enable_quota_enforcement():
+def enable_quota_enforcement() -> None:
     """Enable system-wide quota enforcement."""
     import socket as sock_module
     sock_module.socket = QuotaAwareSocket
@@ -250,18 +256,18 @@ if __name__ == "__main__":
     
     async def test_allocation():
         """Test port allocation."""
-        console.print("[green]Testing port allocation with quota management...[/green]")
+        console.logger.info("[green]Testing port allocation with quota management...[/green]")
         
         # Allocate some ports
         allocations = []
         for i in range(5):
             try:
                 with manager.allocate_port(f"test-service-{i}") as port:
-                    console.print(f"✓ Allocated port {port} for test-service-{i}")
+                    console.logger.info("✓ Allocated port {port} for test-service-{i}")
                     allocations.append(port)
                     await asyncio.sleep(0.5)
-            except Exception as e:
-                console.print(f"[red]✗ Failed to allocate port: {e}[/red]")
+            except (ValueError, KeyError, AttributeError) as e:
+                console.logger.info("[red]✗ Failed to allocate port: {e}[/red]")
         
         # Show status
         status = manager.get_status()
@@ -278,6 +284,6 @@ if __name__ == "__main__":
         
         # Cleanup test
         cleaned = manager.cleanup_stale_allocations()
-        console.print(f"\nCleaned up {cleaned} stale allocations")
+        console.logger.info("\nCleaned up {cleaned} stale allocations")
     
     asyncio.run(test_allocation())

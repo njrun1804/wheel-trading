@@ -301,7 +301,7 @@ class FeatureFlags:
                 if self.is_enabled(feature_name):
                     try:
                         return func(*args, **kwargs)
-                    except Exception as e:
+                    except (ValueError, KeyError, AttributeError) as e:
                         self.degrade(feature_name, e)
 
                         # Try fallback
@@ -395,7 +395,7 @@ class FeatureFlags:
         try:
             with open(self.config_file, "w") as f:
                 json.dump(config, f, indent=2)
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to save feature flags config: {e}")
 
     def _load_config(self) -> None:
@@ -418,7 +418,7 @@ class FeatureFlags:
             # Restore disabled by error set
             self.disabled_by_error = set(config.get("disabled_by_error", []))
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to load feature flags config: {e}")
 
 

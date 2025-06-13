@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """Real-time data quality monitoring dashboard."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import os
 import sys
@@ -9,8 +15,8 @@ from typing import Dict, Tuple
 
 import duckdb
 
-from src.config.loader import get_config
-from unity_wheel.utils.logging import get_logger
+from ..config.loader import get_config
+from ....utils.logging import get_logger
 
 # Get Unity ticker once
 _config = get_config()
@@ -32,7 +38,7 @@ class Colors:
     BOLD = "\033[1m"
 
 
-def clear_screen():
+def clear_screen() -> None:
     """Clear terminal screen."""
     import subprocess
 
@@ -245,27 +251,27 @@ def calculate_health_score(freshness: Dict, quality: Dict) -> Tuple[int, str]:
     return max(score, 0), status
 
 
-def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int):
+def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> None:
     """Display the monitoring dashboard."""
     clear_screen()
 
     # Header
-    print(f"\n{Colors.BOLD}📊 DATA QUALITY MONITOR{Colors.RESET}")
+    logger.info("\n{Colors.BOLD}📊 DATA QUALITY MONITOR{Colors.RESET}")
     print("=" * 60)
-    print(f"Last refresh: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (Update #{refresh_count})")
+    logger.info("Last refresh: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (Update #{refresh_count})")
 
     # Data Freshness Section
-    print(f"\n{Colors.CYAN}⏰ DATA FRESHNESS{Colors.RESET}")
+    logger.info("\n{Colors.CYAN}⏰ DATA FRESHNESS{Colors.RESET}")
     print("-" * 40)
 
     # Unity Prices
     up = freshness.get("unity_prices", {})
     if up.get("records", 0) > 0:
         icon = get_status_icon(up["status"] == "good", up["status"] == "warning")
-        print(f"{icon} Unity Prices: {up['latest']} ({up['days_old']} days old)")
-        print(f"   Records: {up['records']:,}")
+        logger.info("{icon} Unity Prices: {up['latest']} ({up['days_old']} days old)")
+        logger.info("   Records: {up['records']:,}")
     else:
-        print(f"{get_status_icon(False)} Unity Prices: No data")
+        logger.info("{get_status_icon(False)} Unity Prices: No data")
 
     # Options Data
     opt = freshness.get("options", {})
@@ -276,52 +282,48 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int):
             age_str = f"{hours:.1f} hours"
         else:
             age_str = f"{hours/24:.1f} days"
-        print(f"\n{icon} Options Data: {opt['latest'].strftime('%Y-%m-%d %H:%M')} ({age_str} old)")
-        print(f"   Contracts: {opt['records']:,} | Days with data: {opt['days_with_data']}")
+        logger.info("\n{icon} Options Data: {opt['latest'].strftime('%Y-%m-%d %H:%M')} ({age_str} old)")
+        logger.info("   Contracts: {opt['records']:,} | Days with data: {opt['days_with_data']}")
     else:
-        print(f"\n{get_status_icon(False)} Options Data: No data")
+        logger.info("\n{get_status_icon(False)} Options Data: No data")
 
     # FRED Data
     fred = freshness.get("fred", {})
     if fred.get("series_count", 0) > 0:
         icon = get_status_icon(fred["status"] == "good", fred["status"] == "warning")
-        print(f"\n{icon} Economic Data: {fred['latest']} ({fred['days_old']} days old)")
-        print(f"   Series tracked: {fred['series_count']}")
+        logger.info("\n{icon} Economic Data: {fred['latest']} ({fred['days_old']} days old)")
+        logger.info("   Series tracked: {fred['series_count']}")
     else:
-        print(f"\n{get_status_icon(False)} Economic Data: No data")
+        logger.info("\n{get_status_icon(False)} Economic Data: No data")
 
     # Data Quality Section
-    print(f"\n{Colors.MAGENTA}🔍 DATA QUALITY{Colors.RESET}")
+    logger.info("\n{Colors.MAGENTA}🔍 DATA QUALITY{Colors.RESET}")
     print("-" * 40)
 
     # Price Gaps
     gaps = quality.get("price_gaps", {})
     if "total" in gaps:
         icon = get_status_icon(gaps["status"] == "good", gaps["status"] == "warning")
-        print(f"{icon} Price Gaps: {gaps['total']} total, {gaps['large']} large (>10 days)")
+        logger.info("{icon} Price Gaps: {gaps['total']} total, {gaps['large']} large (>10 days)")
 
     # Volatility
     vol = quality.get("volatility", {})
     if "annual" in vol:
         icon = get_status_icon(vol["status"] == "good", vol["status"] == "warning")
-        print(
-            f"{icon} Volatility: {vol['annual']:.1f}% annual, {vol['max_daily_move']:.1f}% max daily"
-        )
+        logger.info("{icon} Volatility: {vol['annual']:.1f}% annual, {vol['max_daily_move']:.1f}% max daily")
 
     # Spreads
     spreads = quality.get("spreads", {})
     if "average" in spreads:
         icon = get_status_icon(spreads["status"] == "good", spreads["status"] == "warning")
-        print(
-            f"{icon} Option Spreads: {spreads['average']:.1f}% avg, {spreads['wide_count']} wide (>50%)"
-        )
+        logger.info("{icon} Option Spreads: {spreads['average']:.1f}% avg, {spreads['wide_count']} wide (>50%)")
 
     # Overall Health Score
     score, status = calculate_health_score(freshness, quality)
-    print(f"\n{Colors.BOLD}🏆 OVERALL HEALTH SCORE: {score}/100 - {status}{Colors.RESET}")
+    logger.info("\n{Colors.BOLD}🏆 OVERALL HEALTH SCORE: {score}/100 - {status}{Colors.RESET}")
 
     # Recommendations
-    print(f"\n{Colors.YELLOW}💡 RECOMMENDATIONS{Colors.RESET}")
+    logger.info("\n{Colors.YELLOW}💡 RECOMMENDATIONS{Colors.RESET}")
     print("-" * 40)
 
     recommendations = []
@@ -348,19 +350,19 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int):
         recommendations.append("✅ All systems operational")
 
     for rec in recommendations:
-        print(f"  {rec}")
+        logger.info("  {rec}")
 
     # Footer
-    print(f"\n{Colors.CYAN}Press Ctrl+C to exit | Refreshing every 60 seconds...{Colors.RESET}")
+    logger.info("\n{Colors.CYAN}Press Ctrl+C to exit | Refreshing every 60 seconds...{Colors.RESET}")
 
 
-def main():
+def main() -> None:
     """Main monitoring loop."""
     db_path = os.path.expanduser(config.storage.database_path)
 
     if not os.path.exists(db_path):
-        print(f"{Colors.RED}❌ Database not found at {db_path}{Colors.RESET}")
-        print("Run data collection first: python tools/analysis/pull_unity_prices.py")
+        logger.info("{Colors.RED}❌ Database not found at {db_path}{Colors.RESET}")
+        logger.info("Run data collection first: python tools/analysis/pull_unity_prices.py")
         sys.exit(1)
 
     refresh_count = 0
@@ -389,7 +391,7 @@ def main():
             time.sleep(60)
 
     except KeyboardInterrupt:
-        print(f"\n\n{Colors.GREEN}Monitoring stopped.{Colors.RESET}")
+        logger.info("\n\n{Colors.GREEN}Monitoring stopped.{Colors.RESET}")
         sys.exit(0)
 
 

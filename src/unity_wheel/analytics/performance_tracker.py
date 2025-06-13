@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Enhanced performance tracker for Unity wheel trading.
 Tracks Unity-specific patterns and learns from actual results.
 """

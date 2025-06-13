@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Configuration loader with environment variable override support.
 Provides unified configuration management with tracking and health reporting.
 """

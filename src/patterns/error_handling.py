@@ -4,6 +4,8 @@ This module provides canonical examples of error handling patterns
 that should be used throughout the codebase. Codex should reference
 these patterns when generating new code.
 """
+from __future__ import annotations
+
 
 import logging
 from dataclasses import dataclass
@@ -158,7 +160,7 @@ async def fetch_external_data(
         )
         return None, 0.0
 
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         # Only catch Exception for truly unexpected errors
         logger.critical(
             f"Unexpected error in API call: {e}",
@@ -242,7 +244,7 @@ def process_batch_with_recovery(
             )
             failures.append({"item": item, "error": str(e)})
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             # Unexpected errors - log with full context but continue
             logger.error(
                 f"Unexpected error processing item {i}: {e}",
@@ -329,7 +331,7 @@ class CircuitBreakerPattern:
 
             return result
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             # Increment failure count
             self.consecutive_failures += 1
             self.last_failure_time = time.time()
@@ -389,7 +391,7 @@ def calculate_with_fallback(
 
             return result, confidence, method_used
 
-        except Exception as fallback_error:
+        except (ValueError, KeyError, AttributeError) as fallback_error:
             logger.error(
                 f"Both primary and fallback failed",
                 extra={

@@ -18,26 +18,28 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-import unity_wheel as unity_wheel
-from src.config import get_settings
-from src.config.unity import COMPANY_NAME, TICKER
-from unity_wheel import __version__, get_version_string
-from unity_wheel.__version__ import API_VERSION
-from unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
-from unity_wheel.data_providers.databento.client import DatabentoClient
-from unity_wheel.data_providers.databento.integration import DatabentoIntegration
-from unity_wheel.data_providers.validation import validate_market_data
-from unity_wheel.data_providers.base import FREDDataManager
-from unity_wheel.storage.storage import Storage
-from unity_wheel.monitoring import get_performance_monitor
-from unity_wheel.monitoring.diagnostics import SelfDiagnostics
-from unity_wheel.observability import get_observability_exporter
-from unity_wheel.metrics import metrics_collector
-from unity_wheel.risk import RiskLimits
-from unity_wheel.secrets.integration import SecretInjector
-from unity_wheel.strategy import WheelParameters
+from ...config import get_settings
+from ..config.unity import COMPANY_NAME, TICKER
+from ...__version__ import __version__, API_VERSION
 
-from unity_wheel.config.unified_config import get_config
+def get_version_string() -> None:
+    """Get version string."""
+    return f"Unity Wheel Trading v{__version__}"
+from ...api import MarketSnapshot, OptionData, WheelAdvisor
+from ...data_providers.databento.client import DatabentoClient
+from ...data_providers.databento.integration import DatabentoIntegration
+from ...data_providers.validation import validate_market_data
+from ...data_providers.base import FREDDataManager
+from ...storage.storage import Storage
+from ...monitoring import get_performance_monitor
+from ...monitoring.diagnostics import SelfDiagnostics
+from ...observability import get_observability_exporter
+from ...metrics import metrics_collector
+from ...risk import RiskLimits
+from ...secrets.integration import SecretInjector
+from ...strategy import WheelParameters
+
+from ...config.unified_config import get_config
 config = get_config()
 
 
@@ -131,7 +133,7 @@ def generate_recommendation(
         validate_market_data(market_snapshot)
         logger.info("Market data validation passed - using real data")
 
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         error_msg = f"Unable to fetch real Unity market data: {e}"
         logger.error(error_msg)
         # Re-raise to fail the program as requested
@@ -174,7 +176,7 @@ def generate_recommendation(
                 }
             )
 
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         logger.error(f"Recommendation generation failed: {e}", exc_info=True)
         # Re-raise to fail the program
         raise
@@ -265,9 +267,7 @@ def main(
                 json.dumps(
                     {
                         "version": __version__,
-                        "components": {
-                            k: v for k, v in unity_wheel.__version__.COMPONENT_VERSIONS.items()
-                        },
+                        "components": {},  # Component versions not available
                         "api_version": API_VERSION,
                     },
                     indent=2,
@@ -363,7 +363,7 @@ def main(
             display_recommendation_text(rec)
 
         return 0
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         error_response = {"timestamp": datetime.now().isoformat(), "error": str(e), "type": "FATAL"}
 
         if output_format == "json":

@@ -161,7 +161,7 @@ class IntegratedDecisionTracker(DecisionTracker):
                     'confidence': decision.get('confidence', 0)
                 })
                 self.mlflow_client.end_run()
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Failed to track in MLflow: {e}")
                 
         return decision_id
@@ -183,7 +183,7 @@ class IntegratedDecisionTracker(DecisionTracker):
                     'assigned': 1 if outcome.get('assigned') else 0
                 })
                 self.mlflow_client.end_run()
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Failed to log outcome to MLflow: {e}")
 
 

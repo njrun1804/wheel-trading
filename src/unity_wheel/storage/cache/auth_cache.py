@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Response caching for graceful degradation during auth failures.
 """
 
@@ -8,7 +10,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional, TypeVar, Union
 
-from unity_wheel.utils.logging import get_logger
+from ....utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -96,7 +98,7 @@ class AuthCache:
                     # Clean up stale cache
                     cache_path.unlink()
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error("get", endpoint=endpoint, error=str(e))
                 cache_path.unlink()  # Remove corrupted cache
 
@@ -142,7 +144,7 @@ class AuthCache:
             # Check cache size
             self._enforce_size_limit()
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error("set", endpoint=endpoint, error=str(e))
 
     def _is_fresh(self, cached: Dict[str, Any], max_age: Optional[int] = None) -> bool:
@@ -181,7 +183,7 @@ class AuthCache:
                 logger.debug(
                     "_enforce_size_limit", action="removed", file=cache_file.name, size_bytes=size
                 )
-            except Exception:
+            except (ValueError, KeyError, AttributeError):
                 pass  # File might already be deleted
 
     def get_fallback(self, endpoint: str, params: Optional[Dict] = None) -> Optional[T]:
@@ -223,7 +225,7 @@ class AuthCache:
                 )
                 return cached["data"]
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error("get_fallback", endpoint=endpoint, error=str(e))
 
         return None
@@ -254,7 +256,7 @@ class AuthCache:
                         cached = json.load(f)
                     if cached.get("endpoint") == endpoint:
                         cache_file.unlink()
-                except Exception:
+                except (ValueError, KeyError, AttributeError):
                     pass
         else:
             # Clear all
@@ -262,7 +264,7 @@ class AuthCache:
             for cache_file in self.cache_dir.rglob("*.cache"):
                 try:
                     cache_file.unlink()
-                except Exception:
+                except (ValueError, KeyError, AttributeError):
                     pass
 
         logger.info("clear", endpoint=endpoint or "all")
@@ -282,7 +284,7 @@ class AuthCache:
                 with open(cache_file, "r") as f:
                     cached = json.load(f)
                 endpoints.add(cached.get("endpoint", "unknown"))
-            except Exception:
+            except (ValueError, KeyError, AttributeError):
                 pass
 
         return {

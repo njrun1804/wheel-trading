@@ -13,7 +13,7 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 # Set up logging
 logging.basicConfig(
@@ -141,7 +141,7 @@ class EnvironmentValidator:
 
             self.results["Account Model"] = (True, "✓ All tests passed")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results["Models"] = (False, f"✗ {str(e)}")
             self.critical_failures += 1
 
@@ -189,7 +189,7 @@ class EnvironmentValidator:
 
             self.results["Probability ITM"] = (True, "✓ Calculation successful")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results["Math Functions"] = (False, f"✗ {str(e)}")
             self.critical_failures += 1
 
@@ -230,7 +230,7 @@ class EnvironmentValidator:
                 f"✓ Kelly={kelly:.3f}, Confidence={confidence:.2f}",
             )
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results["Risk Analytics"] = (False, f"✗ {str(e)}")
             self.critical_failures += 1
 
@@ -254,7 +254,7 @@ class EnvironmentValidator:
 
             self.results["Logging"] = (True, "✓ Logging configured correctly")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             self.results["Logging"] = (False, f"✗ {str(e)}")
             self.warnings += 1
 

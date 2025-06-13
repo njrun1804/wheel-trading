@@ -196,7 +196,7 @@ def with_recovery(
 
                     return result
 
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     context.record_error(e)
                     breaker = recovery_manager.get_circuit_breaker(operation)
                     breaker.call_failed()
@@ -259,7 +259,7 @@ def with_recovery(
 
                     return result
 
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     context.record_error(e)
                     breaker = recovery_manager.get_circuit_breaker(operation)
                     breaker.call_failed()
@@ -309,13 +309,13 @@ def with_recovery(
 
 
 @contextmanager
-def recovery_context(operation: str, fallback: Any = None):
+def recovery_context(operation: str, fallback: Any = None) -> None:
     """Context manager for manual recovery handling."""
     context = RecoveryContext(operation=operation)
 
     try:
         yield context
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         context.record_error(e)
         logger.error(
             f"Error in recovery context for {operation}",
@@ -348,7 +348,7 @@ def validate_and_recover(
                 extra={"operation": operation, "invalid_value": str(value)},
             )
             return recovery_func()
-    except Exception as e:
+    except (ValueError, KeyError, AttributeError) as e:
         logger.error(
             f"Recovery failed for {operation}",
             extra={

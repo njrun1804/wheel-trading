@@ -5,6 +5,8 @@ Bridges:
 - Real-time data → Risk analytics
 - Historical data → Backtesting
 """
+from __future__ import annotations
+
 
 import asyncio
 import logging
@@ -14,10 +16,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from src.config.loader import get_config
-from unity_wheel.math.options import calculate_all_greeks, implied_volatility_validated
-from unity_wheel.models.position import Position
-from unity_wheel.utils.logging import StructuredLogger
+from ..config.loader import get_config
+from ....math.options import calculate_all_greeks, implied_volatility_validated
+from ....models.position import Position
+from ....utils.logging import StructuredLogger
 
 from .client import DatabentoClient
 from .types import InstrumentDefinition, OptionChain, OptionQuote
@@ -164,7 +166,7 @@ class DatabentoIntegration:
                                     **metrics,
                                 }
                             )
-                except Exception as e:  # noqa: BLE001
+                except (ValueError, KeyError, AttributeError) as e:  # noqa: BLE001
                     logger.error(
                         "chain_analysis_error",
                         extra={"expiration": expiry.isoformat(), "error": str(e)},

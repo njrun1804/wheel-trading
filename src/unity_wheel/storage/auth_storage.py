@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Secure token storage with encryption and validation.
 """
 
@@ -116,7 +118,7 @@ class SecureTokenStorage:
             )
             return token_data
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"load_tokens: {str(e)}")
             return None
 

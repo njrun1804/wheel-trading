@@ -1,0 +1,78 @@
+{
+  "system": {
+    "platform": "Darwin",
+    "platform_release": "24.5.0",
+    "platform_version": "Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:27 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T6041",
+    "architecture": "arm64",
+    "processor": "arm",
+    "python_version": "3.13.2"
+  },
+  "chip": "Apple M4 Pro",
+  "cpu": {
+    "physical_cores": 12,
+    "logical_cores": 12,
+    "performance_cores": 8,
+    "efficiency_cores": 4,
+    "cpu_frequency_max": 0.0,
+    "cache_sizes": {
+      "l1_icache": "131072",
+      "l1_dcache": "65536",
+      "l2_cache": "4194304",
+      "l3_cache": "N/A"
+    }
+  },
+  "memory": {
+    "total_gb": 24.0,
+    "available_gb": 11.832183837890625,
+    "used_gb": 11.512115478515625,
+    "percent_used": 50.7,
+    "memory_bandwidth": "N/A",
+    "unified_memory": true
+  },
+  "gpu": {
+    "gpu_cores": "20",
+    "metal_version": "Metal Support: Metal 3",
+    "gpu_family": "Chipset Model: Apple M4 Pro",
+    "libraries": {
+      "mlx": {
+        "available": true,
+        "version": "0.25.2",
+        "device": "gpu"
+      },
+      "pytorch_mps": {
+        "available": true,
+        "version": "2.7.0",
+        "built_with_mps": true
+      },
+      "tensorflow_metal": {
+        "available": false
+      }
+    }
+  },
+  "storage": {
+    "total_gb": 460.4317207336426,
+    "available_gb": 196.85433197021484,
+    "used_percent": 5.1,
+    "ssd_type": "NVMe"
+  },
+  "features": {
+    "simd_width": true,
+    "arm_features": true,
+    "accelerate_framework": true,
+    "metal_performance_shaders": true,
+    "neural_engine": true,
+    "ray_tracing": true,
+    "av1_decode": true
+  },
+  "recommendations": [
+    "Use ProcessPoolExecutor with 8-10 workers for CPU-bound tasks",
+    "Can safely use 16-20GB for memory-intensive operations",
+    "Use MLX for matrix operations and neural networks",
+    "Leverage Neural Engine for ML inference via CoreML",
+    "Use MPS for image processing and parallel compute"
+  ],
+  "benchmarks": {
+    "cpu_10m_ops_ms": 452.10904199984725,
+    "memory_100mb_reverse_ms": 35.84095799988063
+  }
+}

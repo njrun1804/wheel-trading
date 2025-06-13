@@ -1,4 +1,10 @@
 """Memory Pressure Monitor - Tracks RSS/total ratio to prevent OOM."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import contextlib
 import threading
@@ -16,18 +22,19 @@ import psutil
 class MemorySnapshot:
     """Point-in-time memory measurement."""
     timestamp: float
-    rss_mb: float
-    total_mb: float
-    ratio: float
+    rss_mb: float  # Process RSS memory
+    total_mb: float  # Total system memory
+    ratio: float  # System-wide usage ratio (not just process)
     swap_mb: float
     available_mb: float
+    process_ratio: float = 0.0  # Process memory ratio
 
 
 class MemoryPressureMonitor:
     """Background monitor for system memory pressure."""
     
     def __init__(self, 
-                 threshold_ratio: float = 0.70,
+                 threshold_ratio: float = 0.25,  # Match startup.sh threshold
                  sample_interval_ms: int = 250,
                  history_size: int = 240):  # 1 minute of history at 250ms
         
@@ -39,6 +46,8 @@ class MemoryPressureMonitor:
         self.history: deque[MemorySnapshot] = deque(maxlen=history_size)
         self.peak_memory_mb: float = 0.0
         self.peak_ratio: float = 0.0
+        self.initial_memory_mb: float = 0.0
+        self.total_system_mb: float = 0.0
         
         # Pressure tracking
         self.pressure_high: bool = False
@@ -77,6 +86,11 @@ class MemoryPressureMonitor:
                 snapshot = self._take_snapshot()
                 
                 with self._lock:
+                    # Set initial values on first snapshot
+                    if self.initial_memory_mb == 0:
+                        self.initial_memory_mb = snapshot.rss_mb
+                        self.total_system_mb = snapshot.total_mb
+                    
                     self.history.append(snapshot)
                     
                     # Update peaks
@@ -110,8 +124,8 @@ class MemoryPressureMonitor:
                     with contextlib.suppress(Exception):
                         callback(snapshot)
                         
-            except Exception as e:
-                print(f"Memory monitor error: {e}")
+            except (ValueError, KeyError, AttributeError) as e:
+                logger.info("Memory monitor error: {e}")
                 
             # Sleep until next sample
             time.sleep(self.sample_interval_ms / 1000.0)
@@ -132,8 +146,20 @@ class MemoryPressureMonitor:
         swap = psutil.swap_memory()
         swap_mb = swap.used / (1024 * 1024)
         
-        # Calculate ratio
-        ratio = rss_mb / total_mb
+        # Calculate memory pressure ratio
+        # On macOS, use wired memory as the true pressure indicator
+        # since active/inactive/compressed can be freed
+        if hasattr(vm, 'wired'):
+            # macOS provides wired memory
+            wired_mb = vm.wired / (1024 * 1024)
+            ratio = wired_mb / total_mb
+        else:
+            # Linux/other: use traditional calculation
+            used_mb = total_mb - available_mb
+            ratio = used_mb / total_mb
+        
+        # Also track process-specific ratio for diagnostics
+        process_ratio = rss_mb / total_mb
         
         return MemorySnapshot(
             timestamp=time.time(),
@@ -141,7 +167,8 @@ class MemoryPressureMonitor:
             total_mb=total_mb,
             ratio=ratio,
             swap_mb=swap_mb,
-            available_mb=available_mb
+            available_mb=available_mb,
+            process_ratio=process_ratio
         )
         
     def is_pressure_high(self) -> bool:
@@ -154,6 +181,28 @@ class MemoryPressureMonitor:
         with self._lock:
             if self.history:
                 return self.history[-1].ratio
+        return 0.0
+        
+    def get_usage_percent(self) -> float:
+        """Get current system-wide memory usage as percentage (0-1)."""
+        return self.get_current_ratio()
+        
+    def get_system_memory_percent(self) -> int:
+        """Get current system-wide memory usage as percentage (0-100)."""
+        return int(self.get_current_ratio() * 100)
+        
+    def get_process_memory_percent(self) -> float:
+        """Get current process memory usage as percentage (0-1)."""
+        with self._lock:
+            if self.history:
+                return self.history[-1].process_ratio
+        return 0.0
+        
+    def get_current_mb(self) -> float:
+        """Get current process memory usage in MB."""
+        with self._lock:
+            if self.history:
+                return self.history[-1].rss_mb
         return 0.0
         
     def get_stats(self) -> dict[str, Any]:

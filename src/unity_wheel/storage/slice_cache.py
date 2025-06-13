@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 SHA-1 based slice cache for code embeddings.
 Provides lock-free caching with 90%+ hit rate on iterative edits.
 """

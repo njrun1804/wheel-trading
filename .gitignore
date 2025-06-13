@@ -122,3 +122,43 @@ mcp-servers-*.json
 # Large data files
 *.duckdb
 *.parquet
+
+# Claude Code generated files
+*_COMPLETE.md
+*_SUMMARY.md
+*_STATUS.md
+*_ANALYSIS.md
+*_PLAN.md
+*_GUIDE.md
+fix_*.py
+test-*.py
+orchestrate_*.py
+
+# MCP and orchestrator artifacts
+experience_buffer/
+src/unity_wheel/orchestrator_backup_*/
+
+# Build and report files
+*_report.json
+*_report.md
+hardening_report.md
+orchestrator_bootstrap_report.json
+comprehensive_fix_report.json
+
+# Temporary orchestrator files
+orchestrate
+orchestrate-trading
+orchestrator
+
+# Requirements variations
+requirements-*.txt
+!requirements.txt
+!requirements-dev.txt
+!requirements-ci.txt
+
+# Duplicate files with numbers
+*" "[0-9].txt
+*" "[0-9].py
+
+# Version indicators
+=*

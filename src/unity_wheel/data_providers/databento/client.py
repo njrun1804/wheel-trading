@@ -7,6 +7,8 @@ Implements:
 - Symbol batching for efficiency
 - Instrument ID caching for performance
 """
+from __future__ import annotations
+
 
 import asyncio
 import logging
@@ -20,11 +22,11 @@ import pandas as pd
 from databento_dbn import Schema, SType
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from src.config.loader import get_config
-from unity_wheel.secrets.integration import get_databento_api_key
-from unity_wheel.utils.data_validator import die
-from unity_wheel.utils.logging import StructuredLogger
-from unity_wheel.utils.recovery import RecoveryContext
+from ..config.loader import get_config
+from ....secrets.integration import get_databento_api_key
+from ....utils.data_validator import die
+from ....utils.logging import StructuredLogger
+from ....utils.recovery import RecoveryContext
 
 from ..audit_logger import get_audit_logger
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
@@ -254,7 +256,7 @@ class DatabentoClient:
                         )
                     break
 
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     last_error = e
                     if "subscription" in str(e).lower():
                         # Subscription error - don't retry
@@ -287,7 +289,7 @@ class DatabentoClient:
                     defn = InstrumentDefinition.from_databento(record)
                     if defn.expiration.date() == expiration.date():
                         definitions.append(defn)
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     logger.warning(
                         "definition_parse_error", extra={"error": str(e), "record": record}
                     )
@@ -363,7 +365,7 @@ class DatabentoClient:
                         or quote.timestamp > latest_quotes[quote.instrument_id].timestamp
                     ):
                         latest_quotes[quote.instrument_id] = quote
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     logger.warning("quote_parse_error", extra={"error": str(e)})
 
             return latest_quotes

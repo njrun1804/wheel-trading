@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Integration layer between new YAML configuration system and existing codebase.
 Provides compatibility and migration utilities.
 """
@@ -136,14 +142,14 @@ class ConfigAdapter:
         health = self._loader.health_report
 
         if not health.get("valid", False):
-            print("Configuration validation failed!")
+            logger.info("Configuration validation failed!")
             for error in health.get("errors", []):
-                print(f"  ERROR: {error}")
+                logger.info("  ERROR: {error}")
             return False
 
         # Show warnings but don't fail
         for warning in health.get("warnings", []):
-            print(f"  WARNING: {warning}")
+            logger.info("  WARNING: {warning}")
 
         return True
 
@@ -167,7 +173,7 @@ def migrate_env_to_yaml() -> None:
     """
     import os
 
-    print("Environment Variable Migration Helper")
+    logger.info("Environment Variable Migration Helper")
     print("=" * 40)
     print()
 
@@ -191,26 +197,26 @@ def migrate_env_to_yaml() -> None:
             found_vars[env_var] = (value, config_path)
 
     if found_vars:
-        print("Found environment variables to migrate:")
+        logger.info("Found environment variables to migrate:")
         print()
         for env_var, (value, path) in found_vars.items():
-            print(f"  {env_var} = {value}")
-            print(f"    → Set in config.yaml at: {path}")
+            logger.info("  {env_var} = {value}")
+            logger.info("    → Set in config.yaml at: {path}")
             print()
 
-        print("To use environment overrides with new system, rename to:")
+        logger.info("To use environment overrides with new system, rename to:")
         print()
         for env_var, (value, path) in found_vars.items():
             new_name = "WHEEL_" + path.upper().replace(".", "__")
-            print(f"  export {new_name}={value}")
+            logger.info("  export {new_name}={value}")
         print()
     else:
-        print("No legacy environment variables found.")
+        logger.info("No legacy environment variables found.")
 
     print()
-    print("The new configuration system uses config.yaml as the primary")
-    print("configuration source, with environment variables for overrides.")
-    print("See config.yaml for all available parameters.")
+    logger.info("The new configuration system uses config.yaml as the primary")
+    logger.info("configuration source, with environment variables for overrides.")
+    logger.info("See config.yaml for all available parameters.")
 
 
 # Compatibility function for existing code

@@ -3,6 +3,8 @@
 Helps determine whether to use borrowed funds or pay down debt
 when considering positions.
 """
+from __future__ import annotations
+
 
 import logging
 from dataclasses import dataclass
@@ -13,8 +15,8 @@ from ..math import CalculationResult
 
 import numpy as np
 
-from src.config.loader import get_config
-from unity_wheel.utils.logging import StructuredLogger
+from ..config.loader import get_config
+from ..utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -152,7 +154,7 @@ class BorrowingCostAnalyzer:
                 if new_rate is not None and new_rate > 0:
                     source.annual_rate = new_rate
                     updates[name] = new_rate
-            except Exception as exc:  # pragma: no cover - defensive
+            except (ValueError, KeyError, AttributeError) as exc:  # pragma: no cover - defensive
                 logger.warning(
                     "rate_update_failed",
                     extra={"source": name, "error": str(exc)},

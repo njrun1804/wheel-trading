@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Integrated decision engine that combines all analytics components.
 Provides autonomous wheel strategy recommendations.
 """

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+from __future__ import annotations
+
 Incremental filesystem indexer with file-save triggers.
 Integrates with VS Code file watchers for real-time updates.
 """
@@ -184,7 +186,7 @@ class IncrementalIndexer(FileSystemEventHandler):
                     await self._handle_delete(path)
                 else:
                     await self._handle_update(path, change_type)
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Error processing {path}: {e}")
                 
         self.conn.commit()
@@ -244,7 +246,7 @@ class IncrementalIndexer(FileSystemEventHandler):
             
             logger.info(f"Indexed {change_type}: {relative_path} (v{version})")
             
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Error indexing {path}: {e}")
             
     async def _handle_delete(self, path: Path):
@@ -407,7 +409,7 @@ class VSCodeIntegration:
 
 
 # Helper function for VS Code integration
-def notify_file_save(file_path: str):
+def notify_file_save(file_path: str) -> None:
     """Notify indexer of file save (called from VS Code)."""
     try:
         # Send notification to running indexer
@@ -421,7 +423,7 @@ def notify_file_save(file_path: str):
                 'path': file_path
             }).encode())
             sock.close()
-    except Exception:
+    except (ValueError, KeyError, AttributeError):
         pass
 
 

@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Batch PyREPL executor for efficient code testing.
 Executes multiple code snippets in a single PyREPL call for better performance.
 """
@@ -119,7 +125,7 @@ try:
         'execution_time': execution_time
     }}
     
-except Exception as e:
+except (ValueError, KeyError, AttributeError) as e:
     results['{snippet.id}'] = {{
         'success': False,
         'output': None,
@@ -227,7 +233,7 @@ for var in list(locals()):
         Returns:
             Test results and conclusion
         """
-        print(f"\nTesting hypothesis: {hypothesis}")
+        logger.info("\nTesting hypothesis: {hypothesis}")
         
         # Create snippets from test cases
         snippets = []

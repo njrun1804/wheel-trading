@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Volatility regime detection for sophisticated risk management.
 Prevents risk skewing from mixing different market regimes.
 """

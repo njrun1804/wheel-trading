@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Unified caching system with L1 (RAM) and L2 (disk) layers.
 Includes predictive cache warming and LRU eviction.
 """

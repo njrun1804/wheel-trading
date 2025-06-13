@@ -1,0 +1,22 @@
+{
+  "cpu": {
+    "max_workers": 8,
+    "batch_size": 2048,
+    "chunk_size": 65536
+  },
+  "memory": {
+    "cache_size_mb": 4915,
+    "buffer_size_mb": 7372,
+    "max_allocation_gb": 19
+  },
+  "gpu": {
+    "preferred_backend": "mlx",
+    "batch_size": 4096,
+    "use_unified_memory": true
+  },
+  "io": {
+    "concurrent_reads": 24,
+    "prefetch_size_mb": 64,
+    "use_mmap": true
+  }
+}

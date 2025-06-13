@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Dynamic parameter optimizer using continuous functions.
 Directly optimizes: CAGR - 0.20 × |CVaR₉₅| with autonomous operation.
 """

@@ -1,12 +1,14 @@
 """Parser for broker account data (Schwab/TD Ameritrade format)."""
+from __future__ import annotations
+
 
 import re
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-from unity_wheel.models.position import Position
-from unity_wheel.portfolio.single_account import ManualAccount
-from unity_wheel.utils.logging import get_logger
+from ...models.position import Position
+from ...portfolio.single_account import ManualAccount
+from ...utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -162,7 +164,7 @@ class BrokerDataParser:
                 if quantity is not None:
                     return Position(symbol=symbol, quantity=quantity)
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.debug(f"Could not parse position row: {line}, error: {e}")
 
         return None

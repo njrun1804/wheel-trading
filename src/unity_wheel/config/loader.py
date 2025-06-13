@@ -2,11 +2,13 @@
 
 This redirects to the new unified config system.
 """
+from __future__ import annotations
+
 
 from .unified_config import get_config as _get_unified_config
 
 
-def get_config():
+def get_config() -> None:
     """Get configuration - redirects to unified config."""
     unified = _get_unified_config()
     

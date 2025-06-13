@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 MILP (Mixed Integer Linear Programming) solver for wheel strategy optimization.
 Supports multiple backends: OR-Tools, Gurobi (if available), and PuLP.
 """
@@ -6,7 +8,7 @@ Supports multiple backends: OR-Tools, Gurobi (if available), and PuLP.
 import time
 from dataclasses import dataclass
 
-from unity_wheel.utils import get_logger
+from ...utils import get_logger
 
 try:
     from ortools.linear_solver import pywraplp

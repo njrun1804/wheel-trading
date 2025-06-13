@@ -1,4 +1,10 @@
 """Integration module to update existing code to use SecretManager."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import os
 from functools import lru_cache
@@ -69,13 +75,13 @@ def migrate_env_to_secrets() -> None:
                     manager.backend.set_secret(secret_id, value)
                     logger.info(f"Migrated {env_var} to secret {secret_id}")
                     migrated += 1
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.warning(f"Failed to migrate {env_var}: {e}")
 
     if migrated > 0:
         logger.info(f"Migrated {migrated} environment variables to SecretManager")
-        print(f"\n✓ Migrated {migrated} credentials from environment to SecretManager")
-        print("You can now remove these from your environment variables.")
+        logger.info("\n✓ Migrated {migrated} credentials from environment to SecretManager")
+        logger.info("You can now remove these from your environment variables.")
 
 
 class SecretInjector:

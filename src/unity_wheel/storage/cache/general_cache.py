@@ -11,8 +11,8 @@ from functools import lru_cache, wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
-from unity_wheel.utils.logging import get_logger
-from unity_wheel.metrics import metrics_collector
+from ...utils.logging import get_logger
+from ...metrics import metrics_collector
 
 logger = get_logger(__name__)
 
@@ -144,7 +144,7 @@ class IntelligentCache:
         """Estimate size of cached value in bytes."""
         try:
             return len(pickle.dumps(value))
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             # Fallback estimation
             return len(str(value))
 
@@ -218,7 +218,7 @@ class IntelligentCache:
         start_time = time.time()
         try:
             value = compute_func()
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(
                 f"Failed to compute value for cache key {key}", extra={"key": key, "error": str(e)}
             )
@@ -359,7 +359,7 @@ class IntelligentCache:
 
             logger.info(f"Saved {len(cache_data['entries'])} cache entries to disk")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to save cache to disk: {e}")
 
     def _load_from_disk(self) -> None:
@@ -393,7 +393,7 @@ class IntelligentCache:
 
             logger.info(f"Loaded {loaded} cache entries from disk")
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to load cache from disk: {e}")
 
 

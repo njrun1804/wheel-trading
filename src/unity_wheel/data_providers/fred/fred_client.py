@@ -13,10 +13,10 @@ import aiohttp
 from aiohttp import ClientError, ClientSession, ClientTimeout
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from unity_wheel.secrets.integration import get_fred_api_key
-from unity_wheel.storage.cache.general_cache import cached
-from unity_wheel.utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
-from unity_wheel.utils.data_validator import die
+from ....secrets.integration import get_fred_api_key
+from ....storage.cache.general_cache import cached
+from ....utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
+from ....utils.data_validator import die
 
 from .fred_models import (
     FREDDataset,
@@ -139,7 +139,7 @@ class FREDClient:
 
                 return data
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"FRED request failed: {e}", exc_info=True)
             raise
 
@@ -340,7 +340,7 @@ class FREDClient:
             async with semaphore:
                 try:
                     return series_id, await task
-                except Exception as e:
+                except (ValueError, KeyError, AttributeError) as e:
                     logger.error(f"Failed to fetch {series_id}: {e}")
                     return series_id, None
 

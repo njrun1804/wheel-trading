@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Enhanced authentication client that integrates with SecretManager.
 
 This module provides a drop-in replacement for the existing AuthClient
@@ -53,7 +55,7 @@ class AuthClient(BaseAuthClient):
                 creds = manager.get_credentials("schwab")
                 client_id = client_id or creds.get("client_id")
                 client_secret = client_secret or creds.get("client_secret")
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Failed to retrieve credentials from SecretManager: {e}")
                 if not client_id or not client_secret:
                     raise
@@ -109,7 +111,7 @@ class AuthClient(BaseAuthClient):
                 "databento_configured": configured_services.get("databento", False),
                 "ofred_configured": configured_services.get("ofred", False),
             }
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             health["secret_manager"] = {"error": str(e)}
 
         return health

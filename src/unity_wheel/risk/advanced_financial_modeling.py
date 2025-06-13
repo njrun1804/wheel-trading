@@ -3,6 +3,8 @@
 This module provides sophisticated financial analysis for Unity wheel trading
 with borrowed capital considerations.
 """
+from __future__ import annotations
+
 
 import logging
 from dataclasses import dataclass
@@ -11,7 +13,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy import optimize, stats
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 from ..utils.random_utils import set_seed

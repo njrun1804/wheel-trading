@@ -1,4 +1,10 @@
 """Slice Cache - SHA-1 keyed vector storage for code embeddings."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import asyncio
 import json
@@ -116,8 +122,8 @@ class SliceCache:
             conn.close()
             return True
             
-        except Exception as e:
-            print(f"Cache store error: {e}")
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Cache store error: {e}")
             return False
             
     async def retrieve(self, slice_hash: str) -> dict[str, Any] | None:
@@ -173,8 +179,8 @@ class SliceCache:
                     
                 return data
                 
-        except Exception as e:
-            print(f"Cache retrieve error: {e}")
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Cache retrieve error: {e}")
             
         return None
         
@@ -215,8 +221,8 @@ class SliceCache:
             similarities.sort(key=lambda x: x[1], reverse=True)
             return similarities[:top_k]
             
-        except Exception as e:
-            print(f"Search error: {e}")
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Search error: {e}")
             return []
             
     def _evict_if_needed(self):
@@ -251,8 +257,8 @@ class SliceCache:
             
             return deleted
             
-        except Exception as e:
-            print(f"Cleanup error: {e}")
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Cleanup error: {e}")
             return 0
             
     def get_stats(self) -> dict[str, Any]:
@@ -268,7 +274,7 @@ class SliceCache:
             
             total_mb = (total_bytes or 0) / (1024 * 1024)
             
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             count, total_mb = 0, 0
             
         return {
@@ -280,6 +286,35 @@ class SliceCache:
             "misses": self.misses,
             "evictions": self.evictions
         }
+        
+    async def get_all_embeddings(self) -> dict[str, np.ndarray]:
+        """Get all embeddings for GPU similarity search."""
+        return await asyncio.get_event_loop().run_in_executor(
+            self.executor, self._get_all_embeddings_db
+        )
+    
+    def _get_all_embeddings_db(self) -> dict[str, np.ndarray]:
+        """Get all embeddings from database."""
+        try:
+            conn = sqlite3.connect(str(self.db_path))
+            
+            result = conn.execute("""
+                SELECT hash, vector
+                FROM slice_cache
+                WHERE vector IS NOT NULL
+            """).fetchall()
+            
+            embeddings = {}
+            for row in result:
+                # Deserialize vector
+                if row[1]:
+                    embeddings[row[0]] = np.frombuffer(row[1], dtype=np.float32)
+            
+            conn.close()
+            return embeddings
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Failed to get embeddings: {e}")
+            return {}
         
     async def close(self):
         """Shutdown cache and cleanup."""

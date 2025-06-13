@@ -1,4 +1,6 @@
 """Unity Wheel Trading Bot version information."""
+from __future__ import annotations
+
 
 __version__ = "2.0.0"
 __version_info__ = (2, 0, 0)

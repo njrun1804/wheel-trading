@@ -20,6 +20,21 @@ from .analytics import (
 )
 from .advanced_financial_modeling import AdvancedFinancialModeling
 
+# GPU-accelerated risk analytics
+try:
+    from .analytics_gpu import RiskMonitorGPU, get_risk_monitor_gpu
+    GPU_RISK_AVAILABLE = True
+except ImportError:
+    RiskMonitorGPU = None
+    get_risk_monitor_gpu = None
+    GPU_RISK_AVAILABLE = False
+
+# Legacy GPU import for compatibility
+try:
+    from .risk_analytics_gpu import RiskAnalyticsGPU
+except ImportError:
+    RiskAnalyticsGPU = None
+
 __all__ = [
     "BorrowingCostAnalyzer",
     "BorrowingSource",
@@ -37,4 +52,9 @@ __all__ = [
     "RiskLimits",
     "RiskMetrics",
     "AdvancedFinancialModeling",
+    # GPU versions
+    "RiskMonitorGPU",
+    "get_risk_monitor_gpu",
+    "RiskAnalyticsGPU",
+    "GPU_RISK_AVAILABLE",
 ]

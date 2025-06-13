@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Embedding pipeline with SHA-1 slice caching.
 Integrates ripgrep, dynamic chunking, and slice cache for efficient code embeddings.
 """
@@ -220,7 +222,7 @@ class EmbeddingPipeline:
             files = stdout.decode().strip().split('\n')
             return [f for f in files if f]
             
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error("Ripgrep failed", error=str(e))
             return []
             

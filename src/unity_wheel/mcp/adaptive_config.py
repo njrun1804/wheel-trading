@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Adaptive configuration system that dynamically tunes parameters based on query complexity.
 Optimizes resource usage by right-sizing computation for each query type.
 """
@@ -134,7 +140,7 @@ class AdaptiveConfig(UnifiedComputeConfig):
         # Adjust for available hardware
         self._adjust_for_hardware()
         
-        print(f"Configuration tuned for '{complexity}' complexity")
+        logger.info("Configuration tuned for '{complexity}' complexity")
         
     def _adjust_for_hardware(self) -> None:
         """Adjust parameters based on available hardware."""

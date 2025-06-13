@@ -1,14 +1,16 @@
 """Real-time Databento integration for Unity options data."""
+from __future__ import annotations
+
 
 import asyncio
 import logging
 from datetime import datetime, timezone
 
-from src.config import get_settings
-from unity_wheel.api.types import MarketSnapshot, OptionData
-from unity_wheel.data_providers.databento.client import DatabentoClient
-from unity_wheel.data_providers.databento.integration import DatabentoIntegration
-from unity_wheel.secrets.integration import SecretInjector
+from ...config import get_settings
+from ...api.types import MarketSnapshot, OptionData
+from ...data_providers.databento.client import DatabentoClient
+from ...data_providers.databento.integration import DatabentoIntegration
+from ...secrets.integration import SecretInjector
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,7 @@ async def create_databento_market_snapshot(
                 spot_data = await client._get_underlying_price(ticker)
                 current_price = float(spot_data.last_price)
                 logger.info(f"Unity spot price from Databento: ${current_price:.2f}")
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 error_msg = f"Failed to get Unity spot price: {e}"
                 logger.error(error_msg)
                 raise ValueError(error_msg)
@@ -76,7 +78,7 @@ async def create_databento_market_snapshot(
 
                 logger.info(f"Found {len(candidates)} Unity option candidates")
 
-            except Exception as e:
+            except (ValueError, KeyError, AttributeError) as e:
                 error_msg = f"Failed to get Unity options: {e}"
                 logger.error(error_msg)
                 raise ValueError(error_msg)

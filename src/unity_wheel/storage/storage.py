@@ -4,6 +4,8 @@ All data is stored locally using a DuckDB cache.  The module provides a
 ``get_or_fetch`` pattern for convenient caching of API responses and model
 results.
 """
+from __future__ import annotations
+
 
 from dataclasses import dataclass, field
 from datetime import datetime

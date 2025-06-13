@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Configuration schema and validation using Pydantic.
 Provides comprehensive validation, reasonableness checks, and type safety.
 """
@@ -12,7 +14,7 @@ import yaml
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import SecretStr
 
-from unity_wheel.config.unified_config import get_config
+# Removed circular import - use local config instead
 config = get_config()
 
 
@@ -940,3 +942,9 @@ def validate_config_health(config: WheelConfig) -> Dict[str, Union[bool, str]]:
     )
 
     return health
+
+def get_config():
+    """Get configuration - simple version to avoid circular import."""
+    from .loader import ConfigurationLoader
+    loader = ConfigurationLoader()
+    return loader.config

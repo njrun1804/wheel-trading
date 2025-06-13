@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Optimized Unified Compute System with parallel execution and adaptive configuration.
 Implements all quick wins and medium-term optimizations from the technical review.
 """
@@ -127,7 +133,7 @@ class OptimizedUnifiedCompute:
         complexity = self.analyze_query_complexity(query)
         self.config.tune(complexity)
         
-        print(f"Query complexity: {complexity}")
+        logger.info("Query complexity: {complexity}")
         print(f"Configuration: {self.config.sequential_thoughts} thoughts, "
               f"depth {self.config.memory_search_depth}")
         
@@ -150,8 +156,8 @@ class OptimizedUnifiedCompute:
         # Predictive cache warming
         asyncio.create_task(self._predictive_cache_warm(query))
         
-        print(f"\nTotal execution time: {total_time:.2f}s")
-        print(f"Cache hits: {self.metrics.cache_hits}, misses: {self.metrics.cache_misses}")
+        logger.info("\nTotal execution time: {total_time:.2f}s")
+        logger.info("Cache hits: {self.metrics.cache_hits}, misses: {self.metrics.cache_misses}")
         
         return {
             'result': final_result,
@@ -166,7 +172,7 @@ class OptimizedUnifiedCompute:
         phase_start = time.perf_counter()
         
         print("\n" + "="*60)
-        print("PHASES 1-3: PARALLEL DEEP UNDERSTANDING")
+        logger.info("PHASES 1-3: PARALLEL DEEP UNDERSTANDING")
         print("="*60)
         
         # Create parallel tasks
@@ -265,7 +271,7 @@ class OptimizedUnifiedCompute:
         phase_start = time.perf_counter()
         
         print("\n" + "="*60)
-        print("PHASE 5: ITERATIVE REFINEMENT")
+        logger.info("PHASE 5: ITERATIVE REFINEMENT")
         print("="*60)
         
         result = knowledge.copy()
@@ -276,7 +282,7 @@ class OptimizedUnifiedCompute:
             max_iterations = min(5, max_iterations)
             
         for iteration in range(max_iterations):
-            print(f"\nIteration {iteration + 1}/{max_iterations}")
+            logger.info("\nIteration {iteration + 1}/{max_iterations}")
             
             # Refine understanding
             result = await self._refine_iteration(result, query)
@@ -286,11 +292,11 @@ class OptimizedUnifiedCompute:
             confidence_history.append(confidence)
             self.metrics.confidence_progression.append(confidence)
             
-            print(f"Confidence: {confidence:.3f}")
+            logger.info("Confidence: {confidence:.3f}")
             
             # Early termination checks
             if self._should_terminate_early(confidence_history, iteration):
-                print("Early termination: Confidence stabilized")
+                logger.info("Early termination: Confidence stabilized")
                 self.metrics.early_termination = True
                 break
                 
@@ -358,7 +364,7 @@ class OptimizedUnifiedCompute:
     def _handle_result(self, result: Any, name: str) -> Dict[str, Any]:
         """Handle async result or exception."""
         if isinstance(result, Exception):
-            print(f"Warning: {name} failed with {type(result).__name__}: {result}")
+            logger.info("Warning: {name} failed with {type(result).__name__}: {result}")
             return {'error': str(result), 'status': 'failed'}
         return result
         

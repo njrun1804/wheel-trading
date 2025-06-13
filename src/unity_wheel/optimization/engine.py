@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Wheel Strategy Portfolio Optimization Engine
 
 Implements sophisticated optimization algorithms for wheel strategy
@@ -14,7 +16,7 @@ from typing import Any
 
 import numpy as np
 
-from unity_wheel.config.unified_config import get_config
+from ...config.unified_config import get_config
 config = get_config()
 
 
@@ -467,7 +469,7 @@ class PortfolioOptimizer:
         }
 
 
-def run_optimization_demo():
+def run_optimization_demo() -> None:
     """Demo of the optimization engine"""
 
     constraints = OptimizationConstraints(

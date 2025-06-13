@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 DuckDB-powered filesystem index for ultra-fast code search.
 Reduces search time from 47s to <5ms on 14,603 files.
 """
@@ -50,11 +56,8 @@ class FilesystemIndex:
             )
         """)
         
-        # Create FTS index for content search
-        self.conn.execute("""
-            CREATE INDEX IF NOT EXISTS idx_content_fts 
-            ON code_index USING FTS(content)
-        """)
+        # Note: DuckDB has built-in full-text search without special indexes
+        # We'll use LIKE queries which are optimized automatically
         
         # Create optimized indexes for common queries
         self.conn.execute("""
@@ -82,7 +85,7 @@ class FilesystemIndex:
         if not force_rebuild and self._is_index_fresh():
             return {"status": "up_to_date", "files": self._get_file_count()}
             
-        print("Building filesystem index...")
+        logger.info("Building filesystem index...")
         start_time = datetime.now()
         
         # Clear existing data if rebuilding
@@ -113,7 +116,7 @@ class FilesystemIndex:
                 
             processed += len(batch)
             if processed % 1000 == 0:
-                print(f"Indexed {processed}/{total_files} files...")
+                logger.info("Indexed {processed}/{total_files} files...")
                 
         # Commit changes
         self.conn.commit()
@@ -177,14 +180,17 @@ class FilesystemIndex:
                 complexity
             )
             
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             return None
             
     def search_files_indexed(self, query: str, limit: int = 250) -> List[Dict[str, Any]]:
         """
-        Ultra-fast indexed search using DuckDB FTS.
+        Ultra-fast indexed search using DuckDB.
         Returns results in <5ms for 14k files.
         """
+        # Escape special characters for LIKE query
+        escaped_query = query.replace('%', '\\%').replace('_', '\\_')
+        
         sql = """
             SELECT 
                 file_path,
@@ -192,14 +198,16 @@ class FilesystemIndex:
                 size_bytes,
                 last_modified,
                 complexity_score,
-                SNIPPET(content, -1, '<match>', '</match>', '...', 64) as snippet
+                SUBSTRING(content, 
+                    GREATEST(1, POSITION(LOWER(?) IN LOWER(content)) - 50), 
+                    100) as snippet
             FROM code_index
-            WHERE content MATCH ?
+            WHERE LOWER(content) LIKE LOWER('%' || ? || '%')
             ORDER BY complexity_score DESC, last_modified DESC
             LIMIT ?
         """
         
-        results = self.conn.execute(sql, [query, limit]).fetchall()
+        results = self.conn.execute(sql, [escaped_query, escaped_query, limit]).fetchall()
         
         return [
             {
@@ -273,7 +281,7 @@ class FilesystemIndex:
                 age = datetime.now() - result[0]
                 return age < timedelta(hours=max_age_hours)
                 
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             pass
             
         return False

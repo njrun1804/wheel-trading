@@ -1,4 +1,6 @@
 """Unified secret management for local and Google Cloud environments."""
+from __future__ import annotations
+
 
 import base64
 import getpass
@@ -97,7 +99,7 @@ class LocalSecretBackend(BaseSecretBackend):
 
             decrypted_data = self._fernet.decrypt(encrypted_data)
             return json.loads(decrypted_data.decode())
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to load secrets: {e}")
             raise SecretProviderError(f"Failed to load local secrets: {e}")
 
@@ -111,7 +113,7 @@ class LocalSecretBackend(BaseSecretBackend):
             self.secrets_file.touch(mode=0o600)
             with open(self.secrets_file, "wb") as f:
                 f.write(encrypted_data)
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to save secrets: {e}")
             raise SecretProviderError(f"Failed to save local secrets: {e}")
 
@@ -183,7 +185,7 @@ class GCPSecretBackend(BaseSecretBackend):
             return response.payload.data.decode("UTF-8")
         except self._gcp_exceptions.NotFound:
             return None
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to get secret from GCP: {e}")
             raise SecretProviderError(f"Failed to get secret from GCP: {e}")
 
@@ -210,7 +212,7 @@ class GCPSecretBackend(BaseSecretBackend):
                     "payload": {"data": value.encode("UTF-8")},
                 }
             )
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to set secret in GCP: {e}")
             raise SecretProviderError(f"Failed to set secret in GCP: {e}")
 
@@ -221,7 +223,7 @@ class GCPSecretBackend(BaseSecretBackend):
             self.client.delete_secret(request={"name": secret_name})
         except self._gcp_exceptions.NotFound:
             pass  # Already deleted
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to delete secret from GCP: {e}")
             raise SecretProviderError(f"Failed to delete secret from GCP: {e}")
 
@@ -234,7 +236,7 @@ class GCPSecretBackend(BaseSecretBackend):
                 secret_id = secret.name.split("/")[-1]
                 secrets.append(secret_id)
             return secrets
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to list secrets from GCP: {e}")
             raise SecretProviderError(f"Failed to list secrets from GCP: {e}")
 

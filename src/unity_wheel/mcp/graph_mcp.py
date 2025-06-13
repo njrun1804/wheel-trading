@@ -1,4 +1,10 @@
 """
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 Static-Analysis / Dependency-Graph MCP for structural code understanding.
 Provides AST parsing, call graphs, import analysis, and data flow tracking.
 """
@@ -276,11 +282,11 @@ class GraphMCP:
         
         ok_flag = self.index_dir / "ok.flag"
         if not force_rebuild and ok_flag.exists():
-            print("Loading existing code graph...")
+            logger.info("Loading existing code graph...")
             self._load_graph()
             return {"status": "loaded", "nodes": len(self.graph)}
             
-        print("Building code graph...")
+        logger.info("Building code graph...")
         start_time = time.time()
         
         # Clear existing data
@@ -312,7 +318,7 @@ class GraphMCP:
         skip_dirs = {'venv', 'env', '.git', '__pycache__', 'build', 'dist'}
         py_files = [f for f in py_files if not any(skip in f.parts for skip in skip_dirs)]
         
-        print(f"Parsing {len(py_files)} Python files...")
+        logger.info("Parsing {len(py_files)} Python files...")
         
         # Process in parallel with semaphore to limit concurrency
         semaphore = asyncio.Semaphore(min(8, os.cpu_count()))
@@ -326,7 +332,7 @@ class GraphMCP:
         
         # Count successes
         success_count = sum(1 for r in results if not isinstance(r, Exception))
-        print(f"Successfully parsed {success_count}/{len(py_files)} files")
+        logger.info("Successfully parsed {success_count}/{len(py_files)} files")
         
     async def _parse_file_async(self, file_path: Path, semaphore: asyncio.Semaphore):
         """Parse a single file asynchronously."""
@@ -400,13 +406,13 @@ class GraphMCP:
             
             return (analyzer.symbols, analyzer.edges)
             
-        except Exception as e:
-            print(f"Error parsing {file_path}: {e}")
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Error parsing {file_path}: {e}")
             return None
             
     def _build_graph_tables(self):
         """Build in-memory graph from database."""
-        print("Building in-memory graph...")
+        logger.info("Building in-memory graph...")
         
         # Load all symbols
         symbols = self.conn.execute("SELECT * FROM symbols").fetchall()
@@ -670,7 +676,7 @@ class GraphMCP:
         
     async def incremental_update(self, changed_files: List[Path]):
         """Incrementally update graph for changed files."""
-        print(f"Incrementally updating {len(changed_files)} files...")
+        logger.info("Incrementally updating {len(changed_files)} files...")
         
         for file_path in changed_files:
             relative_path = str(file_path.relative_to(self.project_root))

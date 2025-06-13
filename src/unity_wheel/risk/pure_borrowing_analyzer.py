@@ -3,6 +3,8 @@
 This module provides exact financial calculations for capital allocation
 decisions in a tax-free environment.
 """
+from __future__ import annotations
+
 
 import logging
 from dataclasses import dataclass
@@ -12,7 +14,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy.optimize import brentq
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 

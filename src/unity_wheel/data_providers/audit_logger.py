@@ -3,6 +3,8 @@
 Creates an append-only audit trail of every piece of market data used
 in financial decisions. This provides forensic evidence if needed.
 """
+from __future__ import annotations
+
 
 import json
 import os
@@ -125,7 +127,7 @@ class DataAuditLogger:
                 f.write(json.dumps(entry, default=str) + "\n")
                 f.flush()  # Ensure immediate write
                 os.fsync(f.fileno())  # Force write to disk
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to write audit log: {e}")
             # Don't raise - audit failures shouldn't stop trading
 

@@ -5,6 +5,10 @@ eliminating hardcoded values throughout the codebase.
 """
 
 from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 import os
 from dataclasses import dataclass, field
@@ -166,8 +170,8 @@ class UnifiedConfig(BaseModel):
                 raise ValueError("Hot data retention must be less than cold data retention")
                 
             return True
-        except Exception as e:
-            print(f"Configuration validation failed: {e}")
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.info("Configuration validation failed: {e}")
             return False
 
 

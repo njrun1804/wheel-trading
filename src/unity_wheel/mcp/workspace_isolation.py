@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Workspace isolation for MCP runtime.
 Ensures each VS Code window has its own sandbox.
 """
@@ -130,7 +132,7 @@ class WorkspaceIsolation:
                     socket_path = self.get_socket_path(service_name)
                     if os.path.exists(socket_path):
                         os.unlink(socket_path)
-            except Exception:
+            except (ValueError, KeyError, AttributeError):
                 # Clean up corrupt PID file
                 pid_file.unlink()
     
@@ -176,7 +178,7 @@ class WorkspaceIsolation:
                         service_info['status'] = 'stopped'
                     
                     services.append(service_info)
-                except Exception:
+                except (ValueError, KeyError, AttributeError):
                     pass
         
         return services
@@ -201,7 +203,7 @@ class WorkspaceIsolation:
                     if os.path.exists(filepath):
                         total_size += os.path.getsize(filepath)
             stats['disk_usage_mb'] = total_size / (1024 * 1024)
-        except Exception:
+        except (ValueError, KeyError, AttributeError):
             pass
         
         # Count cache entries
@@ -231,7 +233,7 @@ class WorkspaceIsolation:
             for service in running:
                 try:
                     psutil.Process(service['pid']).terminate()
-                except Exception:
+                except (ValueError, KeyError, AttributeError):
                     pass
         
         # Remove runtime directory
@@ -269,7 +271,7 @@ class WorkspaceManager:
                                 ws = WorkspaceIsolation(metadata['workspace_root'])
                                 stats = ws.get_workspace_stats()
                                 workspaces.append(stats)
-                        except Exception:
+                        except (ValueError, KeyError, AttributeError):
                             pass
         
         return workspaces
@@ -290,7 +292,7 @@ class WorkspaceManager:
                     if not dry_run:
                         ws.cleanup(force=True)
                     cleaned.append(ws_stats['workspace_id'])
-            except Exception:
+            except (ValueError, KeyError, AttributeError):
                 pass
         
         return cleaned

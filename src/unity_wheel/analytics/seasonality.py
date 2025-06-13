@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Seasonality and pattern detection for Unity trading.
 Identifies recurring patterns to optimize entry timing.
 """

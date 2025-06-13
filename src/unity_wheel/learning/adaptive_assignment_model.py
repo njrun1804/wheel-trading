@@ -1,4 +1,6 @@
 """Adaptive assignment probability model that learns from outcomes."""
+from __future__ import annotations
+
 
 from dataclasses import dataclass
 from datetime import datetime

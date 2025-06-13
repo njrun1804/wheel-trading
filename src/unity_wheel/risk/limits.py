@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Risk limits and circuit breakers for autonomous safety.
 Prevents the system from making dangerous trades.
 Now with adaptive limits that adjust to market conditions.
@@ -8,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils import get_logger
 

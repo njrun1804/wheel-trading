@@ -1,7 +1,0 @@
-=== Mac System Info ===
-      Model Name: MacBook Pro
-      Model Identifier: Mac16,8
-      Model Number: MX2H3LL/A
-      Chip: Apple M4 Pro
-      Total Number of Cores: 12 (8 performance and 4 efficiency)
-      Memory: 24 GB

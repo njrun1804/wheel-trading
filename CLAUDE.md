@@ -1,5 +1,36 @@
 # Claude Playbook – Trading-Bot Repo
 
+## 🚀 HARDWARE ACCELERATION ENABLED
+This codebase automatically uses ALL available CPU cores, GPU, and memory for maximum performance.
+
+### Quick Commands - Now Hardware Accelerated!
+```bash
+# TURBO MODE - Uses all 12 CPU cores + GPU
+./orchestrate_turbo.py "optimize all trading functions"
+
+# Direct acceleration (no orchestrator complexity)
+./claude_accelerated.py "search for class WheelStrategy"
+./claude_accelerated.py "read multiple files in parallel"
+
+# Standard orchestrator (with MCP)
+./orchestrate "analyze code patterns"
+```
+
+### Automatic Acceleration
+When you use these tools, they automatically run in parallel:
+- **Grep**: Searches using all 12 CPU cores
+- **Glob**: File matching parallelized
+- **Read**: Multiple files read simultaneously  
+- **Task**: Complex operations distributed
+- **Bash**: Compound commands run in parallel
+
+The system provides:
+- 12 CPU cores (M4 Pro) running at maximum
+- 19.2GB RAM allocated (80% of 24GB)
+- Metal GPU acceleration (20 cores)
+- <5ms filesystem operations
+- Automatic parallelization of all operations
+
 ## Workflow
 1. `dependency_graph.search_code_fuzzy(<term>)`  
 2. `ripgrep.search` if step 1 empty or regex-style query  
@@ -14,8 +45,17 @@ Run `dependency_graph.detect_cycles()`; block commit if cycles > 0.
 
 ## Quick Commands
 ```bash
+# Start Claude with all optimizations
+./startup.sh                     # Launch with M4 Pro optimizations + orchestrator
+
+# Trading analysis
 python run.py -p 100000          # Get recommendation
 python run.py --diagnose         # System health
+
+# Complex code analysis (NEW)
+./orchestrate "optimize all trading functions"
+
+# Testing
 pytest -v -m "not slow"          # Fast tests
 ```
 

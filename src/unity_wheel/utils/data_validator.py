@@ -1,4 +1,10 @@
 """Data validation with hard failures - no missing data allowed."""
+from __future__ import annotations
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 import sys
 from datetime import datetime
@@ -284,7 +290,7 @@ def validate_for_trading(snapshot: Dict[str, Any], account_data: Dict[str, Any])
     manager.parse_account(account_data)  # Dies if invalid
 
 
-def validate_api_call(func_name: str, *args, **kwargs):
+def validate_api_call(func_name: str, *args, **kwargs) -> None:
     """Decorator to validate API responses."""
 
     def decorator(func):

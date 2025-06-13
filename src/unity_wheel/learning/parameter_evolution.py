@@ -1,4 +1,6 @@
 """Parameter evolution system for tracking and updating all static values."""
+from __future__ import annotations
+
 
 import json
 from dataclasses import dataclass, field
@@ -397,5 +399,5 @@ class ParameterEvolution:
             
             logger.info(f"Loaded parameter evolution state from {self.storage_path}")
             
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error(f"Failed to load parameter evolution state: {e}")

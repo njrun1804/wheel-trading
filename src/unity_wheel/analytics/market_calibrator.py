@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Market calibrator that uses historical data to optimize wheel strategy parameters.
 Adapts settings based on current market regime and historical performance.
 """

@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Advanced rate limiting with circuit breaker pattern.
 """
 

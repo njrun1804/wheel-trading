@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Adaptive wheel strategy that integrates the Unity adaptive system.
 Replaces static parameters with dynamic ones based on market conditions.
 """

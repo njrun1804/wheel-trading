@@ -6,6 +6,8 @@ Additional features:
 - Options-specific calculations
 - Unity earnings calendar integration
 """
+from __future__ import annotations
+
 
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional, Tuple
@@ -14,7 +16,7 @@ from ..math import CalculationResult
 
 from .trading_calendar import SimpleTradingCalendar
 
-from unity_wheel.config.unified_config import get_config
+from ...config.unified_config import get_config
 config = get_config()
 
 

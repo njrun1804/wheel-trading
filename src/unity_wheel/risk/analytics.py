@@ -13,8 +13,8 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from src.config.loader import get_config
-from unity_wheel.models.position import Position
+from ..config.loader import get_config
+from ..models.position import Position
 
 from ..models.greeks import Greeks
 from ..storage.cache.general_cache import cached

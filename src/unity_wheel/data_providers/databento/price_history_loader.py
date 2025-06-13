@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Load historical price data for risk calculations.
 Only needs 250 days of daily bars - no options history required.
 """
@@ -10,9 +12,9 @@ from typing import Dict, List, Optional
 import pandas as pd
 from databento_dbn import Schema
 
-from src.config.loader import get_config
-from unity_wheel.storage import Storage
-from unity_wheel.utils import get_logger, with_recovery
+from ..config.loader import get_config
+from ....storage import Storage
+from ....utils import get_logger, with_recovery
 
 from .client import DatabentoClient
 
@@ -73,7 +75,7 @@ class PriceHistoryLoader:
 
             return True
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error("price_history_error", symbol=symbol, error=str(e))
             return False
 
@@ -186,7 +188,7 @@ class PriceHistoryLoader:
 
                 return True
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
             logger.error("daily_update_error", symbol=symbol, error=str(e))
 
         return False

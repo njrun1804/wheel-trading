@@ -1,4 +1,6 @@
 """
+from __future__ import annotations
+
 Intelligent MCP Request Router
 Routes requests to optimal MCP based on capabilities, load, and performance history
 """

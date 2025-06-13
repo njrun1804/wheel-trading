@@ -1,136 +1,66 @@
-# Unity Wheel Bot v2.0 - Quick Reference
+# 🚀 GPU Orchestrator Quick Reference
 
-> **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies.
-> For a more conservative approach, see `examples/core/conservative_config.yaml`
-
-## 🚀 Daily Commands
+## Starting the Orchestrator
 
 ```bash
-# Morning health check (run first!)
-./daily_health_check.py
+# Interactive mode (recommended)
+./orchestrate
 
-# Get trading recommendation
-python run.py --portfolio 100000
+# Single command
+./orchestrate "optimize Greek calculations"
 
-# Quick system check
-python run.py --diagnose
-
-# View performance
-python run.py --performance
-
-# Live monitoring dashboard
-./monitor_live.py
+# Test GPU components
+python test_gpu_orchestrator_isolated.py
 ```
 
-## 🤖 Autonomous Operations
+## Common Tasks
+
+### Trading Analysis
+- `analyze Unity position`
+- `optimize portfolio risk`
+- `evaluate SPY options`
+
+### Code Development  
+- `refactor risk module`
+- `optimize Greek calculations`
+- `find performance bottlenecks`
+
+### System Optimization
+- `benchmark GPU acceleration`
+- `profile memory usage`
+- `measure calculation speed`
+
+## Interactive Commands
+
+- `help` - Show commands
+- `stats` - Session statistics  
+- `strategy` - View evolving strategies
+- `cache` - Cache performance
+- `exit` - Quit
+
+## Tips
+
+1. **First Run**: GPU warmup takes ~200ms (one-time)
+2. **Complex Tasks**: Automatically use MCTS (1000+ alternatives)
+3. **Confidence**: 95% is usually enough (early stopping)
+4. **Evolution**: Strategies improve with use
+
+## Performance
+
+- **GPU**: 826 GFLOPS on M4 Pro
+- **Alternatives**: 1000-5000 explored
+- **Time**: 15-60s adaptive
+- **Parallelism**: 128x operations
+
+## Troubleshooting
 
 ```bash
-# Run a full health check (on demand)
-./scripts/health_check.sh
+# Fix imports
+python fix_all_imports.py
 
-# One-time full check
-./scripts/autonomous-checks.sh
+# Test isolated
+python test_gpu_orchestrator_isolated.py
 
-# Weekly maintenance
-./scripts/maintenance.sh
+# Check GPU
+python -c "import mlx.core as mx; print(mx.default_device())"
 ```
-
-## 🔍 Troubleshooting
-
-```bash
-# Check version
-python run.py --version
-
-# Export metrics for analysis
-python run.py --export-metrics
-
-# View configuration health
-python -c "from src.config.loader import get_config_loader; print(get_config_loader().generate_health_report())"
-
-# Check feature flags
-python -c "from unity_wheel.utils import get_feature_flags; f = get_feature_flags(); print(f.get_status_report()['summary'])"
-```
-
-## ⚙️ Configuration Overrides
-
-```bash
-# Change parameters via environment
-export WHEEL_STRATEGY__DELTA_TARGET=0.25
-export WHEEL_STRATEGY__DAYS_TO_EXPIRY_TARGET=30
-
-# Control health check
-export EXPORT_METRICS=true
-```
-
-## 📊 Key Files
-
-- `logs/health_check.log` - Health check output
-- `exports/` - Metric export files
-- `feature_flags.json` - Feature states
-- `metrics.db` - Performance history
-- `config.yaml` - Main configuration
-
-## 🚨 Common Issues
-
-### "System diagnostics failed"
-```bash
-# Check specific failures
-python run.py --diagnose --verbose
-
-# Reset feature flags
-rm feature_flags.json
-```
-
-### "Performance degraded"
-```bash
-# View slow operations
-python run.py --performance
-
-# Clear cache
-find . -name "*.cache" -delete
-```
-
-### "Configuration issues"
-```bash
-# Validate config
-python -c "from src.config import get_config"
-
-# Check for env overrides
-env | grep WHEEL_
-```
-
-## 📈 Monitoring Dashboard
-
-```bash
-# Export latest metrics
-python run.py --export-metrics
-
-# Files created:
-# - exports/dashboard_YYYYMMDD_HHMMSS.json
-# - exports/influx_YYYYMMDD_HHMMSS.txt
-# - exports/prometheus_YYYYMMDD_HHMMSS.txt
-# - exports/metrics_YYYYMMDD_HHMMSS.csv
-```
-
-## 🛡️ Git Hooks
-
-```bash
-# Install (one-time)
-pre-commit install
-
-# Run manually
-pre-commit run --all-files
-
-# Skip hooks (emergency only)
-git commit --no-verify
-```
-
-## 📞 Support
-
-1. Run diagnostics first: `python run.py --diagnose`
-2. Check logs: `tail -f logs/health_check.log`
-3. Review any alerts in the health check output
-4. Check version: `python run.py --version`
-
----
-*Remember: This is a recommendation system only - no broker integration!*
