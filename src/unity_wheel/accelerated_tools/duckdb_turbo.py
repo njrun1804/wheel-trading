@@ -49,8 +49,12 @@ class DuckDBTurbo:
         }
         
         # Create connection pool
-        for _ in range(self.pool_size):
-            conn = duckdb.connect(self.db_path, config=config)
+        if self.shared_memory:
+            # Single shared connection for in-memory database
+            self.main_conn = duckdb.connect(self.db_path, config=config)
+            # All connections share the same in-memory database
+            for _ in range(8):  # Still create workers for parallel execution
+                conn = self.main_conn
             
             # Enable M4 Pro specific extensions
             conn.install_extension('httpfs')
