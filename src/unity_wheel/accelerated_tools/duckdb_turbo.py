@@ -22,10 +22,17 @@ class DuckDBTurbo:
         
         self.db_path = db_path or ":memory:"
         
-        # Connection pool for parallel queries
-        self.pool_size = self.config["io"]["concurrent_reads"]  # 24 concurrent
+        # For in-memory databases, use a single shared connection
+        # For file databases, use connection pool
+        if self.db_path == ":memory:":
+            self.pool_size = 1
+            self.shared_memory = True
+        else:
+            self.pool_size = self.config["io"]["concurrent_reads"]  # 24 concurrent
+            self.shared_memory = False
+            
         self.connections = []
-        self._executor = ThreadPoolExecutor(max_workers=self.pool_size)
+        self._executor = ThreadPoolExecutor(max_workers=max(self.pool_size, 8))
         
         # Configure DuckDB for M4 Pro
         self._init_connections()
@@ -37,14 +44,8 @@ class DuckDBTurbo:
             'memory_limit': f"{self.config['memory']['max_allocation_gb']}GB",  # 19GB
             'max_memory': f"{self.config['memory']['max_allocation_gb']}GB",
             'temp_directory': '/tmp/duckdb_temp',
-            'enable_parallel_csv_reader': True,
             'preserve_insertion_order': False,  # Better performance
-            'enable_object_cache': True,
-            'object_cache_size': self.config["memory"]["cache_size_mb"] * 1024 * 1024,  # 4.8GB
-            'checkpoint_threshold': '1GB',
-            'wal_autocheckpoint': '1GB',
-            'force_compression': 'auto',  # Let DuckDB choose
-            'enable_progress_bar': False
+            'enable_object_cache': True
         }
         
         # Create connection pool
@@ -59,12 +60,9 @@ class DuckDBTurbo:
             conn.load_extension('parquet')
             conn.load_extension('json')
             
-            # Set pragmas for performance
-            conn.execute("PRAGMA threads=8")  # Use all performance cores
-            conn.execute("PRAGMA memory_limit='19GB'")
-            conn.execute("PRAGMA enable_parallel_hash=true")
-            conn.execute("PRAGMA enable_parallel_result_streaming=true")
-            conn.execute("PRAGMA parallel_copy=true")
+            # Set pragmas for performance (only valid pragmas)
+            conn.execute(f"PRAGMA threads={self.config['cpu']['max_workers']}")
+            conn.execute(f"PRAGMA memory_limit='{self.config['memory']['max_allocation_gb']}GB'")
             
             self.connections.append(conn)
     
