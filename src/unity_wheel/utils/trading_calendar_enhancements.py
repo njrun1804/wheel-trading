@@ -16,7 +16,7 @@ from ..math import CalculationResult
 
 from .trading_calendar import SimpleTradingCalendar
 
-from ...config.unified_config import get_config
+from config.unified_config import get_config
 config = get_config()
 
 

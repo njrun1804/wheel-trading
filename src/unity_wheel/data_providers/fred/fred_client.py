@@ -13,10 +13,10 @@ import aiohttp
 from aiohttp import ClientError, ClientSession, ClientTimeout
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ....secrets.integration import get_fred_api_key
-from ....storage.cache.general_cache import cached
-from ....utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
-from ....utils.data_validator import die
+from unity_wheel.secrets.integration import get_fred_api_key
+from ...storage.cache.general_cache import cached
+from unity_wheel.utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
+from unity_wheel.utils.data_validator import die
 
 from .fred_models import (
     FREDDataset,
@@ -79,7 +79,7 @@ class FREDClient:
         # Use provided API key or fall back to SecretManager
         if not api_key:
             logger.info("No API key provided, retrieving from SecretManager")
-            api_key = get_ofred_api_key()
+            api_key = get_fred_api_key()
 
         self.api_key = api_key
         if not self.api_key:

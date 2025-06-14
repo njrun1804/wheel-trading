@@ -6,9 +6,9 @@ import re
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-from ...models.position import Position
+from unity_wheel.models.position import Position
 from ...portfolio.single_account import ManualAccount
-from ...utils.logging import get_logger
+from unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

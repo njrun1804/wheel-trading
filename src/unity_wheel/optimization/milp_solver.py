@@ -8,7 +8,7 @@ Supports multiple backends: OR-Tools, Gurobi (if available), and PuLP.
 import time
 from dataclasses import dataclass
 
-from ...utils import get_logger
+from unity_wheel.utils import get_logger
 
 try:
     from ortools.linear_solver import pywraplp

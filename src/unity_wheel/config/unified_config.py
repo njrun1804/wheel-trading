@@ -49,7 +49,7 @@ class RiskConfig(BaseModel):
 class StorageConfig(BaseModel):
     """Data storage configuration."""
     database_path: str = Field(
-        default="~/.wheel_trading/cache/wheel_cache.duckdb",
+        default="data/wheel_trading_optimized.duckdb",
         env="DATABASE_PATH"
     )
     cache_dir: str = Field(default="~/.wheel_trading/cache", env="CACHE_DIR")

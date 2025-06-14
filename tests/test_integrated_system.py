@@ -15,8 +15,10 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from unity_wheel.analytics import EventType, IntegratedDecisionEngine
+from src.unity_wheel.analytics import EventType, IntegratedDecisionEngine
+from src.config.loader import get_config
 
+config = get_config()
 DB_PATH = os.path.expanduser(config.storage.database_path)
 
 

@@ -15,7 +15,7 @@ from ..math import CalculationResult
 
 import numpy as np
 
-from ..config.loader import get_config
+from config.loader import get_config
 from ..utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))

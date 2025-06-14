@@ -6,10 +6,10 @@ import json
 import time
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import Mock, patch
+# from unittest.mock import Mock, patch
 
 import pytest
-from unity_wheel.api import WheelAdvisor
+from src.unity_wheel.api import WheelAdvisor
 from unity_wheel.api.types import MarketSnapshot
 from unity_wheel.data_providers.base.validation import get_anomaly_detector, get_market_validator
 from unity_wheel.monitoring.diagnostics import SelfDiagnostics
@@ -23,12 +23,12 @@ from unity_wheel.utils.feature_flags import FeatureStatus, get_feature_flags
 def reset_singletons():
     """Reset singleton instances for clean tests."""
     # Reset feature flags
-    from unity_wheel.utils import feature_flags
+    from src.unity_wheel.utils import feature_flags
 
     feature_flags._feature_flags = None
 
     # Reset performance monitor
-    from unity_wheel.monitoring import performance
+    from src.unity_wheel.monitoring import performance
 
     performance._performance_monitor = None
 

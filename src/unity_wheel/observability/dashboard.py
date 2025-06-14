@@ -20,7 +20,7 @@ from ..metrics import metrics_collector
 from ..monitoring import get_performance_monitor
 from ..utils import StructuredLogger, get_feature_flags, get_logger
 
-from ...config.unified_config import get_config
+from ..config.unified_config import get_config
 config = get_config()
 
 

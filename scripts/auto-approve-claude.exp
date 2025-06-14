@@ -1,0 +1,52 @@
+#!/usr/bin/expect -f
+# Auto-approve Claude Code prompts for common operations
+# USE WITH CAUTION - Only for predictable, safe operations
+
+set timeout 30
+
+# Get command from arguments
+set cmd [lindex $argv 0]
+
+# Start Claude Code with the command
+spawn claude $cmd
+
+# Handle common approval prompts
+expect {
+    # File read operations - generally safe
+    "*permission to read*" {
+        send "y\r"
+        exp_continue
+    }
+    
+    # Search operations - safe
+    "*permission to search*" {
+        send "y\r"
+        exp_continue
+    }
+    
+    # Git status/diff - safe read operations
+    "*git status*" {
+        send "y\r"
+        exp_continue
+    }
+    
+    "*git diff*" {
+        send "y\r"
+        exp_continue
+    }
+    
+    # Python test runs - generally safe
+    "*pytest*" {
+        send "y\r"
+        exp_continue
+    }
+    
+    # Listing files - safe
+    "*ls *" {
+        send "y\r"
+        exp_continue
+    }
+    
+    # Continue processing until done
+    eof
+}

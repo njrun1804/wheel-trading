@@ -52,13 +52,55 @@ from .python_helpers_turbo import (
     analyze_project
 )
 
-# Convenience objects for direct access
-ripgrep = get_ripgrep_turbo()
-dependency_graph = get_dependency_graph()
-python_analyzer = get_python_analyzer()
-duckdb = get_duckdb_turbo()
-tracer = get_trace_turbo()
-code_helper = get_code_helper()
+# Lazy initialization to avoid async issues
+_ripgrep = None
+_dependency_graph = None
+_python_analyzer = None
+_duckdb = None
+_tracer = None
+_code_helper = None
+
+@property
+def ripgrep():
+    global _ripgrep
+    if _ripgrep is None:
+        _ripgrep = get_ripgrep_turbo()
+    return _ripgrep
+
+@property
+def dependency_graph():
+    global _dependency_graph
+    if _dependency_graph is None:
+        _dependency_graph = get_dependency_graph()
+    return _dependency_graph
+
+@property
+def python_analyzer():
+    global _python_analyzer
+    if _python_analyzer is None:
+        _python_analyzer = get_python_analyzer()
+    return _python_analyzer
+
+@property
+def duckdb():
+    global _duckdb
+    if _duckdb is None:
+        _duckdb = get_duckdb_turbo()
+    return _duckdb
+
+@property
+def tracer():
+    global _tracer
+    if _tracer is None:
+        _tracer = get_trace_turbo()
+    return _tracer
+
+@property
+def code_helper():
+    global _code_helper
+    if _code_helper is None:
+        _code_helper = get_code_helper()
+    return _code_helper
 
 # Version info
 __version__ = "1.0.0"

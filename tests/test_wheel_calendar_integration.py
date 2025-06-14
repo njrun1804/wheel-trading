@@ -1,11 +1,11 @@
 """Integration tests for trading calendar with wheel strategy."""
 
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock, patch
+# from unittest.mock import MagicMock, patch
 
 import pytest
 from unity_wheel.strategy.wheel import WheelParameters, WheelStrategy
-from unity_wheel.utils import SimpleTradingCalendar
+from src.unity_wheel.utils import SimpleTradingCalendar
 from unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
 
 
@@ -123,7 +123,7 @@ class TestWheelCalendarIntegration:
         # Weekend acceleration should be significant (many weekends)
         assert decay["weekend_acceleration"] > 0.2  # >20% non-trading days
 
-    @patch("src.unity_wheel.strategy.wheel.WheelStrategy.find_optimal_put_strike")
+    # @patch("src.unity_wheel.strategy.wheel.WheelStrategy.find_optimal_put_strike")
     def test_wheel_strategy_with_calendar(self, mock_find_strike, wheel_strategy, calendar):
         """Test wheel strategy using calendar for DTE calculations."""
         # Mock the strike finding

@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
-from ..config.loader import get_config
+from config.loader import get_config
 
 from ..utils import get_logger
 

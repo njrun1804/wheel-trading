@@ -14,8 +14,7 @@ import yaml
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import SecretStr
 
-# Removed circular import - use local config instead
-config = get_config()
+# Removed circular import - config loaded at runtime
 
 
 
@@ -439,12 +438,12 @@ class AdaptiveConfig(BaseModel):
         default_factory=lambda: {
             "normal": RegimeParams(),
             "volatile": RegimeParams(
-                put_delta=0.25, target_dte = config.trading.target_dte, roll_profit_target=0.25, position_size_factor=0.7
+                put_delta=0.25, target_dte=28, roll_profit_target=0.25, position_size_factor=0.7
             ),
             "stressed": RegimeParams(
-                put_delta=0.20, target_dte = config.trading.target_dte, roll_profit_target=0.25, position_size_factor=0.5
+                put_delta=0.20, target_dte=21, roll_profit_target=0.25, position_size_factor=0.5
             ),
-            "low_volatility": RegimeParams(put_delta=0.35, target_dte = config.trading.target_dte, position_size_factor=1.2),
+            "low_volatility": RegimeParams(put_delta=0.35, target_dte=42, position_size_factor=1.2),
         }
     )
 
@@ -532,7 +531,7 @@ class PerformanceConfig(BaseModel):
     export_path: Path = Field(Path("./data/performance/"), description="Export path")
 
 
-class DatentoFilters(BaseModel):
+class DatabentoFilters(BaseModel):
     """Databento data filtering parameters."""
 
     moneyness_range: float = Field(0.20, ge=0.0, le=1.0, description="Range around spot price")
@@ -540,7 +539,7 @@ class DatentoFilters(BaseModel):
     min_volume: int = Field(0, ge=0, description="Minimum volume filter")
 
 
-class DatentoStorage(BaseModel):
+class DatabentoStorage(BaseModel):
     """Databento storage configuration."""
 
     local_retention_days: int = Field(30, ge=1, description="Days to keep locally")
@@ -548,7 +547,7 @@ class DatentoStorage(BaseModel):
     partitioning: str = Field("daily", description="Data partitioning scheme")
 
 
-class DatentoRateLimits(BaseModel):
+class DatabentoRateLimits(BaseModel):
     """Databento rate limits (provider-specific)."""
 
     max_concurrent_live: int = Field(10, ge=1, description="Max concurrent live connections")
@@ -557,7 +556,7 @@ class DatentoRateLimits(BaseModel):
     max_file_size_gb: int = Field(2, ge=1, description="Max file size in GB")
 
 
-class DatentoLoader(BaseModel):
+class DatabentoLoader(BaseModel):
     """Databento data loader configuration."""
 
     max_workers: int = Field(8, ge=1, description="Parallel processing workers")
@@ -568,13 +567,13 @@ class DatentoLoader(BaseModel):
     minimum_days: int = Field(500, ge=1, description="Minimum acceptable days")
 
 
-class DatentoConfig(BaseModel):
+class DatabentoConfig(BaseModel):
     """Databento configuration."""
 
-    filters: DatentoFilters = Field(default_factory=DatentoFilters)
-    storage: DatentoStorage = Field(default_factory=DatentoStorage)
-    rate_limits: DatentoRateLimits = Field(default_factory=DatentoRateLimits)
-    loader: DatentoLoader = Field(default_factory=DatentoLoader)
+    filters: DatabentoFilters = Field(default_factory=DatabentoFilters)
+    storage: DatabentoStorage = Field(default_factory=DatabentoStorage)
+    rate_limits: DatabentoRateLimits = Field(default_factory=DatabentoRateLimits)
+    loader: DatabentoLoader = Field(default_factory=DatabentoLoader)
 
 
 class IVSurfaceConfig(BaseModel):
@@ -596,7 +595,7 @@ class SeasonalityConfig(BaseModel):
 class PerformanceTrackerConfig(BaseModel):
     """Performance tracker configuration."""
 
-    database_path: str = Field("~/.wheel_trading/performance.db", description="Database path")
+    database_path: str = Field("data/wheel_trading_optimized.duckdb", description="Database path")
     track_all_decisions: bool = Field(True, description="Track all decisions")
 
 
@@ -707,9 +706,9 @@ class SystemFeatures(BaseModel):
 class DatabasePaths(BaseModel):
     """Database storage paths."""
 
-    performance: str = Field("~/.wheel_trading/performance.db", description="Performance DB")
-    schwab_data: str = Field("~/.wheel_trading/schwab_data.db", description="Schwab data DB")
-    cache: str = Field(config.storage.database_path, description="Cache DB")
+    performance: str = Field("data/wheel_trading_optimized.duckdb", description="Performance DB")
+    schwab_data: str = Field("data/wheel_trading_optimized.duckdb", description="Schwab data DB")
+    cache: str = Field("data/wheel_trading_optimized.duckdb", description="Cache DB")
 
 
 class StorageConfig(BaseModel):
@@ -842,7 +841,7 @@ class WheelConfig(BaseModel):
     strategy: StrategyConfig = Field(default_factory=StrategyConfig)
     risk: RiskConfig = Field(default_factory=RiskConfig)
     data: DataConfig = Field(default_factory=DataConfig)
-    databento: DatentoConfig = Field(default_factory=DatentoConfig)
+    databento: DatabentoConfig = Field(default_factory=DatabentoConfig)
     trading: TradingConfig = Field(default_factory=TradingConfig)
     unity: UnityConfig = Field(default_factory=UnityConfig)
     adaptive: AdaptiveConfig = Field(default_factory=AdaptiveConfig)

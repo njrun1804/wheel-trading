@@ -17,7 +17,7 @@ from ..risk import analyze_borrowing_decision
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..strategy.position_evaluator import PositionEvaluator
-# from .position_switch_integration import evaluate_position_switch  # TODO: File doesn't exist
+# Position switch evaluation would go here if needed
 from ..utils import (
     DecisionLogger,
     RecoveryStrategy,
@@ -64,7 +64,7 @@ class TradingConstraints:
 
     def __init__(self):
         """Initialize constraints from config."""
-        from ..config.loader import get_config
+        from config.loader import get_config
 
         config = get_config()
 

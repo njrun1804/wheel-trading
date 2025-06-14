@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ..config.loader import get_config
+from config.loader import get_config
 
 from ..data_providers.databento.price_history_loader import PriceHistoryLoader
 from ..math.options import black_scholes_price_validated

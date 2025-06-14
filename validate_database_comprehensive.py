@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive validation of wheel_trading_master.duckdb database.
+Comprehensive validation of data/wheel_trading_optimized.duckdb database.
 
 Tests financial data integrity, mathematical consistency, data completeness,
 and statistical anomalies to ensure the database is reliable for financial decisions.
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class DatabaseValidator:
     """Comprehensive database validation for financial data integrity."""
 
-    def __init__(self, db_path: str = "data/wheel_trading_master.duckdb"):
+    def __init__(self, db_path: str = "data/wheel_trading_optimized.duckdb"):
         """Initialize validator with database connection."""
         self.db_path = db_path
         self.conn = duckdb.connect(db_path, read_only=True)

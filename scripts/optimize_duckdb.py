@@ -2,7 +2,7 @@
 import duckdb
 import os
 
-db_path = 'data/wheel_trading_master.duckdb'
+db_path = 'data/wheel_trading_optimized.duckdb'
 conn = duckdb.connect(db_path)
 
 # Enable all performance optimizations

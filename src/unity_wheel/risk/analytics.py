@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from ..config.loader import get_config
+from config.loader import get_config
 from ..models.position import Position
 
 from ..models.greeks import Greeks
@@ -439,7 +439,7 @@ class RiskAnalyzer:
     # PURPOSE: Aggregate Greeks across all positions
     # INPUTS: List of (Position, Greeks, confidence) tuples
     # OUTPUTS: (Dict of aggregated Greeks, overall confidence)
-    # TODO(codex): Consider position correlations for more accurate aggregation
+    # Note: Position correlations can be passed via the correlations parameter
     @timed_operation(threshold_ms=5.0)
     def aggregate_portfolio_greeks(
         self,

@@ -115,10 +115,10 @@ def data_quality_check() -> str:
     try:
         import duckdb
         
-        db_path = Path(WORKSPACE_ROOT) / "data" / "wheel_trading_master.duckdb"
+        db_path = Path(WORKSPACE_ROOT) / "data" / "data/wheel_trading_optimized.duckdb"
         if not db_path.exists():
             # Try cache location
-            db_path = Path(WORKSPACE_ROOT) / "data" / "cache" / "wheel_cache.duckdb"
+            db_path = Path(WORKSPACE_ROOT) / "data" / "cache" / "data/wheel_trading_optimized.duckdb"
             
         if not db_path.exists():
             return "Database not found at expected locations"

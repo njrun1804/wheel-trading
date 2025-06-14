@@ -16,8 +16,8 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from ....utils.logging import StructuredLogger
-from ....utils.trading_calendar import SimpleTradingCalendar
+from unity_wheel.utils.logging import StructuredLogger
+from unity_wheel.utils.trading_calendar import SimpleTradingCalendar
 
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote
 

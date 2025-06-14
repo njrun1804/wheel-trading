@@ -16,7 +16,7 @@ from typing import Any
 
 import numpy as np
 
-from ...config.unified_config import get_config
+from config.unified_config import get_config
 config = get_config()
 
 

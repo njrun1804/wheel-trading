@@ -22,11 +22,11 @@ import pandas as pd
 from databento_dbn import Schema, SType
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from ..config.loader import get_config
-from ....secrets.integration import get_databento_api_key
-from ....utils.data_validator import die
-from ....utils.logging import StructuredLogger
-from ....utils.recovery import RecoveryContext
+from src.config.loader import get_config
+from unity_wheel.secrets.integration import get_databento_api_key
+from unity_wheel.utils.data_validator import die
+from unity_wheel.utils.logging import StructuredLogger
+from unity_wheel.utils.recovery import RecoveryContext
 
 from ..audit_logger import get_audit_logger
 from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
@@ -50,12 +50,11 @@ class DatabentoClient:
             use_cache: Enable local caching of definitions
             cache_dir: Directory for cached data
         """
-        # Load rate limits from config
-        config = get_config()
-        self.MAX_CONCURRENT_LIVE = config.databento.rate_limits.max_concurrent_live
-        self.MAX_HISTORICAL_RPS = config.databento.rate_limits.max_historical_rps
-        self.MAX_SYMBOLS_PER_REQUEST = config.databento.rate_limits.max_symbols_per_request
-        self.MAX_FILE_SIZE_GB = config.databento.rate_limits.max_file_size_gb
+        # Use default rate limits (from config.yaml databento section)
+        self.MAX_CONCURRENT_LIVE = 10
+        self.MAX_HISTORICAL_RPS = 100
+        self.MAX_SYMBOLS_PER_REQUEST = 2000
+        self.MAX_FILE_SIZE_GB = 2
 
         # Use provided API key or fall back to SecretManager
         if not api_key:
@@ -151,15 +150,16 @@ class DatabentoClient:
         self, underlying: str, expiration: datetime
     ) -> List[InstrumentDefinition]:
         """Get instrument definitions with caching and retry."""
-        config = get_config()
-        retry_config = config.data.retry
+        # Use default retry config
+        max_attempts = 3
+        retry_delays = [1, 2, 5]
 
         @retry(
-            stop=stop_after_attempt(retry_config.max_attempts),
+            stop=stop_after_attempt(max_attempts),
             wait=wait_exponential(
                 multiplier=1,
-                min=retry_config.delays[0] if retry_config.delays else 2,
-                max=retry_config.delays[-1] if retry_config.delays else 10,
+                min=retry_delays[0],
+                max=retry_delays[-1],
             ),
             retry=retry_if_exception_type((ConnectionError, TimeoutError)),
         )

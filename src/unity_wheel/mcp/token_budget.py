@@ -288,10 +288,10 @@ class TokenBudgetAllocator:
                 int(self.safe_limit * 1.1)
             )
             
-        # TODO: Implement more sophisticated learning
+        # Future enhancements:
         # - Track which files are most useful for different tasks
-        # - Learn optimal chunk sizes
-        # - Improve MCP selection based on success rates
+        # - Learn optimal chunk sizes dynamically
+        # - Improve MCP selection based on historical success rates
 
 
 # Example usage

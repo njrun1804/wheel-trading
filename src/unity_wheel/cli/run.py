@@ -19,28 +19,28 @@ from rich.console import Console
 from rich.table import Table
 
 from ...config import get_settings
-from ..config.unity import COMPANY_NAME, TICKER
-from ...__version__ import __version__, API_VERSION
+from config.unity import COMPANY_NAME, TICKER
+from ..config.unified_config import get_config
+from ..__version__ import __version__, API_VERSION
+from ..api import MarketSnapshot, OptionData, WheelAdvisor
+from ..data_providers.databento.client import DatabentoClient
+from ..data_providers.databento.integration import DatabentoIntegration
+from ..data_providers.validation import validate_market_data
+from ..data_providers.base import FREDDataManager
+from ..storage.storage import Storage
+from ..monitoring import get_performance_monitor
+from ..monitoring.diagnostics import SelfDiagnostics
+from ..observability import get_observability_exporter
+from ..metrics import metrics_collector
+from ..risk import RiskLimits
+from ..secrets.integration import SecretInjector
+from ..strategy import WheelParameters
 
-def get_version_string() -> None:
+config = get_config()
+
+def get_version_string() -> str:
     """Get version string."""
     return f"Unity Wheel Trading v{__version__}"
-from ...api import MarketSnapshot, OptionData, WheelAdvisor
-from ...data_providers.databento.client import DatabentoClient
-from ...data_providers.databento.integration import DatabentoIntegration
-from ...data_providers.validation import validate_market_data
-from ...data_providers.base import FREDDataManager
-from ...storage.storage import Storage
-from ...monitoring import get_performance_monitor
-from ...monitoring.diagnostics import SelfDiagnostics
-from ...observability import get_observability_exporter
-from ...metrics import metrics_collector
-from ...risk import RiskLimits
-from ...secrets.integration import SecretInjector
-from ...strategy import WheelParameters
-
-from ...config.unified_config import get_config
-config = get_config()
 
 
 # Configure simple logging to avoid conflicts with StructuredLogger
@@ -227,6 +227,103 @@ def display_recommendation_text(rec: dict[str, Any]) -> None:
         console.print(f"   Confidence: {rec['recommendation']['confidence']:.1%}")
 
 
+
+def run_diagnostics():
+    """Run system diagnostics."""
+    from rich.console import Console
+    from rich.table import Table
+    import duckdb
+    
+    console = Console()
+    console.print("\n[bold blue]Unity Wheel Trading System Diagnostics[/bold blue]\n")
+    
+    results = {}
+    
+    # 1. Check database
+    try:
+        conn = duckdb.connect("data/wheel_trading_optimized.duckdb", read_only=True)
+        
+        # Get data counts
+        stock_count = conn.execute(
+            "SELECT COUNT(*) FROM market.price_data WHERE symbol='U'"
+        ).fetchone()[0]
+        
+        options_count = conn.execute(
+            "SELECT COUNT(*) FROM options.contracts WHERE symbol='U'"
+        ).fetchone()[0]
+        
+        ml_count = conn.execute(
+            "SELECT COUNT(*) FROM analytics.ml_features WHERE symbol='U'"
+        ).fetchone()[0]
+        
+        conn.close()
+        
+        results["Database"] = f"✅ Connected ({stock_count} stocks, {options_count} options, {ml_count} ML records)"
+    except Exception as e:
+        results["Database"] = f"❌ Error: {str(e)[:50]}"
+    
+    # 2. Check API configuration
+    try:
+        from ..secrets.manager import SecretManager
+        secrets = SecretManager()
+        
+        databento_key = secrets.get_secret("databento_api_key")
+        fred_key = secrets.get_secret("ofred_api_key") or secrets.get_secret("fred_api_key")
+        
+        if databento_key and not databento_key.startswith("your_"):
+            results["Databento API"] = "✅ Configured"
+        else:
+            results["Databento API"] = "❌ Not configured"
+            
+        if fred_key and not fred_key.startswith("your_"):
+            results["FRED API"] = "✅ Configured"
+        else:
+            results["FRED API"] = "❌ Not configured"
+    except Exception as e:
+        results["APIs"] = f"❌ Error: {str(e)[:50]}"
+    
+    # 3. Check configuration
+    try:
+        from ..config.loader import get_config
+        config = get_config()
+        results["Configuration"] = "✅ Loaded"
+    except Exception as e:
+        results["Configuration"] = f"❌ Error: {str(e)[:50]}"
+    
+    # 4. Check math libraries
+    try:
+        import numpy as np
+        import scipy
+        from ..math.options import black_scholes_price
+        
+        # Test calculation
+        price = black_scholes_price(100, 100, 0.05, 0.25, 30/365, "call")
+        if price > 0:
+            results["Math Libraries"] = "✅ Working"
+        else:
+            results["Math Libraries"] = "❌ Calculation error"
+    except Exception as e:
+        results["Math Libraries"] = f"❌ Error: {str(e)[:50]}"
+    
+    # 5. Display results
+    table = Table(title="System Status")
+    table.add_column("Component", style="cyan")
+    table.add_column("Status", style="green")
+    
+    for component, status in results.items():
+        table.add_row(component, status)
+    
+    console.print(table)
+    
+    # Overall status
+    if all("✅" in status for status in results.values()):
+        console.print("\n[green]✅ All systems operational![/green]")
+        return 0
+    else:
+        console.print("\n[red]❌ Some components need attention[/red]")
+        return 1
+
+
 @click.command()
 @click.option("--portfolio", type=float, default=100000, help="Portfolio value")
 @click.option(
@@ -279,12 +376,8 @@ def main(
 
     # Run diagnostics if requested
     if diagnose:
-        diag = SelfDiagnostics()
-        success = diag.run_all_checks()
-        print(diag.report(format=output_format))
-        return 0 if success else 1
-
-    # Show performance metrics if requested
+        return run_diagnostics()
+    
     if performance:
         monitor = get_performance_monitor()
         perf_report = monitor.generate_report(format=output_format)

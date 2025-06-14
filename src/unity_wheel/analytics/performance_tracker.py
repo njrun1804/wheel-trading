@@ -61,7 +61,7 @@ class UnityOutcome:
 class PerformanceTracker:
     """Track predictions vs outcomes to improve the system."""
 
-    def __init__(self, db_path: str = "~/.wheel_trading/performance.db"):
+    def __init__(self, db_path: str = "data/wheel_trading_optimized.duckdb"):
         self.db_path = Path(db_path).expanduser()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()

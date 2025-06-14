@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 import numpy as np
 
-from ..config.loader import get_config
+from config.loader import get_config
 
 from ..math import black_scholes_price_validated, calculate_all_greeks
 from ..models import Account, Greeks, Position

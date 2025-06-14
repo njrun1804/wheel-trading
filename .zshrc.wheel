@@ -1,0 +1,20 @@
+#!/bin/zsh
+# Wheel Trading project-specific shell configuration
+# Source this from your main .zshrc when in wheel-trading directory
+
+# Auto-source on directory change
+autoload -U add-zsh-hook
+wheel_trading_init() {
+    if [[ "$PWD" == *"wheel-trading"* ]]; then
+        if [[ -z "$WHEEL_TRADING_INITIALIZED" ]]; then
+            export WHEEL_TRADING_INITIALIZED=1
+            source "$PWD/.wezterm-init.sh" 2>/dev/null || true
+        fi
+    else
+        unset WHEEL_TRADING_INITIALIZED
+    fi
+}
+add-zsh-hook chpwd wheel_trading_init
+
+# Run on initial load if already in directory
+wheel_trading_init

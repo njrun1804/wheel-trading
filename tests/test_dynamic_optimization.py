@@ -18,7 +18,9 @@ from unity_wheel.analytics.dynamic_optimizer import (
     MarketState,
     OptimizationResult,
 )
+from src.config.loader import get_config
 
+config = get_config()
 DB_PATH = os.path.expanduser(config.storage.database_path)
 
 

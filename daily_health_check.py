@@ -24,7 +24,7 @@ def daily_health_check():
 
     # Connect to database
     try:
-        conn = duckdb.connect("data/wheel_trading_master.duckdb", read_only=True)
+        conn = duckdb.connect("data/wheel_trading_optimized.duckdb", read_only=True)
     except Exception as e:
         print(f"❌ CRITICAL: Cannot connect to database: {e}")
         return False

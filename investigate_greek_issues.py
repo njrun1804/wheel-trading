@@ -15,7 +15,7 @@ def investigate_greek_issues():
     """Investigate the specific Greek calculation issues."""
 
     # Connect to database
-    conn = duckdb.connect("data/wheel_trading_master.duckdb", read_only=True)
+    conn = duckdb.connect("data/wheel_trading_optimized.duckdb", read_only=True)
 
     print("Investigating Greek calculation issues...")
     print("=" * 60)

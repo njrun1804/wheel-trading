@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from unity_wheel.utils import validate
+from src.unity_wheel.utils import validate
 
 
 def test_check_python_version() -> None:

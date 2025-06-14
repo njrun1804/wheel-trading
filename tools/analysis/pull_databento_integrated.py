@@ -51,7 +51,7 @@ async def pull_wheel_data_integrated():
     validator = DataValidator()
 
     print(f"✅ System initialized with:")
-    print(f"   - DuckDB cache: ~/.wheel_trading/cache/wheel_cache.duckdb")
+    print(f"   - DuckDB cache: data/wheel_trading_optimized.duckdb")
     print(f"   - Moneyness filter: ±20% (80% storage reduction)")
     print(f"   - TTL: 15 minutes for options, 5 minutes for Greeks")
     print(f"   - Retention: 30 days max")

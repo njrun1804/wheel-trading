@@ -1,0 +1,51 @@
+#!/usr/bin/expect -f
+# Auto-handle common git interactive prompts
+
+set timeout 30
+set operation [lindex $argv 0]
+
+switch $operation {
+    "merge" {
+        spawn git merge
+        expect {
+            "*Merge branch*" {
+                # Accept default merge message
+                send ":wq\r"
+                exp_continue
+            }
+            "*conflict*" {
+                puts "CONFLICT DETECTED - Manual intervention required"
+                interact
+            }
+            eof
+        }
+    }
+    
+    "rebase" {
+        spawn git rebase [lrange $argv 1 end]
+        expect {
+            "*pick*" {
+                # Accept default rebase plan
+                send ":wq\r"
+                exp_continue
+            }
+            "*conflict*" {
+                puts "CONFLICT - Manual intervention required"
+                interact
+            }
+            eof
+        }
+    }
+    
+    "commit" {
+        set message [lindex $argv 1]
+        spawn git commit -m "$message"
+        expect {
+            "*pre-commit*" {
+                # Wait for pre-commit hooks
+                exp_continue
+            }
+            eof
+        }
+    }
+}

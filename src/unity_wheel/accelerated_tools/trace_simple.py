@@ -41,13 +41,21 @@ class TraceTurbo:
         # Trace storage (in-memory for testing)
         self._traces = []
         
-        # Start background export task
-        self._export_task = asyncio.create_task(self._export_loop())
+        # Start background export task when there's an event loop
+        self._export_task = None
+        self._started = False
         
+    async def _ensure_started(self):
+        """Ensure background task is started."""
+        if not self._started:
+            self._started = True
+            self._export_task = asyncio.create_task(self._export_loop())
+    
     @asynccontextmanager
     async def trace_span(self, name: str, attributes: Optional[Dict[str, Any]] = None,
                         span_type: str = "general") -> Dict[str, Any]:
         """Create a traced span."""
+        await self._ensure_started()
         start_time = time.perf_counter()
         
         # Create span data
@@ -166,7 +174,12 @@ class TraceTurbo:
     
     async def cleanup(self):
         """Cleanup resources."""
-        self._export_task.cancel()
+        if self._export_task:
+            self._export_task.cancel()
+            try:
+                await self._export_task
+            except asyncio.CancelledError:
+                pass
         
         # Export remaining spans
         async with self._buffer_lock:

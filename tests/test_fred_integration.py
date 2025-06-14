@@ -8,7 +8,7 @@ from datetime import timedelta
 from unity_wheel.data_providers.base import FREDDataManager
 from unity_wheel.secrets.integration import SecretNotFoundError, get_fred_api_key
 from unity_wheel.storage.storage import Storage
-from unity_wheel.utils import setup_structured_logging as setup_logging
+from src.unity_wheel.utils import setup_structured_logging as setup_logging
 
 
 async def test_integration():

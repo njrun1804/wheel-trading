@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+# Auto-handle npm install prompts
+
+set timeout 120
+
+spawn npm install
+
+expect {
+    # Handle vulnerability warnings
+    "*found*vulnerabilities*" {
+        # Just continue, don't auto-fix
+        exp_continue
+    }
+    
+    # Handle optional dependency prompts
+    "*Would you like to install*" {
+        send "n\r"
+        exp_continue
+    }
+    
+    # Handle peer dependency warnings
+    "*peer dependency*" {
+        exp_continue
+    }
+    
+    eof
+}

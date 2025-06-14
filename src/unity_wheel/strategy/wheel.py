@@ -9,7 +9,7 @@ from typing import List, NamedTuple, Optional, Tuple
 
 import numpy as np
 
-from ..config.loader import get_config
+from config.loader import get_config
 
 from ..math import (
     CalculationResult,
@@ -217,7 +217,7 @@ class WheelStrategy:
         prob_itms = prob_result.value
 
         # Calculate scores for all strikes at once
-        # TODO(codex): Should we use squared error for delta distance instead of absolute?
+        # Using absolute error for delta distance (more intuitive than squared error)
         # CODEX-PATTERN: Lower scores are better (minimize delta distance, maximize premium)
         delta_scores = np.abs(deltas - target_delta)
         premium_ratios = premiums / strikes

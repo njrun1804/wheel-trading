@@ -12,8 +12,8 @@ dbn = types.ModuleType("databento_dbn")
 dbn.Schema = object
 dbn.SType = object
 sys.modules.setdefault("databento_dbn", dbn)
-from unity_wheel.metrics import metrics_collector
-from unity_wheel.monitoring import get_performance_monitor, performance_monitored
+from src.unity_wheel.metrics import metrics_collector
+from src.unity_wheel.monitoring import get_performance_monitor, performance_monitored
 from unity_wheel.risk.analytics import RiskMetrics
 from unity_wheel.storage.cache.general_cache import cached, invalidate_cache
 

@@ -24,8 +24,12 @@ nest-asyncio>=1.6.0 ; python_version >= "3.12" and python_version < "4.0"
 tenacity>=8.2.0 ; python_version >= "3.12" and python_version < "4.0"
 
 # ML/GPU (conditional)
-torch>=2.0.0 ; python_version >= "3.12" and python_version < "4.0" and sys_platform == "darwin" and platform_machine == "arm64"
+torch>=2.4.0 ; python_version >= "3.12" and python_version < "4.0" and sys_platform == "darwin" and platform_machine == "arm64"
 mlx>=0.0.1 ; python_version >= "3.12" and python_version < "4.0" and sys_platform == "darwin" and platform_machine == "arm64"
+
+# Vector search and optimization
+hnswlib>=0.8.0 ; python_version >= "3.12" and python_version < "4.0"
+usearch>=2.9.0 ; python_version >= "3.12" and python_version < "4.0"
 
 # Observability
 opentelemetry-api>=1.22.0 ; python_version >= "3.12" and python_version < "4.0"

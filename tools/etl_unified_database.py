@@ -18,7 +18,7 @@ def create_etl_pipeline():
     """Create ETL pipeline to prepare unified database for backtesting."""
 
     # Database paths
-    operational_db = Path.home() / ".wheel_trading/cache/wheel_cache.duckdb"
+    operational_db = Path.home() / "data/wheel_trading_optimized.duckdb"
     analytical_db = Path("data/unified_wheel_trading.duckdb")
 
     if not analytical_db.exists():
