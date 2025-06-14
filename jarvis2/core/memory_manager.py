@@ -86,7 +86,7 @@ class UnifiedMemoryManager:
             dtype = np.dtype(dtype)
         size = np.prod(shape) * dtype.itemsize
         best_buffer = None
-        best_size = float('inf")
+        best_size = float('inf')
         for name, buffer in self.buffers.items():
             if not buffer.in_use and buffer.size >= size:
                 if buffer.size < best_size:
