@@ -10,9 +10,9 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 
-from ..analytics.unity_assignment import AssignmentProbability
-from ..config.unified_config import get_config
-from ..utils.logging import get_logger
+from unity_wheel.analytics.unity_assignment import AssignmentProbability
+from src.config.loader import get_config
+from unity_wheel.utils.logging import get_logger
 from .feedback_loop import FeedbackLoop, ParameterUpdate
 
 logger = get_logger(__name__)

@@ -179,6 +179,8 @@ class TraceTurbo:
             try:
                 await self._export_task
             except asyncio.CancelledError:
+                import logging
+                logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
         
         # Export remaining spans

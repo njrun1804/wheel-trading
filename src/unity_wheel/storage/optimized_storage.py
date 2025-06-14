@@ -15,8 +15,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import polars as pl
 
-from ..config.unified_config import get_config
-from ..utils import get_logger
+from src.config.loader import get_config
+from unity_wheel.utils import get_logger
 from .storage import Storage
 
 logger = get_logger(__name__)

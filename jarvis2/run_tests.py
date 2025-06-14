@@ -9,14 +9,14 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 # Import tests
 from jarvis2.tests.test_jarvis2_integration import (
     test_basic_code_generation,
-    test_parallel_requests,
-    test_memory_management,
-    test_device_routing,
     test_context_retrieval,
-    test_learning_feedback_loop,
-    test_performance_benchmarks,
+    test_cpu_efficiency_cores,
+    test_device_routing,
     test_error_handling,
-    test_cpu_efficiency_cores
+    test_learning_feedback_loop,
+    test_memory_management,
+    test_parallel_requests,
+    test_performance_benchmarks,
 )
 
 

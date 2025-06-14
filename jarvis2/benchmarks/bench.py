@@ -7,13 +7,12 @@ Usage:
     python bench.py --compare --batch 4096
 """
 import argparse
-import time
-import numpy as np
-import platform
-import psutil
 import json
+import platform
+import time
 from pathlib import Path
-from typing import Dict, List, Tuple
+
+import psutil
 
 # Ensure we're on M4 Pro
 IS_M4PRO = platform.machine() == "arm64" and "Apple M4" in platform.platform()

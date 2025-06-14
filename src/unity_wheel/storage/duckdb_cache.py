@@ -33,9 +33,9 @@ except ImportError:
 
 import pandas as pd
 
-from ..utils import get_logger
+from unity_wheel.utils import get_logger
 
-from ..config.unified_config import get_config
+from src.config.loader import get_config
 config = get_config()
 
 
@@ -72,7 +72,8 @@ class DuckDBCache:
     def __init__(self, config: Optional[CacheConfig] = None):
         self.config = config or CacheConfig()
         self.config.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.db_path = self.config.cache_dir / Path(config.storage.database_path).name
+        # Use a simple default database name instead of accessing non-existent storage attribute
+        self.db_path = self.config.cache_dir / "wheel_trading_cache.duckdb"
         self._conn: Optional[duckdb.DuckDBPyConnection] = None
         self._last_vacuum = datetime.min
 

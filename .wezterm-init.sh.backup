@@ -1,0 +1,64 @@
+#!/bin/bash
+# WezTerm initialization script for Wheel Trading project
+# This runs automatically when WezTerm starts in this directory
+
+# Check if we're already initialized to avoid duplicate messages
+if [ -z "$WHEEL_TRADING_ACTIVE" ]; then
+    export WHEEL_TRADING_ACTIVE=1
+    
+    # Source the unified startup script for full initialization
+    if [ -f "./startup_unified.sh" ]; then
+        # Run unified startup in quiet mode (no banner)
+        export STARTUP_QUIET=1
+        source ./startup_unified.sh
+    else
+        # Fallback to basic initialization if unified script not found
+        
+        # Activate conda environment first
+        if command -v conda &> /dev/null; then
+            conda activate wheel 2>/dev/null || conda activate base 2>/dev/null
+        fi
+        
+        # Set up basic environment
+        export CLAUDE_HARDWARE_ACCEL=1
+        export USE_TURBO_MODE=1
+        export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+        export WHEEL_TRADING_ROOT="${PWD}"
+    fi
+    
+    # Source expect aliases if available
+    if [ -f scripts/setup-expect-aliases.sh ]; then
+        source scripts/setup-expect-aliases.sh
+    fi
+    
+    # Terminal-specific aliases
+    alias claude-search='expect scripts/auto-approve-claude.exp "search"'
+    alias claude-read='expect scripts/auto-approve-claude.exp "read"'
+    alias claude-test='expect scripts/auto-approve-claude.exp "run tests"'
+    
+    # Project commands
+    alias wheel-analyze='claude-auto "analyze trading performance"'
+    alias wheel-optimize='claude-auto "optimize wheel strategy"'
+    alias wheel-backtest='claude-auto "run backtests"'
+    alias wheel-doctor='bash ${WHEEL_TRADING_ROOT}/scripts/wheel-doctor.sh'
+    alias wheel-logs='bash ${WHEEL_TRADING_ROOT}/scripts/wheel-logs.sh'
+    alias wheel-run='python -m unity_wheel.cli.run'
+    alias wheel-performance='python -m unity_wheel.cli.run --performance'
+    alias wheel-diagnose='python -m unity_wheel.cli.run --diagnose'
+    
+    # Git shortcuts
+    alias gpush='git add . && expect scripts/auto-git-operations.exp commit "Update" && git push'
+    alias gcommit='expect scripts/auto-git-operations.exp commit'
+    
+    # Display concise initialization message
+    if [ -z "$STARTUP_QUIET" ]; then
+        echo "🚀 Wheel Trading Environment Ready"
+        echo "   Type 'wheel-' and press TAB to see available commands"
+        echo "   Run './startup_unified.sh' for full system status"
+    fi
+fi
+
+# Always ensure we're in the right directory
+if [ -n "$WHEEL_TRADING_ROOT" ] && [ "$PWD" != "$WHEEL_TRADING_ROOT" ]; then
+    cd "$WHEEL_TRADING_ROOT"
+fi

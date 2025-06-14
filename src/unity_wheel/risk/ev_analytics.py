@@ -8,8 +8,8 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ..config.unified_config import get_config
-from ..utils.logging import get_logger
+from src.config.loader import get_config
+from unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

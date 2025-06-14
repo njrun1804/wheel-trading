@@ -424,6 +424,8 @@ def notify_file_save(file_path: str) -> None:
             }).encode())
             sock.close()
     except (ValueError, KeyError, AttributeError):
+        import logging
+        logging.debug(f"Exception caught: {e}", exc_info=True)
         pass
 
 

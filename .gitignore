@@ -48,6 +48,14 @@ htmlcov/
 .AppleDouble
 .LSOverride
 
+# Logs
+logs/
+*.log
+!logs/.gitkeep
+
+# Wezterm local config
+.wezterm.local.lua
+
 # Project specific
 *.log
 data/

@@ -10,7 +10,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-from config.loader import get_config
+from src.config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 

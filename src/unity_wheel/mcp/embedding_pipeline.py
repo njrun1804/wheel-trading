@@ -14,9 +14,9 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import logging
 
-from ..storage.slice_cache import SliceCache
+from unity_wheel.storage.slice_cache import SliceCache
 from .dynamic_chunking import DynamicChunker, ChunkedFileReader
-from ..utils import get_logger
+from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
 

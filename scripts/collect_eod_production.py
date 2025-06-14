@@ -18,6 +18,10 @@ import duckdb
 import pandas as pd
 import aiohttp
 from src.unity_wheel.secrets.manager import SecretManager
+from src.unity_wheel.data_providers.validation.data_validator import DataValidator
+from src.unity_wheel.data_providers.fred.fred_indicators import (
+    FRED_INDICATORS, get_fred_sql_create, store_fred_observation
+)
 
 # Production logging setup
 log_dir = Path(__file__).parent.parent / "logs"
@@ -71,6 +75,10 @@ class EODCollector:
         # Initialize clients
         self.databento_client = db.Historical(self.databento_key)
         self.conn = duckdb.connect(str(self.db_path))
+        self.validator = DataValidator()
+        
+        # Ensure FRED tables exist
+        self.conn.executescript(get_fred_sql_create())
         
     def _load_credentials(self):
         """Load API keys from SecretManager with error handling"""
@@ -102,21 +110,37 @@ class EODCollector:
             
             logger.info(f"Fetching stock data from {start_dt.date()} to {end_dt.date()}")
             
+            # Log API request details
+            logger.info(f"Databento API request: dataset=EQUS.MINI, symbol=U, schema=ohlcv-1d")
+            logger.info(f"Date range: {start_dt} to {end_dt}")
+            
             # Fetch daily OHLCV data
-            data = self.databento_client.timeseries.get_range(
-                dataset="EQUS.MINI",
-                symbols=["U"],
-                stype_in="raw_symbol",
-                schema="ohlcv-1d",
-                start=start_dt,
-                end=end_dt
-            )
+            try:
+                data = self.databento_client.timeseries.get_range(
+                    dataset="EQUS.MINI",
+                    symbols=["U"],  # Unity Software Inc
+                    stype_in="raw_symbol",
+                    schema="ohlcv-1d",
+                    start=start_dt,
+                    end=end_dt
+                )
+            except Exception as api_error:
+                logger.error(f"Databento API error: {api_error}")
+                self.metrics["errors"].append(f"API call failed: {str(api_error)}")
+                raise
             
             df = data.to_df()
             
             if df.empty:
                 logger.warning("No Unity stock data returned")
                 return 0
+                
+            # Log raw data for debugging
+            logger.info(f"Received {len(df)} rows of stock data")
+            if len(df) > 0:
+                sample = df.iloc[0]
+                logger.debug(f"Sample raw data: open={sample.get('open')}, close={sample.get('close')}, volume={sample.get('volume')}")
+                logger.debug(f"Price range before scaling: {df['close'].min()} - {df['close'].max()}")
                 
             # Process and store
             stored = 0
@@ -129,15 +153,33 @@ class EODCollector:
                     high_price = float(row.get('high', 0)) / 1e9
                     low_price = float(row.get('low', 0)) / 1e9
                     close_price = float(row.get('close', 0)) / 1e9
-                    volume = int(row.get('volume', 0))
+                    volume = int(row.get('volume', 0)) if row.get('volume') is not None else None
                     
-                    if close_price > 0:  # Valid data
-                        self.conn.execute("""
-                            INSERT OR REPLACE INTO market.price_data
-                            (symbol, date, open, high, low, close, volume)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """, ['U', date, open_price, high_price, low_price, close_price, volume])
-                        stored += 1
+                    # Validate data before storing
+                    is_valid, error_msg = self.validator.validate_stock_data(
+                        symbol='U',
+                        date=date,
+                        open_price=open_price,
+                        high_price=high_price,
+                        low_price=low_price,
+                        close_price=close_price,
+                        volume=volume
+                    )
+                    
+                    if not is_valid:
+                        logger.error(f"Invalid stock data for {date}: {error_msg}")
+                        self.metrics["errors"].append(f"Validation failed: {error_msg}")
+                        continue
+                        
+                    # Only store validated data
+                    self.conn.execute("""
+                        INSERT OR REPLACE INTO market.price_data
+                        (symbol, date, open, high, low, close, volume)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, ['U', date, open_price, high_price, low_price, close_price, volume])
+                    stored += 1
+                    
+                    logger.debug(f"Stored Unity price for {date}: ${close_price:.2f}")
                         
                 except Exception as e:
                     logger.error(f"Failed to store stock record: {e}")
@@ -327,9 +369,6 @@ class EODCollector:
                 else:
                     continue
                 
-                if bid <= 0 or ask <= 0:
-                    continue
-                    
                 # Prepare data
                 option_type = 'CALL' if row['instrument_class'] == 'C' else 'PUT'
                 # Use the already scaled strike price
@@ -337,6 +376,21 @@ class EODCollector:
                 expiration = pd.to_datetime(row['expiration']).date()
                 # Handle different timestamp columns
                 timestamp = row.get('ts_recv', row.get('ts_event', datetime.now()))
+                
+                # Validate option quote before storing
+                is_valid, error_msg = self.validator.validate_option_quote(
+                    symbol='U',
+                    strike=strike,
+                    expiration=pd.to_datetime(row['expiration']),
+                    option_type=option_type,
+                    bid_price=bid,
+                    ask_price=ask
+                )
+                
+                if not is_valid:
+                    logger.error(f"Invalid option data: {error_msg}")
+                    self.metrics["errors"].append(f"Option validation failed: {error_msg}")
+                    continue
                 
                 # Calculate Greeks if possible
                 iv = self._calculate_implied_volatility(bid, ask, strike, expiration)
@@ -398,13 +452,8 @@ class EODCollector:
         """Collect FRED economic indicators"""
         logger.info("💰 Collecting FRED economic data...")
         
-        series_list = [
-            ('VIXCLS', 'VIX'),
-            ('DGS10', '10Y Treasury'),
-            ('DFF', 'Fed Funds Rate'),
-            ('TEDRATE', 'TED Spread'),
-            ('BAMLH0A0HYM2', 'High Yield Spread')
-        ]
+        # Use all indicators from our configuration
+        series_list = [(ind.series_id, ind.name) for ind in FRED_INDICATORS.values()]
         
         stored = 0
         
@@ -429,12 +478,28 @@ class EODCollector:
                             for obs in observations:
                                 if obs['value'] != '.' and obs['value']:
                                     try:
-                                        # Store FRED data in ml_features table
-                                        # For now, only VIX goes into ml_features
-                                        # TODO: Create proper FRED storage table
+                                        # Validate FRED data
+                                        value = float(obs['value'])
+                                        date = obs['date']
+                                        
+                                        is_valid, error_msg = self.validator.validate_fred_data(
+                                            indicator=series_id,
+                                            date=datetime.strptime(date, '%Y-%m-%d'),
+                                            value=value
+                                        )
+                                        
+                                        if not is_valid:
+                                            logger.error(f"Invalid FRED data: {error_msg}")
+                                            continue
+                                        
+                                        # Store using our proper storage function
+                                        if store_fred_observation(self.conn, series_id, date, value):
+                                            series_stored += 1
+                                            
+                                        # Keep track of latest VIX for backward compatibility
                                         if series_id == 'VIXCLS':
-                                            self.latest_vix = float(obs['value'])
-                                        series_stored += 1
+                                            self.latest_vix = value
+                                            
                                     except Exception as e:
                                         logger.debug(f"Failed to store {series_id}: {e}")
                                         

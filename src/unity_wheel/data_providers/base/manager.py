@@ -11,7 +11,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ...storage.storage import Storage
+from unity_wheel.storage.storage import Storage
 from unity_wheel.utils import get_logger, timed_operation, with_recovery
 
 from ..fred.fred_client import FREDClient

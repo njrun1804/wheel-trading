@@ -13,9 +13,9 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-from config.loader import get_config
+from src.config.loader import get_config
 
-from ..risk.unity_margin import UnityMarginCalculator
+from unity_wheel.risk.unity_margin import UnityMarginCalculator
 from .logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))

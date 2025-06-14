@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Deque, Dict, Optional
 
-from ..utils.logging import get_logger
+from unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -192,7 +192,7 @@ class RateLimiter:
                     cb.half_open_calls = 0
                     logger.info("_check_circuit_breaker", action="circuit_half_open")
                 else:
-                    from ..auth.exceptions import RateLimitError
+                    from unity_wheel.auth.exceptions import RateLimitError
 
                     raise RateLimitError(
                         retry_after=int(cb.recovery_timeout - elapsed),

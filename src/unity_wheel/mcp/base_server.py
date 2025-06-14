@@ -135,6 +135,8 @@ class HealthCheckMCP(FastMCP):
         try:
             self._health_file.unlink(missing_ok=True)
         except (ValueError, KeyError, AttributeError):
+            import logging
+            logging.debug(f"Exception caught: {e}", exc_info=True)
             pass
             
         # Give ongoing requests time to complete

@@ -4,6 +4,7 @@ This module provides a single source of truth for all configuration,
 eliminating hardcoded values throughout the codebase.
 """
 
+from src.config.network_config import network_config
 from __future__ import annotations
 import logging
 
@@ -84,7 +85,7 @@ class MCPConfig(BaseModel):
     use_mlflow_mcp: bool = Field(default=True, env="USE_MLFLOW_MCP")
     use_statsource_mcp: bool = Field(default=True, env="USE_STATSOURCE_MCP")
     use_memory_mcp: bool = Field(default=True, env="USE_MEMORY_MCP")
-    mlflow_tracking_uri: str = Field(default="http://localhost:5000", env="MLFLOW_URI")
+    mlflow_tracking_uri: str = Field(default=network_config.mlflow_tracking_uri, env="MLFLOW_URI")
     statsource_api_key: Optional[str] = Field(default=None, env="STATSOURCE_API_KEY")
     
     class Config:

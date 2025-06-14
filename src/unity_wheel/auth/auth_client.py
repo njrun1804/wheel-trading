@@ -12,11 +12,11 @@ from typing import Any, Callable, Dict, Optional
 
 import aiohttp
 
-from ..storage.auth_storage import SecureTokenStorage
+from unity_wheel.storage.auth_storage import SecureTokenStorage
 
 # Cache functionality handled by AuthCache, not general cache
-from ..storage.cache.auth_cache import AuthCache
-from ..utils.logging import get_logger
+from unity_wheel.storage.cache.auth_cache import AuthCache
+from unity_wheel.utils.logging import get_logger
 from .exceptions import (
     AuthError,
     InvalidCredentialsError,

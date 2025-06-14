@@ -74,6 +74,8 @@ class DirectAccelerator:
                             "content": data["data"]["lines"]["text"].strip()
                         })
                 except:
+                    import logging
+                    logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
         
         return results

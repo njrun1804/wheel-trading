@@ -1,20 +1,327 @@
 #!/bin/zsh
-# Wheel Trading project-specific shell configuration
-# Source this from your main .zshrc when in wheel-trading directory
+# Wheel Trading + Jarvis2 Shell Configuration
+# This file is sourced from ~/.zshrc and provides all project functionality
 
-# Auto-source on directory change
+# Determine project root from this file's location
+export WHEEL_TRADING_ROOT="${${(%):-%x}:A:h}"
+
+# Critical environment variables - always set these
+export JARVIS2_WORKERS=12
+export METAL_AVAILABLE_MEMORY=20401094656  # 19GB in bytes
+export JARVIS2_PARALLEL_WORKERS=12
+
+# One-time initialization per shell session
+if [[ -z "$WHEEL_TRADING_INITIALIZED" ]]; then
+    export WHEEL_TRADING_INITIALIZED=1
+    
+    # Check if WezTerm shell integration is active
+    if [[ -n "$WEZTERM_PANE" ]]; then
+        export WHEEL_WEZTERM_INTEGRATED=1
+        # Ensure OSC 7 is working for directory tracking
+        precmd() {
+            printf "\e]7;file://%s%s\a" "$HOST" "$PWD"
+        }
+    fi
+    
+    # ===== HARDWARE OPTIMIZATION (M4 Pro) =====
+    # macOS multiprocessing fixes
+    export KMP_DUPLICATE_LIB_OK=TRUE
+    export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+    
+    # Metal/GPU settings (18GB limit for M4 Pro)
+    export PYTORCH_ENABLE_MPS_FALLBACK=1
+    export PYTORCH_METAL_WORKSPACE_LIMIT_BYTES=$((18 * 1024 * 1024 * 1024))
+    export MTL_DEBUG_LAYER=0
+    export METAL_DEVICE_WRAPPER_TYPE=1
+    
+    # CPU optimization - use all 12 cores
+    export OMP_NUM_THREADS=12
+    export MKL_NUM_THREADS=12
+    export NUMEXPR_NUM_THREADS=12
+    export VECLIB_MAXIMUM_THREADS=12
+    export OPENBLAS_NUM_THREADS=12
+    
+    # Python optimizations
+    export PYTHONUNBUFFERED=1
+    export PYTHONHASHSEED=0
+    # Ensure src is in PYTHONPATH (prepend to take precedence)
+    export PYTHONPATH="${WHEEL_TRADING_ROOT}/src:${PYTHONPATH}"
+    # Also add current directory for convenience
+    export PYTHONPATH="${WHEEL_TRADING_ROOT}:${PYTHONPATH}"
+    
+    # Jarvis2 specific - prefer MLX over PyTorch MPS
+    export JARVIS2_BACKEND_PREFERENCE="mlx,mps,cpu"
+    export JARVIS2_MEMORY_LIMIT_GB=18
+    export JARVIS2_SEARCH_WORKERS=8   # P-cores
+    export JARVIS2_NEURAL_WORKERS=2
+    export JARVIS2_LEARNING_WORKERS=4 # E-cores
+    export JARVIS2_ENABLED=1
+    export JARVIS2_HARDWARE_ACCEL=1
+    export JARVIS2_PARALLEL_WORKERS=12
+    
+    # Claude/Unity settings
+    export CLAUDE_HARDWARE_ACCEL=1
+    export USE_TURBO_MODE=1
+    
+    # Claude CLI settings
+    # Use Opus as default model
+    export ANTHROPIC_MODEL="claude-3-opus-20240229"
+    export ANTHROPIC_SMALL_FAST_MODEL="claude-3-haiku-latest"
+    export CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1
+    
+    # Suppress warnings
+    export PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning"
+    
+    # Create required directories
+    mkdir -p "$WHEEL_TRADING_ROOT"/{logs,data/cache} ~/.wheel_trading/{cache,secrets}
+    
+    # Source .env if exists
+    if [[ -f "$WHEEL_TRADING_ROOT/.env" ]]; then
+        set -a
+        source "$WHEEL_TRADING_ROOT/.env"
+        set +a
+    fi
+    
+    # Activate conda environment if available
+    if command -v conda &> /dev/null; then
+        conda activate wheel 2>/dev/null || true
+    fi
+    
+    # Commented out startup messages - uncomment if you want them back
+    # echo "🚀 Wheel Trading + Jarvis2 initialized (12-core M4 Pro optimized)"
+    
+    # If we have WezTerm integration, show status
+    # if [[ -n "$WHEEL_WEZTERM_INTEGRATED" ]]; then
+    #     echo "🔗 WezTerm shell integration active (pane $WEZTERM_PANE)"
+    # fi
+fi
+
+# ===== NAVIGATION HELPERS =====
+
+# Jump to project root (renamed to avoid conflict with Python wheel command)
+wheel-root() {
+    cd "$WHEEL_TRADING_ROOT"
+}
+
+# Shorter alias
+alias wr='wheel-root'
+
+# Auto-activate when entering project
 autoload -U add-zsh-hook
-wheel_trading_init() {
-    if [[ "$PWD" == *"wheel-trading"* ]]; then
-        if [[ -z "$WHEEL_TRADING_INITIALIZED" ]]; then
-            export WHEEL_TRADING_INITIALIZED=1
-            source "$PWD/.wezterm-init.sh" 2>/dev/null || true
+_wheel_chpwd() {
+    if [[ "$PWD" == "$WHEEL_TRADING_ROOT"* ]] && [[ -z "$WHEEL_TRADING_ACTIVE" ]]; then
+        export WHEEL_TRADING_ACTIVE=1
+        # Commented out - uncomment if you want the message back
+        # echo "📁 Wheel Trading project active"
+        
+        # Update WezTerm user var for status display
+        if [[ -n "$WHEEL_WEZTERM_INTEGRATED" ]] && command -v __wezterm_set_user_var &>/dev/null; then
+            __wezterm_set_user_var "wheel_active" "true"
         fi
-    else
-        unset WHEEL_TRADING_INITIALIZED
+    elif [[ "$PWD" != "$WHEEL_TRADING_ROOT"* ]] && [[ -n "$WHEEL_TRADING_ACTIVE" ]]; then
+        unset WHEEL_TRADING_ACTIVE
+        
+        # Clear WezTerm user var
+        if [[ -n "$WHEEL_WEZTERM_INTEGRATED" ]] && command -v __wezterm_set_user_var &>/dev/null; then
+            __wezterm_set_user_var "wheel_active" "false"
+        fi
     fi
 }
-add-zsh-hook chpwd wheel_trading_init
+add-zsh-hook chpwd _wheel_chpwd
+_wheel_chpwd  # Run once on load
 
-# Run on initial load if already in directory
-wheel_trading_init
+# ===== TRADING COMMANDS =====
+
+wheel-run() {
+    python -m unity_wheel.cli.run "$@"
+}
+
+wheel-performance() {
+    python -m unity_wheel.cli.run --performance "$@"
+}
+
+wheel-diagnose() {
+    python -m unity_wheel.cli.run --diagnose "$@"
+}
+
+wheel-export() {
+    local timestamp=$(date +%Y%m%d_%H%M%S)
+    python -m unity_wheel.cli.run --export-metrics "metrics_${timestamp}.json"
+}
+
+# ===== JARVIS2 AI COMMANDS =====
+
+jarvis2() {
+    python -m jarvis2 "$@"
+}
+
+jarvis2-stats() {
+    python -m jarvis2 --stats
+}
+
+jarvis2-benchmark() {
+    python -m jarvis2.benchmark
+}
+
+# ===== MONITORING & DIAGNOSTICS =====
+
+wheel-status() {
+    echo "🎯 Wheel Trading Status"
+    echo "━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Root: $WHEEL_TRADING_ROOT"
+    echo "Active: ${WHEEL_TRADING_ACTIVE:-no}"
+    echo "Python: $(which python)"
+    echo "Conda: $(conda info --envs 2>/dev/null | grep '*' | awk '{print $1}' || echo 'none')"
+    echo ""
+    echo "Hardware Acceleration:"
+    echo "  CPU Threads: ${OMP_NUM_THREADS:-not set}"
+    echo "  Jarvis2 Workers: ${JARVIS2_PARALLEL_WORKERS:-12}"
+    echo "  Metal Memory: ${METAL_AVAILABLE_MEMORY:-20401094656} bytes (~19GB)"
+    echo "  Backend: ${JARVIS2_BACKEND_PREFERENCE:-mlx,mps,cpu}"
+}
+
+wheel-doctor() {
+    bash "$WHEEL_TRADING_ROOT/scripts/wheel-doctor.sh"
+}
+
+wheel-monitor() {
+    if [[ -f "$WHEEL_TRADING_ROOT/scripts/monitor-m4-performance.py" ]]; then
+        python "$WHEEL_TRADING_ROOT/scripts/monitor-m4-performance.py"
+    else
+        echo "M4 Pro: $(sysctl -n hw.ncpu) cores, $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 ))GB RAM"
+    fi
+}
+
+wheel-system() {
+    bash "$WHEEL_TRADING_ROOT/scripts/system-status.sh"
+}
+
+wheel-health() {
+    echo "🏥 System Health Check"
+    echo "━━━━━━━━━━━━━━━━━━━━"
+    
+    # Check processes
+    local procs=$(ps aux | grep -E "(jarvis|wheel|unity)" | grep -v grep | wc -l | tr -d ' ')
+    echo "Running processes: $procs"
+    
+    # Check disk space
+    df -h "$WHEEL_TRADING_ROOT" | tail -1 | awk '{print "Disk available: " $4}'
+    
+    # Check recent errors
+    if [[ -d "$WHEEL_TRADING_ROOT/logs" ]]; then
+        local errors=$(tail -n 100 "$WHEEL_TRADING_ROOT"/logs/*.log 2>/dev/null | grep -c -E "(ERROR|CRITICAL)" || echo "0")
+        echo "Recent errors: $errors"
+    fi
+}
+
+# ===== LOG MANAGEMENT =====
+
+wheel-logs() {
+    bash "$WHEEL_TRADING_ROOT/scripts/wheel-logs.sh" "$@"
+}
+
+alias wheel-logs-test='wheel-logs test'
+alias wheel-logs-trading='wheel-logs trading'
+alias wheel-logs-errors='wheel-logs errors'
+
+wheel-test() {
+    local logfile="$WHEEL_TRADING_ROOT/logs/test_$(date +%Y%m%d_%H%M%S).log"
+    mkdir -p "$WHEEL_TRADING_ROOT/logs"
+    echo "Running tests (log: $logfile)"
+    pytest -v --tb=short --log-cli-level=INFO "$@" 2>&1 | tee "$logfile"
+}
+
+# ===== DATABASE MANAGEMENT =====
+
+wheel-data-check() {
+    echo "📊 Checking databases..."
+    python -c "
+import duckdb
+for db in ['data/wheel_trading_optimized.duckdb', 'data/wheel_trading_master.duckdb']:
+    try:
+        conn = duckdb.connect(db, read_only=True)
+        tables = conn.execute('SHOW TABLES').fetchall()
+        print(f'✅ {db}: {len(tables)} tables')
+        conn.close()
+    except:
+        print(f'❌ {db}: Not found')
+"
+}
+
+# ===== SETUP & MAINTENANCE =====
+
+wheel-setup() {
+    echo "🔧 Setting up Wheel Trading..."
+    
+    # Install dependencies
+    if [[ -f "$WHEEL_TRADING_ROOT/requirements.txt" ]]; then
+        pip install -r "$WHEEL_TRADING_ROOT/requirements.txt"
+    fi
+    
+    # Create database if needed
+    if [[ ! -f "$WHEEL_TRADING_ROOT/data/wheel_trading_optimized.duckdb" ]] && 
+       [[ ! -f "$WHEEL_TRADING_ROOT/data/wheel_trading_master.duckdb" ]]; then
+        echo "Create database? (y/n)"
+        read -r answer
+        if [[ "$answer" = "y" ]]; then
+            python "$WHEEL_TRADING_ROOT/scripts/create_optimized_schema.py"
+        fi
+    fi
+    
+    wheel-doctor
+}
+
+wheel-startup() {
+    # Run full startup with banner
+    bash "$WHEEL_TRADING_ROOT/startup_unified.sh" "$@"
+}
+
+# ===== GIT SHORTCUTS =====
+
+alias gpush='git add . && git commit -m "Update" && git push'
+alias gcommit='git commit'
+
+# ===== CLAUDE CLI INTEGRATION =====
+
+# Wrapper to ensure Claude runs from project root
+alias claude-project='bash "$WHEEL_TRADING_ROOT/scripts/claude-project.sh"'
+
+# Quick Claude commands for common tasks
+wheel-claude() {
+    claude-project "$@"
+}
+
+wheel-claude-analyze() {
+    claude-project "Analyze the current trading performance and suggest improvements"
+}
+
+wheel-claude-debug() {
+    claude-project "Debug the most recent error in the logs"
+}
+
+# ===== QUICK HELP =====
+
+wheel-help() {
+    echo "🚀 Wheel Trading Commands"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Trading:"
+    echo "  wheel-run        Get recommendation"
+    echo "  wheel-diagnose   System diagnostics"
+    echo "  wheel-performance View metrics"
+    echo ""
+    echo "AI/Jarvis2:"
+    echo "  jarvis2 <query>  Generate code"
+    echo "  jarvis2-stats    View statistics"
+    echo "  jarvis2-benchmark Performance test"
+    echo ""
+    echo "Monitoring:"
+    echo "  wheel-status     Environment info"
+    echo "  wheel-doctor     Health check"
+    echo "  wheel-logs       View logs"
+    echo "  wheel-monitor    Hardware stats"
+    echo ""
+    echo "Setup:"
+    echo "  wheel-root (wr) Jump to root"
+    echo "  wheel-setup     Initial setup"
+    echo "  wheel-startup   Full startup"
+}

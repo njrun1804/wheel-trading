@@ -5,8 +5,8 @@ Defines the structure of code solutions and their associated metrics.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 @dataclass

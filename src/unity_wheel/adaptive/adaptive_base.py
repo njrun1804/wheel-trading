@@ -1,6 +1,6 @@
 """Adaptive base module."""
 
-from ..utils import get_logger
+from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -7,7 +7,7 @@ import logging
 import os
 from datetime import datetime, timezone
 
-from ...config import get_settings
+from src.config import get_settings
 from unity_wheel.api.types import MarketSnapshot, OptionData
 from unity_wheel.data_providers.databento.client import DatabentoClient
 from unity_wheel.data_providers.databento.integration import DatabentoIntegration

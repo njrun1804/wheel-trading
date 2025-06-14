@@ -13,8 +13,8 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from ..utils import get_logger
-from ..metrics import metrics_collector
+from unity_wheel.utils import get_logger
+from unity_wheel.metrics import metrics_collector
 
 logger = get_logger(__name__)
 

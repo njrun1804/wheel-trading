@@ -1,4 +1,5 @@
 """
+from src.config.network_config import network_config
 from __future__ import annotations
 
 OAuth2 flow implementation with automatic browser handling.
@@ -19,9 +20,9 @@ from urllib.parse import parse_qs, urlencode
 import aiohttp
 from aiohttp import web
 
-from config.loader import get_config
+from src.config.loader import get_config
 
-from ..utils.logging import get_logger
+from unity_wheel.utils.logging import get_logger
 from .exceptions import AuthError, InvalidCredentialsError
 
 logger = get_logger(__name__)

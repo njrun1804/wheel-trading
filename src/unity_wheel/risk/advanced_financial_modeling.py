@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy import optimize, stats
 
-from config.loader import get_config
+from src.config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 from ..utils.random_utils import set_seed

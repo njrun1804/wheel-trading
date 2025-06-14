@@ -138,7 +138,9 @@ class ConfigurationLoader:
                 return int(value)
             # Then float
             return float(value)
-        except ValueError:
+        except ValueError as e:
+            import logging
+            logging.debug(f"Exception caught: {e}", exc_info=True)
             pass
 
         # Handle lists (comma-separated)

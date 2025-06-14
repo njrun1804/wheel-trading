@@ -1,0 +1,38 @@
+# Essential Requirements for Jarvis2 Real Implementation
+# Minimal set for actual code generation functionality
+
+# Code Understanding & Generation
+libcst>=1.4.0                   # AST manipulation with comments preserved
+black>=24.8.0                   # Code formatting
+ast-comments>=1.2.2             # Preserve comments in AST
+parso>=0.8.4                    # Error-tolerant Python parser
+
+# Code Analysis
+radon>=6.0.1                    # Complexity metrics
+pylint>=3.2.0                   # Static analysis
+mypy>=1.11.0                    # Type checking
+
+# Code Embeddings (Choose one approach)
+# Option 1: Lightweight
+sentence-transformers>=3.0.0    # General embeddings that work with code
+
+# Option 2: Code-specific (heavier)
+# transformers>=4.44.0          # For CodeBERT/CodeT5
+# tokenizers>=0.20.0            # Fast tokenization
+
+# MLX for Apple Silicon (already have)
+mlx-lm>=0.18.0                  # Language models optimized for M4 Pro
+
+# Template Generation
+jinja2>=3.1.4                   # For structured code generation
+
+# Testing Generated Code  
+pytest>=8.3.5                   # Already have
+hypothesis>=6.111.0             # Property-based testing for validation
+
+# Documentation
+docstring-parser>=0.16          # Parse and generate docstrings
+
+# Progress & Debugging
+rich>=13.7.1                    # Better terminal output
+tqdm>=4.66.4                    # Progress bars for long operations

@@ -1,7 +1,7 @@
 """Hardware-accelerated tools for M4 Pro - 10-30x faster than MCP servers.
 
 Quick usage:
-    from unity_wheel.accelerated_tools import ripgrep, dependency_graph, python_analyzer
+    from ..accelerated_tools import ripgrep, dependency_graph, python_analyzer
     
     # Search with all 12 cores
     results = await ripgrep.search("pattern", "src")

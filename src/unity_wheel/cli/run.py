@@ -12,29 +12,31 @@ from datetime import datetime, timezone
 from typing import Any, Final, Literal
 
 # Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 import click
 from rich.console import Console
 from rich.table import Table
 
-from ...config import get_settings
-from config.unity import COMPANY_NAME, TICKER
-from ..config.unified_config import get_config
+from src.config import get_settings
+from src.config.unity import COMPANY_NAME, TICKER
+from src.config.loader import get_config
 from ..__version__ import __version__, API_VERSION
-from ..api import MarketSnapshot, OptionData, WheelAdvisor
-from ..data_providers.databento.client import DatabentoClient
-from ..data_providers.databento.integration import DatabentoIntegration
-from ..data_providers.validation import validate_market_data
-from ..data_providers.base import FREDDataManager
-from ..storage.storage import Storage
-from ..monitoring import get_performance_monitor
-from ..monitoring.diagnostics import SelfDiagnostics
-from ..observability import get_observability_exporter
-from ..metrics import metrics_collector
-from ..risk import RiskLimits
-from ..secrets.integration import SecretInjector
-from ..strategy import WheelParameters
+from unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
+from unity_wheel.data_providers.databento.client import DatabentoClient
+from unity_wheel.data_providers.databento.integration import DatabentoIntegration
+from unity_wheel.data_providers.validation import validate_market_data
+from unity_wheel.data_providers.base import FREDDataManager
+from unity_wheel.storage.storage import Storage
+from unity_wheel.monitoring import get_performance_monitor
+from unity_wheel.monitoring.diagnostics import SelfDiagnostics
+from unity_wheel.observability import get_observability_exporter
+from unity_wheel.metrics import metrics_collector
+from unity_wheel.risk import RiskLimits
+from unity_wheel.secrets.integration import SecretInjector
+from unity_wheel.strategy import WheelParameters
 
 config = get_config()
 
@@ -264,7 +266,7 @@ def run_diagnostics():
     
     # 2. Check API configuration
     try:
-        from ..secrets.manager import SecretManager
+        from unity_wheel.secrets.manager import SecretManager
         secrets = SecretManager()
         
         databento_key = secrets.get_secret("databento_api_key")
@@ -284,7 +286,7 @@ def run_diagnostics():
     
     # 3. Check configuration
     try:
-        from ..config.loader import get_config
+        from src.config.loader import get_config
         config = get_config()
         results["Configuration"] = "✅ Loaded"
     except Exception as e:
@@ -294,10 +296,11 @@ def run_diagnostics():
     try:
         import numpy as np
         import scipy
-        from ..math.options import black_scholes_price
+        from unity_wheel.math.options import black_scholes_price_validated
         
         # Test calculation
-        price = black_scholes_price(100, 100, 0.05, 0.25, 30/365, "call")
+        result = black_scholes_price_validated(100, 100, 30/365, 0.05, 0.25, "call")
+        price = result.value
         if price > 0:
             results["Math Libraries"] = "✅ Working"
         else:

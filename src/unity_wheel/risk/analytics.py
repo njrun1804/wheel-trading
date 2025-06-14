@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from config.loader import get_config
+from src.config.loader import get_config
 from ..models.position import Position
 
 from ..models.greeks import Greeks
@@ -100,11 +100,14 @@ class RiskLimits:
 
         # Use config values as defaults if not explicitly set
         if self.max_var_95 is None:
-            self.max_var_95 = config.risk.limits.max_var_95
+            # Default to 5% VaR limit
+            self.max_var_95 = getattr(config.risk.limits, 'max_var_95', 0.05)
         if self.max_cvar_95 is None:
-            self.max_cvar_95 = config.risk.limits.max_cvar_95
+            # Default to 10% CVaR limit
+            self.max_cvar_95 = getattr(config.risk.limits, 'max_cvar_95', 0.10)
         if self.max_kelly_fraction is None:
-            self.max_kelly_fraction = config.risk.limits.max_kelly_fraction
+            # Default to 50% Kelly fraction
+            self.max_kelly_fraction = getattr(config.risk.limits, 'max_kelly_fraction', 0.50)
         if self.max_delta_exposure is None:
             self.max_delta_exposure = config.risk.greeks.max_delta_exposure
         if self.max_gamma_exposure is None:

@@ -12,11 +12,11 @@ from __future__ import annotations
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional, Tuple
 
-from ..math import CalculationResult
+from unity_wheel.math import CalculationResult
 
 from .trading_calendar import SimpleTradingCalendar
 
-from config.unified_config import get_config
+from src.config.unified_config import get_config
 config = get_config()
 
 

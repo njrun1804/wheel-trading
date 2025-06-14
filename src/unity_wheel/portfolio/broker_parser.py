@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 from unity_wheel.models.position import Position
-from ...portfolio.single_account import ManualAccount
+from unity_wheel.portfolio.single_account import ManualAccount
 from unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -125,6 +125,8 @@ class BrokerDataParser:
             try:
                 return sign * float(amount_str)
             except ValueError:
+                import logging
+                logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
         return None
 

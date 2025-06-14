@@ -179,6 +179,8 @@ class WorkspaceIsolation:
                     
                     services.append(service_info)
                 except (ValueError, KeyError, AttributeError):
+                    import logging
+                    logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
         
         return services
@@ -204,6 +206,8 @@ class WorkspaceIsolation:
                         total_size += os.path.getsize(filepath)
             stats['disk_usage_mb'] = total_size / (1024 * 1024)
         except (ValueError, KeyError, AttributeError):
+            import logging
+            logging.debug(f"Exception caught: {e}", exc_info=True)
             pass
         
         # Count cache entries
@@ -234,6 +238,8 @@ class WorkspaceIsolation:
                 try:
                     psutil.Process(service['pid']).terminate()
                 except (ValueError, KeyError, AttributeError):
+                    import logging
+                    logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
         
         # Remove runtime directory
@@ -272,6 +278,8 @@ class WorkspaceManager:
                                 stats = ws.get_workspace_stats()
                                 workspaces.append(stats)
                         except (ValueError, KeyError, AttributeError):
+                            import logging
+                            logging.debug(f"Exception caught: {e}", exc_info=True)
                             pass
         
         return workspaces
@@ -293,6 +301,8 @@ class WorkspaceManager:
                         ws.cleanup(force=True)
                     cleaned.append(ws_stats['workspace_id'])
             except (ValueError, KeyError, AttributeError):
+                import logging
+                logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
         
         return cleaned

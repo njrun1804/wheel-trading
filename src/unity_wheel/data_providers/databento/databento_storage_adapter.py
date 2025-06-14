@@ -12,7 +12,7 @@ from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.config.loader import get_config
-from ...storage import Storage
+from unity_wheel.storage import Storage
 from unity_wheel.utils import get_logger
 
 from .types import InstrumentDefinition, OptionChain, OptionQuote

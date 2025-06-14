@@ -74,6 +74,11 @@ class StrategyConfig(BaseModel):
 
 
 class RiskLimits(BaseModel):
+
+    # VaR and CVaR limits
+    max_var_95: float = Field(0.05, ge=0.0, le=1.0, description="Maximum 95% VaR as % of portfolio")
+    max_cvar_95: float = Field(0.10, ge=0.0, le=1.0, description="Maximum 95% CVaR as % of portfolio")
+    max_kelly_fraction: float = Field(0.50, ge=0.0, le=1.0, description="Maximum Kelly fraction")
     """Risk limit configuration."""
 
     max_var_95: float = Field(0.05, ge=0.0, le=1.0, description="Max VaR at 95% confidence")

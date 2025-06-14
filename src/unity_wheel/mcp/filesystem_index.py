@@ -282,6 +282,8 @@ class FilesystemIndex:
                 return age < timedelta(hours=max_age_hours)
                 
         except (ValueError, KeyError, AttributeError):
+            import logging
+            logging.debug(f"Exception caught: {e}", exc_info=True)
             pass
             
         return False

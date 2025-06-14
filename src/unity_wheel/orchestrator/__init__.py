@@ -49,7 +49,7 @@ from .pressure import (
 from .slice_cache import SliceCache
 
 # Legacy support (will be deprecated)
-# from .orchestrator import MCPOrchestrator, ExecutionPlan, Phase, PhaseResult  # TODO: File doesn't exist
+from .orchestrator import MCPOrchestrator, ExecutionPlan, Phase, PhaseResult  # TODO: File doesn't exist
 
 __all__ = [
     # New consolidated orchestrator

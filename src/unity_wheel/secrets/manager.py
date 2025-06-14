@@ -447,6 +447,8 @@ class SecretManager:
                 if not update:
                     continue
             except SecretNotFoundError:
+                import logging
+                logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
 
             # Collect credentials

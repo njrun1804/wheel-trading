@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -12,7 +13,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
 from unity_wheel.utils.logging import get_logger
-from ...metrics import metrics_collector
+from unity_wheel.metrics import metrics_collector
 
 logger = get_logger(__name__)
 

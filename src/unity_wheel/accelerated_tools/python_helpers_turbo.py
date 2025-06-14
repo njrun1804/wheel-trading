@@ -97,7 +97,7 @@ class CodeHelper:
     
     async def find_usages(self, symbol: str, directory: str = ".") -> List[Dict[str, Any]]:
         """Find all usages of a symbol using parallel search."""
-        from unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+        from ..accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
         
         rg = get_ripgrep_turbo()
         
@@ -145,7 +145,7 @@ class CodeHelper:
         
         # Search for definitions in parallel
         if undefined:
-            from unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+            from ..accelerated_tools.dependency_graph_turbo import get_dependency_graph
             
             graph = get_dependency_graph()
             if not graph.symbol_locations:

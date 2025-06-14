@@ -10,7 +10,7 @@ import os
 from functools import lru_cache
 from typing import Any, Dict, Optional
 
-from ..utils import get_logger
+from unity_wheel.utils import get_logger
 from .exceptions import SecretNotFoundError
 from .manager import SecretManager
 

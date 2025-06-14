@@ -12,8 +12,8 @@ from typing import Dict, List, Optional
 import pandas as pd
 from databento_dbn import Schema
 
-from config.loader import get_config
-from ...storage import Storage
+from src.config.loader import get_config
+from unity_wheel.storage import Storage
 from unity_wheel.utils import get_logger, with_recovery
 
 from .client import DatabentoClient

@@ -14,7 +14,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy.optimize import brentq
 
-from config.loader import get_config
+from src.config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 

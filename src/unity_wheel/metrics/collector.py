@@ -11,11 +11,11 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from ..utils.logging import get_logger
+from unity_wheel.utils.logging import get_logger
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..risk.analytics import RiskMetrics
+    from unity_wheel.risk.analytics import RiskMetrics
 
 logger = get_logger(__name__)
 

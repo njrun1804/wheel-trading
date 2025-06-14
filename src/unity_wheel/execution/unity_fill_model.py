@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from typing import NoReturn, Optional, Tuple
 
-from ..utils.logging import get_logger
+from unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

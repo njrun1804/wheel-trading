@@ -10,9 +10,9 @@ import platform
 if platform.system() == 'Darwin':
     mp.set_start_method('spawn', force=True)
 
+from .learning_worker import LearningWorker
 from .neural_worker import NeuralWorkerPool, NeuralWorkerProcess
 from .search_worker import SearchWorkerPool, SearchWorkerProcess
-from .learning_worker import LearningWorker
 
 __all__ = [
     'NeuralWorkerPool',

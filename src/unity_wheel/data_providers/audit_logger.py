@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from ..utils import get_logger
+from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
 

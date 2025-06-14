@@ -192,7 +192,7 @@ class DependencyGraphTurbo:
     
     async def _find_symbol_usages(self, symbol: str) -> List[Dict[str, Any]]:
         """Find symbol usages in parallel."""
-        from unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+        from ..accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
         
         rg = get_ripgrep_turbo()
         results = await rg.search(f"\\b{symbol}\\b", str(self.root_path), file_type="py")

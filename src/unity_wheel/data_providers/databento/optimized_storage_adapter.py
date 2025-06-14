@@ -10,7 +10,7 @@ from typing import List, Dict, Any, Optional
 import logging
 
 from .types import OptionChain, OptionQuote, InstrumentDefinition
-from config.loader import get_config
+from src.config.loader import get_config
 from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)

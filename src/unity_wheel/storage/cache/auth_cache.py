@@ -257,6 +257,8 @@ class AuthCache:
                     if cached.get("endpoint") == endpoint:
                         cache_file.unlink()
                 except (ValueError, KeyError, AttributeError):
+                    import logging
+                    logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
         else:
             # Clear all
@@ -265,6 +267,8 @@ class AuthCache:
                 try:
                     cache_file.unlink()
                 except (ValueError, KeyError, AttributeError):
+                    import logging
+                    logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
 
         logger.info("clear", endpoint=endpoint or "all")
@@ -285,6 +289,8 @@ class AuthCache:
                     cached = json.load(f)
                 endpoints.add(cached.get("endpoint", "unknown"))
             except (ValueError, KeyError, AttributeError):
+                import logging
+                logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
 
         return {

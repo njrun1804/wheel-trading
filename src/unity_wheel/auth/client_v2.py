@@ -9,9 +9,9 @@ that automatically retrieves credentials from SecretManager.
 
 from typing import Any, Dict, Optional
 
-from ..secrets.integration import SecretInjector
-from ..secrets import SecretManager
-from ..utils.logging import get_logger
+from unity_wheel.secrets.integration import SecretInjector
+from unity_wheel.secrets import SecretManager
+from unity_wheel.utils.logging import get_logger
 from .auth_client import AuthClient as BaseAuthClient
 
 logger = get_logger(__name__)
@@ -100,7 +100,7 @@ class AuthClient(BaseAuthClient):
 
         # Add SecretManager status
         try:
-            from ..secrets import SecretManager
+            from unity_wheel.secrets import SecretManager
 
             manager = SecretManager()
             configured_services = manager.list_configured_services()

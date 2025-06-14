@@ -2,10 +2,11 @@
 
 This ensures everything works correctly on M4 Pro without shortcuts.
 """
-import pytest
-import sys
 import os
+import sys
 from pathlib import Path
+
+import pytest
 
 # Set environment to avoid OpenMP issues
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'

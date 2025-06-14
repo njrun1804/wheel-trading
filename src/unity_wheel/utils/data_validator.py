@@ -284,7 +284,7 @@ def validate_for_trading(snapshot: Dict[str, Any], account_data: Dict[str, Any])
     validate_market_data(snapshot)
 
     # Account data (handled by SingleAccountManager)
-    from ..portfolio import SingleAccountManager
+    from unity_wheel.portfolio import SingleAccountManager
 
     manager = SingleAccountManager()
     manager.parse_account(account_data)  # Dies if invalid
