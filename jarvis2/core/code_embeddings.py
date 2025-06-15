@@ -201,8 +201,8 @@ class LightweightCodeEmbedder:
 
     def _get_python_stop_words(self) ->List[str]:
         """Get Python-specific stop words."""
-        return ['self", "def", "class', 'import', 'from', 'return', 'if",
-            "else', 'elif", "for', 'while', 'in', 'is', 'not', 'and', 'or',
+        return ['self', 'def', 'class', 'import', 'from', 'return', 'if',
+            'else', 'elif', 'for', 'while', 'in', 'is', 'not', 'and', 'or',
             'as', 'pass', 'break', 'continue', 'True', 'False', 'None']
 
     def similarity(self, embedding1: np.ndarray, embedding2: np.ndarray
@@ -215,8 +215,8 @@ class LightweightCodeEmbedder:
         state = {'vector_dim': self.vector_dim, 'is_fitted': self.is_fitted,
             'feature_weights': self.feature_weights}
         if self.is_fitted:
-            state['tfidf"] = self.tfidf
-            state["svd'] = self.svd
+            state['tfidf'] = self.tfidf
+            state['svd'] = self.svd
         with open(path, 'wb') as f:
             pickle.dump(state, f)
 
@@ -228,8 +228,8 @@ class LightweightCodeEmbedder:
         self.is_fitted = state['is_fitted']
         self.feature_weights = state['feature_weights']
         if self.is_fitted:
-            self.tfidf = state['tfidf"]
-            self.svd = state["svd']
+            self.tfidf = state['tfidf']
+            self.svd = state['svd']
 
 
 class MLXCodeEmbedder:

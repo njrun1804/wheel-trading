@@ -7,6 +7,15 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
+# META INTEGRATION: Enable observation and evolution (SHARED SINGLETON)
+def get_meta():
+    """Get shared MetaPrime instance to prevent multiple spawns."""
+    from ..meta import get_shared_meta
+    meta = get_shared_meta()
+    # Record advisor usage
+    meta.observe("advisor_meta_access", {"timestamp": datetime.now(timezone.utc).isoformat()})
+    return meta
+
 from ..analytics import UnityAssignmentModel
 from ..math import probability_itm_validated
 from ..metrics import metrics_collector
@@ -134,6 +143,14 @@ class WheelAdvisor:
             Action recommendation with confidence and risk metrics
         """
         start_time = datetime.now(timezone.utc)
+        
+        # META OBSERVATION: Record recommendation request
+        get_meta().observe("recommendation_request", {
+            "timestamp": start_time.isoformat(),
+            "current_price": market_snapshot.current_price,
+            "position_count": len(market_snapshot.positions),
+            "account_value": market_snapshot.account.total_value
+        })
         decision_id = f"wheel_{uuid.uuid4().hex[:8]}_{int(start_time.timestamp())}"
 
         # Log decision start

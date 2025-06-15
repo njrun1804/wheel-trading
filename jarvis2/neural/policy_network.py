@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 
 """Simplified Code Policy Network for debugging.
 
 A simpler version without TransformerEncoder to avoid initialization issues.
 """
-from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 

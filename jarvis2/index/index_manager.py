@@ -301,8 +301,9 @@ class DeepIndexManager:
             max_nesting_depth, 'technical_debt_score': visitor.
             calculate_tech_debt()}
 
-    def _generate_embedding(self, text: str) ->np.ndarray:
+    async def _generate_embedding(self, text: str) ->np.ndarray:
         """Generate embedding for text."""
+        await asyncio.sleep(0)  # Make properly async
         embedding = np.zeros(768)
         words = text.split()
         for i, word in enumerate(words[:768]):

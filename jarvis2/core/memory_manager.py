@@ -94,7 +94,7 @@ class UnifiedMemoryManager:
                     best_size = buffer.size
         if not best_buffer:
             raise MemoryError(
-                f"No buffer available for {size / 1024 ** 2:.1f}MB tensor')
+                f"No buffer available for {size / 1024 ** 2:.1f}MB tensor")
         self.buffers[best_buffer].in_use = True
         self.buffers[best_buffer].shape = shape
         self.buffers[best_buffer].dtype = dtype
@@ -153,15 +153,44 @@ class UnifiedMemoryManager:
             0}
 
     def cleanup(self):
-        """Clean up all shared memory."""
-        for shm in self.shm_objects.values():
+        """Clean up all shared memory with robust error handling."""
+        cleanup_errors = []
+        
+        for name, shm in list(self.shm_objects.items()):
             try:
                 shm.close()
-                shm.unlink()
+                try:
+                    shm.unlink()
+                    logger.info(f"Unlinked shared memory: {name}")
+                except FileNotFoundError:
+                    pass  # Already unlinked
+                except Exception as unlink_error:
+                    # Force cleanup using OS-level commands
+                    try:
+                        import os
+                        shm_path = f"/dev/shm/{shm.name}"
+                        if os.path.exists(shm_path):
+                            os.unlink(shm_path)
+                            logger.info(f"Force unlinked shared memory: {name}")
+                    except Exception as force_error:
+                        cleanup_errors.append(f"Force cleanup {name}: {force_error}")
+                        
             except Exception as e:
-                logger.debug(f"Ignored exception in {'memory_manager.py'}: {e}"
-                    )
-        logger.info('Memory manager cleaned up')
+                cleanup_errors.append(f"SharedMemory {name}: {e}")
+                # Attempt force cleanup even if close() failed
+                try:
+                    import os
+                    shm_path = f"/dev/shm/{getattr(shm, 'name', name)}"
+                    if os.path.exists(shm_path):
+                        os.unlink(shm_path)
+                        logger.info(f"Force cleaned orphaned shared memory: {name}")
+                except Exception:
+                    pass
+        
+        if cleanup_errors:
+            logger.warning(f"Cleanup issues: {cleanup_errors[:3]}")
+        else:
+            logger.info('Memory manager cleaned up successfully')
 
 
 class TensorQueue:

@@ -16,10 +16,15 @@ class RipgrepTurbo:
         self.cpu_count = mp.cpu_count()
         self.executor = ThreadPoolExecutor(max_workers=self.cpu_count)
         
-    async def search(self, pattern: str, path: str = ".", 
+    async def search(self, pattern, path: str = ".", 
                     file_type: Optional[str] = None,
                     max_results: int = 1000) -> List[Dict[str, Any]]:
         """Search with full CPU parallelization."""
+        
+        # Handle multiple patterns
+        if isinstance(pattern, list):
+            # For multiple patterns, join with OR
+            pattern = "|".join(pattern)
         
         # Build ripgrep command
         cmd = [
@@ -97,6 +102,23 @@ class RipgrepTurbo:
                 counts[file_path] = int(count)
         
         return counts
+    
+    async def parallel_search(self, patterns: List[str], path: str = ".") -> Dict[str, List[Dict[str, Any]]]:
+        """Search multiple patterns in parallel using all cores."""
+        tasks = []
+        for pattern in patterns:
+            task = asyncio.create_task(self.search(pattern, path))
+            tasks.append((pattern, task))
+        
+        results = {}
+        for pattern, task in tasks:
+            try:
+                results[pattern] = await task
+            except Exception as e:
+                results[pattern] = []
+                print(f"Search failed for pattern '{pattern}': {e}")
+        
+        return results
     
     async def parallel_search(self, patterns: List[str], path: str = ".") -> Dict[str, List[Dict]]:
         """Search multiple patterns in parallel."""

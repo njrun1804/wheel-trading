@@ -18,6 +18,7 @@ from ..workers.search_worker import SearchWorkerPool
 from .device_router import OperationType, get_router
 from .error_handling import ErrorSeverity, ResourceGuard, with_error_handling, with_timeout
 from .memory_manager import get_memory_manager
+from src.unity_wheel.accelerated_tools.sequential_thinking_config import SequentialThinkingEngine
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,7 @@ class Jarvis2Orchestrator:
         self.learning_worker = None
         self.vector_index = None
         self.experience_buffer = None
+        self.sequential_thinking = SequentialThinkingEngine(use_mcp=False)
         self.request_count = 0
         self.total_time = 0
         self._background_tasks = set()
@@ -126,6 +128,23 @@ class Jarvis2Orchestrator:
             f"Processing request #{self.request_count}: {request.query[:50]}..."
             )
         context = await self._get_context(request)
+        
+        # Use sequential thinking for complex planning
+        thinking_plan = await self.sequential_thinking.plan_implementation(
+            feature=request.query,
+            requirements=[
+                "Must be efficient and use hardware acceleration",
+                "Follow existing code patterns",
+                "Include error handling",
+                "Be maintainable and testable"
+            ],
+            existing_code=context.get('related_code', {})
+        )
+        
+        # Add thinking plan to context for search
+        context['thinking_plan'] = thinking_plan
+        context['implementation_steps'] = thinking_plan.get('steps', [])
+        
         guidance_task = asyncio.create_task(self._get_neural_guidance(
             request.query, context))
         default_guidance = {'value': np.array([[0.5]]), 'policy': np.ones(
@@ -279,8 +298,9 @@ if __name__ == "__main__":
     # TODO: Implement
     pass"""
 
-    def _run_initialization_benchmarks(self):
+    async def _run_initialization_benchmarks(self):
         """Run benchmarks to select optimal backends."""
+        await asyncio.sleep(0)  # Make properly async
         logger.info('Running initialization benchmarks...')
         tree_backend = self.device_router.select_optimal_backend(OperationType
             .TREE_SEARCH, input_size=(1000, 64))

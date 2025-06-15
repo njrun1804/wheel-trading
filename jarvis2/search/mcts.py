@@ -47,7 +47,7 @@ class NeuralGuidedMCTS:
         self.neural_evals = 0
         self._model_update_count = 0
 
-    def initialize(self):
+    async def initialize(self):
         """Initialize neural networks."""
         logger.info('MCTS initialized with lazy-loading networks')
         self._initialized = True

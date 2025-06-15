@@ -12,6 +12,7 @@ Adapts chunk size based on file size, complexity, and response time.
 
 import time
 import math
+import json
 from pathlib import Path
 from typing import List, Tuple, Dict, Optional, Any
 from dataclasses import dataclass
@@ -405,7 +406,6 @@ class ChunkedFileReader:
 
 # Example usage for MCP integration
 if __name__ == "__main__":
-    import json
     
     # Test chunking
     reader = ChunkedFileReader()

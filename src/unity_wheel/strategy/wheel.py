@@ -11,6 +11,15 @@ import numpy as np
 
 from src.config.loader import get_config
 
+# META INTEGRATION: Enable observation and evolution (SHARED SINGLETON)
+def get_meta():
+    """Get shared MetaPrime instance to prevent multiple spawns."""
+    from ..meta import get_shared_meta
+    meta = get_shared_meta()
+    # Record wheel strategy usage
+    meta.observe("wheel_strategy_meta_access", {"timestamp": datetime.now().isoformat()})
+    return meta
+
 from ..math import (
     CalculationResult,
     black_scholes_price_validated,
@@ -604,3 +613,4 @@ class WheelStrategy:
         )
 
         return metrics
+# Test comment to trigger meta observation

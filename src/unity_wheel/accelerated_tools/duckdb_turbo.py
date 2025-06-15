@@ -52,27 +52,52 @@ class DuckDBTurbo:
         if self.shared_memory:
             # Single shared connection for in-memory database
             self.main_conn = duckdb.connect(self.db_path, config=config)
-            # All connections share the same in-memory database
-            for _ in range(8):  # Still create workers for parallel execution
-                conn = self.main_conn
             
             # Enable M4 Pro specific extensions
-            conn.install_extension('httpfs')
-            conn.install_extension('parquet')
-            conn.install_extension('json')
-            conn.load_extension('httpfs')
-            conn.load_extension('parquet')
-            conn.load_extension('json')
+            self.main_conn.install_extension('httpfs')
+            self.main_conn.install_extension('parquet')
+            self.main_conn.install_extension('json')
+            self.main_conn.load_extension('httpfs')
+            self.main_conn.load_extension('parquet')
+            self.main_conn.load_extension('json')
             
             # Set pragmas for performance (only valid pragmas)
-            conn.execute(f"PRAGMA threads={self.config['cpu']['max_workers']}")
-            conn.execute(f"PRAGMA memory_limit='{self.config['memory']['max_allocation_gb']}GB'")
+            self.main_conn.execute(f"PRAGMA threads={self.config['cpu']['max_workers']}")
+            self.main_conn.execute(f"PRAGMA memory_limit='{self.config['memory']['max_allocation_gb']}GB'")
             
-            self.connections.append(conn)
+            # All connections share the same in-memory database
+            for _ in range(8):  # Still create workers for parallel execution
+                self.connections.append(self.main_conn)
+        else:
+            # File-based database - create separate connections
+            for i in range(self.pool_size):
+                conn = duckdb.connect(self.db_path, config=config)
+                
+                # Enable extensions for each connection
+                try:
+                    conn.install_extension('httpfs')
+                    conn.install_extension('parquet')
+                    conn.install_extension('json')
+                    conn.load_extension('httpfs')
+                    conn.load_extension('parquet')
+                    conn.load_extension('json')
+                    
+                    # Set pragmas for performance
+                    conn.execute(f"PRAGMA threads={self.config['cpu']['max_workers']}")
+                    conn.execute(f"PRAGMA memory_limit='{self.config['memory']['max_allocation_gb']}GB'")
+                except Exception as e:
+                    # Some extensions might not be available, continue anyway
+                    pass
+                
+                self.connections.append(conn)
     
     @asynccontextmanager
     async def get_connection(self):
         """Get a connection from the pool."""
+        # Check if we have connections available
+        if not self.connections:
+            raise RuntimeError("No DuckDB connections available in pool")
+        
         # Simple round-robin (could be enhanced)
         conn = self.connections[hash(asyncio.current_task()) % len(self.connections)]
         try:

@@ -168,15 +168,11 @@ class CodeTransformer:
             params.append(param)
         body_stmts = []
         if docstring:
-            body_stmts.append(cst.SimpleStatementLine(body=[cst.Expr(cst.
-                SimpleString(f""""{docstring}""""))]))
+            body_stmts.append(cst.SimpleStatementLine(body=[cst.Expr(cst.SimpleString(f'"""{{docstring}}"""'.format(docstring=docstring)))]))
         body_module = cst.parse_module(textwrap.dedent(func_body))
         body_stmts.extend(body_module.body)
-        func_def = cst.FunctionDef(name = cst.Name(func_name), params = cst.
-            Parameters(params = params), body = cst.IndentedBlock(body = body_stmts), returns = cst.Annotation(annotation = cst.Name(
-            return_type)) if return_type else None)
-        new_module = module.with_changes(body=[*module.body, cst.
-            SimpleStatementLine(body=[]), func_def])
+        func_def = cst.FunctionDef(name = cst.Name(func_name), params = cst.Parameters(params = params), body = cst.IndentedBlock(body = body_stmts), returns = cst.Annotation(annotation = cst.Name(return_type)) if return_type else None)
+        new_module = module.with_changes(body=[*module.body, cst.SimpleStatementLine(body=[]), func_def])
         return new_module.code
 
     def add_import(self, code: str, import_name: str, from_module: str = None

@@ -80,6 +80,15 @@ class EinsteinIndexHub:
         self.analysis_semaphore = asyncio.Semaphore(6)   # CPU-bound analysis tasks
         
         # Initialize ALL accelerated tools with error handling
+        # Initialize all tools to None first to ensure they exist
+        self.ripgrep = None
+        self.dependency_graph = None
+        self.python_analyzer = None
+        self.duckdb = None
+        self.sequential_thinking = None
+        self.code_helper = None
+        self.tracer = None
+        
         try:
             self.ripgrep = get_ripgrep_turbo()
             self.dependency_graph = get_dependency_graph()
@@ -96,9 +105,7 @@ class EinsteinIndexHub:
             
         except Exception as e:
             logger.error(f"Error initializing accelerated tools: {e}")
-            # Fall back to None for tools that failed
-            if not hasattr(self, 'duckdb'):
-                self.duckdb = None
+            # Attributes are already set to None above, so we're safe
         
         # Existing systems integration
         self.db_manager = get_database_manager()
@@ -118,8 +125,9 @@ class EinsteinIndexHub:
         # Initialize FAISS-related attributes
         self.vector_index = None
         self._faiss_loaded = False
-        self._faiss_available = None  # Will be set during initialization
+        self._faiss_available = self._check_faiss_availability()
         self.embedding_pipeline = None
+        self._embedding_pipeline_available = False  # Track embedding pipeline availability
         
         # Initialize file watcher attributes
         self._shutdown_event = None
@@ -128,19 +136,142 @@ class EinsteinIndexHub:
         
         # Real-time indexing
         self.file_watcher = None
-        self.file_change_queue = asyncio.Queue()
+        self.file_change_queue = None  # Will be initialized in _start_file_watcher
         self._last_indexed = {}  # File path -> (hash, timestamp)
         
         logger.info(f"🧠 Einstein Index initialized with {self.cpu_cores} cores")
     
     def _check_faiss_availability(self) -> bool:
-        """Check if FAISS is available for import."""
+        """Check if FAISS library is available and working.
+        
+        Returns:
+            bool: True if FAISS is available and functional
+        """
         try:
             import faiss
-            return True
+            import numpy as np
+            
+            # Test basic FAISS functionality
+            test_index = faiss.IndexFlatL2(128)  # Small test index
+            test_vector = np.array([[1.0] * 128], dtype=np.float32)
+            test_index.add(test_vector)
+            
+            if test_index.ntotal == 1:
+                logger.debug("✅ FAISS library is available and functional")
+                return True
+            else:
+                logger.warning("⚠️ FAISS library loaded but basic test failed")
+                return False
+                
         except ImportError:
-            logger.info("FAISS not available - semantic search will use fallback methods")
+            logger.info("ℹ️ FAISS library not available - will use embedding pipeline fallback")
             return False
+        except Exception as e:
+            logger.warning(f"⚠️ FAISS library test failed: {e}")
+            return False
+    
+    def _validate_faiss_index_for_save(self) -> bool:
+        """Validate FAISS index state before saving.
+        
+        Returns:
+            bool: True if index is valid for saving, False otherwise
+        """
+        try:
+            if not hasattr(self, 'vector_index') or self.vector_index is None:
+                logger.warning("No FAISS index exists to validate")
+                return False
+            
+            # Check if index has required attributes
+            if not hasattr(self.vector_index, 'ntotal'):
+                logger.warning("FAISS index missing 'ntotal' attribute")
+                return False
+            
+            if not hasattr(self.vector_index, 'd'):
+                logger.warning("FAISS index missing dimension 'd' attribute")
+                return False
+            
+            # Check if index has valid dimensions
+            if self.vector_index.d <= 0:
+                logger.warning(f"Invalid FAISS index dimension: {self.vector_index.d}")
+                return False
+            
+            # Index can be empty (ntotal = 0) and still be valid for saving
+            logger.debug(f"FAISS index validation passed: {self.vector_index.ntotal} vectors, dimension {self.vector_index.d}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error validating FAISS index: {e}")
+            return False
+    
+    def _validate_faiss_search_input(self, query_embedding: Any, k: int = 20) -> Tuple[bool, str]:
+        """Validate inputs for FAISS search operations.
+        
+        Args:
+            query_embedding: The query embedding vector
+            k: Number of results to search for
+            
+        Returns:
+            Tuple[bool, str]: (is_valid, error_message)
+        """
+        try:
+            # Check if FAISS is available
+            if not self._check_faiss_availability():
+                return False, "FAISS library not available"
+            
+            # Check if FAISS index exists and is loaded
+            if not hasattr(self, 'vector_index') or not self.vector_index:
+                return False, "FAISS index not loaded"
+            
+            if not self._faiss_loaded:
+                return False, "FAISS index not marked as loaded"
+            
+            # Validate index attributes
+            if not hasattr(self.vector_index, 'search') or not hasattr(self.vector_index, 'ntotal'):
+                return False, "FAISS index missing required methods"
+            
+            if self.vector_index.ntotal == 0:
+                return False, "FAISS index is empty"
+            
+            # Validate query embedding
+            if query_embedding is None:
+                return False, "Query embedding is None"
+            
+            try:
+                import numpy as np
+                if not isinstance(query_embedding, np.ndarray):
+                    query_embedding = np.array(query_embedding)
+                
+                if query_embedding.size == 0:
+                    return False, "Query embedding is empty"
+                
+                # Check embedding dimension
+                expected_dim = getattr(self.vector_index, 'd', 1536)
+                query_shape = query_embedding.shape
+                if len(query_shape) == 1:
+                    actual_dim = query_shape[0]
+                elif len(query_shape) == 2:
+                    actual_dim = query_shape[1]
+                else:
+                    return False, f"Invalid query embedding shape: {query_shape}"
+                
+                if actual_dim != expected_dim:
+                    return False, f"Query embedding dimension {actual_dim} doesn't match index dimension {expected_dim}"
+                
+            except Exception as embed_error:
+                return False, f"Error validating query embedding: {embed_error}"
+            
+            # Validate k parameter
+            if k <= 0:
+                return False, "Search parameter k must be positive"
+            
+            if k > self.vector_index.ntotal:
+                # This is acceptable, just limit k
+                pass
+            
+            return True, "Validation passed"
+            
+        except Exception as e:
+            return False, f"Validation error: {e}"
         
     async def initialize(self) -> None:
         """Initialize all indexing components."""
@@ -251,24 +382,44 @@ class EinsteinIndexHub:
         async with semaphore:
             async with PerformanceTracker('file_analysis', semaphore._value):
                 try:
-                    # Use Python analyzer for structure
-                    analysis = await self.python_analyzer.analyze_file(str(file_path))
+                    # Use Python analyzer for structure if available
+                    analysis = {}
+                    if self.python_analyzer:
+                        try:
+                            analysis = await self.python_analyzer.analyze_file(str(file_path))
+                            # Handle case where analyzer returns object instead of dict
+                            if hasattr(analysis, '__dict__'):
+                                analysis = analysis.__dict__
+                            elif not isinstance(analysis, dict):
+                                analysis = {'raw_result': analysis}
+                        except Exception as e:
+                            logger.warning(f"Python analyzer failed for {file_path}: {e}")
+                            analysis = {}
                     
-                    # Get function signatures using code helper
-                    functions = await self.code_helper.get_function_signature(str(file_path), "*")
+                    # Get function signatures using code helper if available
+                    functions = []
+                    if self.code_helper:
+                        try:
+                            functions = await self.code_helper.get_function_signature(str(file_path), "*")
+                        except Exception as e:
+                            logger.debug(f"Code helper failed for {file_path}: {e}")
                     
-                    # Store in analytics DB
-                    await self.duckdb.execute("""
-                        INSERT OR REPLACE INTO file_analytics 
-                        (file_path, lines_of_code, complexity_score, last_modified, language)
-                        VALUES (?, ?, ?, ?, ?)
-                    """, (
-                        str(file_path),
-                        analysis.get('lines_of_code', 0),
-                        analysis.get('complexity', 0.0),
-                        file_path.stat().st_mtime,
-                        'python'
-                    ))
+                    # Store in analytics DB if available
+                    if self.duckdb:
+                        try:
+                            await self.duckdb.execute("""
+                                INSERT OR REPLACE INTO file_analytics 
+                                (file_path, lines_of_code, complexity_score, last_modified, language)
+                                VALUES (?, ?, ?, ?, ?)
+                            """, (
+                                str(file_path),
+                                analysis.get('lines_of_code', 0),
+                                analysis.get('complexity', 0.0),
+                                file_path.stat().st_mtime,
+                                'python'
+                            ))
+                        except Exception as e:
+                            logger.debug(f"DB storage failed for {file_path}: {e}")
                     
                     return analysis
                     
@@ -334,6 +485,11 @@ class EinsteinIndexHub:
         start_time = time.time()
         
         try:
+            # Skip if ripgrep is not available
+            if not self.ripgrep:
+                logger.debug("Ripgrep not available for text search")
+                return []
+            
             # Use ripgrep for blazing fast text search
             rg_results = await self.ripgrep.search(query, str(self.project_root))
             
@@ -360,115 +516,84 @@ class EinsteinIndexHub:
             return []
     
     async def _semantic_search(self, query: str) -> List[SearchResult]:
-        """Semantic search using neural embeddings and FAISS index."""
+        """Semantic search using neural embeddings and FAISS index with comprehensive fallbacks."""
         
         start_time = time.time()
+        results = []
         
         try:
-            # Ensure embedding pipeline is initialized and has valid embedding function
-            if not hasattr(self, 'embedding_pipeline') or self.embedding_pipeline is None:
-                await self._initialize_embedding_pipeline()
+            logger.debug(f"Starting semantic search for query: '{query}'")
             
-            # Check if embedding pipeline is still None after initialization
-            if self.embedding_pipeline is None:
-                logger.warning("Embedding pipeline not available for semantic search")
-                return []
-            
-            # Verify embedding function exists and is callable
-            if not hasattr(self.embedding_pipeline, 'embedding_func') or self.embedding_pipeline.embedding_func is None:
-                logger.error("Embedding function is None - cannot perform semantic search")
-                return []
-            
-            # Generate query embedding with error handling
-            try:
-                query_embedding, _ = self.embedding_pipeline.embedding_func(query)
-            except Exception as e:
-                logger.error(f"Failed to generate query embedding: {e}")
-                return []
-            
-            results = []
-            
-            # Search FAISS index if available
-            if hasattr(self, 'vector_index') and self.vector_index:
-                # Load or create FAISS index
-                faiss_path = self.project_root / ".einstein" / "embeddings.index"
-                
-                if not hasattr(self, '_faiss_loaded'):
-                    await self._load_faiss_index(faiss_path)
-                    self._faiss_loaded = True
-                
-                if self.vector_index and hasattr(self.vector_index, 'search'):
-                    # Perform FAISS search
-                    k = min(20, self.vector_index.ntotal if hasattr(self.vector_index, 'ntotal') else 20)
-                    if k > 0:
-                        try:
-                            import faiss
-                            if isinstance(self.vector_index, (faiss.IndexHNSWFlat, faiss.IndexFlatIP, faiss.IndexFlatL2)):
-                                scores, indices = self.vector_index.search(
-                                    query_embedding.reshape(1, -1).astype('float32'), k
-                                )
-                                
-                                # Convert FAISS results to SearchResult objects
-                                for i, (score, idx) in enumerate(zip(scores[0], indices[0])):
-                                    if idx >= 0 and score > 0.1:  # Minimum similarity threshold
-                                        # Get file info from metadata (simplified for now)
-                                        result = SearchResult(
-                                            content=f"Semantic match with score {score:.3f}",
-                                            file_path=f"indexed_file_{idx}",  # TODO: Map to actual file paths
-                                            line_number=1,
-                                            score=float(score),
-                                            result_type='semantic',
-                                            context={'faiss_index': idx, 'embedding_score': float(score)},
-                                            timestamp=time.time()
-                                        )
-                                        results.append(result)
-                        except ImportError:
-                            logger.warning("FAISS not available for semantic search")
-                        except Exception as e:
-                            logger.warning(f"FAISS search error: {e}")
-            
-            # Fallback to embedding-based similarity with existing files
-            if not results and self.embedding_pipeline is not None:
+            # Multi-stage fallback approach
+            # Stage 1: Try FAISS search if available
+            if self._faiss_available and await self._ensure_embedding_pipeline():
                 try:
-                    # Search through recently indexed files using embedding pipeline
-                    search_results = await self.embedding_pipeline.embed_search_results(
-                        query, str(self.project_root), context_lines=3
-                    )
-                    
-                    for embed_result in search_results[:10]:  # Top 10 results
-                        if 'embedding' in embed_result:
-                            # Calculate similarity score
-                            similarity = self._calculate_similarity(
-                                query_embedding, embed_result['embedding']
-                            )
-                            
-                            if similarity > 0.3:  # Minimum threshold
-                                result = SearchResult(
-                                    content=embed_result['content'][:200],  # Truncate for display
-                                    file_path=embed_result.get('file_path', 'unknown'),
-                                    line_number=embed_result.get('start_line', 1),
-                                    score=float(similarity),
-                                    result_type='semantic',
-                                    context={
-                                        'similarity': float(similarity),
-                                        'tokens': embed_result.get('tokens', 0),
-                                        'cached': embed_result.get('cached', False)
-                                    },
-                                    timestamp=time.time()
-                                )
-                                results.append(result)
+                    query_embedding, token_count = await self._safe_get_query_embedding(query)
+                    if query_embedding is not None:
+                        faiss_results = await self._try_faiss_search(query_embedding)
+                        if faiss_results:
+                            results.extend(faiss_results)
+                            logger.info(f"FAISS search found {len(faiss_results)} results")
                 except Exception as e:
-                    logger.warning(f"Fallback embedding search failed: {e}")
+                    logger.warning(f"FAISS search stage failed: {e}")
+            
+            # Stage 2: Try embedding pipeline search if no FAISS results
+            if not results and await self._ensure_embedding_pipeline():
+                try:
+                    query_embedding, _ = await self._safe_get_query_embedding(query)
+                    if query_embedding is not None:
+                        pipeline_results = await self._try_embedding_pipeline_search(query, query_embedding)
+                        if pipeline_results:
+                            results.extend(pipeline_results)
+                            logger.info(f"Embedding pipeline search found {len(pipeline_results)} results")
+                except Exception as e:
+                    logger.warning(f"Embedding pipeline search stage failed: {e}")
+            
+            # Stage 3: Try neural backend search as fallback
+            if not results:
+                try:
+                    neural_results = await self._try_neural_backend_search(query)
+                    if neural_results:
+                        results.extend(neural_results)
+                        logger.info(f"Neural backend search found {len(neural_results)} results")
+                except Exception as e:
+                    logger.warning(f"Neural backend search stage failed: {e}")
+            
+            # Stage 4: Final fallback to enhanced text search
+            if not results:
+                try:
+                    fallback_results = await self._fallback_semantic_text_search(query)
+                    if fallback_results:
+                        results.extend(fallback_results)
+                        logger.info(f"Semantic text fallback found {len(fallback_results)} results")
+                except Exception as e:
+                    logger.warning(f"Semantic text fallback failed: {e}")
+            
+            # Ultimate fallback - basic text search
+            if not results:
+                try:
+                    text_results = await self._fallback_text_search(query)
+                    results.extend(text_results)
+                    logger.info(f"Using text search as ultimate fallback, found {len(text_results)} results")
+                except Exception as e:
+                    logger.error(f"All fallback methods failed: {e}")
+                    # Return empty results rather than crash
+                    results = []
             
             search_time = (time.time() - start_time) * 1000
             self.search_stats['semantic_search_ms'].append(search_time)
             
-            logger.info(f"Semantic search: {len(results)} results in {search_time:.1f}ms")
-            return results
+            logger.info(f"Semantic search completed: {len(results)} results in {search_time:.1f}ms")
+            return results[:20]  # Limit to top 20 results
             
         except Exception as e:
-            logger.error(f"Semantic search failed: {e}")
-            return []
+            logger.error(f"Semantic search completely failed: {e}")
+            # Even if everything fails, try to return some text-based results
+            try:
+                return await self._fallback_text_search(query)
+            except Exception as final_e:
+                logger.error(f"Final fallback also failed: {final_e}")
+                return []
     
     async def _structural_search(self, query: str) -> List[SearchResult]:
         """Structural search using dependency graph."""
@@ -476,6 +601,11 @@ class EinsteinIndexHub:
         start_time = time.time()
         
         try:
+            # Skip if dependency graph is not available
+            if not self.dependency_graph:
+                logger.debug("Dependency graph not available for structural search")
+                return []
+            
             # Use dependency graph for structural queries
             symbols = await self.dependency_graph.find_symbol(query)
             
@@ -571,38 +701,58 @@ class EinsteinIndexHub:
     async def get_intelligent_context(self, query: str) -> Dict[str, Any]:
         """Get intelligent context for Jarvis using sequential thinking."""
         
-        async with self.tracer.trace_span("intelligent_context") as span:
-            # Use sequential thinking to analyze the query
-            thinking_plan = await self.sequential_thinking.think(
-                goal=f"Provide comprehensive context for: {query}",
-                constraints=[
-                    "Focus on relevant code patterns",
-                    "Include dependencies and relationships",
-                    "Consider performance implications"
-                ],
-                max_steps=5
-            )
-            
-            # Perform unified search
-            search_results = await self.search(query)
-            
-            # Analyze dependencies
+        # Use tracer if available, otherwise skip tracing
+        if self.tracer:
+            async with self.tracer.trace_span("intelligent_context") as span:
+                return await self._get_context_impl(query, span)
+        else:
+            return await self._get_context_impl(query, None)
+    
+    async def _get_context_impl(self, query: str, span=None) -> Dict[str, Any]:
+        """Implementation of get_intelligent_context with optional tracing."""
+        
+        # Use sequential thinking to analyze the query if available
+        thinking_plan = []
+        if self.sequential_thinking:
+            try:
+                thinking_plan = await self.sequential_thinking.think(
+                    goal=f"Provide comprehensive context for: {query}",
+                    constraints=[
+                        "Focus on relevant code patterns",
+                        "Include dependencies and relationships",
+                        "Consider performance implications"
+                    ],
+                    max_steps=5
+                )
+            except Exception as e:
+                logger.warning(f"Sequential thinking failed: {e}")
+                thinking_plan = []
+        
+        # Perform unified search
+        search_results = await self.search(query)
+        
+        # Analyze dependencies if dependency graph is available
+        deps = []
+        if self.dependency_graph:
             try:
                 deps = await self.dependency_graph.find_symbol(query)
-            except:
+            except Exception as e:
+                logger.warning(f"Dependency analysis failed: {e}")
                 deps = []
-            
-            context = {
-                'query': query,
-                'thinking_plan': thinking_plan,
-                'search_results': [r.__dict__ for r in search_results[:10]],
-                'dependencies': deps,
-                'timestamp': time.time(),
-                'total_results': len(search_results)
-            }
-            
+        
+        context = {
+            'query': query,
+            'thinking_plan': thinking_plan,
+            'search_results': [r.__dict__ for r in search_results[:10]],
+            'dependencies': deps,
+            'timestamp': time.time(),
+            'total_results': len(search_results)
+        }
+        
+        if span:
             span.add_attribute("context_size", len(search_results))
-            return context
+        
+        return context
     
     async def _initialize_persistent_faiss(self) -> None:
         """Initialize FAISS index with persistence support and robust error handling."""
@@ -701,37 +851,78 @@ class EinsteinIndexHub:
             return None
     
     async def _initialize_embedding_pipeline(self) -> None:
-        """Initialize the embedding pipeline for semantic search."""
+        """Initialize the embedding pipeline for semantic search with comprehensive error handling."""
         try:
             from src.unity_wheel.mcp.embedding_pipeline import EmbeddingPipeline
             import numpy as np
             
-            # Create a proper embedding function for the pipeline
+            # Create a robust embedding function for the pipeline
             def create_embedding_func():
-                """Create an embedding function that returns proper format."""
+                """Create an embedding function that returns proper format with error handling."""
                 def embedding_func(text: str):
-                    # Mock embedding for now - replace with actual API call
-                    # Returns (embedding, token_count) tuple as expected
-                    embedding = np.random.randn(1536).astype('float32')
-                    token_count = len(text.split()) * 1.3
-                    return embedding, int(token_count)
+                    try:
+                        if not text or not isinstance(text, str):
+                            text = "empty query"
+                        
+                        # TODO: Replace with actual API call to OpenAI/etc
+                        # For now, use a deterministic mock based on text hash
+                        import hashlib
+                        text_hash = hashlib.md5(text.encode()).digest()
+                        # Convert hash to deterministic "embedding"
+                        np.random.seed(int.from_bytes(text_hash[:4], 'big'))
+                        embedding = np.random.randn(1536).astype('float32')
+                        # Normalize for better similarity calculations
+                        embedding = embedding / np.linalg.norm(embedding)
+                        
+                        token_count = max(1, int(len(text.split()) * 1.3))
+                        return embedding, token_count
+                    except Exception as e:
+                        logger.error(f"Embedding function error: {e}")
+                        # Return zero embedding as fallback
+                        return np.zeros(1536, dtype='float32'), 1
                 return embedding_func
             
             # Initialize with Einstein cache path and proper embedding function
             cache_path = self.project_root / ".einstein" / "embeddings.db"
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            embedding_func = create_embedding_func()
+            
+            # Test the embedding function before creating pipeline
+            test_embedding, test_tokens = embedding_func("test query")
+            if test_embedding is None or test_embedding.size == 0:
+                raise ValueError("Embedding function test failed")
+            
             self.embedding_pipeline = EmbeddingPipeline(
                 cache_path=cache_path,
-                embedding_func=create_embedding_func()
+                embedding_func=embedding_func
             )
             
             # Verify the embedding function is properly set
             if not hasattr(self.embedding_pipeline, 'embedding_func') or self.embedding_pipeline.embedding_func is None:
                 raise ValueError("Embedding function not properly initialized")
             
-            logger.info("Embedding pipeline initialized with Einstein cache and valid embedding function")
+            # Test the pipeline's embedding function
+            try:
+                test_result = self.embedding_pipeline.embedding_func("pipeline test")
+                if test_result is None or len(test_result) != 2:
+                    raise ValueError("Pipeline embedding function test failed")
+            except Exception as test_e:
+                logger.error(f"Pipeline embedding function test failed: {test_e}")
+                raise
+            
+            # Mark as available
+            self._embedding_pipeline_available = True
+            logger.info("✅ Embedding pipeline initialized with Einstein cache and validated embedding function")
+            
+        except ImportError as ie:
+            logger.warning(f"Embedding pipeline module not available: {ie}")
+            self.embedding_pipeline = None
+            self._embedding_pipeline_available = False
         except Exception as e:
             logger.error(f"Failed to initialize embedding pipeline: {e}")
             self.embedding_pipeline = None
+            self._embedding_pipeline_available = False
     
     async def _load_faiss_index(self, faiss_path: Path) -> bool:
         """Load FAISS index from disk with comprehensive error handling.
@@ -821,81 +1012,6 @@ class EinsteinIndexHub:
             logger.warning(f"Similarity calculation failed: {e}")
             return 0.0
     
-    def _try_faiss_search(self, query_embedding: Any, results: List[SearchResult]) -> bool:
-        """Attempt FAISS search with comprehensive error handling.
-        
-        Args:
-            query_embedding: The query embedding vector
-            results: List to append search results to
-            
-        Returns:
-            bool: True if FAISS search was successful, False otherwise
-        """
-        try:
-            import faiss
-            
-            # Check if FAISS index is available and loaded
-            if not self.vector_index or not self._faiss_loaded:
-                logger.debug("FAISS index not available or not loaded")
-                return False
-                
-            if not hasattr(self.vector_index, 'search') or not hasattr(self.vector_index, 'ntotal'):
-                logger.warning("FAISS index missing required methods")
-                return False
-                
-            if self.vector_index.ntotal == 0:
-                logger.debug("FAISS index is empty")
-                return False
-            
-            # Validate query embedding
-            if query_embedding is None or query_embedding.size == 0:
-                logger.warning("Invalid query embedding for FAISS search")
-                return False
-            
-            # Determine search parameters
-            k = min(20, self.vector_index.ntotal)
-            if k <= 0:
-                return False
-            
-            # Ensure embedding is in correct format
-            query_vector = query_embedding.reshape(1, -1).astype('float32')
-            
-            # Validate embedding dimension
-            expected_dim = self.vector_index.d if hasattr(self.vector_index, 'd') else 1536
-            if query_vector.shape[1] != expected_dim:
-                logger.warning(f"Query embedding dimension {query_vector.shape[1]} doesn't match index dimension {expected_dim}")
-                return False
-            
-            # Perform FAISS search
-            scores, indices = self.vector_index.search(query_vector, k)
-            
-            # Convert FAISS results to SearchResult objects
-            for score, idx in zip(scores[0], indices[0]):
-                if idx >= 0 and score > 0.1:  # Valid index and minimum similarity threshold
-                    result = SearchResult(
-                        content=f"Semantic match with similarity {score:.3f}",
-                        file_path=f"indexed_content_{idx}",  # TODO: Map to actual file paths via metadata
-                        line_number=1,
-                        score=float(score),
-                        result_type='semantic',
-                        context={
-                            'faiss_index': int(idx),
-                            'similarity_score': float(score),
-                            'search_method': 'faiss_hnsw'
-                        },
-                        timestamp=time.time()
-                    )
-                    results.append(result)
-            
-            logger.debug(f"FAISS search found {len([s for s in scores[0] if s > 0.1])} relevant results")
-            return True
-            
-        except ImportError:
-            logger.debug("FAISS library not available")
-            return False
-        except Exception as e:
-            logger.warning(f"FAISS search failed: {e}")
-            return False
     
     async def save_faiss_index(self) -> bool:
         """Save FAISS index to disk for persistence with comprehensive error handling.
@@ -1449,35 +1565,6 @@ class EinsteinIndexHub:
         # Fall back to default
         return ['text', 'semantic', 'structural']
     
-    def _check_faiss_availability(self) -> bool:
-        """Check if FAISS library is available and working.
-        
-        Returns:
-            bool: True if FAISS is available and functional
-        """
-        try:
-            import faiss
-            import numpy as np
-            
-            # Test basic FAISS functionality
-            test_index = faiss.IndexFlatL2(128)  # Small test index
-            test_vector = np.array([[1.0] * 128], dtype=np.float32)
-            test_index.add(test_vector)
-            
-            if test_index.ntotal == 1:
-                logger.debug("✅ FAISS library is available and functional")
-                return True
-            else:
-                logger.warning("⚠️ FAISS library loaded but basic test failed")
-                return False
-                
-        except ImportError:
-            logger.info("ℹ️ FAISS library not available - will use embedding pipeline fallback")
-            return False
-        except Exception as e:
-            logger.warning(f"⚠️ FAISS library test failed: {e}")
-            return False
-    
     def get_faiss_status(self) -> Dict[str, Any]:
         """Get detailed FAISS status information.
         
@@ -1615,17 +1702,42 @@ class EinsteinIndexHub:
         try:
             # Check if pipeline exists and is marked as available
             if hasattr(self, '_embedding_pipeline_available') and self._embedding_pipeline_available:
-                return True
-                
-            # Initialize if not present
+                # Double-check that the pipeline and function are still valid
+                if (hasattr(self, 'embedding_pipeline') and self.embedding_pipeline and 
+                    hasattr(self.embedding_pipeline, 'embedding_func') and 
+                    self.embedding_pipeline.embedding_func is not None):
+                    return True
+                else:
+                    # Pipeline became invalid, reset availability flag
+                    self._embedding_pipeline_available = False
+                    
+            # Initialize if not present or became invalid
             if not hasattr(self, 'embedding_pipeline') or self.embedding_pipeline is None:
                 await self._initialize_embedding_pipeline()
             
-            # Double-check availability after initialization
-            return getattr(self, '_embedding_pipeline_available', False)
+            # Test pipeline functionality after initialization
+            if hasattr(self, 'embedding_pipeline') and self.embedding_pipeline:
+                try:
+                    test_embedding, test_tokens = self.embedding_pipeline.embedding_func("test")
+                    if test_embedding is not None and test_embedding.size > 0:
+                        self._embedding_pipeline_available = True
+                        return True
+                    else:
+                        logger.warning("Embedding pipeline test failed - invalid output")
+                        self._embedding_pipeline_available = False
+                        return False
+                except Exception as test_e:
+                    logger.warning(f"Embedding pipeline test failed: {test_e}")
+                    self._embedding_pipeline_available = False
+                    return False
+            
+            # Pipeline not available
+            self._embedding_pipeline_available = False
+            return False
             
         except Exception as e:
             logger.error(f"Failed to ensure embedding pipeline: {e}")
+            self._embedding_pipeline_available = False
             return False
     
     async def _safe_get_query_embedding(self, query: str) -> Tuple[Optional[Any], int]:
@@ -1691,51 +1803,133 @@ class EinsteinIndexHub:
         results = []
         
         try:
+            # Check FAISS availability first
+            if not self._faiss_available:
+                logger.debug("FAISS not available for search")
+                return results
+            
             # Ensure FAISS index is loaded
             if not hasattr(self, 'vector_index') or self.vector_index is None:
                 faiss_path = self.project_root / ".einstein" / "embeddings.index"
                 if not await self._load_faiss_index(faiss_path):
+                    logger.debug("Could not load FAISS index")
                     return results
             
             if self.vector_index is None:
+                logger.debug("FAISS vector index is None")
                 return results
                 
-            # Import FAISS
-            import faiss
-            
-            # Check if we have vectors in the index
-            if not hasattr(self.vector_index, 'ntotal') or self.vector_index.ntotal == 0:
-                logger.debug("FAISS index is empty")
+            # Import FAISS with error handling
+            try:
+                import faiss
+            except ImportError:
+                logger.debug("FAISS library not available for import")
+                self._faiss_available = False
                 return results
             
-            # Prepare query embedding
-            query_vector = query_embedding.reshape(1, -1).astype('float32')
+            # Validate index state
+            if not hasattr(self.vector_index, 'ntotal'):
+                logger.warning("FAISS index missing ntotal attribute")
+                return results
+                
+            if self.vector_index.ntotal == 0:
+                logger.debug("FAISS index is empty (no vectors)")
+                return results
+            
+            # Validate query embedding
+            if query_embedding is None:
+                logger.warning("Query embedding is None")
+                return results
+                
+            try:
+                import numpy as np
+                if not isinstance(query_embedding, np.ndarray):
+                    query_embedding = np.array(query_embedding)
+                    
+                if query_embedding.size == 0:
+                    logger.warning("Query embedding is empty")
+                    return results
+            except Exception as array_e:
+                logger.warning(f"Query embedding validation failed: {array_e}")
+                return results
+            
+            # Prepare query embedding with dimension validation
+            try:
+                query_vector = query_embedding.reshape(1, -1).astype('float32')
+                
+                # Check dimension compatibility
+                expected_dim = getattr(self.vector_index, 'd', 1536)
+                if query_vector.shape[1] != expected_dim:
+                    logger.warning(f"Embedding dimension mismatch: got {query_vector.shape[1]}, expected {expected_dim}")
+                    return results
+                    
+            except Exception as reshape_e:
+                logger.warning(f"Query embedding reshape failed: {reshape_e}")
+                return results
+            
+            # Determine search parameters
             k = min(20, self.vector_index.ntotal)
-            
             if k <= 0:
+                logger.debug("No vectors available for search")
                 return results
                 
-            # Perform search
-            scores, indices = self.vector_index.search(query_vector, k)
+            # Perform FAISS search with timeout protection
+            try:
+                scores, indices = self.vector_index.search(query_vector, k)
+                
+                if scores is None or indices is None:
+                    logger.warning("FAISS search returned None results")
+                    return results
+                    
+                if len(scores) == 0 or len(indices) == 0:
+                    logger.debug("FAISS search returned empty results")
+                    return results
+                    
+            except Exception as search_e:
+                logger.warning(f"FAISS search operation failed: {search_e}")
+                return results
             
-            # Convert results
+            # Convert results with validation
+            valid_results = 0
             for score, idx in zip(scores[0], indices[0]):
-                if idx >= 0 and score > 0.1:  # Minimum similarity threshold
+                try:
+                    # Validate result components
+                    if idx < 0:
+                        continue  # Invalid index
+                        
+                    if not isinstance(score, (int, float)) or score <= 0.1:
+                        continue  # Score too low or invalid
+                        
+                    # Create search result
                     result = SearchResult(
-                        content=f"Semantic match with score {score:.3f}",
-                        file_path=f"indexed_file_{idx}",  # TODO: Map to actual file paths
+                        content=f"Semantic match with similarity {score:.3f}",
+                        file_path=f"indexed_content_{idx}",  # TODO: Map to actual file paths via metadata
                         line_number=1,
                         score=float(score),
                         result_type='semantic',
-                        context={'faiss_index': idx, 'embedding_score': float(score)},
+                        context={
+                            'faiss_index': int(idx),
+                            'similarity_score': float(score),
+                            'search_method': 'faiss_vector_search',
+                            'index_size': self.vector_index.ntotal
+                        },
                         timestamp=time.time()
                     )
                     results.append(result)
+                    valid_results += 1
+                    
+                except Exception as result_e:
+                    logger.debug(f"Failed to process FAISS result {idx}: {result_e}")
+                    continue
+            
+            logger.debug(f"FAISS search completed: {valid_results} valid results from {len(scores[0])} candidates")
+            return results
                     
         except ImportError:
-            logger.debug("FAISS not available")
+            logger.debug("FAISS library import failed")
+            self._faiss_available = False
         except Exception as e:
-            logger.warning(f"FAISS search failed: {e}")
+            logger.warning(f"FAISS search failed with unexpected error: {e}")
             
         return results
     

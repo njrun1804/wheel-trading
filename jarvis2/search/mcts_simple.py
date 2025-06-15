@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 
 """Simplified MCTS that actually works."""
-from __future__ import annotations
 
 import logging
 from typing import Any, Dict, Optional
@@ -18,7 +19,7 @@ class SimplifiedMCTS:
         self._initialized = False
         logger.info('SimplifiedMCTS created')
 
-    def initialize(self):
+    async def initialize(self):
         """Initialize MCTS."""
         logger.info('SimplifiedMCTS initialized')
         self._initialized = True

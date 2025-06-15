@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 
 """Code Policy Network for action selection.
 
 Guides MCTS exploration by predicting promising code transformations.
 """
-from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 

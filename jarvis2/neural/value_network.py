@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 
 """Code Value Network for quality evaluation.
 
 Evaluates code quality across multiple dimensions using neural networks.
 """
-from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 

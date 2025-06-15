@@ -241,6 +241,8 @@ class NeuralWorkerPool:
 
     def get_next_worker(self) ->NeuralWorkerProcess:
         """Round-robin worker selection."""
+        if not self.workers:
+            raise RuntimeError("No neural workers available")
         worker = self.workers[self.current_worker]
         self.current_worker = (self.current_worker + 1) % len(self.workers)
         return worker

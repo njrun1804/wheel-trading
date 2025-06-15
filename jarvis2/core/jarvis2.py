@@ -22,6 +22,12 @@ from ..hardware.hardware_optimizer import HardwareAwareExecutor
 from ..index.index_manager import DeepIndexManager
 from .solution import CodeSolution, SolutionMetrics
 
+# Conditional import for meta system components
+try:
+    from src.unity_wheel.accelerated_tools.sequential_thinking_config import SequentialThinkingEngine
+except ImportError:
+    SequentialThinkingEngine = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -133,7 +139,7 @@ class ComplexityEstimate:
 class Jarvis2:
     """Main Jarvis 2.0 coordinator."""
 
-    def __init__(self, config: Optional[Jarvis2Config]=None):
+    def __init__(self, config: Optional[Jarvis2Config]=None, enable_meta: bool = False):
         self.config = config or Jarvis2Config()
         self._current_memory_pressure = 0.0
         self._adaptive_batch_size = self.config.gpu_batch_size
@@ -146,11 +152,33 @@ class Jarvis2:
         self.evaluator = MultiObjectiveEvaluator()
         self.experience_buffer = ExperienceReplaySystem(self.config.
             experience_path, buffer_size=self.config.experience_buffer_size)
+        # Lazy load sequential thinking to prevent meta auto-spawn
+        self._sequential_thinking = None
+        self._meta_enabled = enable_meta
         self._initialized = False
         self._background_tasks: List[asyncio.Task] = []
         self._last_index_update = 0
         self._total_assists = 0
         self._performance_history: List[float] = []
+
+    def _get_sequential_thinking(self):
+        """Lazy load sequential thinking to prevent meta auto-spawn."""
+        if self._sequential_thinking is None:
+            if self._meta_enabled:
+                from src.unity_wheel.accelerated_tools.sequential_thinking_config import SequentialThinkingEngine
+                self._sequential_thinking = SequentialThinkingEngine(use_mcp=False)
+            else:
+                # Dummy implementation when meta is disabled
+                class DummySequentialThinking:
+                    async def think(self, *args, **kwargs):
+                        return [{"action": "Sequential thinking disabled (meta not enabled)", "confidence": 0.5}]
+                self._sequential_thinking = DummySequentialThinking()
+        return self._sequential_thinking
+
+    def enable_meta_integration(self):
+        """Enable meta system integration."""
+        self._meta_enabled = True
+        self._sequential_thinking = None  # Reset to reload with meta
 
     async def initialize(self):
         """Initialize all components with proper integration."""
@@ -214,6 +242,32 @@ class Jarvis2:
             logger.info(
                 f'Complexity: {complexity.score:.2f} (simulations: {complexity.suggested_simulations})'
                 )
+            
+            # Use sequential thinking for complex tasks
+            thinking_plan = None
+            if complexity.is_complex:
+                logger.info('Using hardware-accelerated sequential thinking for planning...')
+                thinking_result = await self._get_sequential_thinking().think_through_problem(
+                    problem=f"Plan approach for: {query}",
+                    constraints=[
+                        "Consider existing codebase patterns",
+                        "Optimize for performance and hardware utilization",
+                        "Break down into implementable steps",
+                        "Identify potential challenges"
+                    ],
+                    context=indexed_context,
+                    max_steps=50,
+                    strategy='parallel_explore'
+                )
+                thinking_plan = thinking_result
+                logger.info(f"Sequential thinking completed {len(thinking_result['steps'])} steps")
+                
+                # Update context with thinking insights
+                indexed_context['thinking_plan'] = thinking_plan
+                indexed_context['implementation_steps'] = [
+                    step for step in thinking_result['steps'] 
+                    if 'implement' in step['action'].lower()
+                ]
             current_memory = psutil.virtual_memory()
             self._current_memory_pressure = current_memory.percent / 100.0
             if self._current_memory_pressure > 0.8:
