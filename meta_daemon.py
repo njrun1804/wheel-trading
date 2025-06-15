@@ -495,4 +495,8 @@ async def main():
 
 
 if __name__ == "__main__":
+    import os
+    if os.environ.get('DISABLE_META_AUTOSTART') == '1':
+        print("⚠️ Meta Daemon blocked by DISABLE_META_AUTOSTART=1")
+        sys.exit(0)
     asyncio.run(main())

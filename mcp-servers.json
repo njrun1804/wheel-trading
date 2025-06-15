@@ -1,5 +1,12 @@
 {
   "mcpServers": {
+    "_disabled_servers": {
+      "note": "Disabled MCP servers - using hardware-accelerated local tools instead",
+      "ripgrep": "replaced by ripgrep_turbo (30x faster)",
+      "dependency_graph": "replaced by dependency_graph_turbo (12x faster)", 
+      "python_analysis": "replaced by python_analysis_turbo (173x faster)",
+      "duckdb": "replaced by duckdb_turbo (no MCP overhead)"
+    },
     "filesystem": {
       "transport": "stdio",
       "command": "npx",
@@ -57,9 +64,9 @@
         "@modelcontextprotocol/server-sequential-thinking@latest"
       ],
       "env": {
-        "NODE_OPTIONS": "--max-old-space-size=512",
-        "THINKING_MAX_STEPS": "20",
-        "THINKING_TIMEOUT": "30000"
+        "NODE_OPTIONS": "--max-old-space-size=2048",
+        "THINKING_MAX_STEPS": "100",
+        "THINKING_TIMEOUT": "300000"
       }
     },
     "puppeteer": {

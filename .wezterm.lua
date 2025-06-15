@@ -14,9 +14,12 @@ config.font_size = 13.0
 
 -- GPU Acceleration for M4 Pro
 config.webgpu_preferred_adapter = 'Metal'
+config.webgpu_power_preference = 'high-performance'
 config.front_end = 'WebGpu'
 config.max_fps = 120
 config.animation_fps = 60
+config.enable_wayland = false
+config.enable_kitty_graphics = true
 
 -- Window settings
 config.window_decorations = "RESIZE"
@@ -26,6 +29,8 @@ config.macos_window_background_blur = 10
 -- Tab bar
 config.hide_tab_bar_if_only_one_tab = true
 config.tab_bar_at_bottom = true
+config.show_new_tab_button_in_tab_bar = false
+config.use_fancy_tab_bar = false
 
 -- Environment variables (defaults, can be overridden by shell)
 config.set_environment_variables = {
@@ -68,6 +73,10 @@ config.keys = {
     label = 'Startup',
     args = { 'bash', '-c', './startup_unified.sh' },
   }},
+  { key = 'c', mods = 'CMD|SHIFT', action = wezterm.action.SpawnCommandInNewTab {
+    label = 'Claude (Auto-Accept)',
+    args = { 'claude', '--dangerously-skip-permissions' },
+  }},
 }
 
 -- Status bar showing environment info
@@ -100,50 +109,34 @@ wezterm.on('update-status', function(window, pane)
   window:set_left_status(wezterm.format(status_items))
 end)
 
--- Auto-split configuration on startup
-wezterm.on('gui-startup', function(cmd)
-  local args = {}
-  if cmd then
-    args = cmd.args
-  end
+-- Launch menu for quick access to Claude with different modes
+config.launch_menu = {
+  {
+    label = 'Claude (Auto-Accept)',
+    args = { 'claude', '--dangerously-skip-permissions' },
+  },
+  {
+    label = 'Claude (Safe Mode)', 
+    args = { 'claude' },
+  },
+  {
+    label = 'Trading System',
+    args = { 'python', 'run.py' },
+    cwd = wezterm.home_dir .. '/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading',
+  },
+  {
+    label = 'Jarvis2',
+    args = { 'python', '-m', 'jarvis2' },
+    cwd = wezterm.home_dir .. '/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading',
+  },
+}
 
-  -- Get the current working directory
-  local cwd = wezterm.home_dir
-  
-  -- Set default working directory for wheel-trading
-  local wheel_root = wezterm.home_dir .. '/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading'
-  
-  -- Only auto-split if we're in the wheel-trading directory
-  if cwd:find("wheel%-trading") or cwd == wheel_root then
-    -- Main tab with development pane
-    local tab, main_pane, window = wezterm.mux.spawn_window {
-      cwd = cwd,
-    }
-    
-    -- Split right for logs (40% width)
-    local log_pane = main_pane:split {
-      direction = 'Right',
-      size = 0.4,
-      cwd = cwd,
-    }
-    
-    -- Split the log pane horizontally for metrics (30% height)
-    local metric_pane = log_pane:split {
-      direction = 'Bottom',
-      size = 0.3,
-      cwd = cwd,
-    }
-    
-    -- Send commands to each pane
-    main_pane:send_text('# Main development pane\n')
-    main_pane:send_text('echo "🚀 Ready for development"\n')
-    
-    log_pane:send_text('# Log viewer pane\n')
-    log_pane:send_text('tail -f logs/*.log 2>/dev/null || echo "Logs will appear here"\n')
-    
-    metric_pane:send_text('# Metrics pane\n')
-    metric_pane:send_text('watch -n 2 "echo System Status: && uptime && echo && df -h . | tail -1"\n')
-  end
+-- Disable auto-startup behavior to prevent doom scrolling
+-- Comment out the gui-startup handler completely
+--[[
+wezterm.on('gui-startup', function(cmd)
+  -- Disabled to prevent automatic command execution and scrolling
 end)
+--]]
 
 return config

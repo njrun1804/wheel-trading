@@ -6,16 +6,18 @@ Dynamically adjusts concurrency limits based on:
 - System resource utilization (CPU, memory)
 - Historical performance metrics
 - Operation type characteristics
-- M4 Pro hardware optimization
+- Hardware-optimized configurations
 """
 
 import asyncio
-import psutil
-import time
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
-from collections import deque
 import logging
+import time
+from collections import deque
+from dataclasses import dataclass
+
+import psutil
+
+from .einstein_config import get_einstein_config
 
 logger = logging.getLogger(__name__)
 
@@ -43,15 +45,17 @@ class ConcurrencyConfig:
 
 
 class AdaptiveConcurrencyManager:
-    """Manages dynamic concurrency limits for optimal M4 Pro performance."""
+    """Manages dynamic concurrency limits for optimal hardware performance."""
     
-    def __init__(self, cpu_cores: int = 12):
-        self.cpu_cores = cpu_cores
-        self.base_memory_gb = psutil.virtual_memory().total / (1024**3)
+    def __init__(self):
+        self.config = get_einstein_config()
+        self.cpu_cores = self.config.hardware.cpu_cores
+        self.cpu_perf_cores = self.config.hardware.cpu_performance_cores
+        self.base_memory_gb = self.config.hardware.memory_total_gb
         
         # Performance history (sliding window)
-        self.performance_history: Dict[str, deque] = {}
-        self.history_window_size = 50
+        self.performance_history: dict[str, deque] = {}
+        self.history_window_size = self.config.monitoring.performance_history_size
         
         # Concurrency configurations for different operation types
         self.configs = {
@@ -60,67 +64,76 @@ class AdaptiveConcurrencyManager:
                 base_limit=self.cpu_cores,        # Can use all cores
                 min_limit=1,
                 max_limit=self.cpu_cores * 2,    # Hyperthreading
-                target_duration_ms=5.0,          # Very fast target
+                target_duration_ms=self.config.performance.target_text_search_ms,
                 current_limit=self.cpu_cores
             ),
             'semantic_search': ConcurrencyConfig(
                 operation_type='semantic_search',
-                base_limit=4,                     # GPU/MLX bound
+                base_limit=max(2, self.cpu_perf_cores // 2),  # Use performance cores
                 min_limit=1,
-                max_limit=8,                      # Don't overwhelm GPU
-                target_duration_ms=20.0,         # Reasonable for embeddings
-                current_limit=4
+                max_limit=self.config.performance.max_embedding_concurrency,
+                target_duration_ms=self.config.performance.target_semantic_search_ms,
+                current_limit=max(2, self.cpu_perf_cores // 2)
             ),
             'structural_search': ConcurrencyConfig(
                 operation_type='structural_search',
-                base_limit=6,                     # Graph traversal
+                base_limit=max(2, self.cpu_cores // 2),     # Graph traversal
                 min_limit=2,
                 max_limit=self.cpu_cores,
-                target_duration_ms=10.0,
-                current_limit=6
+                target_duration_ms=self.config.performance.target_structural_search_ms,
+                current_limit=max(2, self.cpu_cores // 2)
             ),
             'analytical_search': ConcurrencyConfig(
                 operation_type='analytical_search',
-                base_limit=8,                     # DuckDB can use multiple cores
+                base_limit=self.config.performance.max_analysis_concurrency,
                 min_limit=2,
                 max_limit=self.cpu_cores,
-                target_duration_ms=15.0,
-                current_limit=8
+                target_duration_ms=self.config.performance.target_analytical_search_ms,
+                current_limit=self.config.performance.max_analysis_concurrency
             ),
             'file_analysis': ConcurrencyConfig(
                 operation_type='file_analysis',
-                base_limit=self.cpu_cores // 2,  # I/O + CPU bound
+                base_limit=self.config.performance.max_file_io_concurrency // 2,
                 min_limit=2,
-                max_limit=self.cpu_cores,
+                max_limit=self.config.performance.max_file_io_concurrency,
                 target_duration_ms=100.0,        # File analysis takes longer
-                current_limit=self.cpu_cores // 2
+                current_limit=self.config.performance.max_file_io_concurrency // 2
             ),
             'embedding_generation': ConcurrencyConfig(
                 operation_type='embedding_generation',
-                base_limit=2,                     # MLX GPU bound
+                base_limit=2 if self.config.enable_gpu_acceleration else 1,
                 min_limit=1,
-                max_limit=4,                      # Limited by GPU memory
-                target_duration_ms=50.0,
-                current_limit=2
+                max_limit=self.config.performance.max_embedding_concurrency // 2,
+                target_duration_ms=self.config.performance.target_embedding_ms,
+                current_limit=2 if self.config.enable_gpu_acceleration else 1
             )
         }
         
         # Initialize performance history
-        for op_type in self.configs.keys():
+        for op_type in self.configs:
             self.performance_history[op_type] = deque(maxlen=self.history_window_size)
         
         # System monitoring
-        self.system_load_history = deque(maxlen=20)
+        self.system_load_history = deque(maxlen=self.config.monitoring.system_load_history_size)
         self.adjustment_cooldown = {}  # Last adjustment time per operation
-        self.cooldown_period = 5.0  # Seconds between adjustments
+        self.cooldown_period = self.config.monitoring.cooldown_period_s
         
-        logger.info(f"Adaptive concurrency manager initialized for {self.cpu_cores}-core M4 Pro")
+        logger.info(f"Adaptive concurrency manager initialized for {self.cpu_cores}-core {self.config.hardware.platform_type}")
     
     async def get_semaphore(self, operation_type: str) -> asyncio.Semaphore:
         """Get an adaptive semaphore for the given operation type."""
         
         if operation_type not in self.configs:
-            logger.warning(f"Unknown operation type: {operation_type}, using default")
+            logger.warning(f"Unknown operation type: {operation_type}, using default semaphore",
+                          extra={
+                              'operation': 'get_semaphore',
+                              'operation_type': operation_type,
+                              'available_types': list(self.configs.keys()),
+                              'cpu_cores': self.cpu_cores,
+                              'default_semaphore_limit': 4,
+                              'platform_type': self.config.hardware.platform_type,
+                              'perf_cores': self.cpu_perf_cores
+                          })
             return asyncio.Semaphore(4)
         
         config = self.configs[operation_type]
@@ -130,7 +143,7 @@ class AdaptiveConcurrencyManager:
         
         return asyncio.Semaphore(config.current_limit)
     
-    async def record_performance(self, operation_type: str, duration_ms: float, 
+    def record_performance(self, operation_type: str, duration_ms: float, 
                                concurrency_level: int) -> None:
         """Record performance metrics for an operation."""
         
@@ -191,19 +204,33 @@ class AdaptiveConcurrencyManager:
             # Performance is poor, reduce concurrency if CPU is high
             if avg_cpu > 80 or current_cpu > 85:
                 new_limit = max(config.min_limit, old_limit - 1)
-                logger.debug(f"Reducing {operation_type} concurrency: {old_limit} -> {new_limit} (high CPU)")
+                logger.info(f"Reducing {operation_type} concurrency: {old_limit} -> {new_limit} (high CPU)",
+                           extra={
+                               'operation': 'concurrency_adjustment',
+                               'operation_type': operation_type,
+                               'old_limit': old_limit,
+                               'new_limit': new_limit,
+                               'reason': 'high_cpu',
+                               'avg_cpu': round(avg_cpu, 1),
+                               'current_cpu': round(current_cpu, 1),
+                               'avg_duration': round(avg_duration, 1),
+                               'target_duration': config.target_duration_ms,
+                               'performance_ratio': round(avg_duration / config.target_duration_ms, 2),
+                               'history_size': len(history)
+                           })
         
-        elif avg_duration < config.target_duration_ms * 0.7:
+        elif avg_duration < config.target_duration_ms * 0.7 and avg_cpu < 60 and current_cpu < 70 and current_memory < 80:
             # Performance is good, increase concurrency if resources available
-            if avg_cpu < 60 and current_cpu < 70 and current_memory < 80:
                 new_limit = min(config.max_limit, old_limit + 1)
-                logger.debug(f"Increasing {operation_type} concurrency: {old_limit} -> {new_limit} (low resource usage)")
+                logger.info(f"Increasing {operation_type} concurrency: {old_limit} -> {new_limit} (low resource usage)",
+                           extra={'operation': 'concurrency_adjustment', 'operation_type': operation_type, 'old_limit': old_limit, 'new_limit': new_limit, 'reason': 'low_resource_usage', 'avg_cpu': avg_cpu, 'current_cpu': current_cpu, 'current_memory': current_memory, 'avg_duration': avg_duration, 'target_duration': config.target_duration_ms})
         
         # System load-based adjustment
         if current_cpu > 90 or current_memory > 90:
             # System under heavy load, be conservative
             new_limit = max(config.min_limit, min(new_limit, config.base_limit // 2))
-            logger.debug(f"System overload, limiting {operation_type}: {old_limit} -> {new_limit}")
+            logger.warning(f"System overload, limiting {operation_type}: {old_limit} -> {new_limit}",
+                          extra={'operation': 'concurrency_adjustment', 'operation_type': operation_type, 'old_limit': old_limit, 'new_limit': new_limit, 'reason': 'system_overload', 'current_cpu': current_cpu, 'current_memory': current_memory, 'base_limit': config.base_limit, 'min_limit': config.min_limit, 'cpu_cores': self.cpu_cores})
         
         # Update if changed
         if new_limit != old_limit:
@@ -214,7 +241,7 @@ class AdaptiveConcurrencyManager:
                        f"(avg_duration: {avg_duration:.1f}ms, target: {config.target_duration_ms:.1f}ms, "
                        f"CPU: {current_cpu:.1f}%)")
     
-    def get_system_health(self) -> Dict[str, float]:
+    def get_system_health(self) -> dict[str, float]:
         """Get current system health metrics."""
         cpu_percent = psutil.cpu_percent(interval=None)
         memory = psutil.virtual_memory()
@@ -251,7 +278,7 @@ class AdaptiveConcurrencyManager:
         # Combined score (weighted average)
         return (cpu_score * 0.6 + memory_score * 0.4)
     
-    def get_performance_summary(self) -> Dict[str, Dict[str, float]]:
+    def get_performance_summary(self) -> dict[str, dict[str, float]]:
         """Get performance summary for all operation types."""
         
         summary = {}
@@ -314,7 +341,7 @@ class AdaptiveConcurrencyManager:
 
 
 # Global instance
-_adaptive_manager: Optional[AdaptiveConcurrencyManager] = None
+_adaptive_manager: AdaptiveConcurrencyManager | None = None
 
 
 def get_adaptive_concurrency_manager() -> AdaptiveConcurrencyManager:
@@ -342,7 +369,7 @@ class PerformanceTracker:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.start_time:
             duration_ms = (time.time() - self.start_time) * 1000
-            await self.manager.record_performance(
+            self.manager.record_performance(
                 self.operation_type, 
                 duration_ms, 
                 self.concurrency_level
@@ -355,14 +382,14 @@ if __name__ == "__main__":
         manager = get_adaptive_concurrency_manager()
         
         # Simulate some operations
-        for i in range(10):
+        for _i in range(10):
             # Test text search
             async with PerformanceTracker('text_search', 4):
-                await asyncio.sleep(0.005)  # 5ms operation
+                await asyncio.sleep(manager.config.performance.target_text_search_ms / 1000.0)  # Simulate text search
             
             # Test semantic search  
             async with PerformanceTracker('semantic_search', 2):
-                await asyncio.sleep(0.025)  # 25ms operation
+                await asyncio.sleep(manager.config.performance.target_semantic_search_ms / 1000.0)  # Simulate semantic search
         
         # Print performance summary
         summary = manager.get_performance_summary()

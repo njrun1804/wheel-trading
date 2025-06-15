@@ -10,12 +10,14 @@ Intelligently merges and ranks results from multiple search modalities:
 """
 
 import hashlib
+import logging
 from collections import defaultdict
-from typing import List, Dict, Any, Set, Tuple
 from dataclasses import dataclass
-import math
+from typing import Any
 
 from .unified_index import SearchResult
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -25,9 +27,9 @@ class MergedResult:
     file_path: str
     line_number: int
     combined_score: float
-    modality_scores: Dict[str, float]  # Score from each modality
-    source_modalities: List[str]       # Which modalities found this
-    context: Dict[str, Any]
+    modality_scores: dict[str, float]  # Score from each modality
+    source_modalities: list[str]       # Which modalities found this
+    context: dict[str, Any]
     timestamp: float
     relevance_rank: int = 0
 
@@ -47,28 +49,58 @@ class ResultMerger:
         # Boost for multi-modality results
         self.multi_modality_boost = 0.2
         
-    def merge_results(self, results_by_modality: Dict[str, List[SearchResult]]) -> List[MergedResult]:
+    def merge_results(self, results_by_modality: dict[str, list[SearchResult]]) -> list[MergedResult]:
         """Merge results from multiple modalities with intelligent ranking."""
         
-        # Group results by file + line for deduplication
-        result_groups = self._group_by_location(results_by_modality)
-        
-        # Create merged results
-        merged_results = []
-        for location, modality_results in result_groups.items():
-            merged = self._merge_location_group(location, modality_results)
-            merged_results.append(merged)
-        
-        # Rank by combined score
-        merged_results.sort(key=lambda r: r.combined_score, reverse=True)
-        
-        # Assign relevance ranks
-        for i, result in enumerate(merged_results):
-            result.relevance_rank = i + 1
-        
-        return merged_results
+        try:
+            if not results_by_modality:
+                logger.debug("No results to merge")
+                return []
+            
+            total_results = sum(len(results) for results in results_by_modality.values())
+            logger.debug(f"Merging {total_results} results from {len(results_by_modality)} modalities")
+            
+            # Group results by file + line for deduplication
+            result_groups = self._group_by_location(results_by_modality)
+            
+            # Create merged results
+            merged_results = []
+            for location, modality_results in result_groups.items():
+                try:
+                    merged = self._merge_location_group(location, modality_results)
+                    merged_results.append(merged)
+                except Exception as e:
+                    logger.warning(f"Failed to merge results for location {location}: {e}",
+                                  extra={
+                                      'operation': 'merge_location_group',
+                                      'error_type': type(e).__name__,
+                                      'location': str(location),
+                                      'modality_count': len(modality_results),
+                                      'modalities': list(modality_results.keys())
+                                  })
+                    continue
+            
+            # Rank by combined score
+            merged_results.sort(key=lambda r: r.combined_score, reverse=True)
+            
+            # Assign relevance ranks
+            for i, result in enumerate(merged_results):
+                result.relevance_rank = i + 1
+            
+            logger.debug(f"Successfully merged into {len(merged_results)} unique results")
+            return merged_results
+            
+        except Exception as e:
+            logger.error(f"Failed to merge results: {e}", exc_info=True,
+                        extra={
+                            'operation': 'merge_results',
+                            'error_type': type(e).__name__,
+                            'modality_count': len(results_by_modality) if results_by_modality else 0,
+                            'total_input_results': sum(len(results) for results in results_by_modality.values()) if results_by_modality else 0
+                        })
+            return []
     
-    def _group_by_location(self, results_by_modality: Dict[str, List[SearchResult]]) -> Dict[Tuple[str, int], Dict[str, SearchResult]]:
+    def _group_by_location(self, results_by_modality: dict[str, list[SearchResult]]) -> dict[tuple[str, int], dict[str, SearchResult]]:
         """Group results by file path and line number."""
         
         location_groups = defaultdict(dict)
@@ -80,61 +112,98 @@ class ResultMerger:
         
         return dict(location_groups)
     
-    def _merge_location_group(self, location: Tuple[str, int], modality_results: Dict[str, SearchResult]) -> MergedResult:
+    def _merge_location_group(self, location: tuple[str, int], modality_results: dict[str, SearchResult]) -> MergedResult:
         """Merge results from the same location across modalities."""
         
-        file_path, line_number = location
-        
-        # Combine content (prefer longest/most detailed)
-        content = max((r.content for r in modality_results.values()), 
-                     key=len, default="")
-        
-        # Calculate combined score
-        modality_scores = {}
-        weighted_scores = []
-        
-        for modality, result in modality_results.items():
-            modality_scores[modality] = result.score
-            weight = self.modality_weights.get(modality, 1.0)
-            weighted_scores.append(result.score * weight)
-        
-        # Base score is weighted average
-        if weighted_scores:
-            base_score = sum(weighted_scores) / len(weighted_scores)
-        else:
-            base_score = 0.0
-        
-        # Apply multi-modality boost
-        if len(modality_results) > 1:
-            base_score += self.multi_modality_boost
-        
-        # Ensure score doesn't exceed 1.0
-        combined_score = min(base_score, 1.0)
-        
-        # Merge contexts
-        merged_context = {}
-        for result in modality_results.values():
-            merged_context.update(result.context)
-        
-        # Add merger metadata
-        merged_context['merger_info'] = {
-            'modality_count': len(modality_results),
-            'source_modalities': list(modality_results.keys()),
-            'multi_modality_boost': len(modality_results) > 1
-        }
-        
-        return MergedResult(
-            content=content,
-            file_path=file_path,
-            line_number=line_number,
-            combined_score=combined_score,
-            modality_scores=modality_scores,
-            source_modalities=list(modality_results.keys()),
-            context=merged_context,
-            timestamp=max(r.timestamp for r in modality_results.values())
-        )
+        try:
+            file_path, line_number = location
+            
+            # Combine content (prefer longest/most detailed)
+            content = max((r.content for r in modality_results.values()), 
+                         key=len, default="")
+            
+            # Calculate combined score
+            modality_scores = {}
+            weighted_scores = []
+            
+            for modality, result in modality_results.items():
+                if not isinstance(result.score, (int, float)) or result.score < 0:
+                    logger.warning(f"Invalid score {result.score} for modality {modality}, using 0.0")
+                    score = 0.0
+                else:
+                    score = min(result.score, 1.0)  # Cap at 1.0
+                
+                modality_scores[modality] = score
+                weight = self.modality_weights.get(modality, 1.0)
+                weighted_scores.append(score * weight)
+            
+            # Base score is weighted average
+            if weighted_scores:
+                base_score = sum(weighted_scores) / len(weighted_scores)
+            else:
+                base_score = 0.0
+            
+            # Apply multi-modality boost
+            if len(modality_results) > 1:
+                base_score += self.multi_modality_boost
+            
+            # Ensure score doesn't exceed 1.0
+            combined_score = min(base_score, 1.0)
+            
+            # Merge contexts
+            merged_context = {}
+            for result in modality_results.values():
+                if hasattr(result, 'context') and isinstance(result.context, dict):
+                    merged_context.update(result.context)
+            
+            # Add merger metadata
+            merged_context['merger_info'] = {
+                'modality_count': len(modality_results),
+                'source_modalities': list(modality_results.keys()),
+                'multi_modality_boost': len(modality_results) > 1
+            }
+            
+            # Get timestamp with fallback
+            try:
+                timestamp = max(r.timestamp for r in modality_results.values() if hasattr(r, 'timestamp'))
+            except (ValueError, AttributeError):
+                import time
+                timestamp = time.time()
+            
+            return MergedResult(
+                content=content,
+                file_path=file_path,
+                line_number=line_number,
+                combined_score=combined_score,
+                modality_scores=modality_scores,
+                source_modalities=list(modality_results.keys()),
+                context=merged_context,
+                timestamp=timestamp
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to merge location group {location}: {e}", exc_info=True,
+                        extra={
+                            'operation': 'merge_location_group',
+                            'error_type': type(e).__name__,
+                            'location': str(location),
+                            'modality_count': len(modality_results),
+                            'modalities': list(modality_results.keys())
+                        })
+            # Return a fallback result
+            import time
+            return MergedResult(
+                content="",
+                file_path=str(location[0]) if len(location) > 0 else "unknown",
+                line_number=int(location[1]) if len(location) > 1 else 0,
+                combined_score=0.0,
+                modality_scores={},
+                source_modalities=[],
+                context={'error': 'merge_failed'},
+                timestamp=time.time()
+            )
     
-    def deduplicate_results(self, results: List[SearchResult]) -> List[SearchResult]:
+    def deduplicate_results(self, results: list[SearchResult]) -> list[SearchResult]:
         """Remove duplicate results based on content similarity."""
         
         seen_hashes = set()
@@ -157,7 +226,7 @@ class ResultMerger:
         content_str = f"{result.file_path}:{result.line_number}:{result.content}"
         return hashlib.md5(content_str.encode()).hexdigest()[:12]
     
-    def boost_relevant_results(self, results: List[MergedResult], query: str) -> List[MergedResult]:
+    def boost_relevant_results(self, results: list[MergedResult], query: str) -> list[MergedResult]:
         """Apply additional relevance boosting based on query analysis."""
         
         query_lower = query.lower()
@@ -185,12 +254,12 @@ class ResultMerger:
         
         return results
     
-    def filter_by_confidence(self, results: List[MergedResult], min_confidence: float = 0.3) -> List[MergedResult]:
+    def filter_by_confidence(self, results: list[MergedResult], min_confidence: float = 0.3) -> list[MergedResult]:
         """Filter results below minimum confidence threshold."""
         
         return [r for r in results if r.combined_score >= min_confidence]
     
-    def get_diversity_subset(self, results: List[MergedResult], max_results: int = 20) -> List[MergedResult]:
+    def get_diversity_subset(self, results: list[MergedResult], max_results: int = 20) -> list[MergedResult]:
         """Get diverse subset of results to avoid redundancy."""
         
         if len(results) <= max_results:
@@ -220,7 +289,7 @@ class ResultMerger:
         
         return diverse_results
     
-    def generate_search_summary(self, results: List[MergedResult], query: str) -> Dict[str, Any]:
+    def generate_search_summary(self, results: list[MergedResult], query: str) -> dict[str, Any]:
         """Generate summary of search results for reporting."""
         
         if not results:
@@ -255,8 +324,9 @@ class ResultMerger:
 
 if __name__ == "__main__":
     # Test the result merger
-    from unified_index import SearchResult
     import time
+
+    from unified_index import SearchResult
     
     # Create sample results
     text_results = [

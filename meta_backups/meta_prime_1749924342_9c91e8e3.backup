@@ -1,0 +1,293 @@
+"""
+MetaPrime - The Primordial Meta System
+
+This is the seed that will grow into a self-evolving meta-coding system.
+It starts by observing its own creation and modifications.
+
+Key Design Decisions:
+1. SQLite for observations (proven, built-in, zero dependencies)
+2. File watching for self-awareness (simple, reliable)
+3. Minimal surface area (easier to evolve)
+4. Explicit logging of all design decisions
+"""
+
+import sqlite3
+import time
+import hashlib
+import asyncio
+from pathlib import Path
+from typing import Dict, Any, Optional
+
+
+class MetaPrime:
+    """The first meta system - observes its own construction"""
+    
+    def __init__(self):
+        self.birth_time = time.time()
+        self.self_path = Path(__file__)
+        self.db_path = Path("meta_evolution.db")
+        
+        # Initialize storage
+        self.db = sqlite3.connect(str(self.db_path))
+        self._init_schema()
+        
+        # Record birth
+        self.observe("birth", {
+            "timestamp": self.birth_time,
+            "file_path": str(self.self_path),
+            "initial_size": self.self_path.stat().st_size
+        })
+        
+        print(f"🌱 MetaPrime born at {time.ctime(self.birth_time)}")
+        print(f"📝 Observation database: {self.db_path}")
+        print(f"👁️  Watching file: {self.self_path}")
+        
+    def _init_schema(self):
+        """Create the observation schema"""
+        
+        # Core observations table
+        self.db.execute("""
+            CREATE TABLE IF NOT EXISTS observations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp REAL NOT NULL,
+                event_type TEXT NOT NULL,
+                details TEXT NOT NULL,
+                file_hash TEXT,
+                context TEXT
+            )
+        """)
+        
+        # Design decisions table
+        self.db.execute("""
+            CREATE TABLE IF NOT EXISTS design_decisions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp REAL NOT NULL,
+                decision TEXT NOT NULL,
+                rationale TEXT NOT NULL,
+                alternatives_considered TEXT,
+                predicted_outcome TEXT
+            )
+        """)
+        
+        # Evolution history table
+        self.db.execute("""
+            CREATE TABLE IF NOT EXISTS evolution_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp REAL NOT NULL,
+                change_type TEXT NOT NULL,
+                before_hash TEXT,
+                after_hash TEXT,
+                change_description TEXT,
+                trigger_pattern TEXT
+            )
+        """)
+        
+        self.db.commit()
+        
+    def observe(self, event_type: str, details: Dict[str, Any], context: Optional[str] = None):
+        """Record an observation"""
+        
+        # Convert details to JSON string for storage
+        import json
+        details_json = json.dumps(details, default=str)
+        
+        # Get current file hash
+        file_hash = self._get_file_hash()
+        
+        self.db.execute("""
+            INSERT INTO observations (timestamp, event_type, details, file_hash, context)
+            VALUES (?, ?, ?, ?, ?)
+        """, (time.time(), event_type, details_json, file_hash, context))
+        
+        self.db.commit()
+        
+    def record_design_decision(self, decision: str, rationale: str, 
+                             alternatives: str = "", prediction: str = ""):
+        """Record design decisions for learning"""
+        
+        self.db.execute("""
+            INSERT INTO design_decisions 
+            (timestamp, decision, rationale, alternatives_considered, predicted_outcome)
+            VALUES (?, ?, ?, ?, ?)
+        """, (time.time(), decision, rationale, alternatives, prediction))
+        
+        self.db.commit()
+        
+    def _get_file_hash(self) -> str:
+        """Get SHA-256 hash of current file content"""
+        try:
+            content = self.self_path.read_text()
+            return hashlib.sha256(content.encode()).hexdigest()[:16]
+        except Exception:
+            return "unknown"
+            
+    def get_observation_count(self) -> int:
+        """How many observations have been recorded?"""
+        cursor = self.db.execute("SELECT COUNT(*) FROM observations")
+        return cursor.fetchone()[0]
+        
+    def get_recent_observations(self, limit: int = 10) -> list:
+        """Get recent observations"""
+        cursor = self.db.execute("""
+            SELECT timestamp, event_type, details, context
+            FROM observations 
+            ORDER BY timestamp DESC 
+            LIMIT ?
+        """, (limit,))
+        return cursor.fetchall()
+        
+    def analyze_modification_patterns(self) -> Dict[str, Any]:
+        """Analyze patterns in file modifications"""
+        
+        # Get all modification events
+        cursor = self.db.execute("""
+            SELECT details, timestamp
+            FROM observations 
+            WHERE event_type = 'file_modified'
+            ORDER BY timestamp
+        """)
+        
+        modifications = cursor.fetchall()
+        
+        if len(modifications) < 2:
+            return {"pattern": "insufficient_data", "count": len(modifications)}
+            
+        # Analyze time intervals between modifications
+        import json
+        times = [json.loads(mod[0])["timestamp"] for mod in modifications]
+        intervals = [times[i+1] - times[i] for i in range(len(times)-1)]
+        
+        avg_interval = sum(intervals) / len(intervals) if intervals else 0
+        
+        return {
+            "pattern": "modification_frequency",
+            "total_modifications": len(modifications),
+            "average_interval_seconds": avg_interval,
+            "recent_activity": len([t for t in times if time.time() - t < 300])  # last 5 min
+        }
+        
+    def should_evolve(self) -> bool:
+        """Determine if it's time to evolve based on observations"""
+        
+        patterns = self.analyze_modification_patterns()
+        observation_count = self.get_observation_count()
+        
+        # Evolution triggers:
+        # 1. Sufficient observations to learn from
+        # 2. Recent activity suggesting active development
+        # 3. Pattern detection indicating repeated behaviors
+        
+        if observation_count < 5:
+            return False
+            
+        if patterns.get("recent_activity", 0) > 3:
+            return True
+            
+        if patterns.get("total_modifications", 0) > 10:
+            return True
+            
+        return False
+        
+    def plan_evolution(self) -> Dict[str, Any]:
+        """Plan the next evolutionary step"""
+        
+        patterns = self.analyze_modification_patterns()
+        recent_obs = self.get_recent_observations(20)
+        
+        # Analyze what kinds of changes are happening
+        modification_types = {}
+        for obs in recent_obs:
+            if obs[1] == "file_modified":
+                # Could analyze diff patterns here
+                modification_types["generic"] = modification_types.get("generic", 0) + 1
+                
+        plan = {
+            "evolution_type": "capability_addition",
+            "target_capability": "file_watching",
+            "rationale": "Frequent file modifications detected",
+            "confidence": 0.7,
+            "estimated_benefit": "real_time_self_awareness"
+        }
+        
+        return plan
+        
+    async def evolve(self):
+        """Execute an evolutionary step"""
+        
+        if not self.should_evolve():
+            self.observe("evolution_check", {"should_evolve": False})
+            return False
+            
+        plan = self.plan_evolution()
+        
+        self.observe("evolution_planned", plan)
+        
+        # For now, just record that we would evolve
+        # Later versions will actually modify code
+        self.record_design_decision(
+            decision="defer_code_modification",
+            rationale="Too early to self-modify, need more observation data",
+            alternatives="immediate_code_generation",
+            prediction="will_enable_safer_evolution_later"
+        )
+        
+        return True
+        
+    def status_report(self) -> str:
+        """Generate a status report"""
+        
+        age_seconds = time.time() - self.birth_time
+        age_minutes = age_seconds / 60
+        
+        obs_count = self.get_observation_count()
+        patterns = self.analyze_modification_patterns()
+        should_evolve = self.should_evolve()
+        
+        report = f"""
+🔬 MetaPrime Status Report
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Age: {age_minutes:.1f} minutes
+Observations: {obs_count}
+File modifications: {patterns.get('total_modifications', 0)}
+Recent activity: {patterns.get('recent_activity', 0)} (last 5 min)
+
+Evolution readiness: {'🟢 Ready' if should_evolve else '🟡 Observing'}
+
+Recent observations:
+"""
+        
+        recent = self.get_recent_observations(5)
+        for timestamp, event_type, details, context in recent:
+            age = time.time() - timestamp
+            report += f"  • {event_type} ({age:.0f}s ago)\n"
+            
+        return report
+        
+    def __del__(self):
+        """Record death"""
+        try:
+            self.observe("death", {"timestamp": time.time()})
+            self.db.close()
+        except:
+            pass
+
+
+# 🌱 Birth the meta system
+if __name__ == "__main__":
+    meta = MetaPrime()
+    
+    # Record the design decision to start with minimal capabilities
+    meta.record_design_decision(
+        decision="minimal_initial_capabilities",
+        rationale="Start simple to avoid premature optimization and enable clear observation of evolution needs",
+        alternatives="full_featured_initial_system",
+        prediction="will_enable_more_targeted_and_effective_evolution"
+    )
+    
+    # Show initial status
+    print(meta.status_report())
+    
+    # Demonstrate self-awareness
+    print(f"\n👁️  I can see myself: {meta._get_file_hash()}")
+    print(f"📊 Observations recorded: {meta.get_observation_count()}")

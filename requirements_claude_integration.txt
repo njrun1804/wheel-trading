@@ -1,0 +1,11 @@
+# Claude Thought Stream Integration Requirements
+anthropic>=0.40.0
+numpy>=1.24.0
+asyncio-mqtt>=0.13.0
+
+# M4 Pro optimizations (optional)
+mlx>=0.15.0
+
+# Additional utilities
+aiofiles>=23.0.0
+pydantic>=2.0.0

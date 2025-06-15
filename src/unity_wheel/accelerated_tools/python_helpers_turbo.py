@@ -11,10 +11,13 @@ from collections import defaultdict
 from dataclasses import dataclass
 import importlib.util
 import sys
+import logging
 from concurrent.futures import ProcessPoolExecutor
 
 # Use MLX for similarity computations
 import mlx.core as mx
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -38,6 +41,10 @@ class CodeHelper:
         
     async def get_function_signature(self, module_path: str, function_name: str) -> Dict[str, Any]:
         """Get function signature with type hints."""
+        # Handle wildcard case
+        if function_name == "*":
+            return await self.get_all_functions(module_path)
+        
         module = await self._load_module(module_path)
         
         if hasattr(module, function_name):
@@ -61,6 +68,62 @@ class CodeHelper:
             }
         
         return {"error": f"Function {function_name} not found in {module_path}"}
+    
+    async def get_all_functions(self, module_path: str) -> Dict[str, Any]:
+        """Get all functions from a module."""
+        try:
+            module = await self._load_module(module_path)
+            
+            import inspect
+            import warnings
+            functions = []
+            
+            # Use warning suppression during introspection to avoid async issues
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*coroutine.*was never awaited")
+                
+                for name, obj in inspect.getmembers(module, inspect.isfunction):
+                    # Skip private functions and async functions that might cause issues
+                    if not name.startswith('_'):
+                        try:
+                            # Additional check to avoid problematic async functions
+                            if inspect.iscoroutinefunction(obj) and name in ['test', 'main', 'run']:
+                                logger.debug(f"Skipping async function {name} in {module_path} to avoid coroutine warnings")
+                                continue
+                                
+                            sig = inspect.signature(obj)
+                            functions.append({
+                                "name": name,
+                                "signature": str(sig),
+                                "parameters": {
+                                    param_name: {
+                                        "type": param.annotation if param.annotation != inspect.Parameter.empty else "Any",
+                                        "default": param.default if param.default != inspect.Parameter.empty else None
+                                    }
+                                    for param_name, param in sig.parameters.items()
+                                },
+                                "return_type": sig.return_annotation if sig.return_annotation != inspect.Parameter.empty else "Any",
+                                "docstring": inspect.getdoc(obj),
+                                "is_async": inspect.iscoroutinefunction(obj)
+                            })
+                        except Exception as e:
+                            # Skip functions that can't be introspected
+                            functions.append({
+                                "name": name,
+                                "signature": "Unable to inspect",
+                                "error": str(e)
+                            })
+            
+            return {
+                "module": module_path,
+                "functions": functions,
+                "count": len(functions)
+            }
+            
+        except ImportError as e:
+            return {"error": f"Module skipped: {e}"}
+        except Exception as e:
+            return {"error": f"Failed to get functions from {module_path}: {e}"}
     
     async def get_class_info(self, module_path: str, class_name: str) -> Dict[str, Any]:
         """Get detailed class information."""
@@ -259,25 +322,66 @@ class CodeHelper:
         }
     
     async def _load_module(self, module_path: str):
-        """Load a module dynamically."""
+        """Load a module dynamically with improved error handling."""
         if module_path in self._module_cache:
             return self._module_cache[module_path]
         
         path = Path(module_path)
         
-        if path.suffix == ".py":
-            # Load from file
-            spec = importlib.util.spec_from_file_location(
-                path.stem, path
-            )
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-        else:
-            # Import by name
-            module = importlib.import_module(module_path)
+        # Skip test files and other files that might contain async functions at module level
+        if self._should_skip_module(path):
+            raise ImportError(f"Skipping module {module_path} - likely contains async code at module level")
         
-        self._module_cache[module_path] = module
-        return module
+        try:
+            if path.suffix == ".py":
+                # Load from file with better error handling
+                spec = importlib.util.spec_from_file_location(
+                    path.stem, path
+                )
+                if spec is None or spec.loader is None:
+                    raise ImportError(f"Cannot create spec for {module_path}")
+                
+                module = importlib.util.module_from_spec(spec)
+                
+                # Execute module in a controlled way to catch async issues
+                import warnings
+                with warnings.catch_warnings():
+                    # Suppress RuntimeWarnings about unawaited coroutines during module loading
+                    warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*coroutine.*was never awaited")
+                    spec.loader.exec_module(module)
+            else:
+                # Import by name
+                module = importlib.import_module(module_path)
+            
+            self._module_cache[module_path] = module
+            return module
+            
+        except Exception as e:
+            # Don't cache failed imports
+            raise ImportError(f"Failed to load module {module_path}: {e}")
+    
+    def _should_skip_module(self, path: Path) -> bool:
+        """Check if module should be skipped to avoid async issues."""
+        # Skip test files that often contain async functions at module level
+        if any(part.startswith('test_') for part in path.parts):
+            return True
+        if path.name.startswith('test_'):
+            return True
+        
+        # Skip other problematic patterns
+        skip_patterns = [
+            'debug_', 'validate_', 'benchmark_', 'quick_', 'simple_',
+            'mock_', 'example_', 'demo_', 'sample_'
+        ]
+        
+        if any(path.name.startswith(pattern) for pattern in skip_patterns):
+            return True
+        
+        # Skip files in test directories
+        if any(part in ['tests', 'test', 'testing', 'examples', 'demos'] for part in path.parts):
+            return True
+            
+        return False
     
     def _file_to_module_path(self, file_path: str) -> str:
         """Convert file path to module import path."""

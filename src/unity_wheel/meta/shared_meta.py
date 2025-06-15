@@ -12,6 +12,16 @@ _meta_instance: Optional[object] = None
 
 def get_shared_meta():
     """Get or create the shared MetaPrime instance."""
+    import os
+    
+    # Check if meta system is disabled
+    if os.environ.get('DISABLE_META_AUTOSTART') == '1':
+        # Return mock instance when disabled
+        class MockMeta:
+            def observe(self, *args, **kwargs):
+                pass
+        return MockMeta()
+    
     global _meta_instance
     if _meta_instance is None:
         try:

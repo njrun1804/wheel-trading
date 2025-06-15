@@ -10,10 +10,18 @@ from typing import Any, Dict, List, Optional, Tuple
 # META INTEGRATION: Enable observation and evolution (SHARED SINGLETON)
 def get_meta():
     """Get shared MetaPrime instance to prevent multiple spawns."""
-    from ..meta import get_shared_meta
-    meta = get_shared_meta()
-    # Record advisor usage
-    meta.observe("advisor_meta_access", {"timestamp": datetime.now(timezone.utc).isoformat()})
+    # META COMPLETELY DISABLED FOR EINSTEIN TESTING
+    class MockMeta:
+        def observe(self, *args, **kwargs):
+            pass
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: None
+    return MockMeta()
+    
+    # from ..meta import get_shared_meta
+    # meta = get_shared_meta() 
+    # # Record advisor usage
+    # meta.observe("advisor_meta_access", {"timestamp": datetime.now(timezone.utc).isoformat()})
     return meta
 
 from ..analytics import UnityAssignmentModel

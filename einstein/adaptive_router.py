@@ -6,18 +6,19 @@ Self-tuning query router that learns from user patterns and success rates.
 Implements contextual bandit for optimizing search strategy selection.
 """
 
-import asyncio
-import json
+import logging
+import os
 import pickle
 import time
+from collections import deque
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
-from collections import defaultdict, deque
-import numpy as np
-import logging
+from typing import Any
 
-from .query_router import QueryRouter, QueryPlan, QueryType
+import numpy as np
+
+from .query_router import QueryPlan, QueryRouter
+from .einstein_config import get_einstein_config
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +51,10 @@ class QueryFeatures:
 class ContextualBandit:
     """Simple contextual bandit for route selection."""
     
-    def __init__(self, n_arms: int = 4, learning_rate: float = 0.1):
+    def __init__(self, n_arms: int = 4, learning_rate: float = None):
         self.n_arms = n_arms  # Number of search modality combinations
-        self.learning_rate = learning_rate
+        config = get_einstein_config()
+        self.learning_rate = learning_rate or config.ml.adaptive_learning_rate
         self.arm_weights = np.ones(n_arms) * 0.5  # Initial weights
         self.arm_counts = np.zeros(n_arms)
         self.exploration_rate = 0.1
@@ -111,7 +113,7 @@ class ContextualBandit:
         total_pulls = np.sum(self.arm_counts)
         self.exploration_rate = max(0.05, 0.1 * np.exp(-total_pulls / 1000))
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get bandit statistics."""
         
         return {
@@ -128,12 +130,13 @@ class AdaptiveQueryRouter(QueryRouter):
     def __init__(self, model_path: Path = None):
         super().__init__()
         
-        self.model_path = model_path or Path('.einstein/adaptive_router.pkl')
+        config = get_einstein_config()
+        self.model_path = model_path or (config.paths.cache_dir / 'adaptive_router.pkl')
         self.model_path.parent.mkdir(parents=True, exist_ok=True)
         
         # Learning components
         self.bandit = ContextualBandit()
-        self.query_history = deque(maxlen=10000)  # Keep last 10k queries
+        self.query_history = deque(maxlen=config.cache.max_cache_entries)  # Keep last queries
         self.outcome_buffer = deque(maxlen=1000)  # Buffer for batch learning
         
         # Statistics
@@ -170,7 +173,7 @@ class AdaptiveQueryRouter(QueryRouter):
             contains_symbol='.' in query and any(c.isupper() for c in query)
         )
     
-    def analyze_query_adaptive(self, query: str, context: Dict[str, Any] = None) -> QueryPlan:
+    def analyze_query_adaptive(self, query: str, context: dict[str, Any] = None) -> QueryPlan:
         """Analyze query with adaptive learning."""
         
         # Extract features
@@ -238,9 +241,9 @@ class AdaptiveQueryRouter(QueryRouter):
         
         # Trigger learning if buffer is full
         if len(self.outcome_buffer) >= 50:
-            asyncio.create_task(self._learn_from_outcomes())
+            self._learn_from_outcomes()
     
-    async def _learn_from_outcomes(self):
+    def _learn_from_outcomes(self):
         """Learn from recent query outcomes."""
         
         if not self.outcome_buffer:
@@ -329,7 +332,17 @@ class AdaptiveQueryRouter(QueryRouter):
             logger.debug(f"Saved adaptive router model to {self.model_path}")
             
         except Exception as e:
-            logger.error(f"Failed to save model: {e}")
+            logger.error(f"Failed to save adaptive model: {e}", exc_info=True,
+                        extra={
+                            'operation': 'save_adaptive_model',
+                            'error_type': type(e).__name__,
+                            'model_path': str(self.model_path),
+                            'model_exists': self.model_path.exists(),
+                            'parent_exists': self.model_path.parent.exists(),
+                            'parent_writable': os.access(self.model_path.parent, os.W_OK) if self.model_path.parent.exists() else False,
+                            'stats': self.stats,
+                            'bandit_weights': self.bandit.arm_weights.tolist() if hasattr(self.bandit, 'arm_weights') else None
+                        })
     
     def _load_model(self):
         """Load bandit model and statistics."""
@@ -347,9 +360,18 @@ class AdaptiveQueryRouter(QueryRouter):
                 logger.info(f"Loaded adaptive router model from {self.model_path}")
                 
         except Exception as e:
-            logger.warning(f"Failed to load model: {e}")
+            logger.error(f"Failed to load adaptive model: {e}", exc_info=True,
+                        extra={
+                            'operation': 'load_adaptive_model',
+                            'error_type': type(e).__name__,
+                            'model_path': str(self.model_path),
+                            'model_exists': self.model_path.exists(),
+                            'file_size': self.model_path.stat().st_size if self.model_path.exists() else 0,
+                            'file_readable': os.access(self.model_path, os.R_OK) if self.model_path.exists() else False,
+                            'bandit_stats': self.bandit.get_stats() if hasattr(self.bandit, 'get_stats') else None
+                        })
     
-    def get_learning_stats(self) -> Dict[str, Any]:
+    def get_learning_stats(self) -> dict[str, Any]:
         """Get comprehensive learning statistics."""
         
         return {

@@ -14,10 +14,18 @@ from src.config.loader import get_config
 # META INTEGRATION: Enable observation and evolution (SHARED SINGLETON)
 def get_meta():
     """Get shared MetaPrime instance to prevent multiple spawns."""
-    from ..meta import get_shared_meta
-    meta = get_shared_meta()
-    # Record wheel strategy usage
-    meta.observe("wheel_strategy_meta_access", {"timestamp": datetime.now().isoformat()})
+    # META COMPLETELY DISABLED FOR EINSTEIN TESTING
+    class MockMeta:
+        def observe(self, *args, **kwargs):
+            pass
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: None
+    return MockMeta()
+    
+    # from ..meta import get_shared_meta
+    # meta = get_shared_meta()
+    # # Record wheel strategy usage
+    # meta.observe("wheel_strategy_meta_access", {"timestamp": datetime.now().isoformat()})
     return meta
 
 from ..math import (

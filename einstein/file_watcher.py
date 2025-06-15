@@ -3,18 +3,23 @@
 Einstein File Watcher - Real-time Index Updates
 
 Provides real-time file monitoring with debounced updates for Einstein indexing.
-Optimized for macOS FSEvents and M4 Pro performance.
+Optimized for macOS FSEvents and hardware-accelerated performance.
 """
 
 import asyncio
-import time
-from pathlib import Path
-from typing import Set, Dict, Any, Optional, Callable
-from dataclasses import dataclass
 import logging
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
+from watchdog.events import (
+    FileSystemEventHandler,
+)
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileModifiedEvent, FileCreatedEvent, FileDeletedEvent
+
+from .einstein_config import get_einstein_config
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +38,10 @@ class EinsteinFileWatcher(FileSystemEventHandler):
     def __init__(self, update_callback: Callable[[FileChangeEvent], None]):
         super().__init__()
         self.update_callback = update_callback
-        self.debounce_delay = 0.25  # 250ms debounce
-        self.pending_updates: Dict[str, FileChangeEvent] = {}
-        self.debounce_tasks: Dict[str, asyncio.Task] = {}
+        config = get_einstein_config()
+        self.debounce_delay = config.monitoring.debounce_delay_ms / 1000.0  # Convert to seconds
+        self.pending_updates: dict[str, FileChangeEvent] = {}
+        self.debounce_tasks: dict[str, asyncio.Task] = {}
         
         # File patterns to watch
         self.watched_extensions = {'.py', '.md', '.txt', '.json', '.yaml', '.yml'}
@@ -116,7 +122,17 @@ class EinsteinFileWatcher(FileSystemEventHandler):
             # Task was cancelled due to new event
             pass
         except Exception as e:
-            logger.error(f"Error processing file update {file_path}: {e}")
+            logger.error(f"Error processing file update {file_path}: {e}", exc_info=True,
+                        extra={
+                            'operation': 'debounced_update',
+                            'error_type': type(e).__name__,
+                            'file_path': file_path,
+                            'event_type': change_event.event_type if 'change_event' in locals() else 'unknown',
+                            'debounce_delay': self.debounce_delay,
+                            'callback_available': self.update_callback is not None,
+                            'pending_updates_count': len(self.pending_updates),
+                            'active_tasks_count': len(self.debounce_tasks)
+                        })
         finally:
             # Clean up task reference
             if file_path in self.debounce_tasks:
@@ -141,7 +157,7 @@ class EinsteinRealtimeIndexer:
             'start_time': None
         }
     
-    async def start_watching(self):
+    def start_watching(self):
         """Start file system monitoring."""
         
         if self.is_watching:
@@ -166,7 +182,7 @@ class EinsteinRealtimeIndexer:
         
         logger.info("✅ Real-time indexing active")
     
-    async def stop_watching(self):
+    def stop_watching(self):
         """Stop file system monitoring."""
         
         if not self.is_watching:
@@ -199,7 +215,17 @@ class EinsteinRealtimeIndexer:
                             str(change_event.file_path)
                         )
                     except Exception as e:
-                        logger.warning(f"Embedding update failed for {change_event.file_path}: {e}")
+                        logger.error(f"Embedding update failed for {change_event.file_path}: {e}", exc_info=True,
+                                   extra={
+                                       'operation': 'embedding_update',
+                                       'error_type': type(e).__name__,
+                                       'file_path': str(change_event.file_path),
+                                       'event_type': change_event.event_type,
+                                       'has_embedding_pipeline': hasattr(self.einstein_hub, 'embedding_pipeline'),
+                                       'stats': self.stats,
+                                       'file_exists': change_event.file_path.exists(),
+                                       'file_size': change_event.file_path.stat().st_size if change_event.file_path.exists() else 0
+                                   })
                 
                 # Update dependency graph
                 if hasattr(self.einstein_hub, 'dependency_graph'):
@@ -208,7 +234,17 @@ class EinsteinRealtimeIndexer:
                             str(change_event.file_path)
                         )
                     except Exception as e:
-                        logger.warning(f"Dependency graph update failed for {change_event.file_path}: {e}")
+                        logger.error(f"Dependency graph update failed for {change_event.file_path}: {e}", exc_info=True,
+                                   extra={
+                                       'operation': 'dependency_graph_update',
+                                       'error_type': type(e).__name__,
+                                       'file_path': str(change_event.file_path),
+                                       'event_type': change_event.event_type,
+                                       'has_dependency_graph': hasattr(self.einstein_hub, 'dependency_graph'),
+                                       'stats': self.stats,
+                                       'file_exists': change_event.file_path.exists(),
+                                       'file_extension': change_event.file_path.suffix
+                                   })
             
             elif change_event.event_type == 'deleted':
                 # Remove from all indexes
@@ -218,7 +254,18 @@ class EinsteinRealtimeIndexer:
             self.stats['files_processed'] += 1
             
         except Exception as e:
-            logger.error(f"Failed to process file change {change_event.file_path}: {e}")
+            logger.error(f"Failed to process file change {change_event.file_path}: {e}", exc_info=True,
+                        extra={
+                            'operation': 'handle_file_change',
+                            'error_type': type(e).__name__,
+                            'file_path': str(change_event.file_path),
+                            'event_type': change_event.event_type,
+                            'stats': self.stats,
+                            'einstein_hub_available': self.einstein_hub is not None,
+                            'watch_paths': [str(p) for p in self.watch_paths],
+                            'timestamp': change_event.timestamp,
+                            'uptime': time.time() - self.stats.get('start_time', time.time())
+                        })
     
     async def _remove_from_indexes(self, file_path: Path):
         """Remove file from all Einstein indexes."""
@@ -241,9 +288,18 @@ class EinsteinRealtimeIndexer:
             logger.debug(f"Removed {file_path} from all indexes")
             
         except Exception as e:
-            logger.warning(f"Failed to remove {file_path} from indexes: {e}")
+            logger.error(f"Failed to remove {file_path} from indexes: {e}", exc_info=True,
+                        extra={
+                            'operation': 'remove_from_indexes',
+                            'error_type': type(e).__name__,
+                            'file_path': str(file_path),
+                            'has_duckdb': hasattr(self.einstein_hub, 'duckdb'),
+                            'has_embedding_pipeline': hasattr(self.einstein_hub, 'embedding_pipeline'),
+                            'has_dependency_graph': hasattr(self.einstein_hub, 'dependency_graph'),
+                            'file_existed': file_path in str(e) if 'not found' in str(e).lower() else 'unknown'
+                        })
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get file watching statistics."""
         
         uptime = 0

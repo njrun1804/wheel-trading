@@ -1,7 +1,23 @@
 # Claude Playbook – Trading-Bot Repo
 
-## 🚀 HARDWARE ACCELERATION ENABLED
-This codebase automatically uses ALL available CPU cores, GPU, and memory for maximum performance.
+## 🔧 META-SYSTEM DEVELOPMENT ENVIRONMENT
+This codebase includes a meta-programming system that provides development workflow automation and code quality monitoring.
+
+### 📁 Meta System Documentation
+- **README**: `META_SYSTEM_README.md` - Complete overview and usage guide
+- **Capabilities**: `META_CAPABILITIES.md` - Detailed what it does vs. doesn't do
+- **Build Instructions**: `/meta/BUILD_INSTRUCTIONS.md` - Setup guide for meta components
+- **Integration Guide**: `/meta/META_INTEGRATION.md` - How to integrate meta-awareness into code
+
+### 🔄 Meta Development Workflow
+1. **Observe** → File change monitoring and event logging
+2. **Analyze** → Pattern detection from development activity
+3. **Quality Check** → Code validation using predefined rules
+4. **Generate** → Template-based code improvements
+5. **Execute** → Safe file modifications with backups
+
+## ⚡ HARDWARE OPTIMIZATION
+System is optimized for M4 Pro: 8 P-cores + 4 E-cores with parallel processing.
 
 ### NEW: Hardware-Accelerated Local Tools (10-30x Faster!)
 Replace slow MCP servers with blazing-fast local implementations:
@@ -41,16 +57,21 @@ helper = get_code_helper()
 sig = await helper.get_function_signature("module.py", "function_name")
 ```
 
-### Quick Commands - Now Hardware Accelerated!
+### Quick Commands - Hardware Accelerated + Meta-Aware
 ```bash
-# TURBO MODE - Uses all 12 CPU cores + GPU
-./orchestrate_turbo.py "optimize all trading functions"
+# Start meta development environment
+python meta_coordinator.py --dev-mode &
 
-# Direct acceleration (no orchestrator complexity)
-./claude_accelerated.py "search for class WheelStrategy"
-./claude_accelerated.py "read multiple files in parallel"
+# Start file monitoring with quality checks
+python meta_daemon.py --watch-path . &
 
-# Test all accelerated tools
+# Run one-time quality audit
+python meta_auditor.py --validate
+
+# Start complete integrated system
+python start_complete_meta_system.py
+
+# Test accelerated tools
 python test_all_accelerated_tools.py
 ```
 
@@ -77,13 +98,15 @@ The system provides:
 - Automatic parallelization of all operations
 
 ## Workflow
-1. `dependency_graph.search_code_fuzzy(<term>)`  
-2. `ripgrep.search` if step 1 empty or regex-style query  
-3. `filesystem.read` surrounding lines  
-4. `python_analysis.*` domain checks  
-5. `trace_phoenix.*` for runtime / perf issues  
-6. Persist interim notes in `memory.save()`  
-7. Ask before edits > 30 LOC
+1. **Meta-First**: Use meta system for all development (`/meta/BUILD_INSTRUCTIONS.md`)
+2. `dependency_graph.search_code_fuzzy(<term>)`  
+3. `ripgrep.search` if step 2 empty or regex-style query  
+4. `filesystem.read` surrounding lines  
+5. `python_analysis.*` domain checks  
+6. `trace_phoenix.*` for runtime / perf issues  
+7. **Meta Integration**: Apply meta-awareness patterns (`/meta/META_INTEGRATION_STRATEGY.md`)
+8. Persist interim notes in `memory.save()`  
+9. Ask before edits > 30 LOC
 
 ## Pre-commit gate
 Run `dependency_graph.detect_cycles()`; block commit if cycles > 0.

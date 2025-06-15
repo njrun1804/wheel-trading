@@ -11,30 +11,36 @@ Builds on ALL Jarvis accelerated tools to create a unified indexing system that:
 """
 
 import asyncio
-import time
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Union, Tuple
-from dataclasses import dataclass
-from concurrent.futures import ThreadPoolExecutor
-import logging
+import contextlib
 import hashlib
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+import logging
+import sqlite3
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Optional
 
-# Import ALL accelerated tools
-from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
-from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
-from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer
-from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo
-from src.unity_wheel.accelerated_tools.sequential_thinking_turbo import SequentialThinkingTurbo
-from src.unity_wheel.accelerated_tools.python_helpers_turbo import get_code_helper
-from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo
+import numpy as np
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 # Import existing indexing components
 from database_manager import get_database_manager
+from einstein.adaptive_concurrency import PerformanceTracker, get_adaptive_concurrency_manager
+from einstein.file_watcher import add_realtime_indexing
 from neural_backend_manager import get_neural_backend_manager
+from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo
+from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer
+from src.unity_wheel.accelerated_tools.python_helpers_turbo import get_code_helper
+
+# Import ALL accelerated tools
+from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+from src.unity_wheel.accelerated_tools.sequential_thinking_turbo import SequentialThinkingTurbo
+from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo
 from unified_config import get_unified_config
-from einstein.adaptive_concurrency import get_adaptive_concurrency_manager, PerformanceTracker
+from .einstein_config import get_einstein_config
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +53,7 @@ class SearchResult:
     line_number: int
     score: float
     result_type: str  # 'text', 'semantic', 'structural', 'analytical'
-    context: Dict[str, Any]
+    context: dict[str, Any]
     timestamp: float
 
 
@@ -58,7 +64,7 @@ class IndexStats:
     total_lines: int
     index_size_mb: float
     last_update: float
-    search_performance_ms: Dict[str, float]
+    search_performance_ms: dict[str, float]
     coverage_percentage: float
 
 
@@ -68,16 +74,17 @@ class EinsteinIndexHub:
     def __init__(self, project_root: Path = None):
         self.project_root = project_root or Path.cwd()
         self.config = get_unified_config()
+        self.einstein_config = get_einstein_config(project_root)
         self.neural_backend = get_neural_backend_manager()
         
-        # Adaptive concurrency manager for M4 Pro optimization
+        # Adaptive concurrency manager for hardware optimization
         self.concurrency_manager = get_adaptive_concurrency_manager()
         
         # Bounded concurrency (will be replaced by adaptive semaphores)
-        self.search_semaphore = asyncio.Semaphore(4)     # Max 4 concurrent modalities
-        self.embedding_semaphore = asyncio.Semaphore(8)  # MLX embedding concurrency  
-        self.file_io_semaphore = asyncio.Semaphore(12)   # Match M4 Pro cores
-        self.analysis_semaphore = asyncio.Semaphore(6)   # CPU-bound analysis tasks
+        self.search_semaphore = asyncio.Semaphore(self.einstein_config.performance.max_search_concurrency)
+        self.embedding_semaphore = asyncio.Semaphore(self.einstein_config.performance.max_embedding_concurrency)
+        self.file_io_semaphore = asyncio.Semaphore(self.einstein_config.performance.max_file_io_concurrency)
+        self.analysis_semaphore = asyncio.Semaphore(self.einstein_config.performance.max_analysis_concurrency)
         
         # Initialize ALL accelerated tools with error handling
         # Initialize all tools to None first to ensure they exist
@@ -94,17 +101,24 @@ class EinsteinIndexHub:
             self.dependency_graph = get_dependency_graph()
             self.python_analyzer = get_python_analyzer()
             
-            # Initialize DuckDB with proper database path
-            db_path = self.project_root / ".einstein" / "analytics.db"
-            db_path.parent.mkdir(exist_ok=True)
-            self.duckdb = get_duckdb_turbo(str(db_path))
+            # Initialize DuckDB with proper database path from config
+            self.duckdb = get_duckdb_turbo(str(self.einstein_config.paths.analytics_db_path))
             
             self.sequential_thinking = SequentialThinkingTurbo()
             self.code_helper = get_code_helper()
             self.tracer = get_trace_turbo()
             
         except Exception as e:
-            logger.error(f"Error initializing accelerated tools: {e}")
+            logger.error(f"Error initializing accelerated tools: {e}", exc_info=True,
+                        extra={
+                            'operation': 'init_accelerated_tools',
+                            'error_type': type(e).__name__,
+                            'project_root': str(self.project_root),
+                            'cpu_cores': self.einstein_config.hardware.cpu_cores,
+                            'platform_type': self.einstein_config.hardware.platform_type,
+                            'gpu_available': self.einstein_config.hardware.has_gpu,
+                            'memory_gb': self.einstein_config.hardware.memory_total_gb
+                        })
             # Attributes are already set to None above, so we're safe
         
         # Existing systems integration
@@ -119,8 +133,8 @@ class EinsteinIndexHub:
         }
         
         # Hardware optimization
-        self.cpu_cores = self.config.get_jarvis2_cpu_cores()
-        self.executor = ThreadPoolExecutor(max_workers=self.cpu_cores)
+        self.cpu_cores = self.einstein_config.hardware.cpu_cores
+        self.executor = ThreadPoolExecutor(max_workers=self.einstein_config.hardware.cpu_cores)
         
         # Initialize FAISS-related attributes
         self.vector_index = None
@@ -139,7 +153,10 @@ class EinsteinIndexHub:
         self.file_change_queue = None  # Will be initialized in _start_file_watcher
         self._last_indexed = {}  # File path -> (hash, timestamp)
         
-        logger.info(f"🧠 Einstein Index initialized with {self.cpu_cores} cores")
+        # Add realtime indexing capability
+        add_realtime_indexing(self, [self.project_root])
+        
+        logger.info(f"🧠 Einstein Index initialized with {self.cpu_cores} cores on {self.einstein_config.hardware.platform_type}")
     
     def _check_faiss_availability(self) -> bool:
         """Check if FAISS library is available and working.
@@ -167,7 +184,14 @@ class EinsteinIndexHub:
             logger.info("ℹ️ FAISS library not available - will use embedding pipeline fallback")
             return False
         except Exception as e:
-            logger.warning(f"⚠️ FAISS library test failed: {e}")
+            logger.warning(f"⚠️ FAISS library test failed: {e}",
+                          extra={
+                              'operation': 'check_faiss_availability',
+                              'error_type': type(e).__name__,
+                              'test_vector_shape': '(1, 128)',
+                              'faiss_import_success': True,
+                              'numpy_available': True
+                          })
             return False
     
     def _validate_faiss_index_for_save(self) -> bool:
@@ -203,7 +227,7 @@ class EinsteinIndexHub:
             logger.error(f"Error validating FAISS index: {e}")
             return False
     
-    def _validate_faiss_search_input(self, query_embedding: Any, k: int = 20) -> Tuple[bool, str]:
+    def _validate_faiss_search_input(self, query_embedding: Any, k: int = 20) -> tuple[bool, str]:
         """Validate inputs for FAISS search operations.
         
         Args:
@@ -284,14 +308,34 @@ class EinsteinIndexHub:
             einstein_dir = self.project_root / ".einstein"
             einstein_dir.mkdir(exist_ok=True)
             
-            # Build dependency graph
-            await self.dependency_graph.build_graph()
+            # Build dependency graph (skip if running in script context to avoid multiprocessing issues)
+            if not getattr(self, '_skip_dependency_build', False):
+                try:
+                    await self.dependency_graph.build_graph()
+                except Exception as e:
+                    logger.error(f"Dependency graph build failed, skipping: {e}", exc_info=True,
+                                extra={
+                                    'operation': 'build_dependency_graph',
+                                    'error_type': type(e).__name__,
+                                    'project_root': str(self.project_root),
+                                    'skip_dependency_build': getattr(self, '_skip_dependency_build', False),
+                                    'dependency_graph_available': self.dependency_graph is not None,
+                                    'multiprocessing_context': getattr(self, '_multiprocessing_context', 'unknown')
+                                })
+            else:
+                logger.info("Skipping dependency graph build in script context")
             
             # Initialize DuckDB analytics (skip if DuckDB failed to initialize)
             if self.duckdb:
                 await self._initialize_analytics_db()
             else:
-                logger.warning("Skipping DuckDB analytics initialization due to connection issues")
+                logger.warning("Skipping DuckDB analytics initialization due to connection issues",
+                      extra={
+                          'operation': 'initialize_duckdb',
+                          'duckdb_available': self.duckdb is not None,
+                          'analytics_db_path': str(self.einstein_config.paths.analytics_db_path),
+                          'db_exists': self.einstein_config.paths.analytics_db_path.exists()
+                      })
             
             # Initialize FAISS index with persistence
             await self._initialize_persistent_faiss()
@@ -299,21 +343,28 @@ class EinsteinIndexHub:
             # Initialize embedding pipeline
             await self._initialize_embedding_pipeline()
             
-            # Perform initial scan
-            await self._perform_initial_scan()
+            # Check if we need to perform initial scan
+            await self._check_and_perform_initial_scan()
             
-            # Start real-time file watching
-            await self._start_file_watcher()
+            # Initialize file watcher components but don't start watching yet
+            # (start_file_watching() must be called explicitly)
+            self._prepare_file_watcher()
             
             logger.info("✅ Einstein Index initialization complete")
             
         except Exception as e:
-            logger.error(f"Failed to initialize Einstein Index: {e}")
+            logger.error(f"Failed to initialize Einstein Index: {e}", exc_info=True,
+                        extra={
+                            'operation': 'initialize',
+                            'error_type': type(e).__name__,
+                            'project_root': str(self.project_root),
+                            'faiss_available': self._faiss_available,
+                            'embedding_pipeline_available': self._embedding_pipeline_available,
+                            'initialization_stage': 'complete',
+                            'cpu_cores': self.cpu_cores
+                        })
             # Ensure cleanup on initialization failure
             await self._cleanup_initialization()
-            raise
-        except Exception as e:
-            logger.error(f"❌ Einstein initialization failed: {e}")
             raise
     
     async def _initialize_analytics_db(self) -> None:
@@ -325,7 +376,7 @@ class EinsteinIndexHub:
                 file_path TEXT PRIMARY KEY,
                 lines_of_code INTEGER,
                 complexity_score REAL,
-                last_modified TIMESTAMP,
+                last_modified REAL,
                 language TEXT,
                 dependencies TEXT[],
                 exports TEXT[]
@@ -334,7 +385,7 @@ class EinsteinIndexHub:
         
         await self.duckdb.execute("""
             CREATE TABLE IF NOT EXISTS search_analytics (
-                timestamp TIMESTAMP,
+                timestamp REAL,
                 query TEXT,
                 result_count INTEGER,
                 search_time_ms REAL,
@@ -352,19 +403,89 @@ class EinsteinIndexHub:
                 best_search_types TEXT,
                 avg_success_rating REAL,
                 usage_count INTEGER,
-                last_used TIMESTAMP
+                last_used REAL
             )
         """)
     
+    async def _check_and_perform_initial_scan(self) -> None:
+        """Check if initial scan is needed and perform if necessary."""
+        
+        # Check if we have a valid cached scan
+        scan_cache_file = self.project_root / ".einstein" / "scan_cache.json"
+        
+        if scan_cache_file.exists():
+            try:
+                import json
+                with open(scan_cache_file) as f:
+                    cache_data = json.load(f)
+                
+                # Check if cache is recent and complete
+                cache_timestamp = cache_data.get('timestamp', 0)
+                cache_file_count = cache_data.get('file_count', 0)
+                
+                # Get current file count
+                current_files = list(self.project_root.rglob("*.py"))
+                current_count = len(current_files)
+                
+                # Cache is valid if it's less than 1 hour old and file count matches
+                import time
+                cache_age_hours = (time.time() - cache_timestamp) / 3600
+                
+                if cache_age_hours < 1 and abs(cache_file_count - current_count) <= 5:
+                    logger.info(f"✅ Using cached scan data ({current_count} files, {cache_age_hours:.1f}h old)")
+                    return
+                else:
+                    logger.info(f"🔄 Cache outdated (age: {cache_age_hours:.1f}h, files: {cache_file_count}→{current_count})")
+            
+            except Exception as e:
+                logger.warning(f"Invalid scan cache: {e}",
+                              extra={
+                                  'operation': 'check_scan_cache',
+                                  'error_type': type(e).__name__,
+                                  'cache_file': str(scan_cache_file),
+                                  'cache_exists': scan_cache_file.exists(),
+                                  'cache_size': scan_cache_file.stat().st_size if scan_cache_file.exists() else 0
+                              })
+        
+        # Perform full scan
+        await self._perform_initial_scan()
+        
+        # Save scan cache
+        try:
+            import json
+            import time
+            cache_data = {
+                'timestamp': time.time(),
+                'file_count': len(list(self.project_root.rglob("*.py"))),
+                'status': 'complete'
+            }
+            scan_cache_file.parent.mkdir(exist_ok=True)
+            with open(scan_cache_file, 'w') as f:
+                json.dump(cache_data, f)
+            logger.info("💾 Scan cache saved")
+        except Exception as e:
+            logger.error(f"Failed to save scan cache: {e}", exc_info=True,
+                        extra={
+                            'operation': 'save_scan_cache',
+                            'error_type': type(e).__name__,
+                            'cache_file': str(scan_cache_file),
+                            'file_count': len(list(self.project_root.rglob("*.py"))),
+                            'parent_exists': scan_cache_file.parent.exists(),
+                            'parent_writable': os.access(scan_cache_file.parent, os.W_OK) if scan_cache_file.parent.exists() else False
+                        })
+
     async def _perform_initial_scan(self) -> None:
         """Perform initial codebase scan using all tools."""
         
         # Find all Python files
         python_files = list(self.project_root.rglob("*.py"))
+        import os
+        cores = getattr(self.config.hardware, 'max_workers', os.cpu_count() or 12)
+        logger.info(f"🔍 Analyzing {len(python_files)} Python files on {cores} cores...")
         
         # Analyze files in parallel using accelerated tools
         tasks = []
-        for file_path in python_files[:100]:  # Limit for initial scan
+        for file_path in python_files:  # Analyze ALL files, not just 100
             task = asyncio.create_task(self._analyze_file(file_path))
             tasks.append(task)
         
@@ -373,7 +494,7 @@ class EinsteinIndexHub:
         successful_analyses = [r for r in results if not isinstance(r, Exception)]
         logger.info(f"📊 Analyzed {len(successful_analyses)}/{len(python_files)} files")
     
-    async def _analyze_file(self, file_path: Path) -> Dict[str, Any]:
+    async def _analyze_file(self, file_path: Path) -> dict[str, Any]:
         """Analyze a single file using accelerated tools with adaptive concurrency."""
         
         # Use adaptive concurrency for file analysis
@@ -393,16 +514,40 @@ class EinsteinIndexHub:
                             elif not isinstance(analysis, dict):
                                 analysis = {'raw_result': analysis}
                         except Exception as e:
-                            logger.warning(f"Python analyzer failed for {file_path}: {e}")
+                            logger.warning(f"Python analyzer failed for {file_path}: {e}",
+                                          extra={
+                                              'operation': 'python_analyzer_file_analysis',
+                                              'error_type': type(e).__name__,
+                                              'file_path': str(file_path),
+                                              'analyzer_available': self.python_analyzer is not None,
+                                              'file_exists': file_path.exists(),
+                                              'file_size': file_path.stat().st_size if file_path.exists() else 0,
+                                              'file_extension': file_path.suffix
+                                          })
                             analysis = {}
                     
                     # Get function signatures using code helper if available
-                    functions = []
                     if self.code_helper:
                         try:
-                            functions = await self.code_helper.get_function_signature(str(file_path), "*")
+                            # Use wildcard to get all functions from the file
+                            functions_result = await self.code_helper.get_function_signature(str(file_path), "*")
+                            if isinstance(functions_result, dict) and "functions" in functions_result:
+                                functions_result["functions"]
+                            elif isinstance(functions_result, dict) and "error" in functions_result:
+                                logger.debug(f"Code helper returned error for {file_path}: {functions_result['error']}")
+                        except ImportError as e:
+                            # Skip files that shouldn't be analyzed (test files, etc.)
+                            logger.debug(f"Skipping {file_path} (likely test file or contains async module-level code): {e}")
                         except Exception as e:
-                            logger.debug(f"Code helper failed for {file_path}: {e}")
+                            logger.debug(f"Code helper failed for {file_path}: {e}",
+                                        extra={
+                                            'operation': 'code_helper_function_signatures',
+                                            'error_type': type(e).__name__,
+                                            'file_path': str(file_path),
+                                            'helper_available': self.code_helper is not None,
+                                            'file_exists': file_path.exists(),
+                                            'file_extension': file_path.suffix
+                                        })
                     
                     # Store in analytics DB if available
                     if self.duckdb:
@@ -413,21 +558,38 @@ class EinsteinIndexHub:
                                 VALUES (?, ?, ?, ?, ?)
                             """, (
                                 str(file_path),
-                                analysis.get('lines_of_code', 0),
+                                analysis.get('loc', analysis.get('lines_of_code', 0)),
                                 analysis.get('complexity', 0.0),
                                 file_path.stat().st_mtime,
                                 'python'
                             ))
                         except Exception as e:
-                            logger.debug(f"DB storage failed for {file_path}: {e}")
+                            logger.warning(f"DB storage failed for {file_path}: {e}",
+                                          extra={
+                                              'operation': 'analyze_file_db_storage',
+                                              'error_type': type(e).__name__,
+                                              'file_path': str(file_path),
+                                              'analysis_keys': list(analysis.keys()),
+                                              'duckdb_available': self.duckdb is not None,
+                                              'file_size': file_path.stat().st_size if file_path.exists() else 0
+                                          })
                     
                     return analysis
                     
                 except Exception as e:
-                    logger.warning(f"Analysis failed for {file_path}: {e}")
+                    logger.error(f"Analysis failed for {file_path}: {e}", exc_info=True,
+                                extra={
+                                    'operation': 'analyze_file',
+                                    'error_type': type(e).__name__,
+                                    'file_path': str(file_path),
+                                    'semaphore_type': 'file_analysis',
+                                    'python_analyzer_available': self.python_analyzer is not None,
+                                    'code_helper_available': self.code_helper is not None,
+                                    'file_exists': file_path.exists()
+                                })
                     return {}
     
-    async def search(self, query: str, search_types: List[str] = None, use_learning: bool = True) -> List[SearchResult]:
+    async def search(self, query: str, search_types: list[str] = None, use_learning: bool = True, max_results: int = 1000) -> list[SearchResult]:
         """Unified search across all indexing modalities with adaptive concurrency and learning."""
         
         # Use learned search types if available and requested
@@ -468,18 +630,17 @@ class EinsteinIndexHub:
         # Record search analytics with search types for learning
         await self._record_search_analytics(query, len(all_results), search_time, search_types)
         
-        return all_results[:50]  # Top 50 results
+        return all_results[:max_results]  # Top results based on configured limit
     
     async def _bounded_search(self, search_func, query: str, operation_type: str = 'search'):
         """Execute search function with adaptive concurrency."""
         # Get adaptive semaphore based on operation type
         semaphore = await self.concurrency_manager.get_semaphore(operation_type)
         
-        async with semaphore:
-            async with PerformanceTracker(operation_type, semaphore._value):
-                return await search_func(query)
+        async with semaphore, PerformanceTracker(operation_type, semaphore._value):
+            return await search_func(query)
     
-    async def _text_search(self, query: str) -> List[SearchResult]:
+    async def _text_search(self, query: str) -> list[SearchResult]:
         """Fast text search using ripgrep turbo."""
         
         start_time = time.time()
@@ -512,10 +673,19 @@ class EinsteinIndexHub:
             return results
             
         except Exception as e:
-            logger.error(f"Text search failed: {e}")
+            logger.error(f"Text search failed: {e}", exc_info=True,
+                        extra={
+                            'operation': 'text_search',
+                            'error_type': type(e).__name__,
+                            'query': query[:50],  # Truncate long queries
+                            'query_length': len(query),
+                            'ripgrep_available': self.ripgrep is not None,
+                            'project_root': str(self.project_root),
+                            'search_time_ms': (time.time() - start_time) * 1000
+                        })
             return []
     
-    async def _semantic_search(self, query: str) -> List[SearchResult]:
+    async def _semantic_search(self, query: str) -> list[SearchResult]:
         """Semantic search using neural embeddings and FAISS index with comprehensive fallbacks."""
         
         start_time = time.time()
@@ -535,7 +705,17 @@ class EinsteinIndexHub:
                             results.extend(faiss_results)
                             logger.info(f"FAISS search found {len(faiss_results)} results")
                 except Exception as e:
-                    logger.warning(f"FAISS search stage failed: {e}")
+                    logger.error(f"FAISS search stage failed: {e}", exc_info=True,
+                                extra={
+                                    'operation': 'semantic_search_faiss',
+                                    'error_type': type(e).__name__,
+                                    'query': query[:50],  # Truncate long queries
+                                    'query_length': len(query),
+                                    'faiss_available': self._faiss_available,
+                                    'embedding_pipeline_available': self._embedding_pipeline_available,
+                                    'faiss_loaded': self._faiss_loaded,
+                                    'vector_index_size': self.vector_index.ntotal if self.vector_index and hasattr(self.vector_index, 'ntotal') else 0
+                                })
             
             # Stage 2: Try embedding pipeline search if no FAISS results
             if not results and await self._ensure_embedding_pipeline():
@@ -547,7 +727,15 @@ class EinsteinIndexHub:
                             results.extend(pipeline_results)
                             logger.info(f"Embedding pipeline search found {len(pipeline_results)} results")
                 except Exception as e:
-                    logger.warning(f"Embedding pipeline search stage failed: {e}")
+                    logger.error(f"Embedding pipeline search stage failed: {e}", exc_info=True,
+                                extra={
+                                    'operation': 'semantic_search_embedding_pipeline',
+                                    'error_type': type(e).__name__,
+                                    'query': query[:50],  # Truncate long queries
+                                    'query_length': len(query),
+                                    'embedding_pipeline_available': self._embedding_pipeline_available,
+                                    'pipeline_type': type(self.embedding_pipeline).__name__ if self.embedding_pipeline else 'None'
+                                })
             
             # Stage 3: Try neural backend search as fallback
             if not results:
@@ -557,7 +745,15 @@ class EinsteinIndexHub:
                         results.extend(neural_results)
                         logger.info(f"Neural backend search found {len(neural_results)} results")
                 except Exception as e:
-                    logger.warning(f"Neural backend search stage failed: {e}")
+                    logger.error(f"Neural backend search stage failed: {e}", exc_info=True,
+                                extra={
+                                    'operation': 'semantic_search_neural_backend',
+                                    'error_type': type(e).__name__,
+                                    'query': query[:50],  # Truncate long queries
+                                    'query_length': len(query),
+                                    'neural_backend_available': self.neural_backend is not None,
+                                    'neural_backend_type': type(self.neural_backend).__name__ if self.neural_backend else 'None'
+                                })
             
             # Stage 4: Final fallback to enhanced text search
             if not results:
@@ -567,7 +763,14 @@ class EinsteinIndexHub:
                         results.extend(fallback_results)
                         logger.info(f"Semantic text fallback found {len(fallback_results)} results")
                 except Exception as e:
-                    logger.warning(f"Semantic text fallback failed: {e}")
+                    logger.warning(f"Semantic text fallback failed: {e}",
+                                  extra={
+                                      'operation': 'semantic_search_text_fallback',
+                                      'error_type': type(e).__name__,
+                                      'query': query[:50],
+                                      'fallback_stage': 'semantic_text',
+                                      'previous_results_count': len(results)
+                                  })
             
             # Ultimate fallback - basic text search
             if not results:
@@ -576,7 +779,15 @@ class EinsteinIndexHub:
                     results.extend(text_results)
                     logger.info(f"Using text search as ultimate fallback, found {len(text_results)} results")
                 except Exception as e:
-                    logger.error(f"All fallback methods failed: {e}")
+                    logger.error(f"All fallback methods failed: {e}", exc_info=True,
+                                extra={
+                                    'operation': 'semantic_search_ultimate_fallback',
+                                    'error_type': type(e).__name__,
+                                    'query': query[:50],
+                                    'fallback_stage': 'ultimate_text',
+                                    'previous_results_count': len(results),
+                                    'search_time_ms': (time.time() - start_time) * 1000
+                                })
                     # Return empty results rather than crash
                     results = []
             
@@ -587,15 +798,31 @@ class EinsteinIndexHub:
             return results[:20]  # Limit to top 20 results
             
         except Exception as e:
-            logger.error(f"Semantic search completely failed: {e}")
+            logger.error(f"Semantic search completely failed: {e}", exc_info=True,
+                        extra={
+                            'operation': 'semantic_search',
+                            'error_type': type(e).__name__,
+                            'query': query[:50],
+                            'search_time_ms': (time.time() - start_time) * 1000,
+                            'faiss_available': self._faiss_available,
+                            'embedding_pipeline_available': self._embedding_pipeline_available,
+                            'neural_backend_available': self.neural_backend is not None
+                        })
             # Even if everything fails, try to return some text-based results
             try:
                 return await self._fallback_text_search(query)
             except Exception as final_e:
-                logger.error(f"Final fallback also failed: {final_e}")
+                logger.error(f"Final fallback also failed: {final_e}", exc_info=True,
+                            extra={
+                                'operation': 'semantic_search_final_fallback',
+                                'error_type': type(final_e).__name__,
+                                'query': query[:50],
+                                'original_error': str(e),
+                                'search_time_ms': (time.time() - start_time) * 1000
+                            })
                 return []
     
-    async def _structural_search(self, query: str) -> List[SearchResult]:
+    async def _structural_search(self, query: str) -> list[SearchResult]:
         """Structural search using dependency graph."""
         
         start_time = time.time()
@@ -628,10 +855,18 @@ class EinsteinIndexHub:
             return results
             
         except Exception as e:
-            logger.error(f"Structural search failed: {e}")
+            logger.error(f"Structural search failed: {e}", exc_info=True,
+                        extra={
+                            'operation': 'structural_search',
+                            'error_type': type(e).__name__,
+                            'query': query[:50],
+                            'query_length': len(query),
+                            'dependency_graph_available': self.dependency_graph is not None,
+                            'search_time_ms': (time.time() - start_time) * 1000
+                        })
             return []
     
-    async def _analytical_search(self, query: str) -> List[SearchResult]:
+    async def _analytical_search(self, query: str) -> list[SearchResult]:
         """Analytical search using DuckDB."""
         
         start_time = time.time()
@@ -672,11 +907,12 @@ class EinsteinIndexHub:
             return results
             
         except Exception as e:
-            logger.error(f"Analytical search failed: {e}")
+            logger.error(f"Analytical search failed: {e}", exc_info=True,
+                        extra={'operation': 'analytical_search', 'query': query, 'duckdb_available': self.duckdb is not None})
             return []
     
     async def _record_search_analytics(self, query: str, result_count: int, search_time_ms: float, 
-                                      search_types: List[str] = None) -> None:
+                                      search_types: list[str] = None) -> None:
         """Record search analytics for performance monitoring and learning."""
         
         try:
@@ -696,9 +932,10 @@ class EinsteinIndexHub:
             await self._update_query_patterns(query, search_types or ['unified'], result_count > 0)
             
         except Exception as e:
-            logger.warning(f"Failed to record search analytics: {e}")
+            logger.error(f"Failed to record search analytics: {e}", exc_info=True,
+                        extra={'operation': 'record_search_analytics', 'query': query, 'result_count': result_count, 'search_time_ms': search_time_ms, 'search_types': search_types, 'duckdb_available': self.duckdb is not None})
     
-    async def get_intelligent_context(self, query: str) -> Dict[str, Any]:
+    async def get_intelligent_context(self, query: str) -> dict[str, Any]:
         """Get intelligent context for Jarvis using sequential thinking."""
         
         # Use tracer if available, otherwise skip tracing
@@ -708,7 +945,7 @@ class EinsteinIndexHub:
         else:
             return await self._get_context_impl(query, None)
     
-    async def _get_context_impl(self, query: str, span=None) -> Dict[str, Any]:
+    async def _get_context_impl(self, query: str, span=None) -> dict[str, Any]:
         """Implementation of get_intelligent_context with optional tracing."""
         
         # Use sequential thinking to analyze the query if available
@@ -762,7 +999,15 @@ class EinsteinIndexHub:
         try:
             einstein_dir.mkdir(parents=True, exist_ok=True)
         except Exception as e:
-            logger.error(f"Failed to create Einstein directory {einstein_dir}: {e}")
+            logger.error(f"Failed to create Einstein directory {einstein_dir}: {e}", exc_info=True,
+                        extra={
+                            'operation': 'create_einstein_directory',
+                            'error_type': type(e).__name__,
+                            'einstein_dir': str(einstein_dir),
+                            'parent_exists': einstein_dir.parent.exists(),
+                            'parent_writable': os.access(einstein_dir.parent, os.W_OK) if einstein_dir.parent.exists() else False,
+                            'project_root': str(self.project_root)
+                        })
             self.vector_index = None
             self._faiss_loaded = False
             return
@@ -777,10 +1022,10 @@ class EinsteinIndexHub:
             return
         
         try:
-            import faiss
-            
             # Set FAISS threading for optimal performance
             import os
+
+            import faiss
             num_threads = min(os.cpu_count() or 4, 8)  # Limit to 8 threads max
             faiss.omp_set_num_threads(num_threads)
             
@@ -806,7 +1051,9 @@ class EinsteinIndexHub:
                     try:
                         faiss_path.rename(backup_path)
                         logger.info(f"Backed up corrupted index to {backup_path}")
-                    except Exception:
+                    except (OSError, FileNotFoundError, PermissionError) as e:
+                        logger.debug(f"Failed to backup corrupted FAISS index {faiss_path} to {backup_path}: {e}",
+                                    extra={'operation': 'backup_corrupted_faiss_index', 'faiss_path': str(faiss_path), 'backup_path': str(backup_path)})
                         pass
                     
                     # Create new index
@@ -821,7 +1068,15 @@ class EinsteinIndexHub:
             self.vector_index = None
             self._faiss_loaded = False
         except Exception as e:
-            logger.error(f"❌ Failed to initialize FAISS index: {e}")
+            logger.error(f"❌ Failed to initialize FAISS index: {e}", exc_info=True,
+                        extra={
+                            'operation': 'initialize_persistent_faiss',
+                            'error_type': type(e).__name__,
+                            'faiss_path': str(faiss_path) if 'faiss_path' in locals() else 'unknown',
+                            'faiss_available': self._faiss_available,
+                            'einstein_dir': str(einstein_dir),
+                            'num_threads': locals().get('num_threads', 'unknown')
+                        })
             self.vector_index = None
             self._faiss_loaded = False
     
@@ -846,15 +1101,23 @@ class EinsteinIndexHub:
             return index
             
         except Exception as e:
-            logger.error(f"Failed to create new FAISS index: {e}")
+            logger.error(f"Failed to create new FAISS index: {e}", exc_info=True,
+                        extra={
+                            'operation': 'create_new_faiss_index',
+                            'error_type': type(e).__name__,
+                            'dimension': 1536,
+                            'index_type': 'IndexHNSWFlat',
+                            'faiss_available': self._faiss_available
+                        })
             self._faiss_loaded = False
             return None
     
     async def _initialize_embedding_pipeline(self) -> None:
         """Initialize the embedding pipeline for semantic search with comprehensive error handling."""
         try:
-            from src.unity_wheel.mcp.embedding_pipeline import EmbeddingPipeline
             import numpy as np
+
+            from src.unity_wheel.mcp.embedding_pipeline import EmbeddingPipeline
             
             # Create a robust embedding function for the pipeline
             def create_embedding_func():
@@ -883,7 +1146,7 @@ class EinsteinIndexHub:
                 return embedding_func
             
             # Initialize with Einstein cache path and proper embedding function
-            cache_path = self.project_root / ".einstein" / "embeddings.db"
+            cache_path = self.einstein_config.paths.embeddings_db_path
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             
             embedding_func = create_embedding_func()
@@ -916,11 +1179,13 @@ class EinsteinIndexHub:
             logger.info("✅ Embedding pipeline initialized with Einstein cache and validated embedding function")
             
         except ImportError as ie:
-            logger.warning(f"Embedding pipeline module not available: {ie}")
+            logger.warning(f"Embedding pipeline module not available: {ie}",
+                          extra={'operation': 'initialize_embedding_pipeline', 'module_import': 'embedding_pipeline'})
             self.embedding_pipeline = None
             self._embedding_pipeline_available = False
         except Exception as e:
-            logger.error(f"Failed to initialize embedding pipeline: {e}")
+            logger.error(f"Failed to initialize embedding pipeline: {e}", exc_info=True,
+                        extra={'operation': 'initialize_embedding_pipeline', 'einstein_dir': str(self.project_root / ".einstein")})
             self.embedding_pipeline = None
             self._embedding_pipeline_available = False
     
@@ -959,27 +1224,31 @@ class EinsteinIndexHub:
                 return True
                 
             except Exception as load_error:
-                logger.error(f"Failed to load FAISS index from {faiss_path}: {load_error}")
+                logger.error(f"Failed to load FAISS index from {faiss_path}: {load_error}", exc_info=True,
+                            extra={'operation': 'load_faiss_index', 'faiss_path': str(faiss_path), 'file_size': faiss_path.stat().st_size if faiss_path.exists() else 0})
                 
                 # Try to backup corrupted file
                 backup_path = faiss_path.with_suffix('.index.corrupted')
                 try:
                     faiss_path.rename(backup_path)
                     logger.info(f"Moved corrupted index to {backup_path}")
-                except Exception:
-                    pass
+                except (OSError, FileNotFoundError, PermissionError) as e:
+                    logger.warning(f"Failed to move corrupted FAISS index {faiss_path} to backup: {e}",
+                                  extra={'operation': 'backup_corrupted_index', 'faiss_path': str(faiss_path), 'backup_path': str(backup_path)})
                     
                 self.vector_index = None
                 self._faiss_loaded = False
                 return False
                 
         except ImportError:
-            logger.warning("⚠️  FAISS library not available for loading index")
+            logger.warning("FAISS library not available for loading index",
+                          extra={'operation': 'load_faiss_index', 'faiss_path': str(faiss_path)})
             self.vector_index = None
             self._faiss_loaded = False
             return False
         except Exception as e:
-            logger.error(f"❌ Unexpected error loading FAISS index: {e}")
+            logger.error(f"Unexpected error loading FAISS index: {e}", exc_info=True,
+                        extra={'operation': 'load_faiss_index', 'faiss_path': str(faiss_path), 'faiss_available': self._faiss_available})
             self.vector_index = None
             self._faiss_loaded = False
             return False
@@ -1076,7 +1345,9 @@ class EinsteinIndexHub:
                 if backup_path.exists():
                     try:
                         backup_path.unlink()
-                    except Exception:
+                    except (OSError, PermissionError) as e:
+                        logger.debug(f"Failed to clean up backup file {backup_path}: {e}",
+                                    extra={'operation': 'cleanup_faiss_backup', 'backup_path': str(backup_path), 'critical': False})
                         pass  # Not critical if backup cleanup fails
                 
                 logger.info(f"✅ Saved FAISS index with {self.vector_index.ntotal} vectors to {faiss_path}")
@@ -1089,7 +1360,9 @@ class EinsteinIndexHub:
                 if temp_path.exists():
                     try:
                         temp_path.unlink()
-                    except Exception:
+                    except (OSError, PermissionError) as e:
+                        logger.debug(f"Failed to clean up temporary FAISS index file {temp_path}: {e}",
+                                    extra={'operation': 'cleanup_temp_faiss_file', 'temp_path': str(temp_path), 'critical': False})
                         pass
                 
                 # Restore backup if it exists and main file is corrupted
@@ -1118,7 +1391,10 @@ class EinsteinIndexHub:
             file_count_result = await self.duckdb.execute(
                 "SELECT COUNT(*) FROM file_analytics"
             )
-            total_files = file_count_result[0][0] if file_count_result else 0
+            if file_count_result:
+                # Convert PyArrow scalar to Python int
+                raw_count = file_count_result[0][0]
+                total_files = int(raw_count.as_py()) if hasattr(raw_count, 'as_py') else int(raw_count)
         except Exception as e:
             logger.warning(f"Could not get file count from analytics: {e}")
         
@@ -1128,7 +1404,11 @@ class EinsteinIndexHub:
             total_lines_result = await self.duckdb.execute(
                 "SELECT SUM(lines_of_code) FROM file_analytics WHERE lines_of_code IS NOT NULL"
             )
-            total_lines = total_lines_result[0][0] if total_lines_result and total_lines_result[0][0] else 0
+            if total_lines_result and total_lines_result[0][0] is not None:
+                # Convert PyArrow scalar to Python int
+                raw_lines = total_lines_result[0][0]
+                if raw_lines is not None:
+                    total_lines = int(raw_lines.as_py()) if hasattr(raw_lines, 'as_py') else int(raw_lines)
         except Exception as e:
             logger.warning(f"Could not get total lines from analytics: {e}")
         
@@ -1144,9 +1424,8 @@ class EinsteinIndexHub:
             avg_performance[search_type] = sum(times) / len(times) if times else 0.0
         
         # Get FAISS index size if available
-        faiss_size = 0
         if self.vector_index and hasattr(self.vector_index, 'ntotal'):
-            faiss_size = self.vector_index.ntotal
+            pass
         
         return IndexStats(
             total_files=total_files,
@@ -1174,12 +1453,10 @@ class EinsteinIndexHub:
                             continue
             
             # Add DuckDB database file size
-            db_path = self.project_root / "einstein_analytics.db"
+            db_path = self.einstein_config.paths.analytics_db_path
             if db_path.exists():
-                try:
+                with contextlib.suppress(OSError, FileNotFoundError):
                     total_size_bytes += db_path.stat().st_size
-                except (OSError, FileNotFoundError):
-                    pass
             
             # Add any other index-related files
             for cache_pattern in [".einstein_cache", ".metacoding_cache", ".thinking_cache"]:
@@ -1220,8 +1497,14 @@ class EinsteinIndexHub:
                 indexed_files_result = await self.duckdb.execute(
                     "SELECT COUNT(*) FROM file_analytics"
                 )
-                indexed_files = indexed_files_result[0][0] if indexed_files_result else 0
-            except Exception:
+                if indexed_files_result:
+                    # Convert PyArrow scalar to Python int
+                    raw_indexed = indexed_files_result[0][0]
+                    indexed_files = int(raw_indexed.as_py()) if hasattr(raw_indexed, 'as_py') else int(raw_indexed)
+                else:
+                    indexed_files = 0
+            except (sqlite3.Error, AttributeError, TypeError, ValueError) as e:
+                logger.debug(f"DuckDB query failed for coverage calculation - database may not be initialized: {e}")
                 # Database not initialized yet
                 indexed_files = 0
             
@@ -1239,21 +1522,51 @@ class EinsteinIndexHub:
                 indexed_files_result = await self.duckdb.execute(
                     "SELECT COUNT(*) FROM file_analytics"
                 )
-                indexed_files = indexed_files_result[0][0] if indexed_files_result else 0
+                if indexed_files_result:
+                    # Convert PyArrow scalar to Python int
+                    raw_indexed = indexed_files_result[0][0]
+                    indexed_files = int(raw_indexed.as_py()) if hasattr(raw_indexed, 'as_py') else int(raw_indexed)
+                else:
+                    indexed_files = 0
                 
                 # Assume we've indexed a reasonable portion if we have any data
                 if indexed_files > 0:
                     return min(80.0, indexed_files * 2.0)  # Conservative estimate
                 else:
                     return 0.0
-            except:
+            except (sqlite3.Error, AttributeError, TypeError, ValueError) as e:
+                logger.warning(f"Failed to query DuckDB for coverage fallback calculation: {e}")
                 return 0.0
+    
+    def _prepare_file_watcher(self) -> None:
+        """Prepare file watcher components without starting them."""
+        try:
+            # Initialize file watcher attributes if not already done
+            if not hasattr(self, '_shutdown_event') or self._shutdown_event is None:
+                self._shutdown_event = None
+                
+            if not hasattr(self, '_file_change_loop') or self._file_change_loop is None:
+                self._file_change_loop = None
+                
+            if not hasattr(self, '_file_change_task') or self._file_change_task is None:
+                self._file_change_task = None
+                
+            if not hasattr(self, 'file_watcher') or self.file_watcher is None:
+                self.file_watcher = None
+                
+            if not hasattr(self, 'file_change_queue') or self.file_change_queue is None:
+                self.file_change_queue = None
+                
+            logger.debug("📁 File watcher components prepared")
+            
+        except Exception as e:
+            logger.warning(f"Failed to prepare file watcher: {e}")
     
     async def _start_file_watcher(self) -> None:
         """Start real-time file system monitoring for automatic reindexing."""
         try:
             # Initialize async components for file watching
-            self.file_change_queue = asyncio.Queue(maxsize=1000)  # Prevent memory bloat
+            self.file_change_queue = asyncio.Queue(maxsize=self.einstein_config.cache.max_cache_entries // 10)  # Prevent memory bloat
             self._shutdown_event = asyncio.Event()
             
             # Get current event loop for proper callback handling
@@ -1308,7 +1621,7 @@ class EinsteinIndexHub:
                     finally:
                         self.file_change_queue.task_done()
                         
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Timeout is normal - just check shutdown and continue
                     continue
                     
@@ -1428,11 +1741,7 @@ class EinsteinIndexHub:
                 '.einstein', '.thinking_cache', '.metacoding_cache'
             }
             
-            for ignored in ignored_patterns:
-                if ignored in path.parts:
-                    return False
-            
-            return True
+            return all(ignored not in path.parts for ignored in ignored_patterns)
             
         except Exception as e:
             logger.warning(f"Error checking if should process {file_path}: {e}")
@@ -1457,10 +1766,8 @@ class EinsteinIndexHub:
             # Cancel file change processing task
             if hasattr(self, '_file_change_task') and self._file_change_task and not self._file_change_task.done():
                 self._file_change_task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await self._file_change_task
-                except asyncio.CancelledError:
-                    pass
             
             # Stop file watcher
             if hasattr(self, 'file_watcher') and self.file_watcher:
@@ -1473,7 +1780,8 @@ class EinsteinIndexHub:
                     try:
                         self.file_change_queue.get_nowait()
                         self.file_change_queue.task_done()
-                    except:
+                    except (asyncio.QueueEmpty, RuntimeError) as e:
+                        logger.debug(f"Queue cleanup completed or queue operation failed: {e}")
                         break
             
             logger.info("📋 File watcher cleanup completed")
@@ -1481,7 +1789,7 @@ class EinsteinIndexHub:
         except Exception as e:
             logger.error(f"Error during file watcher cleanup: {e}")
     
-    async def _update_query_patterns(self, query: str, search_types: List[str], had_results: bool) -> None:
+    async def _update_query_patterns(self, query: str, search_types: list[str], had_results: bool) -> None:
         """Update query patterns for learning."""
         try:
             query_hash = hashlib.md5(query.lower().encode()).hexdigest()
@@ -1518,7 +1826,7 @@ class EinsteinIndexHub:
         except Exception as e:
             logger.warning(f"Failed to update query patterns: {e}")
     
-    async def get_optimized_search_types(self, query: str) -> List[str]:
+    async def get_optimized_search_types(self, query: str) -> list[str]:
         """Get optimized search types based on query learning."""
         try:
             query_hash = hashlib.md5(query.lower().encode()).hexdigest()
@@ -1550,7 +1858,7 @@ class EinsteinIndexHub:
                 similar_patterns_df = similar_patterns_result_arrow.to_pandas()
                 
                 for _, row in similar_patterns_df.iterrows():
-                    pattern_types, rating, pattern_text = row['best_search_types'], row['avg_success_rating'], row['query_text']
+                    pattern_types, _rating, pattern_text = row['best_search_types'], row['avg_success_rating'], row['query_text']
                     pattern_words = set(pattern_text.lower().split())
                     union_words = query_words.union(pattern_words)
                     overlap = len(query_words.intersection(pattern_words)) / len(union_words) if len(union_words) > 0 else 0.0
@@ -1565,7 +1873,7 @@ class EinsteinIndexHub:
         # Fall back to default
         return ['text', 'semantic', 'structural']
     
-    def get_faiss_status(self) -> Dict[str, Any]:
+    def get_faiss_status(self) -> dict[str, Any]:
         """Get detailed FAISS status information.
         
         Returns:
@@ -1613,7 +1921,7 @@ class EinsteinIndexHub:
             
             if len(existing_pattern_df) > 0:
                 row = existing_pattern_df.iloc[0]
-                old_rating, count = row['avg_success_rating'], row['usage_count']
+                old_rating, _count = row['avg_success_rating'], row['usage_count']
                 # Weight user feedback more heavily than automatic scoring
                 new_rating = (old_rating * 0.7 + success_rating * 0.3)
                 
@@ -1628,7 +1936,7 @@ class EinsteinIndexHub:
         except Exception as e:
             logger.error(f"Failed to record user feedback: {e}")
     
-    async def get_search_analytics_summary(self) -> Dict[str, Any]:
+    async def get_search_analytics_summary(self) -> dict[str, Any]:
         """Get summary of search analytics and learning."""
         try:
             # Get recent search statistics
@@ -1685,6 +1993,31 @@ class EinsteinIndexHub:
             logger.error(f"Failed to get analytics summary: {e}")
             return {}
     
+    async def start_file_watching(self) -> None:
+        """Start file system watching for real-time index updates.
+        
+        This is the main entry point for file watching, compatible with the startup script.
+        """
+        try:
+            if hasattr(self, 'file_watcher') and self.file_watcher and self.file_watcher.is_alive():
+                logger.info("📁 File watcher already running")
+                return
+            
+            logger.info("🔍 Starting Einstein file watching system...")
+            
+            # Start the file watcher
+            await self._start_file_watcher()
+            
+            logger.info("✅ File watching started successfully")
+            
+        except Exception as e:
+            logger.error(f"Failed to start file watching: {e}")
+            raise
+    
+    async def stop_file_watching(self) -> None:
+        """Stop the file system watcher safely."""
+        await self._cleanup_file_watcher()
+    
     async def stop_file_watcher(self) -> None:
         """Stop the file system watcher safely."""
         await self._cleanup_file_watcher()
@@ -1695,6 +2028,84 @@ class EinsteinIndexHub:
             self.file_watcher.stop()
             self.file_watcher.join()
             logger.info("🛑 File watcher stopped")
+    
+    def get_file_watching_stats(self) -> dict[str, Any]:
+        """Get file watching statistics."""
+        try:
+            stats = {
+                'is_watching': False,
+                'files_processed': 0,
+                'updates_queued': 0,
+                'updates_completed': 0,
+                'uptime_seconds': 0,
+                'watch_paths': [str(self.project_root)]
+            }
+            
+            if hasattr(self, 'file_watcher') and self.file_watcher:
+                stats['is_watching'] = self.file_watcher.is_alive()
+            
+            if hasattr(self, 'file_change_queue') and self.file_change_queue:
+                stats['updates_queued'] = self.file_change_queue.qsize()
+            
+            if hasattr(self, '_file_change_task') and self._file_change_task:
+                stats['updates_completed'] = getattr(self._file_change_task, '_completed_tasks', 0)
+            
+            return stats
+            
+        except Exception as e:
+            logger.warning(f"Failed to get file watching stats: {e}")
+            return {
+                'is_watching': False,
+                'files_processed': 0,
+                'updates_queued': 0,
+                'updates_completed': 0,
+                'uptime_seconds': 0,
+                'watch_paths': [str(self.project_root)]
+            }
+    
+    async def cleanup(self) -> None:
+        """Clean up all Einstein resources safely.
+        
+        This is the main cleanup method expected by startup/shutdown scripts.
+        """
+        try:
+            logger.info("🧹 Starting Einstein cleanup...")
+            
+            # Stop file watching first
+            await self.stop_file_watching()
+            
+            # Clean up file watcher resources
+            await self._cleanup_file_watcher()
+            
+            # Save any persistent indexes
+            try:
+                if hasattr(self, 'vector_index') and self.vector_index:
+                    await self.save_faiss_index()
+                    logger.debug("💾 FAISS index saved during cleanup")
+            except Exception as e:
+                logger.warning(f"Failed to save FAISS index during cleanup: {e}")
+            
+            # Shutdown executor
+            try:
+                if hasattr(self, 'executor') and self.executor:
+                    self.executor.shutdown(wait=False)
+                    logger.debug("⚡ Thread pool executor shutdown")
+            except Exception as e:
+                logger.warning(f"Error shutting down executor: {e}")
+            
+            # Close database connections
+            try:
+                if hasattr(self, 'duckdb') and self.duckdb:
+                    # DuckDB connections are automatically managed, no explicit close needed
+                    logger.debug("💾 DuckDB connections released")
+            except Exception as e:
+                logger.warning(f"Error cleaning up DuckDB: {e}")
+            
+            logger.info("✅ Einstein cleanup completed successfully")
+            
+        except Exception as e:
+            logger.error(f"Error during Einstein cleanup: {e}")
+            # Don't re-raise - cleanup should be as robust as possible
     
     # Semantic Search Helper Methods
     async def _ensure_embedding_pipeline(self) -> bool:
@@ -1740,7 +2151,7 @@ class EinsteinIndexHub:
             self._embedding_pipeline_available = False
             return False
     
-    async def _safe_get_query_embedding(self, query: str) -> Tuple[Optional[Any], int]:
+    async def _safe_get_query_embedding(self, query: str) -> tuple[Any | None, int]:
         """Safely get query embedding with multiple fallback mechanisms."""
         try:
             if not self.embedding_pipeline or not hasattr(self.embedding_pipeline, 'embedding_func'):
@@ -1781,7 +2192,8 @@ class EinsteinIndexHub:
                     try:
                         # This would be replaced with actual neural backend call
                         pass
-                    except Exception:
+                    except (AttributeError, ImportError, RuntimeError) as e:
+                        logger.debug(f"Neural backend embedding failed, using fallback: {e}")
                         pass
                 
                 # Fallback to mock embedding
@@ -1798,7 +2210,7 @@ class EinsteinIndexHub:
                 
         return embedding_func
     
-    async def _try_faiss_search(self, query_embedding: 'np.ndarray') -> List[SearchResult]:
+    async def _try_faiss_search(self, query_embedding: 'np.ndarray') -> list[SearchResult]:
         """Try FAISS search with comprehensive error handling."""
         results = []
         
@@ -1891,13 +2303,13 @@ class EinsteinIndexHub:
             
             # Convert results with validation
             valid_results = 0
-            for score, idx in zip(scores[0], indices[0]):
+            for score, idx in zip(scores[0], indices[0], strict=False):
                 try:
                     # Validate result components
                     if idx < 0:
                         continue  # Invalid index
                         
-                    if not isinstance(score, (int, float)) or score <= 0.1:
+                    if not isinstance(score, int | float) or score <= 0.1:
                         continue  # Score too low or invalid
                         
                     # Create search result
@@ -1933,7 +2345,7 @@ class EinsteinIndexHub:
             
         return results
     
-    async def _try_embedding_pipeline_search(self, query: str, query_embedding: 'np.ndarray') -> List[SearchResult]:
+    async def _try_embedding_pipeline_search(self, query: str, query_embedding: 'np.ndarray') -> list[SearchResult]:
         """Try embedding pipeline search with error handling."""
         results = []
         
@@ -1974,7 +2386,7 @@ class EinsteinIndexHub:
             
         return results
     
-    async def _try_neural_backend_search(self, query: str) -> List[SearchResult]:
+    async def _try_neural_backend_search(self, query: str) -> list[SearchResult]:
         """Try neural backend search as fallback."""
         results = []
         
@@ -2005,7 +2417,7 @@ class EinsteinIndexHub:
             logger.warning(f"Neural backend embedding failed: {e}")
             return None
     
-    async def _fallback_text_search(self, query: str) -> List[SearchResult]:
+    async def _fallback_text_search(self, query: str) -> list[SearchResult]:
         """Fallback to text search when semantic search is unavailable."""
         try:
             logger.info("Using text search fallback for semantic query")
@@ -2014,7 +2426,7 @@ class EinsteinIndexHub:
             logger.error(f"Text search fallback failed: {e}")
             return []
     
-    async def _fallback_similarity_search(self, query: str) -> List[SearchResult]:
+    async def _fallback_similarity_search(self, query: str) -> list[SearchResult]:
         """Fallback similarity search using text-based methods."""
         try:
             # Try text search first
@@ -2031,7 +2443,7 @@ class EinsteinIndexHub:
             logger.error(f"Fallback similarity search failed: {e}")
             return []
     
-    async def _fallback_semantic_text_search(self, query: str) -> List[SearchResult]:
+    async def _fallback_semantic_text_search(self, query: str) -> list[SearchResult]:
         """Final fallback using enhanced text search for semantic queries."""
         try:
             # Split query into individual terms for broader matching
@@ -2067,7 +2479,7 @@ class EinsteinIndexHub:
 
 
 # Global instance
-_einstein_hub: Optional[EinsteinIndexHub] = None
+_einstein_hub: EinsteinIndexHub | None = None
 
 
 class EinsteinFileHandler(FileSystemEventHandler):
@@ -2080,7 +2492,7 @@ class EinsteinFileHandler(FileSystemEventHandler):
     def __init__(self, einstein_hub: EinsteinIndexHub):
         super().__init__()
         self.einstein_hub = einstein_hub
-        self.debounce_delay = 0.25  # 250ms debounce
+        self.debounce_delay = self.einstein_config.monitoring.debounce_delay_ms / 1000.0  # Convert ms to seconds
         self.pending_events = {}  # file_path -> (event_type, timer)
     
     def _schedule_event(self, file_path: str, event_type: str):
@@ -2184,7 +2596,7 @@ class EinsteinFileHandler(FileSystemEventHandler):
     
     def cleanup(self):
         """Clean up any pending timers."""
-        for file_path, (event_type, timer) in self.pending_events.items():
+        for _file_path, (_event_type, timer) in self.pending_events.items():
             if timer:
                 timer.cancel()
         self.pending_events.clear()
