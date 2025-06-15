@@ -131,6 +131,33 @@ mcp-servers-*.json
 *.duckdb
 *.parquet
 
+# Einstein system - databases, caches, and state files
+.einstein/
+.jarvis/indexes/
+.mac_thinking_cache/
+.metacoding_cache/
+.thinking_cache/
+
+# Meta system databases and state
+meta_*.db
+meta_*.db-shm
+meta_*.db-wal
+meta_*.pid
+jarvis2_*.db
+*.db
+!*schema*.db
+!*template*.db
+
+# Session and monitoring files
+claude_cli_session_*.json
+system_status.json
+settings.json
+profile_output.txt
+
+# Meta system backups and logs
+meta_backups/
+backups/
+
 # Claude Code generated files
 *_COMPLETE.md
 *_SUMMARY.md
