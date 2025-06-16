@@ -176,6 +176,12 @@ class DynamicCoreManager:
                 elif p_cores >= 4 and total_cores >= 8:
                     chip_type = MacChip.M4
                     gpu_cores = 10
+                
+                # Special handling for M4 Max Studio with 128GB RAM
+                if memory_gb >= 120 and p_cores >= 12:
+                    chip_type = MacChip.M4_MAX
+                    gpu_cores = 40
+                    self.logger.info("🏢 Detected M4 Max Studio configuration!")
             
             config = CoreConfiguration(
                 chip_type=chip_type,
