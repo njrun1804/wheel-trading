@@ -199,3 +199,4 @@ requirements-*.txt
 =*
 *.tar.gz
 .env.bak
+mcp-servers/statsource/
