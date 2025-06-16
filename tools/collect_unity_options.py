@@ -8,8 +8,7 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional, Tuple
+from datetime import UTC, datetime, timedelta
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,7 +25,7 @@ from src.unity_wheel.utils.logging import StructuredLogger
 logger = StructuredLogger(logging.getLogger(__name__))
 
 
-def get_fridays(months_back: int = 6) -> List[datetime]:
+def get_fridays(months_back: int = 6) -> list[datetime]:
     """Generate list of Fridays going back N months.
 
     Args:
@@ -36,7 +35,7 @@ def get_fridays(months_back: int = 6) -> List[datetime]:
         List of Friday dates in chronological order
     """
     fridays = []
-    end_date = datetime.now(timezone.utc)
+    end_date = datetime.now(UTC)
     start_date = end_date - timedelta(days=months_back * 30)
 
     # Find first Friday
@@ -46,7 +45,9 @@ def get_fridays(months_back: int = 6) -> List[datetime]:
 
     # Collect all Fridays
     while current <= end_date:
-        fridays.append(current.replace(hour=15, minute=0, second=0, microsecond=0))  # Market close
+        fridays.append(
+            current.replace(hour=15, minute=0, second=0, microsecond=0)
+        )  # Market close
         current += timedelta(days=7)
 
     return fridays
@@ -55,9 +56,9 @@ def get_fridays(months_back: int = 6) -> List[datetime]:
 async def collect_historical_chains(
     symbol: str = "U",
     months_back: int = 6,
-    dte_range: Tuple[int, int] = (30, 60),
+    dte_range: tuple[int, int] = (30, 60),
     batch_size: int = 5,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Collect historical Unity option chains for Fridays.
 
     Args:
@@ -97,7 +98,7 @@ async def collect_historical_chains(
 
     # Get list of Fridays
     fridays = get_fridays(months_back)
-    logger.info(f"collecting_data_for_fridays", extra={"count": len(fridays)})
+    logger.info("collecting_data_for_fridays", extra={"count": len(fridays)})
 
     # Statistics
     stats = {
@@ -117,7 +118,9 @@ async def collect_historical_chains(
         # Process batch concurrently
         tasks = []
         for friday in batch:
-            tasks.append(process_friday(client, adapter, symbol, friday, dte_range, stats))
+            tasks.append(
+                process_friday(client, adapter, symbol, friday, dte_range, stats)
+            )
 
         # Wait for batch to complete
         await asyncio.gather(*tasks, return_exceptions=True)
@@ -168,7 +171,7 @@ async def collect_historical_chains(
 
     # Get storage statistics
     storage_stats = await adapter.get_storage_stats()
-    print(f"\n💾 Storage Statistics:")
+    print("\n💾 Storage Statistics:")
     print(f"  Database size: {storage_stats['db_size_mb']:.1f} MB")
     print(f"  Unique expirations: {storage_stats['unique_expirations']}")
     print(f"  Cache hit rate: {storage_stats['cache_hit_rate']:.1%}")
@@ -184,8 +187,8 @@ async def process_friday(
     adapter: DatabentoStorageAdapter,
     symbol: str,
     friday: datetime,
-    dte_range: Tuple[int, int],
-    stats: Dict,
+    dte_range: tuple[int, int],
+    stats: dict,
 ) -> None:
     """Process a single Friday's option data.
 
@@ -198,7 +201,9 @@ async def process_friday(
         stats: Statistics dictionary to update
     """
     try:
-        logger.info("processing_friday", extra={"date": friday.isoformat(), "symbol": symbol})
+        logger.info(
+            "processing_friday", extra={"date": friday.isoformat(), "symbol": symbol}
+        )
 
         # Find expirations in our target DTE range
         min_expiry = friday + timedelta(days=dte_range[0])
@@ -272,7 +277,9 @@ async def process_friday(
                     )
 
             except Exception as e:
-                error_msg = f"Failed to fetch {symbol} expiring {expiration.date()}: {str(e)}"
+                error_msg = (
+                    f"Failed to fetch {symbol} expiring {expiration.date()}: {str(e)}"
+                )
                 logger.error("expiration_fetch_error", extra={"error": error_msg})
                 stats["errors"].append(error_msg)
 
@@ -389,7 +396,10 @@ async def main():
         description="Collect historical Unity options data from Databento"
     )
     parser.add_argument(
-        "--months", type=int, default=6, help="Number of months of history to collect (default: 6)"
+        "--months",
+        type=int,
+        default=6,
+        help="Number of months of history to collect (default: 6)",
     )
     parser.add_argument(
         "--validate-only",
@@ -412,9 +422,11 @@ async def main():
     else:
         print(f"🚀 Starting historical collection for {args.symbol}")
         print(f"📅 Collecting {args.months} months of Friday option chains")
-        print(f"🎯 Focusing on 30-60 DTE puts for wheel strategy\n")
+        print("🎯 Focusing on 30-60 DTE puts for wheel strategy\n")
 
-        stats = await collect_historical_chains(symbol=args.symbol, months_back=args.months)
+        stats = await collect_historical_chains(
+            symbol=args.symbol, months_back=args.months
+        )
 
         # Validate after collection
         if stats["successful_fetches"] > 0:

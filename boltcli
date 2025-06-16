@@ -1,0 +1,5 @@
+#\!/bin/bash
+# Bolt CLI wrapper script for easier access
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "${DIR}/bolt_executable" "$@"
+EOF < /dev/null

@@ -4,21 +4,19 @@ High-performance Unity options downloader implementing all 9 optimizations.
 Targets <1 second per expiration, <600ms for two expirations.
 """
 
-import asyncio
 import logging
 import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import aiohttp
 import databento as db
 import duckdb
-import pyarrow as pa
-import pyarrow.parquet as pq
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -27,15 +25,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
 # ============================================================
 # OPTIMIZATION 1: Singleton client with shared session
 # ============================================================
-_SESSION: Optional[aiohttp.ClientSession] = None
-_CLIENT: Optional[db.Historical] = None
+_SESSION: aiohttp.ClientSession | None = None
+_CLIENT: db.Historical | None = None
 
 
 def get_db_client() -> db.Historical:
@@ -76,8 +76,8 @@ class HighPerfUnityDownloader:
         self._local = threading.local()
 
         # Cache for spot prices and symbology
-        self.spot_cache: Dict[str, float] = {}
-        self.symbology_cache: Dict[str, Any] = {}
+        self.spot_cache: dict[str, float] = {}
+        self.symbology_cache: dict[str, Any] = {}
 
         # Setup tables
         self.setup_tables()
@@ -159,9 +159,8 @@ class HighPerfUnityDownloader:
     # ============================================================
     # OPTIMIZATION 2: Parallel fetching by date
     # ============================================================
-    def download_dates_parallel(self, dates: List[datetime.date]) -> int:
+    def download_dates_parallel(self, dates: list[datetime.date]) -> int:
         """Download multiple dates in parallel using ThreadPoolExecutor."""
-        import threading
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         max_workers = 8  # 5-8 concurrent optimal
@@ -170,7 +169,8 @@ class HighPerfUnityDownloader:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # Submit all tasks
             future_to_date = {
-                executor.submit(self.download_single_date_sync, date): date for date in dates
+                executor.submit(self.download_single_date_sync, date): date
+                for date in dates
             }
 
             # Process completed tasks
@@ -279,9 +279,8 @@ class HighPerfUnityDownloader:
 
         return len(records_to_insert)
 
-    def batch_insert(self, records: List[tuple]):
+    def batch_insert(self, records: list[tuple]):
         """Efficiently batch insert records with thread safety."""
-        import threading
 
         # Create thread-local connection for thread safety
         if not hasattr(self._local, "conn"):
@@ -301,13 +300,13 @@ class HighPerfUnityDownloader:
 
         self._local.conn.commit()
 
-    def convert_price(self, price) -> Optional[float]:
+    def convert_price(self, price) -> float | None:
         """Convert Databento price format efficiently."""
         if price is None:
             return None
         try:
             # Databento uses fixed-point representation
-            if isinstance(price, (int, float)):
+            if isinstance(price, int | float):
                 if price > 10000:
                     return float(price) / 10000.0
                 elif price > 1000:
@@ -369,7 +368,7 @@ class HighPerfUnityDownloader:
         logger.info("=" * 60)
 
         # Performance metrics
-        logger.info(f"Performance Metrics:")
+        logger.info("Performance Metrics:")
         logger.info(f"  Total time: {duration_secs:.1f} seconds")
         logger.info(f"  Days/second: {days_requested/duration_secs:.1f}")
         logger.info(f"  Records/second: {total_records/duration_secs:.0f}")
@@ -391,7 +390,7 @@ class HighPerfUnityDownloader:
         ).fetchone()
 
         if stats and stats[0] > 0:
-            logger.info(f"\nData Statistics:")
+            logger.info("\nData Statistics:")
             logger.info(f"  Trading days: {stats[0]}")
             logger.info(f"  Unique contracts: {stats[1]:,}")
             logger.info(f"  Total records: {stats[2]:,}")
@@ -401,7 +400,9 @@ class HighPerfUnityDownloader:
             actual_days = stats[0]
             coverage = (actual_days / days_requested) * 100
 
-            logger.info(f"  Coverage: {coverage:.1f}% ({actual_days}/{days_requested} days)")
+            logger.info(
+                f"  Coverage: {coverage:.1f}% ({actual_days}/{days_requested} days)"
+            )
 
             if stats[5]:  # If we have volume data
                 daily_volume = stats[5] / stats[0]
@@ -410,19 +411,19 @@ class HighPerfUnityDownloader:
                 logger.info(f"  Avg volume per contract: {stats[6]:.1f}")
 
                 # Compare to expected
-                logger.info(f"\nValidation:")
-                logger.info(f"  Expected: ~55,000 contracts/day (CBOE)")
+                logger.info("\nValidation:")
+                logger.info("  Expected: ~55,000 contracts/day (CBOE)")
                 logger.info(f"  Actual: {daily_volume:,.0f} contracts/day")
 
                 if daily_volume > 40000:
-                    logger.info(f"  ✅ EXCELLENT! Data matches expectations")
+                    logger.info("  ✅ EXCELLENT! Data matches expectations")
                 elif daily_volume > 20000:
-                    logger.info(f"  ✅ Good coverage")
+                    logger.info("  ✅ Good coverage")
                 else:
-                    logger.info(f"  ⚠️  Lower than expected")
+                    logger.info("  ⚠️  Lower than expected")
 
             # Show sample of recent data
-            logger.info(f"\nRecent Data Quality Check:")
+            logger.info("\nRecent Data Quality Check:")
             recent = self.conn.execute(
                 """
                 SELECT
@@ -439,7 +440,9 @@ class HighPerfUnityDownloader:
             ).fetchall()
 
             if recent:
-                logger.info(f"  {'Date':<12} {'Contracts':<10} {'Volume':<12} {'Avg Price':<10}")
+                logger.info(
+                    f"  {'Date':<12} {'Contracts':<10} {'Volume':<12} {'Avg Price':<10}"
+                )
                 logger.info(f"  {'-'*12} {'-'*10} {'-'*12} {'-'*10}")
                 for date, contracts, volume, avg_price in recent:
                     avg_str = f"${avg_price:.2f}" if avg_price else "N/A"
@@ -451,23 +454,23 @@ class HighPerfUnityDownloader:
             standard_time = days_requested * 3  # ~3 seconds per day standard
             speedup = standard_time / duration_secs
 
-            logger.info(f"\nPerformance Improvement:")
+            logger.info("\nPerformance Improvement:")
             logger.info(f"  Standard approach: ~{standard_time:.0f} seconds")
             logger.info(f"  High-perf approach: {duration_secs:.1f} seconds")
             logger.info(f"  Speedup: {speedup:.1f}x faster")
 
-            logger.info(f"\n✅ High-performance download successful!")
-            logger.info(f"✅ All optimizations applied")
-            logger.info(f"✅ Real data from Databento OPRA feed")
+            logger.info("\n✅ High-performance download successful!")
+            logger.info("✅ All optimizations applied")
+            logger.info("✅ Real data from Databento OPRA feed")
 
             # Note about further optimizations
-            logger.info(f"\nFor even better performance:")
-            logger.info(f"  • Deploy to us-east-1/4 (saves ~40ms RTT)")
-            logger.info(f"  • Use Databento Live API for real-time updates")
-            logger.info(f"  • Process DBN format directly (skip DataFrame)")
+            logger.info("\nFor even better performance:")
+            logger.info("  • Deploy to us-east-1/4 (saves ~40ms RTT)")
+            logger.info("  • Use Databento Live API for real-time updates")
+            logger.info("  • Process DBN format directly (skip DataFrame)")
 
         else:
-            logger.warning(f"\n⚠️  No data in database")
+            logger.warning("\n⚠️  No data in database")
 
     def cleanup(self):
         """Cleanup resources."""

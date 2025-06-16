@@ -5,12 +5,12 @@ from __future__ import annotations
 import json
 from datetime import date as Date
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from unity_wheel.storage.storage import Storage
 from unity_wheel.utils import get_logger, timed_operation
 
-from .fred_models import FREDDataset, FREDObservation, FREDSeries, WheelStrategyFREDSeries
+from .fred_models import FREDDataset, FREDObservation, FREDSeries
 
 logger = get_logger(__name__)
 
@@ -139,7 +139,7 @@ class FREDStorage:
     async def save_observations(
         self,
         series_id: str,
-        observations: List[FREDObservation],
+        observations: list[FREDObservation],
         mark_revised: bool = False,
     ) -> int:
         """Save observations to storage."""
@@ -168,7 +168,7 @@ class FREDStorage:
                 # Convert to DataFrame for faster bulk insert
                 import pandas as pd
 
-                df = pd.DataFrame(
+                pd.DataFrame(
                     data,
                     columns=[
                         "series_id",
@@ -197,7 +197,7 @@ class FREDStorage:
         await self.save_series_metadata(dataset.series)
         await self.save_observations(dataset.series.series_id, dataset.observations)
 
-    async def get_latest_observation(self, series_id: str) -> Optional[tuple[float, Date]]:
+    async def get_latest_observation(self, series_id: str) -> tuple[float, Date] | None:
         """Get the most recent observation for a series."""
         await self.initialize()
 
@@ -220,10 +220,10 @@ class FREDStorage:
     async def get_observations(
         self,
         series_id: str,
-        start_date: Optional[Date] = None,
-        end_date: Optional[Date] = None,
-        limit: Optional[int] = None,
-    ) -> List[FREDObservation]:
+        start_date: Date | None = None,
+        end_date: Date | None = None,
+        limit: int | None = None,
+    ) -> list[FREDObservation]:
         """Get observations from storage."""
         await self.initialize()
 
@@ -263,7 +263,9 @@ class FREDStorage:
             # Return in chronological order
             return list(reversed(observations))
 
-    async def save_risk_metrics(self, metric_date: Date, metrics: Dict[str, Any]) -> None:
+    async def save_risk_metrics(
+        self, metric_date: Date, metrics: dict[str, Any]
+    ) -> None:
         """Save calculated risk metrics."""
         await self.initialize()
 
@@ -286,7 +288,7 @@ class FREDStorage:
                 ],
             )
 
-    async def get_risk_metrics(self, metric_date: Date) -> Optional[Dict[str, Any]]:
+    async def get_risk_metrics(self, metric_date: Date) -> dict[str, Any] | None:
         """Get risk metrics for a specific date."""
         await self.initialize()
 
@@ -311,7 +313,9 @@ class FREDStorage:
                     "high_yield_spread",
                     "created_at",
                 ]
-                return {col: result[i] for i, col in enumerate(columns) if i < len(result)}
+                return {
+                    col: result[i] for i, col in enumerate(columns) if i < len(result)
+                }
             return None
 
     async def save_feature(
@@ -321,7 +325,7 @@ class FREDStorage:
         calculation_date: Date,
         value: float,
         confidence: float = 1.0,
-        parameters: Optional[Dict[str, Any]] = None,
+        parameters: dict[str, Any] | None = None,
     ) -> None:
         """Save calculated feature value."""
         await self.initialize()
@@ -343,7 +347,7 @@ class FREDStorage:
                 ],
             )
 
-    async def get_data_summary(self) -> Dict[str, Any]:
+    async def get_data_summary(self) -> dict[str, Any]:
         """Get summary of stored FRED data."""
         await self.initialize()
 

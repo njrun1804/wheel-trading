@@ -197,3 +197,5 @@ requirements-*.txt
 
 # Version indicators
 =*
+*.tar.gz
+.env.bak

@@ -2,21 +2,26 @@
 
 from __future__ import annotations
 
-import logging
-import warnings
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Literal, NamedTuple, Optional, Tuple, Union, overload
+from functools import lru_cache
+from typing import Literal, NamedTuple, Union, overload
 
 import numpy as np
 import numpy.typing as npt
 from scipy.stats import norm
-from functools import lru_cache
 
 from ..storage.cache.general_cache import cached
-from ..utils import RecoveryStrategy, get_feature_flags, get_logger, timed_operation, with_recovery
+from ..utils import (
+    RecoveryStrategy,
+    get_feature_flags,
+    get_logger,
+    timed_operation,
+    with_recovery,
+)
 
 logger = get_logger(__name__)
+
 
 # Cache frequently used values of the normal CDF for scalar inputs
 @lru_cache(maxsize=100)
@@ -30,6 +35,7 @@ def norm_cdf_cached(x: FloatOrArray) -> FloatOrArray:
     if np.ndim(x) == 0:
         return _cached_norm_cdf_scalar(float(x))
     return norm.cdf(x)
+
 
 # Type aliases
 FloatArray = npt.NDArray[np.float64]
@@ -61,7 +67,7 @@ def validate_inputs(
     T: FloatOrArray,
     r: FloatOrArray,
     sigma: FloatOrArray,
-) -> Tuple[bool, list[str]]:
+) -> tuple[bool, list[str]]:
     """
     Validate inputs for options calculations.
 
@@ -146,7 +152,8 @@ def black_scholes_price_validated(
     r: float,
     sigma: float,
     option_type: OptionType = "call",
-) -> CalculationResult: ...
+) -> CalculationResult:
+    ...
 
 
 @overload
@@ -157,7 +164,8 @@ def black_scholes_price_validated(
     r: FloatOrArray,
     sigma: FloatOrArray,
     option_type: OptionType = "call",
-) -> CalculationResult: ...
+) -> CalculationResult:
+    ...
 
 
 @timed_operation(threshold_ms=0.2)
@@ -234,7 +242,9 @@ def black_scholes_price_validated(
             # Perfect confidence for expired options
             confidence = 1.0 if not warnings_list else 0.9
             return CalculationResult(
-                float(value) if np.ndim(value) == 0 else value, confidence, warnings_list
+                float(value) if np.ndim(value) == 0 else value,
+                confidence,
+                warnings_list,
             )
 
         # Calculate d1 and d2
@@ -250,7 +260,9 @@ def black_scholes_price_validated(
             confidence = 0.8  # Lower confidence for zero vol
             warnings_list.append("Zero volatility - using intrinsic value")
             return CalculationResult(
-                float(value) if np.ndim(value) == 0 else value, confidence, warnings_list
+                float(value) if np.ndim(value) == 0 else value,
+                confidence,
+                warnings_list,
             )
 
         # Standard Black-Scholes calculation
@@ -265,10 +277,14 @@ def black_scholes_price_validated(
 
         # Calculate prices
         if option_type == "call":
-            call_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d2)
+            call_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(
+                d2
+            )
             value = call_price
         else:
-            put_price = K * np.exp(-r * T) * norm_cdf_cached(-d2) - S * norm_cdf_cached(-d1)
+            put_price = K * np.exp(-r * T) * norm_cdf_cached(-d2) - S * norm_cdf_cached(
+                -d1
+            )
             value = put_price
 
         # Validate bounds
@@ -286,8 +302,12 @@ def black_scholes_price_validated(
         # Put-call parity check (if we can)
         if T > 0 and sigma > 0:
             # Calculate both prices for parity check
-            call_val = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d2)
-            put_val = K * np.exp(-r * T) * norm_cdf_cached(-d2) - S * norm_cdf_cached(-d1)
+            call_val = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(
+                d2
+            )
+            put_val = K * np.exp(-r * T) * norm_cdf_cached(-d2) - S * norm_cdf_cached(
+                -d1
+            )
 
             # Put-call parity: C - P = S - K*exp(-rT)
             parity_lhs = call_val - put_val
@@ -340,7 +360,7 @@ def calculate_all_greeks(
     r: FloatOrArray,
     sigma: FloatOrArray,
     option_type: OptionType = "call",
-) -> Tuple[dict[str, FloatOrArray], float]:
+) -> tuple[dict[str, FloatOrArray], float]:
     """
     Calculate all Greeks with validation.
 
@@ -422,7 +442,9 @@ def calculate_all_greeks(
 
         # Rho
         if option_type == "call":
-            greeks["rho"] = K * T * np.exp(-r * T) * norm_cdf_cached(d2) / 100  # Per 1% change
+            greeks["rho"] = (
+                K * T * np.exp(-r * T) * norm_cdf_cached(d2) / 100
+            )  # Per 1% change
         else:
             greeks["rho"] = -K * T * np.exp(-r * T) * norm_cdf_cached(-d2) / 100
 
@@ -512,7 +534,7 @@ def implied_volatility_validated(
     T: FloatOrArray,
     r: FloatOrArray,
     option_type: OptionType = "call",
-    initial_guess: Optional[FloatOrArray] = None,
+    initial_guess: FloatOrArray | None = None,
     max_iterations: int = 100,
     tolerance: float = 1e-6,
 ) -> CalculationResult:
@@ -585,9 +607,13 @@ def implied_volatility_validated(
         vega = S * norm.pdf(d1) * sqrt_T
 
         if option_type == "call":
-            bs_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(d1 - sigma * sqrt_T)
+            bs_price = S * norm_cdf_cached(d1) - K * np.exp(-r * T) * norm_cdf_cached(
+                d1 - sigma * sqrt_T
+            )
         else:
-            bs_price = K * np.exp(-r * T) * norm_cdf_cached(-(d1 - sigma * sqrt_T)) - S * norm_cdf_cached(-d1)
+            bs_price = K * np.exp(-r * T) * norm_cdf_cached(
+                -(d1 - sigma * sqrt_T)
+            ) - S * norm_cdf_cached(-d1)
 
         price_diff = bs_price - option_price
 

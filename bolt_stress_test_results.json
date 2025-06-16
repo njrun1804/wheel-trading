@@ -1,0 +1,35 @@
+{
+  "performance_stats": {
+    "duration_seconds": 29.731638193130493,
+    "cpu_usage": {
+      "average": 44.33,
+      "peak": 64.8,
+      "minimum": 0.0,
+      "std": 16.50096057809969
+    },
+    "memory_usage": {
+      "average_mb": 248.134375,
+      "peak_mb": 304.03125,
+      "minimum_mb": 50.296875,
+      "growth_mb": 253.734375
+    },
+    "system_memory": {
+      "average_percent": 55.102000000000004,
+      "peak_percent": 56.3
+    }
+  },
+  "workload_analysis": {
+    "total_workloads": 249,
+    "peak_concurrent": 0,
+    "throughput_per_second": 8.374916927972423,
+    "errors": 0
+  },
+  "assessment": {
+    "cpu_efficiency": "OPTIMAL",
+    "memory_efficiency": "EXCELLENT",
+    "throughput_performance": "LOW",
+    "overall_assessment": "GOOD",
+    "performance_score": 9
+  },
+  "compliance": {
+    "cpu_within_limits": 

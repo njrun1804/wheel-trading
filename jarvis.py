@@ -7,9 +7,9 @@ Usage:
     ./jarvis.py --interactive
 """
 
+import argparse
 import asyncio
 import sys
-import argparse
 from pathlib import Path
 
 # Add parent directory to path
@@ -29,60 +29,49 @@ Examples:
   ./jarvis.py --explain "add comprehensive tests"
   ./jarvis.py --interactive
   ./jarvis.py --verbose "refactor duplicate code"
-        """
+        """,
     )
-    
+
     parser.add_argument(
-        "query",
-        nargs="?",
-        help="Task description for Jarvis to assist with"
+        "query", nargs="?", help="Task description for Jarvis to assist with"
     )
-    
+
     parser.add_argument(
-        "--explain",
-        action="store_true",
-        help="Explain approach without executing"
+        "--explain", action="store_true", help="Explain approach without executing"
     )
-    
+
     parser.add_argument(
-        "--interactive",
-        "-i",
-        action="store_true",
-        help="Enter interactive mode"
+        "--interactive", "-i", action="store_true", help="Enter interactive mode"
     )
-    
+
     parser.add_argument(
         "--verbose",
         "-v",
         action="store_true",
-        help="Show detailed execution information"
+        help="Show detailed execution information",
     )
-    
+
     parser.add_argument(
-        "--no-mcts",
-        action="store_true",
-        help="Disable MCTS for faster execution"
+        "--no-mcts", action="store_true", help="Disable MCTS for faster execution"
     )
-    
+
     parser.add_argument(
         "--workspace",
         "-w",
         default=".",
-        help="Workspace root directory (default: current directory)"
+        help="Workspace root directory (default: current directory)",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Configure Jarvis
     config = JarvisConfig(
-        workspace_root=args.workspace,
-        use_mcts=not args.no_mcts,
-        verbose=args.verbose
+        workspace_root=args.workspace, use_mcts=not args.no_mcts, verbose=args.verbose
     )
-    
+
     # Initialize Jarvis
     jarvis = Jarvis(config)
-    
+
     try:
         if args.interactive:
             await interactive_mode(jarvis)
@@ -94,21 +83,21 @@ Examples:
             else:
                 # Execute mode
                 result = await jarvis.assist(args.query)
-                
+
                 if not args.verbose:
                     # Show summary if not in verbose mode
                     print(f"\n✅ Task completed in {result['total_duration_ms']:.1f}ms")
-                    
+
                     # Show key results
                     impl_data = result["phases"]["implement"]["data"]
                     if "strategy_used" in impl_data:
                         print(f"📋 Strategy: {impl_data['strategy_used']}")
-                    
+
                     if "files_modified" in impl_data:
                         print(f"📝 Files modified: {impl_data['files_modified']}")
         else:
             parser.print_help()
-            
+
     finally:
         # Cleanup
         await jarvis.cleanup()
@@ -120,20 +109,21 @@ async def interactive_mode(jarvis: Jarvis):
     print("=" * 60)
     print("Enter tasks for assistance. Type 'help' for commands or 'quit' to exit.")
     print()
-    
+
     while True:
         try:
             query = input("jarvis> ").strip()
-            
+
             if not query:
                 continue
-                
+
             if query.lower() in ["quit", "exit", "q"]:
                 print("👋 Goodbye!")
                 break
-                
+
             if query.lower() == "help":
-                print("""
+                print(
+                    """
 Commands:
   <task description>    - Execute a task
   explain <task>        - Explain approach without executing
@@ -141,13 +131,14 @@ Commands:
   clear                - Clear screen
   help                 - Show this help
   quit/exit            - Exit Jarvis
-                """)
+                """
+                )
                 continue
-                
+
             if query.lower() == "clear":
                 print("\033[2J\033[H")  # Clear screen
                 continue
-                
+
             if query.lower() == "status":
                 if jarvis.last_result:
                     print(f"Last task: {jarvis.last_result['query']}")
@@ -156,7 +147,7 @@ Commands:
                 else:
                     print("No tasks executed yet.")
                 continue
-                
+
             if query.lower().startswith("explain "):
                 task = query[8:]
                 explanation = await jarvis.explain_approach(task)
@@ -164,10 +155,10 @@ Commands:
             else:
                 # Execute task
                 result = await jarvis.assist(query)
-                
+
                 if not jarvis.config.verbose:
                     print(f"\n✅ Completed in {result['total_duration_ms']:.1f}ms")
-                    
+
         except KeyboardInterrupt:
             print("\n👋 Goodbye!")
             break

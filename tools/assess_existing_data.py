@@ -6,16 +6,14 @@ Checks for real vs mock data, completeness, and errors
 import asyncio
 import os
 import sys
-from datetime import datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 async def assess_database():
@@ -145,7 +143,18 @@ async def assess_database():
             ).fetchone()
 
             if option_stats and option_stats[0] > 0:
-                total, days, exps, strikes, start, end, min_s, max_s, spread, zeros = option_stats
+                (
+                    total,
+                    days,
+                    exps,
+                    strikes,
+                    start,
+                    end,
+                    min_s,
+                    max_s,
+                    spread,
+                    zeros,
+                ) = option_stats
                 print(f"  Total option records: {total:,}")
                 print(f"  Unique days: {days}")
                 print(f"  Unique expirations: {exps}")
@@ -169,14 +178,14 @@ async def assess_database():
                 ).fetchone()
 
                 round_q, no_vol, has_iv, has_greeks = mock_patterns
-                print(f"\n  Data Quality Indicators:")
+                print("\n  Data Quality Indicators:")
                 print(f"    Round quotes: {round_q} ({round_q/total*100:.1f}%)")
                 print(f"    No volume: {no_vol} ({no_vol/total*100:.1f}%)")
                 print(f"    Has IV: {has_iv} ({has_iv/total*100:.1f}%)")
                 print(f"    Has Greeks: {has_greeks} ({has_greeks/total*100:.1f}%)")
 
                 # Check moneyness distribution
-                print(f"\n  Moneyness Distribution:")
+                print("\n  Moneyness Distribution:")
                 moneyness_dist = conn.execute(
                     """
                     SELECT
@@ -204,7 +213,9 @@ async def assess_database():
                 ).fetchall()
 
                 for category, count, spread in moneyness_dist:
-                    print(f"    {category}: {count:,} records (avg spread: ${spread:.3f})")
+                    print(
+                        f"    {category}: {count:,} records (avg spread: ${spread:.3f})"
+                    )
             else:
                 print("  ❌ No Unity options data found")
         else:

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -26,7 +26,7 @@ class ParameterPerformance:
     avg_confidence: float = 0.0
     avg_return: float = 0.0
     risk_adjusted_return: float = 0.0
-    timestamps: List[datetime] = field(default_factory=list)
+    timestamps: list[datetime] = field(default_factory=list)
 
 
 @dataclass
@@ -108,7 +108,7 @@ class ConfigAutoTuner:
         self.lookback_days = lookback_days
 
         # Performance tracking by parameter values
-        self.parameter_performance: Dict[str, Dict[Any, ParameterPerformance]] = {}
+        self.parameter_performance: dict[str, dict[Any, ParameterPerformance]] = {}
 
         # Load historical data
         self._load_history()
@@ -116,8 +116,8 @@ class ConfigAutoTuner:
     def record_outcome(
         self,
         decision_id: str,
-        parameters_used: Dict[str, Any],
-        outcome: Dict[str, Any],
+        parameters_used: dict[str, Any],
+        outcome: dict[str, Any],
     ) -> None:
         """
         Record the outcome of a decision with the parameters used.
@@ -131,7 +131,7 @@ class ConfigAutoTuner:
         outcome : dict
             Outcome metrics (confidence, return, success, etc.)
         """
-        timestamp = datetime.now(timezone.utc)
+        timestamp = datetime.now(UTC)
 
         for param_name, param_value in parameters_used.items():
             if param_name not in self.TUNABLE_PARAMETERS:
@@ -142,7 +142,9 @@ class ConfigAutoTuner:
                 self.parameter_performance[param_name] = {}
 
             if param_value not in self.parameter_performance[param_name]:
-                self.parameter_performance[param_name][param_value] = ParameterPerformance(
+                self.parameter_performance[param_name][
+                    param_value
+                ] = ParameterPerformance(
                     parameter_name=param_name,
                     parameter_value=param_value,
                 )
@@ -156,7 +158,9 @@ class ConfigAutoTuner:
             alpha = 0.1  # Exponential moving average factor
 
             success = outcome.get("success", False)
-            perf.success_rate = alpha * (1.0 if success else 0.0) + (1 - alpha) * perf.success_rate
+            perf.success_rate = (
+                alpha * (1.0 if success else 0.0) + (1 - alpha) * perf.success_rate
+            )
 
             confidence = outcome.get("confidence", 0.0)
             perf.avg_confidence = alpha * confidence + (1 - alpha) * perf.avg_confidence
@@ -186,7 +190,9 @@ class ConfigAutoTuner:
             },
         )
 
-    def get_recommendations(self, current_config: Dict[str, Any]) -> List[TuningRecommendation]:
+    def get_recommendations(
+        self, current_config: dict[str, Any]
+    ) -> list[TuningRecommendation]:
         """
         Get tuning recommendations based on performance data.
 
@@ -201,9 +207,9 @@ class ConfigAutoTuner:
             Sorted list of recommendations (best first)
         """
         recommendations = []
-        cutoff_date = datetime.now(timezone.utc) - timedelta(days=self.lookback_days)
+        cutoff_date = datetime.now(UTC) - timedelta(days=self.lookback_days)
 
-        for param_name, param_spec in self.TUNABLE_PARAMETERS.items():
+        for param_name, _param_spec in self.TUNABLE_PARAMETERS.items():
             if param_name not in current_config:
                 continue
 
@@ -215,7 +221,7 @@ class ConfigAutoTuner:
 
             # Filter to recent data only
             recent_perfs = []
-            for value, perf in self.parameter_performance[param_name].items():
+            for _value, perf in self.parameter_performance[param_name].items():
                 recent_timestamps = [t for t in perf.timestamps if t > cutoff_date]
                 if len(recent_timestamps) >= self.min_samples:
                     recent_perfs.append(perf)
@@ -243,13 +249,17 @@ class ConfigAutoTuner:
                     recommended_value=best_perf.parameter_value,
                     expected_improvement=improvement,
                     confidence=self._calculate_confidence(best_perf, current_perf),
-                    reasoning=self._generate_reasoning(param_name, current_perf, best_perf),
+                    reasoning=self._generate_reasoning(
+                        param_name, current_perf, best_perf
+                    ),
                     based_on_samples=best_perf.sample_count,
                 )
                 recommendations.append(rec)
 
         # Sort by expected improvement
-        recommendations.sort(key=lambda r: r.expected_improvement * r.confidence, reverse=True)
+        recommendations.sort(
+            key=lambda r: r.expected_improvement * r.confidence, reverse=True
+        )
 
         return recommendations
 
@@ -267,7 +277,8 @@ class ConfigAutoTuner:
             weights["success_rate"] * perf.success_rate
             + weights["avg_confidence"] * perf.avg_confidence
             + weights["avg_return"] * min(perf.avg_return, 1.0)
-            + weights["risk_adjusted_return"] * min(perf.risk_adjusted_return, 1.0)  # Cap at 100%
+            + weights["risk_adjusted_return"]
+            * min(perf.risk_adjusted_return, 1.0)  # Cap at 100%
         )
 
         return score
@@ -282,18 +293,22 @@ class ConfigAutoTuner:
         sample_confidence = min(recommended.sample_count / 50.0, 1.0)
 
         # Based on score difference
-        score_diff = abs(self._calculate_score(recommended) - self._calculate_score(current))
+        score_diff = abs(
+            self._calculate_score(recommended) - self._calculate_score(current)
+        )
         diff_confidence = min(score_diff * 2, 1.0)
 
         # Based on recency
         if recommended.timestamps:
-            days_old = (datetime.now(timezone.utc) - max(recommended.timestamps)).days
+            days_old = (datetime.now(UTC) - max(recommended.timestamps)).days
             recency_confidence = max(0, 1.0 - days_old / 30.0)
         else:
             recency_confidence = 0.5
 
         # Combined confidence
-        confidence = sample_confidence * 0.4 + diff_confidence * 0.4 + recency_confidence * 0.2
+        confidence = (
+            sample_confidence * 0.4 + diff_confidence * 0.4 + recency_confidence * 0.2
+        )
 
         return min(max(confidence, 0.0), 1.0)
 
@@ -332,15 +347,17 @@ class ConfigAutoTuner:
             else:
                 reasons.append("faster theta decay with manageable risk")
 
-        return f"Based on {recommended.sample_count} recent decisions: " + ", ".join(reasons)
+        return f"Based on {recommended.sample_count} recent decisions: " + ", ".join(
+            reasons
+        )
 
     def apply_recommendations(
         self,
-        recommendations: List[TuningRecommendation],
-        current_config: Dict[str, Any],
+        recommendations: list[TuningRecommendation],
+        current_config: dict[str, Any],
         max_changes: int = 2,
         min_confidence: float = 0.7,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Apply recommended changes to configuration.
 
@@ -389,7 +406,7 @@ class ConfigAutoTuner:
 
         return updated_config
 
-    def get_parameter_trends(self, param_name: str) -> Dict[str, Any]:
+    def get_parameter_trends(self, param_name: str) -> dict[str, Any]:
         """Get performance trends for a specific parameter."""
         if param_name not in self.parameter_performance:
             return {"error": "No data for parameter"}
@@ -425,13 +442,15 @@ class ConfigAutoTuner:
                 scores = [p[1] for p in sorted(perfs)]
 
                 # Simple linear regression to find trend
-                if isinstance(values[0], (int, float)):
+                if isinstance(values[0], int | float):
                     x = np.array(values)
                     y = np.array(scores)
                     if len(x) > 1:
                         slope = np.polyfit(x, y, 1)[0]
                         if abs(slope) > 0.01:
-                            trends["trend_direction"] = "increasing" if slope > 0 else "decreasing"
+                            trends["trend_direction"] = (
+                                "increasing" if slope > 0 else "decreasing"
+                            )
 
         return trends
 
@@ -439,7 +458,7 @@ class ConfigAutoTuner:
         """Save performance history to file."""
         try:
             history = {
-                "last_updated": datetime.now(timezone.utc).isoformat(),
+                "last_updated": datetime.now(UTC).isoformat(),
                 "parameter_performance": {},
             }
 
@@ -454,7 +473,9 @@ class ConfigAutoTuner:
                         "avg_return": perf.avg_return,
                         "risk_adjusted_return": perf.risk_adjusted_return,
                         "last_timestamp": (
-                            max(perf.timestamps).isoformat() if perf.timestamps else None
+                            max(perf.timestamps).isoformat()
+                            if perf.timestamps
+                            else None
                         ),
                     }
 
@@ -470,7 +491,7 @@ class ConfigAutoTuner:
             return
 
         try:
-            with open(self.history_file, "r") as f:
+            with open(self.history_file) as f:
                 history = json.load(f)
 
             # Convert back to objects
@@ -512,7 +533,7 @@ class ConfigAutoTuner:
 
 
 # Global auto-tuner instance
-_auto_tuner: Optional[ConfigAutoTuner] = None
+_auto_tuner: ConfigAutoTuner | None = None
 
 
 def get_auto_tuner() -> ConfigAutoTuner:

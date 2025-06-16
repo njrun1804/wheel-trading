@@ -11,7 +11,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.api.advisor import advise_position
+from src.unity_wheel.api.advisor import WheelAdvisor
 from src.unity_wheel.api.types import MarketSnapshot
 
 
@@ -24,9 +24,12 @@ def main() -> None:
         "ticker": "U",
         "current_price": 35.50,
         "buying_power": 100000.0,
+        "margin_used": 0.0,
         "positions": [],  # No existing positions
         "option_chain": {
             "30.0": {
+                "strike": 30.0,
+                "expiration": "2025-02-21",
                 "bid": 0.45,
                 "ask": 0.55,
                 "mid": 0.50,
@@ -36,9 +39,11 @@ def main() -> None:
                 "gamma": 0.02,
                 "theta": -0.03,
                 "vega": 0.08,
-                "iv": 0.62,
+                "implied_volatility": 0.62,
             },
             "32.5": {
+                "strike": 32.5,
+                "expiration": "2025-02-21",
                 "bid": 0.85,
                 "ask": 0.95,
                 "mid": 0.90,
@@ -48,9 +53,11 @@ def main() -> None:
                 "gamma": 0.04,
                 "theta": -0.04,
                 "vega": 0.12,
-                "iv": 0.64,
+                "implied_volatility": 0.64,
             },
             "35.0": {
+                "strike": 35.0,
+                "expiration": "2025-02-21",
                 "bid": 1.45,
                 "ask": 1.55,
                 "mid": 1.50,
@@ -60,9 +67,11 @@ def main() -> None:
                 "gamma": 0.05,
                 "theta": -0.05,
                 "vega": 0.15,
-                "iv": 0.65,
+                "implied_volatility": 0.65,
             },
             "37.5": {
+                "strike": 37.5,
+                "expiration": "2025-02-21",
                 "bid": 2.35,
                 "ask": 2.45,
                 "mid": 2.40,
@@ -72,9 +81,11 @@ def main() -> None:
                 "gamma": 0.04,
                 "theta": -0.06,
                 "vega": 0.13,
-                "iv": 0.67,
+                "implied_volatility": 0.67,
             },
             "40.0": {
+                "strike": 40.0,
+                "expiration": "2025-02-21",
                 "bid": 3.80,
                 "ask": 3.95,
                 "mid": 3.875,
@@ -84,10 +95,11 @@ def main() -> None:
                 "gamma": 0.03,
                 "theta": -0.07,
                 "vega": 0.10,
-                "iv": 0.70,
+                "implied_volatility": 0.70,
             },
         },
-        "iv": 0.65,  # Overall IV for Unity
+        "implied_volatility": 0.65,  # Overall IV for Unity
+        "risk_free_rate": 0.05,
     }
 
     # Get recommendation
@@ -97,7 +109,9 @@ def main() -> None:
     print(f"Buying Power: ${market_snapshot['buying_power']:,.0f}")
     print()
 
-    recommendation = advise_position(market_snapshot)
+    # Create advisor and get recommendation
+    advisor = WheelAdvisor()
+    recommendation = advisor.advise_position(market_snapshot)
 
     print(f"Action: {recommendation['action']}")
     print(f"Rationale: {recommendation['rationale']}")

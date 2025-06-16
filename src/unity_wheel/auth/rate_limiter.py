@@ -8,8 +8,6 @@ import asyncio
 import time
 from collections import deque
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Deque, Dict, Optional
 
 from unity_wheel.utils.logging import get_logger
 
@@ -71,7 +69,7 @@ class CircuitBreakerState:
     half_open_max_calls: int = 3
 
     failures: int = 0
-    last_failure_time: Optional[float] = None
+    last_failure_time: float | None = None
     half_open_calls: int = 0
     state: str = "closed"  # closed, open, half_open
 
@@ -92,17 +90,19 @@ class RateLimiter:
             burst_capacity: Maximum burst size
             enable_circuit_breaker: Enable circuit breaker pattern
         """
-        self.bucket = RateLimitBucket(capacity=burst_capacity, refill_rate=requests_per_second)
+        self.bucket = RateLimitBucket(
+            capacity=burst_capacity, refill_rate=requests_per_second
+        )
 
         self.circuit_breaker = CircuitBreakerState() if enable_circuit_breaker else None
 
         # Sliding window for request tracking
-        self.request_times: Deque[float] = deque(maxlen=1000)
+        self.request_times: deque[float] = deque(maxlen=1000)
 
         # Per-endpoint rate limits
-        self.endpoint_buckets: Dict[str, RateLimitBucket] = {}
+        self.endpoint_buckets: dict[str, RateLimitBucket] = {}
 
-    async def acquire(self, endpoint: Optional[str] = None, priority: int = 1) -> None:
+    async def acquire(self, endpoint: str | None = None, priority: int = 1) -> None:
         """Acquire permission to make a request.
 
         Args:
@@ -173,7 +173,9 @@ class RateLimiter:
         if self.circuit_breaker.failures >= self.circuit_breaker.failure_threshold:
             self.circuit_breaker.state = "open"
             logger.warning(
-                "report_failure", action="circuit_opened", failures=self.circuit_breaker.failures
+                "report_failure",
+                action="circuit_opened",
+                failures=self.circuit_breaker.failures,
             )
 
     def _check_circuit_breaker(self) -> None:
@@ -221,7 +223,10 @@ class RateLimiter:
         )
 
         logger.info(
-            "add_endpoint_limit", endpoint=endpoint, rps=requests_per_second, burst=burst_capacity
+            "add_endpoint_limit",
+            endpoint=endpoint,
+            rps=requests_per_second,
+            burst=burst_capacity,
         )
 
     def get_current_rate(self, window_seconds: int = 60) -> float:
@@ -244,7 +249,7 @@ class RateLimiter:
 
         return recent_requests / window_seconds
 
-    def get_status(self) -> Dict[str, any]:
+    def get_status(self) -> dict[str, any]:
         """Get rate limiter status."""
         status = {
             "tokens_available": self.bucket.tokens,

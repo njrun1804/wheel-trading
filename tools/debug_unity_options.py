@@ -2,7 +2,7 @@
 """Debug Unity options - find the correct symbol format."""
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -97,10 +97,12 @@ def debug_unity():
         if unity_options:
             # Show first one
             opt = unity_options[0]
-            print(f"\n   Sample Unity option:")
+            print("\n   Sample Unity option:")
             print(f"   Raw symbol: {opt.raw_symbol}")
             print(f"   Strike: ${opt.strike_price / 1e9:.2f}")
-            print(f"   Expiration: {datetime.fromtimestamp(opt.expiration / 1e9).date()}")
+            print(
+                f"   Expiration: {datetime.fromtimestamp(opt.expiration / 1e9).date()}"
+            )
             print(f"   Type: {'Call' if opt.instrument_class == 'C' else 'Put'}")
 
     except Exception as e:
@@ -120,7 +122,7 @@ def debug_unity():
         )
 
         for record in response:
-            print(f"   ✅ Unity trades as 'U' on NYSE")
+            print("   ✅ Unity trades as 'U' on NYSE")
             print(f"   Price: ${record.price / 1e9:.2f}")
             break
 

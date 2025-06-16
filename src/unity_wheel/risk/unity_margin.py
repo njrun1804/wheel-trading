@@ -5,12 +5,10 @@ accounting for the stock's high volatility and different account types.
 """
 from __future__ import annotations
 
-
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 
@@ -26,7 +24,7 @@ class MarginResult:
     calculation_method: str
     account_type: str
     confidence: float = 0.99
-    details: Dict[str, float] = None
+    details: dict[str, float] = None
 
     def __post_init__(self):
         if self.details is None:
@@ -135,7 +133,9 @@ class UnityMarginCalculator:
         otm_per_contract = otm_amount * 100
 
         # Method 1: 20% of underlying - OTM + premium
-        method1_base = (self.STANDARD_MARGIN_PERCENT * current_price * 100) - otm_per_contract
+        method1_base = (
+            self.STANDARD_MARGIN_PERCENT * current_price * 100
+        ) - otm_per_contract
         method1 = max(0, method1_base - premium_received)  # Premium reduces margin
 
         # Method 2: 10% of strike + premium
@@ -263,7 +263,7 @@ class UnityMarginCalculator:
         current_price: float,
         premium_received: float,
         account_type: str,
-        implied_volatility: Optional[float] = None,
+        implied_volatility: float | None = None,
         option_type: str = "put",
     ) -> MarginResult:
         """
@@ -311,7 +311,7 @@ def calculate_unity_margin_requirement(
     premium_received: float,
     account_type: str = "margin",
     option_type: str = "put",
-) -> Tuple[float, Dict[str, float]]:
+) -> tuple[float, dict[str, float]]:
     """
     Convenience function for quick margin calculations.
 

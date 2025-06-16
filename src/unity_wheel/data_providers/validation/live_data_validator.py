@@ -5,10 +5,9 @@ are based on real market data from Databento, never mock or placeholder values.
 """
 from __future__ import annotations
 
-
 import os
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from unity_wheel.utils import get_logger
 
@@ -92,7 +91,9 @@ class LiveDataValidator:
 
         # Check for any test/mock environment variables
         for key, value in os.environ.items():
-            if any(pattern in key.lower() for pattern in ["mock", "test", "fake", "dummy"]):
+            if any(
+                pattern in key.lower() for pattern in ["mock", "test", "fake", "dummy"]
+            ):
                 if key not in ["PATH", "PYTEST_CURRENT_TEST"]:
                     logger.warning(f"Suspicious environment variable: {key}={value}")
 
@@ -109,12 +110,11 @@ class LiveDataValidator:
             )
 
         # Unity-specific checks
-        if symbol == "U":
-            if price < 15.0 or price > 60.0:
-                raise ValueError(
-                    f"Unity price {price} outside historical range [15-60]. "
-                    "Possible mock data or data error."
-                )
+        if symbol == "U" and (price < 15.0 or price > 60.0):
+            raise ValueError(
+                f"Unity price {price} outside historical range [15-60]. "
+                "Possible mock data or data error."
+            )
 
     @classmethod
     def validate_volatility(cls, vol: float, symbol: str = "U") -> None:
@@ -129,12 +129,11 @@ class LiveDataValidator:
             )
 
         # Unity-specific checks
-        if symbol == "U":
-            if vol < 0.30 or vol > 2.0:
-                logger.warning(f"Unity volatility {vol} outside typical range [0.30-2.0]")
+        if symbol == "U" and (vol < 0.30 or vol > 2.0):
+            logger.warning(f"Unity volatility {vol} outside typical range [0.30-2.0]")
 
     @classmethod
-    def validate_option_chain(cls, chain: Dict[str, Any]) -> None:
+    def validate_option_chain(cls, chain: dict[str, Any]) -> None:
         """Validate that option chain data is real."""
         if not chain:
             raise ValueError("Empty option chain - no market data available")
@@ -149,16 +148,26 @@ class LiveDataValidator:
 
             spread = ask - bid
             if spread < 0.01:
-                raise ValueError(f"Impossibly tight spread for strike {strike}: {spread}")
+                raise ValueError(
+                    f"Impossibly tight spread for strike {strike}: {spread}"
+                )
 
             # Check for round number premiums
-            if bid in [0.05, 0.10, 0.25, 0.50, 1.00] and ask in [0.05, 0.10, 0.25, 0.50, 1.00]:
-                logger.warning(f"Suspicious round bid/ask for strike {strike}: {bid}/{ask}")
+            if bid in [0.05, 0.10, 0.25, 0.50, 1.00] and ask in [
+                0.05,
+                0.10,
+                0.25,
+                0.50,
+                1.00,
+            ]:
+                logger.warning(
+                    f"Suspicious round bid/ask for strike {strike}: {bid}/{ask}"
+                )
 
     @classmethod
     def validate_timestamp(cls, timestamp: datetime) -> None:
         """Ensure timestamp is recent and during market hours."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         age = (now - timestamp).total_seconds()
 
         # Data should be very recent for live trading
@@ -177,7 +186,7 @@ class LiveDataValidator:
             logger.warning(f"Data timestamp {hour}:00 UTC may be outside market hours")
 
     @classmethod
-    def validate_market_snapshot(cls, snapshot: Dict[str, Any]) -> None:
+    def validate_market_snapshot(cls, snapshot: dict[str, Any]) -> None:
         """Comprehensive validation of a market snapshot."""
         # Check required fields
         required = ["ticker", "current_price", "option_chain", "timestamp"]
@@ -210,7 +219,7 @@ class LiveDataValidator:
         )
 
 
-def validate_market_data(data: Dict[str, Any]) -> None:
+def validate_market_data(data: dict[str, Any]) -> None:
     """Convenience function to validate market data.
 
     Raises ValueError if data appears to be mock/fake.

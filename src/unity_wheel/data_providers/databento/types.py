@@ -7,12 +7,10 @@ These types map Databento's raw data to our internal models with:
 """
 from __future__ import annotations
 
-
 import enum
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import List, Optional
 
 import pandas as pd
 
@@ -39,10 +37,10 @@ class InstrumentDefinition:
     @property
     def days_to_expiry(self) -> int:
         """Calculate days to expiration from now."""
-        return (self.expiration.date() - datetime.now(timezone.utc).date()).days
+        return (self.expiration.date() - datetime.now(UTC).date()).days
 
     @classmethod
-    def from_databento(cls, msg) -> "InstrumentDefinition":
+    def from_databento(cls, msg) -> InstrumentDefinition:
         """Create from Databento definition message."""
         # Handle Databento's InstrumentDefMsg object
         # Strike price is already in correct units (not scaled)
@@ -91,7 +89,7 @@ class OptionQuote:
         return (self.spread / self.mid_price) * 100
 
     @classmethod
-    def from_databento(cls, msg: dict) -> "OptionQuote":
+    def from_databento(cls, msg: dict) -> OptionQuote:
         """Create from Databento mbp-1 message."""
         # Prices are in 1e-9 dollars
         scale = Decimal("1e-9")
@@ -99,7 +97,9 @@ class OptionQuote:
         level = msg["levels"][0]  # Top of book
         return cls(
             instrument_id=msg["instrument_id"],
-            timestamp=pd.to_datetime(msg["ts_event"], unit="ns", utc=True).to_pydatetime(),
+            timestamp=pd.to_datetime(
+                msg["ts_event"], unit="ns", utc=True
+            ).to_pydatetime(),
             bid_price=Decimal(str(level["bid_px"])) * scale,
             ask_price=Decimal(str(level["ask_px"])) * scale,
             bid_size=level["bid_sz"],
@@ -114,12 +114,12 @@ class UnderlyingPrice:
     symbol: str
     timestamp: datetime
     last_price: Decimal
-    bid_price: Optional[Decimal] = None
-    ask_price: Optional[Decimal] = None
-    volume: Optional[int] = None
+    bid_price: Decimal | None = None
+    ask_price: Decimal | None = None
+    volume: int | None = None
 
     @classmethod
-    def from_databento_trade(cls, msg, symbol: str) -> "UnderlyingPrice":
+    def from_databento_trade(cls, msg, symbol: str) -> UnderlyingPrice:
         """Create from Databento trade message."""
         scale = Decimal("1e-9")
         return cls(
@@ -138,20 +138,22 @@ class OptionChain:
     expiration: datetime
     spot_price: Decimal
     timestamp: datetime
-    calls: List[OptionQuote]
-    puts: List[OptionQuote]
+    calls: list[OptionQuote]
+    puts: list[OptionQuote]
 
     def get_atm_strike(self) -> Decimal:
         """Find the at-the-money strike."""
         all_strikes = set()
-        for opt in self.calls + self.puts:
+        for _opt in self.calls + self.puts:
             # Need instrument definitions to get strikes
             pass
 
         # Find closest strike to spot
         return min(all_strikes, key=lambda x: abs(x - self.spot_price))
 
-    def filter_by_delta(self, target_delta: float, option_type: OptionType) -> List[OptionQuote]:
+    def filter_by_delta(
+        self, target_delta: float, option_type: OptionType
+    ) -> list[OptionQuote]:
         """Filter options by target delta (requires Greeks calculation)."""
         # This will integrate with our Greeks module
         pass

@@ -4,76 +4,78 @@ Setup data ingestion for the optimized database
 Configures Databento and FRED data providers to save to the new structure
 """
 
-import os
-import yaml
-from pathlib import Path
-from datetime import datetime, time
 import logging
+import os
+from pathlib import Path
+
+import yaml
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def update_config_for_optimized_db():
     """Update config.yaml to use the optimized database"""
     logger.info("📝 Updating config.yaml for optimized database...")
-    
+
     config_path = Path("config.yaml")
-    with open(config_path, 'r') as f:
+    with open(config_path) as f:
         config = yaml.safe_load(f)
-    
+
     # Update primary database path
-    config['storage']['database_path'] = 'data/wheel_trading_optimized.duckdb'
-    
+    config["storage"]["database_path"] = "data/wheel_trading_optimized.duckdb"
+
     # Update cache database to use optimized DB
-    config['storage']['databases']['cache'] = 'data/wheel_trading_optimized.duckdb'
-    
+    config["storage"]["databases"]["cache"] = "data/wheel_trading_optimized.duckdb"
+
     # Ensure data provider settings are correct
-    if 'databento' not in config:
-        config['databento'] = {}
-    
+    if "databento" not in config:
+        config["databento"] = {}
+
     # Set up Databento for end-of-day and ad-hoc fetching
-    config['databento']['fetch_schedule'] = {
-        'end_of_day': {
-            'enabled': True,
-            'time': '16:30',  # 4:30 PM ET
-            'timezone': 'America/New_York',
-            'symbols': ['U'],  # Unity
-            'lookback_days': 1
+    config["databento"]["fetch_schedule"] = {
+        "end_of_day": {
+            "enabled": True,
+            "time": "16:30",  # 4:30 PM ET
+            "timezone": "America/New_York",
+            "symbols": ["U"],  # Unity
+            "lookback_days": 1,
         },
-        'intraday': {
-            'enabled': True,
-            'cache_ttl_minutes': 5,  # 5-minute cache for live data
-            'moneyness_filter': 0.35  # Only options within 35% of spot
-        }
+        "intraday": {
+            "enabled": True,
+            "cache_ttl_minutes": 5,  # 5-minute cache for live data
+            "moneyness_filter": 0.35,  # Only options within 35% of spot
+        },
     }
-    
+
     # Set up FRED for daily updates
-    if 'fred' not in config:
-        config['fred'] = {}
-        
-    config['fred']['fetch_schedule'] = {
-        'daily': {
-            'enabled': True,
-            'time': '06:00',  # 6 AM ET
-            'timezone': 'America/New_York',
-            'series': [
-                'DGS10',     # 10-Year Treasury Rate
-                'DFF',       # Federal Funds Rate
-                'VIXCLS',    # VIX
-                'DEXUSEU',   # USD/EUR Exchange Rate
-            ]
+    if "fred" not in config:
+        config["fred"] = {}
+
+    config["fred"]["fetch_schedule"] = {
+        "daily": {
+            "enabled": True,
+            "time": "06:00",  # 6 AM ET
+            "timezone": "America/New_York",
+            "series": [
+                "DGS10",  # 10-Year Treasury Rate
+                "DFF",  # Federal Funds Rate
+                "VIXCLS",  # VIX
+                "DEXUSEU",  # USD/EUR Exchange Rate
+            ],
         }
     }
-    
+
     # Save updated config
-    with open(config_path, 'w') as f:
+    with open(config_path, "w") as f:
         yaml.dump(config, f, default_flow_style=False, sort_keys=False)
-    
+
     logger.info("✅ Config updated")
+
 
 def create_data_ingestion_scripts():
     """Create scripts for automated data ingestion"""
-    
+
     # Create end-of-day Databento script
     eod_script = '''#!/usr/bin/env python3
 """
@@ -187,13 +189,13 @@ def refresh_wheel_opportunities():
 if __name__ == "__main__":
     pull_eod_options_data()
 '''
-    
+
     # Write EOD script
-    with open('scripts/pull_databento_eod.py', 'w') as f:
+    with open("scripts/pull_databento_eod.py", "w") as f:
         f.write(eod_script)
-    os.chmod('scripts/pull_databento_eod.py', 0o755)
+    os.chmod("scripts/pull_databento_eod.py", 0o755)
     logger.info("✅ Created scripts/pull_databento_eod.py")
-    
+
     # Create FRED daily script
     fred_script = '''#!/usr/bin/env python3
 """
@@ -250,16 +252,17 @@ def pull_daily_fred_data():
 if __name__ == "__main__":
     pull_daily_fred_data()
 '''
-    
+
     # Write FRED script
-    with open('scripts/pull_fred_daily.py', 'w') as f:
+    with open("scripts/pull_fred_daily.py", "w") as f:
         f.write(fred_script)
-    os.chmod('scripts/pull_fred_daily.py', 0o755)
+    os.chmod("scripts/pull_fred_daily.py", 0o755)
     logger.info("✅ Created scripts/pull_fred_daily.py")
+
 
 def create_cron_entries():
     """Create cron entries for automated data pulls"""
-    
+
     cron_entries = """# Wheel Trading Data Ingestion Schedule
 # Add these to your crontab with: crontab -e
 
@@ -275,15 +278,16 @@ def create_cron_entries():
 # Weekly database optimization (Sunday 2:00 AM)
 0 2 * * 0 cd /path/to/wheel-trading && duckdb data/wheel_trading_optimized.duckdb -c "CHECKPOINT; ANALYZE;" >> logs/db_maintenance.log 2>&1
 """
-    
-    with open('scripts/cron_data_ingestion.txt', 'w') as f:
+
+    with open("scripts/cron_data_ingestion.txt", "w") as f:
         f.write(cron_entries)
-    
+
     logger.info("✅ Created scripts/cron_data_ingestion.txt")
+
 
 def create_ad_hoc_fetch_function():
     """Create function for ad-hoc data fetching"""
-    
+
     adhoc_script = '''#!/usr/bin/env python3
 """
 Ad-hoc data fetcher for live/on-demand data
@@ -370,34 +374,36 @@ if __name__ == "__main__":
     if quote:
         print(f"Latest U quote: ${quote[5]}")  # close price
 '''
-    
-    with open('scripts/fetch_adhoc_data.py', 'w') as f:
+
+    with open("scripts/fetch_adhoc_data.py", "w") as f:
         f.write(adhoc_script)
-    os.chmod('scripts/fetch_adhoc_data.py', 0o755)
+    os.chmod("scripts/fetch_adhoc_data.py", 0o755)
     logger.info("✅ Created scripts/fetch_adhoc_data.py")
+
 
 def main():
     """Set up data ingestion for optimized database"""
     logger.info("🚀 Setting up data ingestion for optimized database\n")
-    
+
     # Update configuration
     update_config_for_optimized_db()
-    
+
     # Create ingestion scripts
     create_data_ingestion_scripts()
-    
+
     # Create cron entries
     create_cron_entries()
-    
+
     # Create ad-hoc fetch function
     create_ad_hoc_fetch_function()
-    
+
     logger.info("\n✅ Data ingestion setup complete!")
     logger.info("\nNext steps:")
     logger.info("1. Review and install cron entries: crontab -e")
     logger.info("2. Test end-of-day script: python scripts/pull_databento_eod.py")
     logger.info("3. Test FRED script: python scripts/pull_fred_daily.py")
     logger.info("4. Test ad-hoc fetching: python scripts/fetch_adhoc_data.py")
+
 
 if __name__ == "__main__":
     main()

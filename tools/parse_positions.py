@@ -39,7 +39,10 @@ def main():
 
     try:
         # Try broker parser first (for full account data)
-        if "total accounts value" in data.lower() or "positions details" in data.lower():
+        if (
+            "total accounts value" in data.lower()
+            or "positions details" in data.lower()
+        ):
             account = parse_broker_paste(data)
             print("✅ Successfully parsed broker data!")
         else:
@@ -49,7 +52,7 @@ def main():
             print("✅ Successfully parsed manual format!")
 
         # Display results
-        print(f"\n📊 Account Summary:")
+        print("\n📊 Account Summary:")
         print(f"   Total Value: ${account.total_value:,.2f}")
         print(f"   Cash Balance: ${account.cash_balance:,.2f}")
         print(f"   Buying Power: ${account.buying_power:,.2f}")
@@ -58,7 +61,7 @@ def main():
         for pos in account.positions:
             print(f"   {pos}")
 
-        print(f"\n🎯 Unity Exposure:")
+        print("\n🎯 Unity Exposure:")
         print(f"   Shares: {account.unity_shares:,}")
         print(f"   Puts: {account.unity_puts}")
         print(f"   Calls: {account.unity_calls}")

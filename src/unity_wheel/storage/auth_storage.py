@@ -9,7 +9,6 @@ import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Optional
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -23,7 +22,7 @@ logger = get_logger(__name__)
 class SecureTokenStorage:
     """Secure storage for OAuth tokens with encryption."""
 
-    def __init__(self, storage_path: Optional[Path] = None):
+    def __init__(self, storage_path: Path | None = None):
         """Initialize secure token storage.
 
         Args:
@@ -60,7 +59,12 @@ class SecureTokenStorage:
         return Fernet(key)
 
     def save_tokens(
-        self, access_token: str, refresh_token: str, expires_in: int, scope: str = "", **extra_data
+        self,
+        access_token: str,
+        refresh_token: str,
+        expires_in: int,
+        scope: str = "",
+        **extra_data,
     ) -> None:
         """Save tokens securely with expiration tracking.
 
@@ -74,7 +78,9 @@ class SecureTokenStorage:
         token_data = {
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "expires_at": (datetime.utcnow() + timedelta(seconds=expires_in)).isoformat(),
+            "expires_at": (
+                datetime.utcnow() + timedelta(seconds=expires_in)
+            ).isoformat(),
             "scope": scope,
             "created_at": datetime.utcnow().isoformat(),
             **extra_data,
@@ -91,7 +97,7 @@ class SecureTokenStorage:
             has_refresh_token=bool(refresh_token),
         )
 
-    def load_tokens(self) -> Optional[Dict[str, str]]:
+    def load_tokens(self) -> dict[str, str] | None:
         """Load and decrypt tokens if they exist.
 
         Returns:

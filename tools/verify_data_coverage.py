@@ -6,8 +6,8 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def verify_data_coverage():
@@ -90,7 +90,9 @@ def verify_data_coverage():
     print("  Year | Days | Returns | Vol Data | Avg Vol")
     print("  -----|------|---------|----------|--------")
     for year, days, ret_pct, vol_pct, avg_vol in yearly:
-        print(f"  {int(year)} | {days:>4} | {ret_pct:>6.1%} | {vol_pct:>7.1%} | {avg_vol:>6.1%}")
+        print(
+            f"  {int(year)} | {days:>4} | {ret_pct:>6.1%} | {vol_pct:>7.1%} | {avg_vol:>6.1%}"
+        )
 
     # 4. Check option data coverage
     print("\n4. Option Data Coverage:")

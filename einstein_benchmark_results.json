@@ -1,0 +1,49 @@
+{
+  "total_tests": 5,
+  "passed_tests": 5,
+  "pass_rate": 1.0,
+  "performance_score": 95,
+  "memory_increase_mb": 488.375,
+  "results": [
+    {
+      "name": "config_loading",
+      "duration_ms": 0.0003462000222498318,
+      "ops_per_second": 2888503.5694144466,
+      "memory_mb": 520.109375,
+      "success": true,
+      "error": null
+    },
+    {
+      "name": "file_operations",
+      "duration_ms": 0.03566704000604659,
+      "ops_per_second": 28037.08970047616,
+      "memory_mb": 520.109375,
+      "success": true,
+      "error": null
+    },
+    {
+      "name": "search_operations",
+      "duration_ms": 21.327498360042227,
+      "ops_per_second": 46.88782449391876,
+      "memory_mb": 520.546875,
+      "success": true,
+      "error": null
+    },
+    {
+      "name": "memory_usage",
+      "duration_ms": 0,
+      "ops_per_second": 0,
+      "memory_mb": 520.546875,
+      "success": true,
+      "error": null
+    },
+    {
+      "name": "concurrent_operations",
+      "duration_ms": 31.362791666500318,
+      "ops_per_second": 93.8432303171816,
+      "memory_mb": 520.546875,
+      "success": true,
+      "error": null
+    }
+  ]
+}

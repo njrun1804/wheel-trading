@@ -1,0 +1,86 @@
+{
+  "archive_operation": {
+    "timestamp": "2025-06-16T02:50:00Z",
+    "operation_type": "backup_directory_consolidation",
+    "agent": "Agent 1 (P-Core 0)",
+    "purpose": "Consolidate and archive old backup directories for storage recovery"
+  },
+  "directories_to_archive": {
+    "archive/old_logs_2025_06_15": {
+      "file_count": 4,
+      "estimated_size_mb": 0.0011,
+      "description": "Old log files from core4 cleanup operations",
+      "files": [
+        "consolidation_output.log",
+        "core4_cleanup.log", 
+        "core4_manager.log",
+        "core4_process_monitor.log"
+      ]
+    },
+    "backups/archive_consolidation_2025_01_16": {
+      "file_count": 33,
+      "estimated_size_mb": 0.0015,
+      "description": "Previous archive consolidation from January 2025",
+      "subdirectories": [
+        "deprecated_components_20250612",
+        "duplicate_reports_2025_06_15", 
+        "old_orchestrator_tests"
+      ]
+    },
+    "backups/database_consolidation": {
+      "file_count": 14,
+      "estimated_size_mb": 10.5,
+      "description": "Old database files consolidated during database cleanup",
+      "largest_files": [
+        "meta_evolution.db (10MB)",
+        "meta_monitoring.db (242KB)"
+      ]
+    },
+    "backups/hardware_consolidation": {
+      "file_count": 3,
+      "estimated_size_mb": 0.018,
+      "description": "Hardware optimization scripts backup",
+      "files": [
+        "hardware_assessment.py",
+        "hardware_detector.py",
+        "hardware_maximizer.py"
+      ]
+    },
+    "backups/jarvis2_consolidation": {
+      "file_count": 8,
+      "estimated_size_mb": 0.073,
+      "description": "Old jarvis2 implementation files",
+      "files": [
+        "jarvis2.py",
+        "jarvis2_complete.py",
+        "jarvis2_config.py",
+        "jarvis2_core.py",
+        "jarvis2_mcts.py",
+        "jarvis2_meta_overlay.py",
+        "jarvis2_optimized.py",
+        "jarvis2_working.py"
+      ]
+    },
+    "backups/sequential_thinking_cleanup": {
+      "file_count": 13,
+      "estimated_size_mb": 0.159,
+      "description": "Sequential thinking implementation variants cleanup",
+      "largest_files": [
+        "sequential_thinking_turbo.py (45KB)",
+        "sequential_thinking_turbo_v2.py (23KB)"
+      ]
+    }
+  },
+  "summary": {
+    "total_files": 75,
+    "total_estimated_size_mb": 10.76,
+    "directories_count": 6,
+    "safety_checks": {
+      "active_references_found": 1,
+      "reference_file": "database_consolidation.py",
+      "reference_type": "backup creation script (safe to proceed)",
+      "orphaned_processes": false,
+      "database_locks": false
+    }
+  }
+}

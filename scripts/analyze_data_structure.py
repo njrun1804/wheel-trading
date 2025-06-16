@@ -45,7 +45,9 @@ def analyze_database_structure():
             if count > 0:
                 # Check for date columns and get range
                 date_cols = [
-                    col[0] for col in schema if "date" in col[0].lower() or "time" in col[0].lower()
+                    col[0]
+                    for col in schema
+                    if "date" in col[0].lower() or "time" in col[0].lower()
                 ]
 
                 for date_col in date_cols:
@@ -92,7 +94,9 @@ def analyze_database_structure():
 
                         # Check for expiration column
                         if any("expir" in col[0].lower() for col in schema):
-                            exp_col = next(col[0] for col in schema if "expir" in col[0].lower())
+                            exp_col = next(
+                                col[0] for col in schema if "expir" in col[0].lower()
+                            )
                             exp_count = conn.execute(
                                 f"""
                                 SELECT COUNT(DISTINCT {exp_col}) as unique_expirations
@@ -121,7 +125,9 @@ def analyze_database_structure():
     print("=" * 80)
 
     # Check for Unity-related tables
-    unity_tables = [t[0] for t in tables if "unity" in t[0].lower() or t[0].upper() == "U"]
+    unity_tables = [
+        t[0] for t in tables if "unity" in t[0].lower() or t[0].upper() == "U"
+    ]
     print(f"\nUnity-related tables found: {len(unity_tables)}")
     for table in unity_tables:
         count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
@@ -135,7 +141,9 @@ def analyze_database_structure():
         print(f"  - {table}: {count:,} rows")
 
     # Check for price/stock tables
-    price_tables = [t[0] for t in tables if "price" in t[0].lower() or "stock" in t[0].lower()]
+    price_tables = [
+        t[0] for t in tables if "price" in t[0].lower() or "stock" in t[0].lower()
+    ]
     print(f"\nPrice/stock tables found: {len(price_tables)}")
     for table in price_tables:
         count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
@@ -163,11 +171,15 @@ def analyze_database_structure():
 
                 # Check date range if available
                 date_cols = [
-                    col for col in df.columns if "date" in col.lower() or "time" in col.lower()
+                    col
+                    for col in df.columns
+                    if "date" in col.lower() or "time" in col.lower()
                 ]
                 if date_cols:
                     date_col = date_cols[0]
-                    print(f"    Date range: {df[date_col].min()} to {df[date_col].max()}")
+                    print(
+                        f"    Date range: {df[date_col].min()} to {df[date_col].max()}"
+                    )
             except Exception as e:
                 print(f"    Error reading: {e}")
 

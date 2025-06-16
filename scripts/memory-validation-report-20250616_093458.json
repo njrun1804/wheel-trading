@@ -1,0 +1,163 @@
+{
+  "timestamp": "2025-06-16T09:34:58.156819",
+  "system_info": {
+    "macos_version": "15.5",
+    "hardware_model": "Mac16,8",
+    "cpu_cores": 12,
+    "total_memory_gb": 24.0,
+    "node_version": "Not installed",
+    "shell": "/bin/zsh"
+  },
+  "validations": [
+    {
+      "category": "Environment",
+      "name": "Heap Size",
+      "status": "pass",
+      "details": "Optimal heap size: 20480MB",
+      "value": "--max-old-space-size=20480 --max-semi-space-size=1024 --optimize-for-size=false --memory-reducer=false --expose-gc --trace-gc --v8-pool-size=12",
+      "timestamp": "2025-06-16T09:34:58.199748"
+    },
+    {
+      "category": "Environment",
+      "name": "Semi-space Size",
+      "status": "pass",
+      "details": "Optimal semi-space size: 1024MB",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.199780"
+    },
+    {
+      "category": "Environment",
+      "name": "Manual GC",
+      "status": "pass",
+      "details": "Manual garbage collection enabled",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.199786"
+    },
+    {
+      "category": "Environment",
+      "name": "V8 Pool Size",
+      "status": "pass",
+      "details": "V8 pool optimized for M4 Pro (12 threads)",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.199790"
+    },
+    {
+      "category": "Environment",
+      "name": "Thread Pool Size",
+      "status": "pass",
+      "details": "Thread pool optimized for M4 Pro (12 threads)",
+      "value": "12",
+      "timestamp": "2025-06-16T09:34:58.199794"
+    },
+    {
+      "category": "Environment",
+      "name": "Memory Allocator",
+      "status": "pass",
+      "details": "Memory allocator optimized",
+      "value": "4",
+      "timestamp": "2025-06-16T09:34:58.199800"
+    },
+    {
+      "category": "System Limits",
+      "name": "File Descriptors",
+      "status": "pass",
+      "details": "Optimal file descriptor limit: 32768",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.203462"
+    },
+    {
+      "category": "System Limits",
+      "name": "Process Limit",
+      "status": "fail",
+      "details": "Low process limit: 2048",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.206637"
+    },
+    {
+      "category": "System Limits",
+      "name": "Stack Size",
+      "status": "warning",
+      "details": "Default stack size: 8176KB",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.209932"
+    },
+    {
+      "category": "LaunchAgent",
+      "name": "Plist File",
+      "status": "pass",
+      "details": "LaunchAgent plist file exists",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.210081"
+    },
+    {
+      "category": "LaunchAgent",
+      "name": "Service Status",
+      "status": "pass",
+      "details": "LaunchAgent is loaded and active",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.217235"
+    },
+    {
+      "category": "Node.js",
+      "name": "Installation",
+      "status": "critical",
+      "details": "Node.js not available",
+      "value": "node: --optimize-for-size= is not allowed in NODE_OPTIONS",
+      "timestamp": "2025-06-16T09:34:58.232316"
+    },
+    {
+      "category": "String Allocation",
+      "name": "100MB Test",
+      "status": "fail",
+      "details": "Failed to allocate 100MB string - configuration issue",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.247763"
+    },
+    {
+      "category": "Config Files",
+      "name": ".zshenv",
+      "status": "pass",
+      "details": "Node.js configuration found in .zshenv",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.247971"
+    },
+    {
+      "category": "Config Files",
+      "name": ".bashrc",
+      "status": "pass",
+      "details": "Node.js configuration found in .bashrc",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.248024"
+    },
+    {
+      "category": "System Config",
+      "name": "/etc/launchd.conf",
+      "status": "warning",
+      "details": "/etc/launchd.conf not found",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.248053"
+    },
+    {
+      "category": "System Config",
+      "name": "/etc/sysctl.conf",
+      "status": "pass",
+      "details": "Kernel limits configured",
+      "value": null,
+      "timestamp": "2025-06-16T09:34:58.248275"
+    }
+  ],
+  "summary": {
+    "total_checks": 17,
+    "passed": 12,
+    "warnings": 2,
+    "failed": 2,
+    "critical_issues": 1
+  },
+  "recommendations": [
+    "\ud83d\udea8 CRITICAL: Address critical issues immediately:",
+    "   - Installation: Node.js not available",
+    "Run comprehensive tests: ./scripts/test-memory-config.js",
+    "Review warning items for optimal performance",
+    "Fix failed validations before production use"
+  ]
+}

@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -56,17 +55,21 @@ class Account:
     cash_balance: float
     buying_power: float
     margin_used: float = 0.0
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def __post_init__(self) -> None:
         """Validate account values."""
         # Validate cash balance
         if self.cash_balance < 0:
-            raise ValueError(f"Cash balance cannot be negative, got {self.cash_balance}")
+            raise ValueError(
+                f"Cash balance cannot be negative, got {self.cash_balance}"
+            )
 
         # Validate buying power
         if self.buying_power < 0:
-            raise ValueError(f"Buying power cannot be negative, got {self.buying_power}")
+            raise ValueError(
+                f"Buying power cannot be negative, got {self.buying_power}"
+            )
 
         # Validate margin used
         if self.margin_used < 0:

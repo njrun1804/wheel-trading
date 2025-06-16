@@ -1,0 +1,148 @@
+{
+  "mcpServers": {
+    "_disabled_servers": {
+      "note": "Disabled MCP servers - using hardware-accelerated local tools instead",
+      "ripgrep": "replaced by ripgrep_turbo (30x faster)",
+      "dependency_graph": "replaced by dependency_graph_turbo (12x faster)", 
+      "python_analysis": "replaced by python_analysis_turbo (173x faster)",
+      "duckdb": "replaced by duckdb_turbo (no MCP overhead)"
+    },
+    "filesystem": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem@latest",
+        "/Users/mikeedwards"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=2048",
+        "FILESYSTEM_CACHE_SIZE": "1GB",
+        "FILESYSTEM_WATCH_ENABLED": "false"
+      }
+    },
+    "github": {
+      "transport": "stdio",
+      "command": "mcp-server-github",
+      "args": [],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+        "GITHUB_API_TIMEOUT": "30000",
+        "GITHUB_MAX_RETRIES": "3"
+      }
+    },
+    "brave": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search@latest"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      }
+    },
+    "memory": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory@latest"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=1024",
+        "MEMORY_MAX_NODES": "10000",
+        "MEMORY_CACHE_SIZE": "500MB",
+        "MEMORY_PERSISTENCE": "true"
+      }
+    },
+    "sequential-thinking": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking@latest"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=2048",
+        "THINKING_MAX_STEPS": "100",
+        "THINKING_TIMEOUT": "300000"
+      }
+    },
+    "puppeteer": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer@latest"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=1024",
+        "PUPPETEER_HEADLESS": "true",
+        "PUPPETEER_TIMEOUT": "30000"
+      }
+    },
+    "statsource": {
+      "transport": "stdio",
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": [
+        "-m",
+        "mcp_server_stats"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/mcp-servers/statsource"
+      }
+    },
+    "mlflow": {
+      "transport": "stdio",
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": [
+        "/Users/mikeedwards/mcp-servers/community/mlflowMCPServer/mlflow_server.py"
+      ],
+      "env": {
+        "MLFLOW_TRACKING_URI": "http://localhost:5000",
+        "PYTHONPATH": "/Users/mikeedwards/mcp-servers/community/mlflowMCPServer"
+      }
+    },
+    "pyrepl": {
+      "transport": "stdio",
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": [
+        "-m",
+        "mcp_py_repl"
+      ]
+    },
+    "sklearn": {
+      "transport": "stdio",
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": [
+        "/Users/mikeedwards/mcp-servers/community/mcp-server-scikit-learn/src/mcp_server_scikit_learn/server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/mikeedwards/mcp-servers/community/mcp-server-scikit-learn/src"
+      }
+    },
+    "optionsflow": {
+      "transport": "stdio",
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": [
+        "/Users/mikeedwards/mcp-servers/community/mcp-optionsflow/optionsflow.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/mikeedwards/mcp-servers/community/mcp-optionsflow",
+        "DATABENTO_API_KEY": "${DATABENTO_API_KEY}"
+      }
+    },
+    "logfire": {
+      "transport": "stdio",
+      "command": "/Users/mikeedwards/.pyenv/shims/python3",
+      "args": [
+        "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/scripts/trace-logfire-mcp.py"
+      ],
+      "env": {
+        "LOGFIRE_TOKEN": "pylf_v1_us_00l06NMSXxWp1V9cTNJWJLvjRPs5HPRVsFtmdTSS1YC2",
+        "LOGFIRE_READ_TOKEN": "pylf_v1_us_00l06NMSXxWp1V9cTNJWJLvjRPs5HPRVsFtmdTSS1YC2"
+      }
+    }
+  }
+}

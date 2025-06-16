@@ -10,15 +10,14 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.unity_wheel.risk.analytics import (
-
-from unity_wheel.config.unified_config import get_config
-config = get_config()
-
     RiskAnalyzer,
     calculate_cvar,
     calculate_sharpe_ratio,
     calculate_var,
 )
+from unity_wheel.config.unified_config import get_config
+
+config = get_config()
 
 
 def main():

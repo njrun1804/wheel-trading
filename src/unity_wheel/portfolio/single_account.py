@@ -1,19 +1,18 @@
 """Single Schwab account portfolio management with hard failures on missing data."""
 from __future__ import annotations
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-
 import sys
 from dataclasses import dataclass
-from typing import Dict, List, NoReturn
+from typing import NoReturn
 
-from src.config.loader import get_config
-from unity_wheel.models.position import Position, PositionType
-
-from unity_wheel.utils.logging import get_logger
+from ..config.loader import get_config
+from ..models.position import Position, PositionType
+from ..utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -34,7 +33,7 @@ class SchwabAccount:
     cash_balance: float
     buying_power: float
     margin_buying_power: float
-    positions: List[Position]
+    positions: list[Position]
     unity_shares: int = 0
     unity_puts: int = 0
     unity_calls: int = 0
@@ -48,7 +47,7 @@ class SingleAccountManager:
         self.config = get_config()
         self.unity_ticker = self.config.unity.ticker
 
-    def parse_account(self, account_data: Dict) -> SchwabAccount:
+    def parse_account(self, account_data: dict) -> SchwabAccount:
         """
         Parse Schwab account data. Dies if any required data is missing.
 
@@ -116,7 +115,7 @@ class SingleAccountManager:
 
         return account
 
-    def _parse_positions(self, positions_data: List[Dict]) -> List[Position]:
+    def _parse_positions(self, positions_data: list[dict]) -> list[Position]:
         """Parse positions from Schwab data. Dies on invalid data."""
         positions = []
 
@@ -168,16 +167,19 @@ class SingleAccountManager:
 
         account.unity_notional = share_exposure + put_exposure + call_exposure
 
-    def _get_unity_price_from_positions(self, positions: List[Position]) -> float:
+    def _get_unity_price_from_positions(self, positions: list[Position]) -> float:
         """Extract Unity price from stock positions or use a reasonable default."""
         # Look for Unity stock position to get current market price
         for position in positions:
             if (
-                position.symbol == self.unity_ticker
-                and position.position_type == PositionType.STOCK
+                (
+                    position.symbol == self.unity_ticker
+                    and position.position_type == PositionType.STOCK
+                )
+                and position.market_value
+                and position.quantity > 0
             ):
-                if position.market_value and position.quantity > 0:
-                    return position.market_value / position.quantity
+                return position.market_value / position.quantity
 
         # If no Unity stock position, log warning and use config default
         logger.warning(
@@ -190,7 +192,9 @@ class SingleAccountManager:
 
     def _is_unity_position(self, position: Position) -> bool:
         """Check if position is Unity-related."""
-        return position.symbol == self.unity_ticker or position.symbol.startswith(self.unity_ticker)
+        return position.symbol == self.unity_ticker or position.symbol.startswith(
+            self.unity_ticker
+        )
 
     def validate_buying_power(self, required: float, account: SchwabAccount) -> None:
         """
@@ -211,7 +215,9 @@ class SingleAccountManager:
                 f"Insufficient margin buying power: ${account.margin_buying_power:,.2f} < ${required:,.2f} required"
             )
 
-    def validate_position_limits(self, new_position_value: float, account: SchwabAccount) -> None:
+    def validate_position_limits(
+        self, new_position_value: float, account: SchwabAccount
+    ) -> None:
         """
         Validate position limits. Dies if exceeded.
 
@@ -232,4 +238,6 @@ class SingleAccountManager:
         # Check max concurrent puts
         max_puts = self.config.operations.api.max_concurrent_puts
         if account.unity_puts >= max_puts:
-            die(f"Max concurrent puts limit reached: {account.unity_puts} >= {max_puts}")
+            die(
+                f"Max concurrent puts limit reached: {account.unity_puts} >= {max_puts}"
+            )

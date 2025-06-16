@@ -1,0 +1,288 @@
+name: NLP Validation Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/unity_wheel/orchestrator/**'
+      - 'tests/test_natural_language_processing.py'
+      - 'tests/test_nlp_integration.py'
+      - 'scripts/run_nlp_validation_suite.py'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/unity_wheel/orchestrator/**'
+      - 'tests/test_natural_language_processing.py'
+      - 'tests/test_nlp_integration.py'
+      - 'scripts/run_nlp_validation_suite.py'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: 'Test level to run'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+          - 'basic'
+          - 'full'
+          - 'performance'
+
+jobs:
+  nlp-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+    
+    - name: Set up test environment
+      run: |
+        mkdir -p test_results
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        echo "PYTHONPATH=${PYTHONPATH}" >> $GITHUB_ENV
+    
+    - name: Run NLP unit tests
+      run: |
+        pytest tests/test_natural_language_processing.py -v \
+          --cov=src/unity_wheel/orchestrator \
+          --cov-report=xml \
+          --cov-report=html \
+          --junit-xml=test_results/nlp_unit_tests.xml
+    
+    - name: Run NLP integration tests
+      if: ${{ github.event.inputs.test_level != 'basic' || github.event_name != 'workflow_dispatch' }}
+      run: |
+        pytest tests/test_nlp_integration.py -v -m integration \
+          --junit-xml=test_results/nlp_integration_tests.xml
+    
+    - name: Run full NLP validation suite
+      if: ${{ github.event.inputs.test_level == 'full' || github.event_name != 'workflow_dispatch' }}
+      run: |
+        python scripts/run_nlp_validation_suite.py
+      env:
+        VALIDATION_MODE: ci
+    
+    - name: Run performance benchmarks
+      if: ${{ github.event.inputs.test_level == 'performance' || github.event_name == 'schedule' }}
+      run: |
+        python -c "
+        import asyncio
+        from scripts.run_nlp_validation_suite import NLPValidationSuite
+        
+        async def run_perf():
+            suite = NLPValidationSuite()
+            result = await suite.run_performance_benchmarks()
+            print(f'Performance results: {result}')
+            
+            # Fail if performance is below threshold
+            if not result.get('pass', False):
+                exit(1)
+        
+        asyncio.run(run_perf())
+        "
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: nlp-test-results-${{ matrix.python-version }}
+        path: |
+          test_results/
+          nlp_validation_report_*.json
+          htmlcov/
+        retention-days: 30
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.10'
+      with:
+        file: ./coverage.xml
+        flags: nlp
+        name: nlp-coverage
+        fail_ci_if_error: false
+    
+    - name: Comment PR with results
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Find the latest validation report
+          const files = fs.readdirSync('.');
+          const reportFile = files.find(f => f.startsWith('nlp_validation_report_'));
+          
+          if (reportFile) {
+            const report = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
+            const summary = report.summary;
+            
+            const comment = `
+            ## NLP Validation Results
+            
+            **Overall Result:** ${summary.overall_pass ? '✅ PASS' : '❌ FAIL'}
+            **Execution Time:** ${summary.suite_execution_time_s.toFixed(1)}s
+            **Categories Passed:** ${summary.passed_categories}/${summary.total_categories}
+            
+            ### Category Results
+            ${Object.entries(report).filter(([k, v]) => k !== 'summary' && k !== 'metrics' && typeof v === 'object' && v.pass !== undefined).map(([category, result]) => 
+              `- **${category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}:** ${result.pass ? '✅' : '❌'}`
+            ).join('\n')}
+            
+            ${summary.overall_pass ? '' : '⚠️ Some validation checks failed. Please review the test results.'}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }
+
+  regression-detection:
+    runs-on: ubuntu-latest
+    needs: nlp-validation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run regression detection
+      run: |
+        python -c "
+        import asyncio
+        from src.unity_wheel.orchestrator.nlp_validator import NLPValidator
+        
+        async def check_regression():
+            validator = NLPValidator()
+            result = await validator.run_regression_tests()
+            
+            if result.regression_detected:
+                print('❌ REGRESSION DETECTED!')
+                print(f'Pass rate: {result.pass_rate:.1%}')
+                print(f'Failed tests: {result.failed_tests}')
+                exit(1)
+            else:
+                print('✅ No regression detected')
+                print(f'Pass rate: {result.pass_rate:.1%}')
+        
+        asyncio.run(check_regression())
+        "
+    
+    - name: Create regression issue
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🚨 NLP Regression Detected',
+            body: `
+            A regression has been detected in the NLP system.
+            
+            **Commit:** ${context.sha}
+            **Branch:** ${context.ref}
+            **Workflow:** ${context.workflow}
+            
+            Please investigate and fix the regression immediately.
+            `,
+            labels: ['bug', 'regression', 'high-priority', 'nlp']
+          });
+
+  deployment-readiness:
+    runs-on: ubuntu-latest
+    needs: nlp-validation
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'ready-for-deployment')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Check deployment readiness
+      run: |
+        python -c "
+        import asyncio
+        from src.unity_wheel.orchestrator.nlp_validator import NLPValidator
+        
+        async def check_deployment():
+            validator = NLPValidator()
+            result = await validator.validate_for_deployment()
+            
+            print(f'Deployment ready: {result.ready_for_deployment}')
+            print(f'Classification accuracy: {result.classification_accuracy:.1%}')
+            print(f'Average latency: {result.average_latency:.0f}ms')
+            print(f'Error rate: {result.error_rate:.1%}')
+            
+            if result.blocking_issues:
+                print(f'Blocking issues: {result.blocking_issues}')
+                exit(1)
+            
+            if result.recommendations:
+                print(f'Recommendations: {result.recommendations}')
+        
+        asyncio.run(check_deployment())
+        "
+    
+    - name: Add deployment status to PR
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const status = '${{ job.status }}' === 'success' ? '✅ Ready for deployment' : '❌ Not ready for deployment';
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## Deployment Readiness Check\n\n${status}`
+          });

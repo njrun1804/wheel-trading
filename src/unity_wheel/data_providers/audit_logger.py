@@ -5,12 +5,11 @@ in financial decisions. This provides forensic evidence if needed.
 """
 from __future__ import annotations
 
-
 import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from unity_wheel.utils import get_logger
 
@@ -43,8 +42,8 @@ class DataAuditLogger:
         source: str,
         symbol: str,
         data_type: str,
-        data: Dict[str, Any],
-        request_params: Optional[Dict[str, Any]] = None,
+        data: dict[str, Any],
+        request_params: dict[str, Any] | None = None,
     ) -> None:
         """Log a data fetch event with full details.
 
@@ -75,7 +74,7 @@ class DataAuditLogger:
                 "source": source,
                 "symbol": symbol,
                 "data_type": data_type,
-                "record_count": len(data) if isinstance(data, (list, dict)) else 1,
+                "record_count": len(data) if isinstance(data, list | dict) else 1,
             },
         )
 
@@ -83,7 +82,7 @@ class DataAuditLogger:
         self,
         data_type: str,
         passed: bool,
-        details: Dict[str, Any],
+        details: dict[str, Any],
     ) -> None:
         """Log results of data validation checks."""
         entry = {
@@ -103,7 +102,7 @@ class DataAuditLogger:
     def log_calculation(
         self,
         function: str,
-        inputs: Dict[str, Any],
+        inputs: dict[str, Any],
         output: Any,
         data_sources: list[str],
     ) -> None:
@@ -120,7 +119,7 @@ class DataAuditLogger:
 
         self._log_event(entry)
 
-    def _log_event(self, entry: Dict[str, Any]) -> None:
+    def _log_event(self, entry: dict[str, Any]) -> None:
         """Append entry to audit file (append-only for immutability)."""
         try:
             with open(self.audit_file, "a") as f:
@@ -131,7 +130,7 @@ class DataAuditLogger:
             logger.error(f"Failed to write audit log: {e}")
             # Don't raise - audit failures shouldn't stop trading
 
-    def _summarize_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _summarize_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """Create summary of data without storing full dataset."""
         if isinstance(data, dict):
             return {
@@ -147,13 +146,13 @@ class DataAuditLogger:
         else:
             return {"type": type(data).__name__, "value": str(data)[:100]}
 
-    def _sanitize_inputs(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+    def _sanitize_inputs(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """Remove sensitive data from inputs before logging."""
         sanitized = {}
         for key, value in inputs.items():
             if key.lower() in ["api_key", "secret", "password", "token"]:
                 sanitized[key] = "***REDACTED***"
-            elif isinstance(value, (int, float, str, bool)):
+            elif isinstance(value, int | float | str | bool):
                 sanitized[key] = value
             else:
                 sanitized[key] = type(value).__name__
@@ -161,7 +160,7 @@ class DataAuditLogger:
 
 
 # Global singleton
-_audit_logger: Optional[DataAuditLogger] = None
+_audit_logger: DataAuditLogger | None = None
 
 
 def get_audit_logger() -> DataAuditLogger:

@@ -7,9 +7,7 @@ Useful for:
 """
 
 from datetime import datetime, timedelta
-from typing import List, Tuple
 
-from src.unity_wheel.utils import SimpleTradingCalendar
 from src.unity_wheel.utils.trading_calendar_enhancements import EnhancedTradingCalendar
 
 
@@ -18,12 +16,12 @@ def analyze_upcoming_expiries(months_ahead: int = 3) -> None:
     calendar = EnhancedTradingCalendar()
     today = datetime.now()
 
-    print(f"Trading Calendar Analysis for Unity (U)")
+    print("Trading Calendar Analysis for Unity (U)")
     print(f"Analysis Date: {today.strftime('%Y-%m-%d %A')}")
     print(f"Market Status: {'OPEN' if calendar.is_trading_day(today) else 'CLOSED'}")
 
     if calendar.is_early_close(today):
-        print(f"⚠️  Early Close Today (1 PM ET)")
+        print("⚠️  Early Close Today (1 PM ET)")
 
     print("\n" + "=" * 60 + "\n")
 
@@ -67,14 +65,16 @@ def analyze_upcoming_expiries(months_ahead: int = 3) -> None:
         optimal_entry = calendar.optimal_entry_day(
             datetime.combine(expiry_date, datetime.min.time())
         )
-        trading_days = len(calendar.get_trading_days_between(optimal_entry, expiry_date)) - 1
+        trading_days = (
+            len(calendar.get_trading_days_between(optimal_entry, expiry_date)) - 1
+        )
 
         print(
             f"For {expiry_date.strftime('%b %d')} expiry: Enter around {optimal_entry.strftime('%b %d (%a)')} ({trading_days} trading days)"
         )
 
         if near_earnings:
-            print(f"  ⚠️  Warning: This expiry is near Unity earnings")
+            print("  ⚠️  Warning: This expiry is near Unity earnings")
 
 
 def check_holidays_and_early_closes(days_ahead: int = 30) -> None:
@@ -83,7 +83,7 @@ def check_holidays_and_early_closes(days_ahead: int = 30) -> None:
     today = datetime.now()
     end_date = today + timedelta(days=days_ahead)
 
-    print(f"\nMarket Holidays & Early Closes")
+    print("\nMarket Holidays & Early Closes")
     print(f"Next {days_ahead} days from {today.strftime('%Y-%m-%d')}")
     print("=" * 60)
 
@@ -119,7 +119,7 @@ def calculate_theta_decay_comparison(dte_target: int = 45) -> None:
     calendar = EnhancedTradingCalendar()
     today = datetime.now()
 
-    print(f"\nTheta Decay Analysis")
+    print("\nTheta Decay Analysis")
     print(f"Comparing {dte_target} DTE positions starting on different days")
     print("=" * 60)
 

@@ -9,9 +9,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import databento as db
-import pandas as pd
-
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -19,7 +16,9 @@ from src.unity_wheel.data_providers.databento import DatabentoClient
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -70,7 +69,9 @@ def diagnose_coverage():
             else:
                 logger.info(f"  ✅ {schema}: {len(df)} records found!")
                 if "symbol" in df.columns:
-                    logger.info(f"     Sample symbols: {df['symbol'].unique()[:3].tolist()}")
+                    logger.info(
+                        f"     Sample symbols: {df['symbol'].unique()[:3].tolist()}"
+                    )
 
         except Exception as e:
             logger.error(f"  {schema}: Error - {str(e)[:100]}")
@@ -185,10 +186,12 @@ def diagnose_coverage():
             min_vol = df["volume"].min()
             avg_vol = df["volume"].mean()
 
-            logger.info(f"  Volume stats in ohlcv-1d data:")
+            logger.info("  Volume stats in ohlcv-1d data:")
             logger.info(f"    Minimum: {min_vol}")
             logger.info(f"    Average: {avg_vol:.0f}")
-            logger.info(f"    Inference: ohlcv-1d might exclude contracts with volume < {min_vol}")
+            logger.info(
+                f"    Inference: ohlcv-1d might exclude contracts with volume < {min_vol}"
+            )
 
     except Exception as e:
         logger.error(f"  Volume analysis error: {e}")

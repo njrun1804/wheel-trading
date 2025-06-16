@@ -4,8 +4,8 @@
 # ===================
 # Code Understanding & AST
 # ===================
-astor>=0.8.1                    # AST to source code conversion
-ast-comments>=1.2.2             # Preserve comments in AST
+# REMOVED: astor>=0.8.1 - unmaintained since 2020, use ast.unparse() (Python 3.9+) or libcst
+# REMOVED: ast-comments>=1.2.2 - unmaintained, use libcst for comment preservation
 libcst>=1.4.0                   # Concrete Syntax Tree for code modification
 parso>=0.8.4                    # Python parser with error recovery
 black>=24.8.0                   # Code formatting

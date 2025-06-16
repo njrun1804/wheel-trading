@@ -23,9 +23,9 @@
   },
   "memory": {
     "total_gb": 24.0,
-    "available_gb": 11.832183837890625,
-    "used_gb": 11.512115478515625,
-    "percent_used": 50.7,
+    "available_gb": 8.820831298828125,
+    "used_gb": 11.457183837890625,
+    "percent_used": 63.2,
     "memory_bandwidth": "N/A",
     "unified_memory": true
   },
@@ -36,12 +36,12 @@
     "libraries": {
       "mlx": {
         "available": true,
-        "version": "0.25.2",
+        "version": "0.26.1",
         "device": "gpu"
       },
       "pytorch_mps": {
         "available": true,
-        "version": "2.7.0",
+        "version": "2.7.1",
         "built_with_mps": true
       },
       "tensorflow_metal": {
@@ -51,8 +51,8 @@
   },
   "storage": {
     "total_gb": 460.4317207336426,
-    "available_gb": 196.85433197021484,
-    "used_percent": 5.1,
+    "available_gb": 159.31302642822266,
+    "used_percent": 6.2,
     "ssd_type": "NVMe"
   },
   "features": {
@@ -72,7 +72,7 @@
     "Use MPS for image processing and parallel compute"
   ],
   "benchmarks": {
-    "cpu_10m_ops_ms": 452.10904199984725,
-    "memory_100mb_reverse_ms": 35.84095799988063
+    "cpu_10m_ops_ms": 293.73941700032447,
+    "memory_100mb_reverse_ms": 39.4177920097718
   }
 }

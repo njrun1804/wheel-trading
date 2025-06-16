@@ -14,7 +14,6 @@ import asyncio
 import os
 import signal
 import sys
-from datetime import datetime
 from pathlib import Path
 
 # Add src to path
@@ -23,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from src.config.loader import get_config, get_config_loader
 from unity_wheel.analytics import IntegratedDecisionEngine
 from unity_wheel.analytics.performance_tracker import PerformanceTracker
-from unity_wheel.risk.limits import RiskLimitChecker, TradingLimits
+from unity_wheel.risk.limits import RiskLimitChecker
 from unity_wheel.storage import UnifiedStorage
 from unity_wheel.utils import get_logger
 
@@ -122,7 +121,7 @@ async def display_dashboard(
         logger.info("   ✅ Trading allowed")
     else:
         logger.info("   🚫 Trading blocked")
-        for reason in restrictions["reasons"]:
+        for _reason in restrictions["reasons"]:
             logger.info("      - {reason}")
 
     if restrictions["reduced_size"]:
@@ -165,7 +164,7 @@ async def display_dashboard(
             alerts.append(f"Price gap: {gap:.1%}")
 
     if alerts:
-        for alert in alerts:
+        for _alert in alerts:
             logger.info("   ⚠️  {alert}")
     else:
         logger.info("   ✅ No active alerts")
@@ -201,7 +200,9 @@ async def check_for_opportunities(
                 historical[-2]["close"] if len(historical) > 1 else latest["close"]
             ),
             "volume": float(latest.get("volume", 0)),
-            "realized_vol": await get_realized_volatility_from_databento(config.unity.ticker),
+            "realized_vol": await get_realized_volatility_from_databento(
+                config.unity.ticker
+            ),
         }
 
         # Mock option chain for monitoring
@@ -219,7 +220,9 @@ async def check_for_opportunities(
 
         # Check risk limits
         breaches = risk_checker.check_all_limits(
-            recommendation._asdict(), portfolio_value = config.trading.portfolio_value, market_data=current_prices  # Default
+            recommendation._asdict(),
+            portfolio_value=config.trading.portfolio_value,
+            market_data=current_prices,  # Default
         )
 
         # Log if interesting opportunity

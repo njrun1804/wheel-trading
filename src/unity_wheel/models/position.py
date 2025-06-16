@@ -7,7 +7,6 @@ import re
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
-from typing import Literal, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -63,10 +62,10 @@ class Position:
 
     symbol: str
     quantity: int
-    _position_type: Optional[PositionType] = field(default=None, init=False, repr=False)
-    _underlying: Optional[str] = field(default=None, init=False, repr=False)
-    _strike: Optional[float] = field(default=None, init=False, repr=False)
-    _expiration: Optional[date] = field(default=None, init=False, repr=False)
+    _position_type: PositionType | None = field(default=None, init=False, repr=False)
+    _underlying: str | None = field(default=None, init=False, repr=False)
+    _strike: float | None = field(default=None, init=False, repr=False)
+    _expiration: date | None = field(default=None, init=False, repr=False)
     _parsed: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -159,14 +158,14 @@ class Position:
         return self._underlying  # type: ignore
 
     @property
-    def strike(self) -> Optional[float]:
+    def strike(self) -> float | None:
         """Get the strike price (None for stocks)."""
         if not self._parsed:
             self._parse_symbol()
         return self._strike
 
     @property
-    def expiration(self) -> Optional[date]:
+    def expiration(self) -> date | None:
         """Get the expiration date (None for stocks)."""
         if not self._parsed:
             self._parse_symbol()
@@ -200,7 +199,7 @@ class Position:
                 f"${self.strike:.2f} {opt_type} exp {self.expiration}"
             )
 
-    def to_dict(self) -> dict[str, Union[str, int, float, None]]:
+    def to_dict(self) -> dict[str, str | int | float | None]:
         """Convert to dictionary for serialization."""
         return {
             "symbol": self.symbol,
@@ -212,7 +211,7 @@ class Position:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Union[str, int, float, None]]) -> Position:
+    def from_dict(cls, data: dict[str, str | int | float | None]) -> Position:
         """Create Position from dictionary."""
         return cls(
             symbol=str(data["symbol"]),

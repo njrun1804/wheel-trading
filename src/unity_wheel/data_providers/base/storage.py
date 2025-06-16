@@ -5,20 +5,18 @@ from __future__ import annotations
 import json
 import sqlite3
 from contextlib import contextmanager
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 
 from unity_wheel.utils import get_logger, timed_operation
 
 from ..fred.fred_models import (
-    FREDDataPoint,
     FREDDataset,
     FREDObservation,
     FREDSeries,
-    UpdateFrequency,
 )
 
 logger = get_logger(__name__)
@@ -27,7 +25,7 @@ logger = get_logger(__name__)
 class DataStorage:
     """SQLite-based storage for time series data."""
 
-    def __init__(self, db_path: Optional[Path] = None):
+    def __init__(self, db_path: Path | None = None):
         """
         Initialize storage.
 
@@ -178,7 +176,7 @@ class DataStorage:
     def save_observations(
         self,
         series_id: str,
-        observations: List[FREDObservation],
+        observations: list[FREDObservation],
         mark_revised: bool = False,
     ) -> int:
         """
@@ -200,7 +198,7 @@ class DataStorage:
                     obs.date,
                     obs.value,
                     mark_revised,
-                    datetime.now(timezone.utc) if mark_revised else None,
+                    datetime.now(UTC) if mark_revised else None,
                 )
                 for obs in observations
             ]
@@ -224,7 +222,7 @@ class DataStorage:
         self.save_series_metadata(dataset.series)
         self.save_observations(dataset.series.series_id, dataset.observations)
 
-    def get_latest_observation_date(self, series_id: str) -> Optional[date]:
+    def get_latest_observation_date(self, series_id: str) -> date | None:
         """Get the date of the most recent observation."""
         with self._get_connection() as conn:
             result = conn.execute(
@@ -242,10 +240,10 @@ class DataStorage:
     def get_observations(
         self,
         series_id: str,
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
-        limit: Optional[int] = None,
-    ) -> List[FREDObservation]:
+        start_date: date | None = None,
+        end_date: date | None = None,
+        limit: int | None = None,
+    ) -> list[FREDObservation]:
         """Get observations from storage."""
         with self._get_connection() as conn:
             query = """
@@ -276,7 +274,7 @@ class DataStorage:
                 for row in reversed(rows)  # Return in chronological order
             ]
 
-    def get_series_metadata(self, series_id: str) -> Optional[FREDSeries]:
+    def get_series_metadata(self, series_id: str) -> FREDSeries | None:
         """Get series metadata from storage."""
         with self._get_connection() as conn:
             row = conn.execute(
@@ -305,9 +303,9 @@ class DataStorage:
     def get_dataset(
         self,
         series_id: str,
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
-    ) -> Optional[FREDDataset]:
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> FREDDataset | None:
         """Get complete dataset from storage."""
         metadata = self.get_series_metadata(series_id)
         if not metadata:
@@ -327,7 +325,7 @@ class DataStorage:
         calculation_date: date,
         value: float,
         confidence: float = 1.0,
-        parameters: Optional[Dict[str, Any]] = None,
+        parameters: dict[str, Any] | None = None,
     ) -> None:
         """Save calculated feature value."""
         with self._get_connection() as conn:
@@ -352,7 +350,7 @@ class DataStorage:
         series_id: str,
         feature_name: str,
         calculation_date: date,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get calculated feature value.
 
@@ -373,7 +371,7 @@ class DataStorage:
 
             return (row["value"], row["confidence"]) if row else None
 
-    def get_data_summary(self) -> Dict[str, Any]:
+    def get_data_summary(self) -> dict[str, Any]:
         """Get summary of stored data."""
         with self._get_connection() as conn:
             # Series count and date ranges

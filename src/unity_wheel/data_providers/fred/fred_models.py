@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from datetime import date as Date
-from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -53,7 +53,7 @@ class FREDSeries(BaseModel):
     seasonal_adjustment: str = Field(..., description="Seasonal adjustment type")
     last_updated: datetime = Field(..., description="Last update timestamp")
     popularity: int = Field(0, description="Series popularity score")
-    notes: Optional[str] = Field(None, description="Series notes")
+    notes: str | None = Field(None, description="Series notes")
 
     @field_validator("frequency", mode="before")
     @classmethod
@@ -66,7 +66,7 @@ class FREDSeries(BaseModel):
 
     @field_validator("last_updated", mode="before")
     @classmethod
-    def parse_datetime(cls, v: Union[str, datetime]) -> datetime:
+    def parse_datetime(cls, v: str | datetime) -> datetime:
         """Parse datetime string."""
         if isinstance(v, datetime):
             return v
@@ -75,7 +75,7 @@ class FREDSeries(BaseModel):
     @property
     def days_since_update(self) -> int:
         """Days since last update."""
-        return (datetime.now(timezone.utc) - self.last_updated).days
+        return (datetime.now(UTC) - self.last_updated).days
 
     @property
     def is_discontinued(self) -> bool:
@@ -90,11 +90,11 @@ class FREDObservation(BaseModel):
     """Single FRED observation with validation."""
 
     date: Date = Field(..., description="Observation date")
-    value: Optional[float] = Field(None, description="Observation value")
+    value: float | None = Field(None, description="Observation value")
 
     @field_validator("value", mode="before")
     @classmethod
-    def parse_value(cls, v: Any) -> Optional[float]:
+    def parse_value(cls, v: Any) -> float | None:
         """Parse value string, handling missing data."""
         if v is None or v == "." or v == "nan" or v == "NaN":
             return None
@@ -106,7 +106,7 @@ class FREDObservation(BaseModel):
 
     @field_validator("date", mode="before")
     @classmethod
-    def parse_date(cls, v: Union[str, Date]) -> Date:
+    def parse_date(cls, v: str | Date) -> Date:
         """Parse date string."""
         if isinstance(v, Date):
             return v
@@ -121,11 +121,11 @@ class FREDDataPoint:
 
     series_id: str
     date: Date
-    value: Optional[float]
+    value: float | None
     confidence: float = 1.0
     is_revised: bool = False
-    revision_date: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    revision_date: datetime | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_valid(self) -> bool:
@@ -142,11 +142,11 @@ class FREDDataset:
     """Collection of FRED series with metadata."""
 
     series: FREDSeries
-    observations: List[FREDObservation]
-    fetch_timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    observations: list[FREDObservation]
+    fetch_timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property
-    def latest_value(self) -> Optional[float]:
+    def latest_value(self) -> float | None:
         """Get most recent non-null value."""
         for obs in reversed(self.observations):
             if obs.value is not None:
@@ -160,7 +160,7 @@ class FREDDataset:
             return self.series.observation_start, self.series.observation_end
         return self.observations[0].date, self.observations[-1].date
 
-    def get_value(self, target_date: date) -> Optional[float]:
+    def get_value(self, target_date: date) -> float | None:
         """Get value for specific date."""
         for obs in self.observations:
             if obs.date == target_date:

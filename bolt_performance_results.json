@@ -1,0 +1,114 @@
+{
+  "summary": {
+    "total_benchmarks": 6,
+    "successful": 6,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "performance_metrics": {
+    "total_ops_per_sec": 27732.953089612747,
+    "average_latency_ms": 1.0688866825579486,
+    "peak_ram_mb": 38.390625,
+    "initial_memory_mb": 212.5
+  },
+  "performance_ratings": {
+    "throughput": 100,
+    "latency": 80,
+    "memory_efficiency": 100,
+    "overall": 93.33333333333333
+  },
+  "system_info": {
+    "cpu_count": 12,
+    "cpu_count_logical": 12,
+    "total_memory_gb": 24.0,
+    "available_memory_gb": 9.370376586914062,
+    "mlx_available": true,
+    "torch_mps_available": true
+  },
+  "config_validation": {
+    "meets_minimum_performance": true,
+    "within_memory_limits": true,
+    "meets_target_performance": true,
+    "expected_limits": {
+      "min_ops_per_sec": 100,
+      "max_latency_ms": 100,
+      "max_ram_mb": 4096,
+      "target_ops_per_sec": 500,
+      "target_latency_ms": 10
+    },
+    "recommendations": [
+      "Excellent performance - system is well optimized"
+    ]
+  },
+  "detailed_results": [
+    {
+      "name": "core_operations",
+      "ops_per_sec": 1357.2797291209238,
+      "latency_ms": 0.7367677999933553,
+      "peak_ram_mb": 23.9375,
+      "success": true,
+      "error": null,
+      "details": {
+        "total_operations": 110,
+        "duration": 0.08104445799926907
+      }
+    },
+    {
+      "name": "memory_management",
+      "ops_per_sec": 6863.155990385333,
+      "latency_ms": 0.1457055619019749,
+      "peak_ram_mb": 38.390625,
+      "success": true,
+      "error": null,
+      "details": {
+        "peak_memory_mb": 274.828125
+      }
+    },
+    {
+      "name": "parallel_processing",
+      "ops_per_sec": 1819.514474720861,
+      "latency_ms": 0.5495971666581075,
+      "peak_ram_mb": 0.015625,
+      "success": true,
+      "error": null,
+      "details": {
+        "num_parallel_tasks": 12
+      }
+    },
+    {
+      "name": "gpu_acceleration",
+      "ops_per_sec": 241.2991507625828,
+      "latency_ms": 4.1442334000748815,
+      "peak_ram_mb": 2.5625,
+      "success": true,
+      "error": null,
+      "details": {
+        "backend": "mlx",
+        "operations": 5
+      }
+    },
+    {
+      "name": "file_operations",
+      "ops_per_sec": 16161.61615416634,
+      "latency_ms": 0.061875000028521754,
+      "peak_ram_mb": 0.0,
+      "success": true,
+      "error": null,
+      "details": {
+        "files_processed": 20
+      }
+    },
+    {
+      "name": "realistic_workload",
+      "ops_per_sec": 1290.0875904567076,
+      "latency_ms": 0.7751411666908502,
+      "peak_ram_mb": 0.25,
+      "success": true,
+      "error": null,
+      "details": {
+        "mixed_operations": 18
+      }
+    }
+  ],
+  "failures": []
+}

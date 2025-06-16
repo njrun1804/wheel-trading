@@ -11,38 +11,71 @@ python = "^3.11"
 
 [tool.poetry.scripts]
 wheel-trading = "unity_wheel.cli.run:main"
+bolt = "bolt.cli.main:main"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length = 100
-target-version = ['py311']
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
 [tool.ruff]
 line-length = 100
 target-version = "py311"
 
+# Enable ruff formatting (replaces black)
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
 [tool.ruff.lint]
-# Enable only essential rules
+# Comprehensive rule set replacing black, isort, pyflakes, and basic pylint
 select = [
     "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
     "F",   # pyflakes
     "UP",  # pyupgrade
     "B",   # flake8-bugbear
     "SIM", # flake8-simplify
-    "I",   # isort
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "D",   # pydocstyle (basic docstring checks)
+    "S",   # flake8-bandit (security)
+    "T20", # flake8-print (no print statements)
+    "PT",  # flake8-pytest-style
+    "Q",   # flake8-quotes
+    "RSE", # flake8-raise
+    "RET", # flake8-return
+    "SLF", # flake8-self
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+    "ERA", # eradicate (commented-out code)
+    "PD",  # pandas-vet
+    "PGH", # pygrep-hooks
+    "PL",  # pylint subset
+    "TRY", # tryceratops
+    "FLY", # flynt (f-string conversion)
+    "PERF", # perflint
 ]
 
 ignore = [
-    "E501",  # line too long (black handles this)
+    "E501",  # line too long (handled by formatter)
     "B008",  # do not perform function calls in argument defaults
     "SIM108", # use ternary operator (sometimes less readable)
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # docstring requirements (too strict for trading code)
+    "D203", # 1 blank line required before class docstring (conflicts with D211)
+    "D213", # Multi-line docstring summary should start at the second line (conflicts with D212)
+    "S101", # use of assert (common in trading code)
+    "T201", # print statements (used in CLI tools)
+    "PLR0913", # too many arguments (common in trading functions)
+    "PLR0911", # too many return statements
+    "PLR0912", # too many branches
+    "PLR0915", # too many statements
+    "PD008", # pandas .at (sometimes needed for performance)
+    "PD901", # pandas df variable name
+    "TRY003", # specific exception messages
+    "ARG001", # unused function argument (common in callback signatures)
+    "PTH123", # pathlib open() (sometimes file handles needed)
 ]
 
 [tool.ruff.lint.per-file-ignores]

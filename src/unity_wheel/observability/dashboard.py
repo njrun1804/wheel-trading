@@ -8,19 +8,17 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import duckdb
 import pandas as pd
 
-from unity_wheel.data_providers.base import get_anomaly_detector, get_market_validator
-from unity_wheel.metrics import metrics_collector
-from unity_wheel.monitoring import get_performance_monitor
-from unity_wheel.utils import StructuredLogger, get_feature_flags, get_logger
-
 from src.config.loader import get_config
+from unity_wheel.metrics import metrics_collector
+from unity_wheel.utils import StructuredLogger, get_logger
+
 config = get_config()
 
 
@@ -35,7 +33,7 @@ class MetricPoint:
     timestamp: datetime
     metric_name: str
     value: float
-    tags: Dict[str, str] = field(default_factory=dict)
+    tags: dict[str, str] = field(default_factory=dict)
 
     def to_influx_line(self) -> str:
         """Convert to InfluxDB line protocol format."""
@@ -65,12 +63,12 @@ class DashboardExport:
     """Aggregated data export for dashboards."""
 
     timestamp: datetime
-    metrics: List[MetricPoint]
-    events: List[Dict[str, Any]]
-    alerts: List[Dict[str, Any]]
-    system_health: Dict[str, Any]
+    metrics: list[MetricPoint]
+    events: list[dict[str, Any]]
+    alerts: list[dict[str, Any]]
+    system_health: dict[str, Any]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON export."""
         return {
             "timestamp": self.timestamp.isoformat(),
@@ -103,7 +101,7 @@ class ObservabilityExporter:
     def __init__(
         self,
         export_dir: Path = Path("exports"),
-        storage_path: Optional[Path] = None,
+        storage_path: Path | None = None,
     ):
         """Initialize exporter."""
         self.export_dir = export_dir
@@ -111,7 +109,12 @@ class ObservabilityExporter:
 
         # Use unified DuckDB storage
         if storage_path is None:
-            storage_path = Path.home() / ".wheel_trading" / "cache" / Path(config.storage.database_path).name
+            storage_path = (
+                Path.home()
+                / ".wheel_trading"
+                / "cache"
+                / Path(config.storage.database_path).name
+            )
         self.db_path = storage_path
 
     def _ensure_metrics_tables(self, conn: duckdb.DuckDBPyConnection) -> None:
@@ -155,7 +158,7 @@ class ObservabilityExporter:
 
     def collect_current_metrics(self) -> DashboardExport:
         """Collect all current metrics from various systems."""
-        timestamp = datetime.now(timezone.utc)
+        timestamp = datetime.now(UTC)
         metrics = []
         events = []
         alerts = []
@@ -273,7 +276,10 @@ class ObservabilityExporter:
             )
 
             # Risk metric distributions
-            for metric_name, values in metrics_collector.get_risk_distribution().items():
+            for (
+                metric_name,
+                values,
+            ) in metrics_collector.get_risk_distribution().items():
                 metrics.extend(
                     [
                         MetricPoint(
@@ -320,7 +326,10 @@ class ObservabilityExporter:
                         timestamp=timestamp,
                         metric_name="feature_flag_status",
                         value=1.0 if feature_info["is_enabled"] else 0.0,
-                        tags={"feature": feature_name, "status": feature_info["status"]},
+                        tags={
+                            "feature": feature_name,
+                            "status": feature_info["status"],
+                        },
                     )
                 )
 
@@ -350,7 +359,9 @@ class ObservabilityExporter:
                 )
 
             # System health summary
-            system_health = self._calculate_system_health(perf_stats, validation_stats, flag_report)
+            system_health = self._calculate_system_health(
+                perf_stats, validation_stats, flag_report
+            )
 
             # Log export
             logger.info(
@@ -375,17 +386,19 @@ class ObservabilityExporter:
 
     def _calculate_system_health(
         self,
-        perf_stats: Dict[str, Any],
-        validation_stats: Dict[str, Any],
-        flag_report: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        perf_stats: dict[str, Any],
+        validation_stats: dict[str, Any],
+        flag_report: dict[str, Any],
+    ) -> dict[str, Any]:
         """Calculate overall system health metrics."""
         health_score = 100.0
         issues = []
 
         # Performance health
         slow_ops = sum(
-            1 for stats in perf_stats.values() if stats.p95_duration_ms > 1000  # 1 second
+            1
+            for stats in perf_stats.values()
+            if stats.p95_duration_ms > 1000  # 1 second
         )
         if slow_ops > 0:
             health_score -= slow_ops * 5
@@ -394,7 +407,9 @@ class ObservabilityExporter:
         # Data quality health
         if validation_stats["success_rate"] < 0.95:
             health_score -= (1 - validation_stats["success_rate"]) * 50
-            issues.append(f"Data validation rate {validation_stats['success_rate']:.1%}")
+            issues.append(
+                f"Data validation rate {validation_stats['success_rate']:.1%}"
+            )
 
         # Feature health
         degraded_features = sum(
@@ -409,15 +424,17 @@ class ObservabilityExporter:
             "components": {
                 "performance": "healthy" if slow_ops == 0 else "degraded",
                 "data_quality": (
-                    "healthy" if validation_stats["success_rate"] >= 0.95 else "degraded"
+                    "healthy"
+                    if validation_stats["success_rate"] >= 0.95
+                    else "degraded"
                 ),
                 "features": "healthy" if degraded_features == 0 else "degraded",
             },
             "issues": issues,
-            "last_check": datetime.now(timezone.utc).isoformat(),
+            "last_check": datetime.now(UTC).isoformat(),
         }
 
-    def export_json(self, data: DashboardExport, filename: Optional[str] = None) -> Path:
+    def export_json(self, data: DashboardExport, filename: str | None = None) -> Path:
         """Export data as JSON."""
         if filename is None:
             filename = f"dashboard_{data.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
@@ -428,7 +445,9 @@ class ObservabilityExporter:
 
         return filepath
 
-    def export_influxdb(self, data: DashboardExport, filename: Optional[str] = None) -> Path:
+    def export_influxdb(
+        self, data: DashboardExport, filename: str | None = None
+    ) -> Path:
         """Export data in InfluxDB line protocol format."""
         if filename is None:
             filename = f"influx_{data.timestamp.strftime('%Y%m%d_%H%M%S')}.txt"
@@ -440,7 +459,9 @@ class ObservabilityExporter:
 
         return filepath
 
-    def export_prometheus(self, data: DashboardExport, filename: Optional[str] = None) -> Path:
+    def export_prometheus(
+        self, data: DashboardExport, filename: str | None = None
+    ) -> Path:
         """Export data in Prometheus exposition format."""
         if filename is None:
             filename = f"prometheus_{data.timestamp.strftime('%Y%m%d_%H%M%S')}.txt"
@@ -464,7 +485,7 @@ class ObservabilityExporter:
 
         return filepath
 
-    def export_csv(self, data: DashboardExport, filename: Optional[str] = None) -> Path:
+    def export_csv(self, data: DashboardExport, filename: str | None = None) -> Path:
         """Export metrics as CSV for analysis."""
         if filename is None:
             filename = f"metrics_{data.timestamp.strftime('%Y%m%d_%H%M%S')}.csv"
@@ -526,9 +547,13 @@ class ObservabilityExporter:
                 )
 
             # Clean old data (30 day retention)
-            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
-            conn.execute("DELETE FROM observability_metrics WHERE created_at < ?", [cutoff])
-            conn.execute("DELETE FROM observability_events WHERE created_at < ?", [cutoff])
+            cutoff = datetime.now(UTC) - timedelta(days=30)
+            conn.execute(
+                "DELETE FROM observability_metrics WHERE created_at < ?", [cutoff]
+            )
+            conn.execute(
+                "DELETE FROM observability_events WHERE created_at < ?", [cutoff]
+            )
         finally:
             conn.close()
 
@@ -536,12 +561,12 @@ class ObservabilityExporter:
         self,
         metric_name: str,
         start_time: datetime,
-        end_time: Optional[datetime] = None,
-        tags: Optional[Dict[str, str]] = None,
+        end_time: datetime | None = None,
+        tags: dict[str, str] | None = None,
     ) -> pd.DataFrame:
         """Query historical metrics from database."""
         if end_time is None:
-            end_time = datetime.now(timezone.utc)
+            end_time = datetime.now(UTC)
 
         query = """
             SELECT timestamp, metric_name, value, tags
@@ -569,9 +594,9 @@ class ObservabilityExporter:
 
         return df
 
-    def generate_summary_report(self, hours: int = 24) -> Dict[str, Any]:
+    def generate_summary_report(self, hours: int = 24) -> dict[str, Any]:
         """Generate summary report for specified time period."""
-        end_time = datetime.now(timezone.utc)
+        end_time = datetime.now(UTC)
         start_time = end_time - timedelta(hours=hours)
 
         conn = duckdb.connect(str(self.db_path), read_only=True)
@@ -618,18 +643,22 @@ class ObservabilityExporter:
                     "unique_metrics": [row[0] for row in metric_names],
                 },
                 "events": events_df.to_dict("records") if not events_df.empty else [],
-                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "generated_at": datetime.now(UTC).isoformat(),
             }
         finally:
             conn.close()
 
-    def _get_cached_performance_data(self, conn: duckdb.DuckDBPyConnection) -> Dict[str, Any]:
+    def _get_cached_performance_data(
+        self, conn: duckdb.DuckDBPyConnection
+    ) -> dict[str, Any]:
         """Get performance data from DuckDB cache."""
         # In pull-when-asked architecture, we don't track continuous performance
         # Return basic stats from recent operations
         return {}
 
-    def _get_decision_statistics(self, conn: duckdb.DuckDBPyConnection) -> Dict[str, Any]:
+    def _get_decision_statistics(
+        self, conn: duckdb.DuckDBPyConnection
+    ) -> dict[str, Any]:
         """Get decision statistics from predictions cache."""
         try:
             result = conn.execute(
@@ -652,7 +681,9 @@ class ObservabilityExporter:
             logger.warning(f"Failed to get decision statistics: {e}")
         return {"total_decisions": 0}
 
-    def _get_validation_statistics(self, conn: duckdb.DuckDBPyConnection) -> Dict[str, Any]:
+    def _get_validation_statistics(
+        self, conn: duckdb.DuckDBPyConnection
+    ) -> dict[str, Any]:
         """Get data validation statistics."""
         # In pull-when-asked, validation happens on demand
         return {
@@ -660,11 +691,13 @@ class ObservabilityExporter:
             "total_validations": 0,
         }
 
-    def _get_system_health_report(self, conn: duckdb.DuckDBPyConnection) -> Dict[str, Any]:
+    def _get_system_health_report(
+        self, conn: duckdb.DuckDBPyConnection
+    ) -> dict[str, Any]:
         """Get system health from cache statistics."""
         try:
             # Check cache size and age
-            stats = conn.execute(
+            conn.execute(
                 """
                 SELECT
                     COUNT(*) as cache_entries,
@@ -679,7 +712,11 @@ class ObservabilityExporter:
 
             features = {
                 "caching": {"is_enabled": True, "status": "healthy", "error_count": 0},
-                "api_integration": {"is_enabled": True, "status": "healthy", "error_count": 0},
+                "api_integration": {
+                    "is_enabled": True,
+                    "status": "healthy",
+                    "error_count": 0,
+                },
             }
 
             return {"features": features}
@@ -689,7 +726,7 @@ class ObservabilityExporter:
 
 
 # Global exporter instance
-_exporter: Optional[ObservabilityExporter] = None
+_exporter: ObservabilityExporter | None = None
 
 
 def get_observability_exporter() -> ObservabilityExporter:

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-06-16T02:52:03.115301",
+  "cpu_cores": {
+    "physical": 12,
+    "logical": 12
+  },
+  "memory": {
+    "total_gb": 24.0,
+    "available_gb": 8.531692504882812,
+    "percent_used": 64.5
+  },
+  "load_average": [
+    3.2001953125,
+    2.75439453125,
+    2.11279296875
+  ],
+  "performance_test": {
+    "cpu_ms": 24.293899536132812,
+    "memory_ms": 0.7519721984863281
+  }
+}

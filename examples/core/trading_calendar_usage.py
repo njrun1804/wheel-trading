@@ -29,7 +29,7 @@ def main():
     # Check upcoming dates
     print("Next 5 trading days:")
     current = today
-    for i in range(5):
+    for _i in range(5):
         current = calendar.get_next_trading_day(current)
         print(f"  {current.strftime('%Y-%m-%d %A')}")
     print()

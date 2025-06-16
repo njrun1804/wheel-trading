@@ -5,15 +5,13 @@ with borrowed capital considerations.
 """
 from __future__ import annotations
 
-
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from scipy import optimize, stats
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils.logging import StructuredLogger
 from ..utils.random_utils import set_seed
@@ -29,13 +27,13 @@ class MonteCarloResult:
 
     mean_return: float
     std_return: float
-    percentiles: Dict[int, float]  # 5th, 25th, 50th, 75th, 95th
+    percentiles: dict[int, float]  # 5th, 25th, 50th, 75th, 95th
     probability_profit: float
     probability_loss: float
     expected_shortfall: float  # CVaR
     max_drawdown: float
-    paths: Optional[np.ndarray] = None  # Sample paths for visualization
-    confidence_interval: Tuple[float, float] = None  # 95% CI
+    paths: np.ndarray | None = None  # Sample paths for visualization
+    confidence_interval: tuple[float, float] = None  # 95% CI
 
 
 @dataclass
@@ -71,27 +69,27 @@ class OptimalCapitalStructure:
     sharpe_ratio: float
 
     # Sensitivity
-    leverage_curve: List[Tuple[float, float, float]]  # (leverage, return, risk)
-    efficient_frontier: List[Tuple[float, float]]  # (risk, return) points
+    leverage_curve: list[tuple[float, float, float]]  # (leverage, return, risk)
+    efficient_frontier: list[tuple[float, float]]  # (risk, return) points
 
 
 @dataclass
 class MultiPeriodOptimization:
     """Multi-period borrowing and trading optimization."""
 
-    periods: List[Dict[str, float]]  # Period details
+    periods: list[dict[str, float]]  # Period details
     total_return: float
     total_borrowing_cost: float
     net_return: float
-    optimal_borrowing_schedule: List[float]
-    optimal_position_schedule: List[float]
+    optimal_borrowing_schedule: list[float]
+    optimal_position_schedule: list[float]
     reinvestment_strategy: str
 
 
 class AdvancedFinancialModeling:
     """Advanced financial modeling for Unity wheel trading."""
 
-    def __init__(self, borrowing_analyzer: Optional[BorrowingCostAnalyzer] = None):
+    def __init__(self, borrowing_analyzer: BorrowingCostAnalyzer | None = None):
         """Initialize with borrowing analyzer."""
         self.config = get_config()
         self.borrowing_analyzer = borrowing_analyzer or BorrowingCostAnalyzer()
@@ -140,7 +138,9 @@ class AdvancedFinancialModeling:
 
         # Initialize arrays
         returns = np.zeros(n_simulations)
-        paths = np.zeros((n_simulations, n_days + 1)) if include_path_dependency else None
+        paths = (
+            np.zeros((n_simulations, n_days + 1)) if include_path_dependency else None
+        )
 
         # Run simulations
         for i in range(n_simulations):
@@ -171,7 +171,9 @@ class AdvancedFinancialModeling:
                 # Simple terminal value simulation
                 # Use student-t distribution for fatter tails (Unity characteristic)
                 shock = np.random.standard_t(df=5) * np.sqrt(n_days)
-                log_return = (daily_return - 0.5 * daily_vol**2) * n_days + daily_vol * shock
+                log_return = (
+                    daily_return - 0.5 * daily_vol**2
+                ) * n_days + daily_vol * shock
                 final_value = position_size * np.exp(log_return)
 
             # Calculate return after borrowing costs
@@ -191,7 +193,9 @@ class AdvancedFinancialModeling:
 
         # Risk metrics
         negative_returns = returns[returns < 0]
-        expected_shortfall = np.mean(negative_returns) if len(negative_returns) > 0 else 0
+        expected_shortfall = (
+            np.mean(negative_returns) if len(negative_returns) > 0 else 0
+        )
 
         # Maximum drawdown (if paths available)
         max_dd = 0
@@ -222,8 +226,8 @@ class AdvancedFinancialModeling:
         borrowed_capital: float,
         total_capital: float,
         risk_free_rate: float = 0.05,
-        benchmark_returns: Optional[np.ndarray] = None,
-    ) -> Tuple[RiskAdjustedMetrics, float]:
+        benchmark_returns: np.ndarray | None = None,
+    ) -> tuple[RiskAdjustedMetrics, float]:
         """
         Calculate comprehensive risk-adjusted metrics.
 
@@ -243,7 +247,9 @@ class AdvancedFinancialModeling:
 
         # Downside deviation (for Sortino)
         downside_returns = returns[returns < risk_free_rate / 252]  # Daily risk-free
-        downside_std = np.std(downside_returns) if len(downside_returns) > 0 else std_return
+        downside_std = (
+            np.std(downside_returns) if len(downside_returns) > 0 else std_return
+        )
 
         # Calculate borrowing cost impact
         leverage_ratio = total_capital / (total_capital - borrowed_capital)
@@ -256,18 +262,26 @@ class AdvancedFinancialModeling:
         adjusted_std = np.std(adjusted_returns)
 
         # Sharpe Ratio (standard and adjusted)
-        sharpe_ratio = (mean_return - risk_free_rate / 252) / std_return if std_return > 0 else 0
+        sharpe_ratio = (
+            (mean_return - risk_free_rate / 252) / std_return if std_return > 0 else 0
+        )
         adjusted_sharpe = (
-            (adjusted_mean - risk_free_rate / 252) / adjusted_std if adjusted_std > 0 else 0
+            (adjusted_mean - risk_free_rate / 252) / adjusted_std
+            if adjusted_std > 0
+            else 0
         )
         net_sharpe = adjusted_sharpe  # After all costs
 
         # Sortino Ratio
         sortino_ratio = (
-            (mean_return - risk_free_rate / 252) / downside_std if downside_std > 0 else 0
+            (mean_return - risk_free_rate / 252) / downside_std
+            if downside_std > 0
+            else 0
         )
         adjusted_sortino = (
-            (adjusted_mean - risk_free_rate / 252) / downside_std if downside_std > 0 else 0
+            (adjusted_mean - risk_free_rate / 252) / downside_std
+            if downside_std > 0
+            else 0
         )
 
         # Calmar Ratio (return / max drawdown)
@@ -290,7 +304,9 @@ class AdvancedFinancialModeling:
         # Treynor Ratio (uses beta instead of total risk)
         if benchmark_returns is not None and len(benchmark_returns) == len(returns):
             beta = np.cov(returns, benchmark_returns)[0, 1] / np.var(benchmark_returns)
-            treynor_ratio = (mean_return - risk_free_rate / 252) / beta if beta > 0 else 0
+            treynor_ratio = (
+                (mean_return - risk_free_rate / 252) / beta if beta > 0 else 0
+            )
         else:
             beta = 1.0
             treynor_ratio = sharpe_ratio
@@ -299,7 +315,9 @@ class AdvancedFinancialModeling:
         threshold = risk_free_rate / 252
         gains = returns[returns > threshold] - threshold
         losses = threshold - returns[returns <= threshold]
-        omega_ratio = np.sum(gains) / np.sum(losses) if np.sum(losses) > 0 else float("inf")
+        omega_ratio = (
+            np.sum(gains) / np.sum(losses) if np.sum(losses) > 0 else float("inf")
+        )
 
         # Leverage metrics
         debt_to_equity = borrowed_capital / (total_capital - borrowed_capital)
@@ -364,7 +382,11 @@ class AdvancedFinancialModeling:
             leveraged_vol = leverage * volatility
 
             # Sharpe ratio
-            sharpe = (leveraged_return - borrow_rate) / leveraged_vol if leveraged_vol > 0 else 0
+            sharpe = (
+                (leveraged_return - borrow_rate) / leveraged_vol
+                if leveraged_vol > 0
+                else 0
+            )
 
             results.append((leverage, leveraged_return, leveraged_vol, sharpe))
 
@@ -384,7 +406,9 @@ class AdvancedFinancialModeling:
         frontier.sort(key=lambda x: x[0])  # Sort by risk
 
         # Leverage curve for visualization
-        leverage_curve = [(leverages[i], returns[i], vols[i]) for i in range(len(leverages))]
+        leverage_curve = [
+            (leverages[i], returns[i], vols[i]) for i in range(len(leverages))
+        ]
 
         return OptimalCapitalStructure(
             optimal_leverage=leverages[optimal_idx],
@@ -398,8 +422,8 @@ class AdvancedFinancialModeling:
 
     def multi_period_optimization(
         self,
-        periods: List[
-            Dict[str, float]
+        periods: list[
+            dict[str, float]
         ],  # Each period: {'days': X, 'expected_return': Y, 'volatility': Z}
         initial_capital: float,
         max_leverage: float = 1.5,
@@ -426,7 +450,9 @@ class AdvancedFinancialModeling:
             total_return = 0
             total_borrow_cost = 0
 
-            for i, (borrow, period) in enumerate(zip(borrowings, periods)):
+            for _i, (borrow, period) in enumerate(
+                zip(borrowings, periods, strict=False)
+            ):
                 # Position size = capital + borrowing
                 position = capital + borrow
 
@@ -485,7 +511,9 @@ class AdvancedFinancialModeling:
         total_return = 0
         total_borrow_cost = 0
 
-        for i, (borrow, period) in enumerate(zip(optimal_borrowings, periods)):
+        for i, (borrow, period) in enumerate(
+            zip(optimal_borrowings, periods, strict=False)
+        ):
             position = capital + borrow
             period_return = period["expected_return"] * period["days"] / 365
             gross_profit = position * period_return
@@ -531,8 +559,8 @@ class AdvancedFinancialModeling:
         self,
         unity_returns: np.ndarray,
         interest_rates: np.ndarray,
-        other_factors: Optional[Dict[str, np.ndarray]] = None,
-    ) -> Tuple[Dict[str, float], float]:
+        other_factors: dict[str, np.ndarray] | None = None,
+    ) -> tuple[dict[str, float], float]:
         """
         Analyze correlation between Unity returns and interest rates.
 
@@ -576,7 +604,9 @@ class AdvancedFinancialModeling:
         if other_factors:
             for name, data in other_factors.items():
                 if len(data) == len(unity_returns):
-                    results[f"{name}_correlation"] = np.corrcoef(unity_returns, data)[0, 1]
+                    results[f"{name}_correlation"] = np.corrcoef(unity_returns, data)[
+                        0, 1
+                    ]
 
         # Interest rate sensitivity (beta to rates)
         if len(interest_rates) > 1:
@@ -585,7 +615,9 @@ class AdvancedFinancialModeling:
             return_changes = np.diff(unity_returns)
 
             if len(rate_changes) > 0:
-                rate_beta = np.cov(return_changes, rate_changes)[0, 1] / np.var(rate_changes)
+                rate_beta = np.cov(return_changes, rate_changes)[0, 1] / np.var(
+                    rate_changes
+                )
                 results["interest_rate_beta"] = rate_beta
 
         return results
@@ -597,7 +629,7 @@ class AdvancedFinancialModeling:
         returns_distribution: np.ndarray,
         confidence_level: float = 0.95,
         time_horizon: int = 1,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calculate Value at Risk with borrowed capital.
 
@@ -630,18 +662,25 @@ class AdvancedFinancialModeling:
         threshold_leveraged = np.percentile(net_returns, var_percentile)
 
         cvar_basic = (
-            -np.mean(returns_distribution[returns_distribution <= threshold_basic]) * position_size
+            -np.mean(returns_distribution[returns_distribution <= threshold_basic])
+            * position_size
         )
-        cvar_leveraged = -np.mean(net_returns[net_returns <= threshold_leveraged]) * position_size
+        cvar_leveraged = (
+            -np.mean(net_returns[net_returns <= threshold_leveraged]) * position_size
+        )
 
         # Marginal VaR (impact of $1 more borrowing)
         marginal_position = position_size + 1
-        marginal_leverage = marginal_position / (marginal_position - borrowed_amount - 1)
+        marginal_leverage = marginal_position / (
+            marginal_position - borrowed_amount - 1
+        )
         marginal_returns = (
             returns_distribution * marginal_leverage
             - loan.daily_rate * (borrowed_amount + 1) / marginal_position
         )
-        marginal_var = -np.percentile(marginal_returns, var_percentile) * marginal_position
+        marginal_var = (
+            -np.percentile(marginal_returns, var_percentile) * marginal_position
+        )
         marginal_var_impact = marginal_var - var_leveraged
 
         # Worst case (with model risk)
@@ -668,7 +707,7 @@ class AdvancedFinancialModeling:
 
     def optimize_portfolio_leverage(
         self,
-        portfolio: List[Dict[str, float]],
+        portfolio: list[dict[str, float]],
         max_leverage: float = 2.0,
         n_points: int = 20,
         n_simulations: int = 1000,
@@ -683,10 +722,18 @@ class AdvancedFinancialModeling:
         weights /= weights.sum()
 
         expected = float(
-            sum(w * p["expected_return"] for w, p in zip(weights, portfolio))
+            sum(
+                w * p["expected_return"]
+                for w, p in zip(weights, portfolio, strict=False)
+            )
         )
         volatility = float(
-            np.sqrt(sum((w * p["volatility"]) ** 2 for w, p in zip(weights, portfolio)))
+            np.sqrt(
+                sum(
+                    (w * p["volatility"]) ** 2
+                    for w, p in zip(weights, portfolio, strict=False)
+                )
+            )
         )
         horizon = max(int(p.get("time_horizon", 252)) for p in portfolio)
 
@@ -718,14 +765,18 @@ class AdvancedFinancialModeling:
         frontier = [(risks[i], returns[i]) for i in range(len(risks))]
         frontier.sort(key=lambda x: x[0])
 
-        leverage_curve = [(leverages[i], returns[i], risks[i]) for i in range(len(leverages))]
+        leverage_curve = [
+            (leverages[i], returns[i], risks[i]) for i in range(len(leverages))
+        ]
 
         return OptimalCapitalStructure(
             optimal_leverage=leverages[optimal_idx],
             optimal_debt_ratio=(leverages[optimal_idx] - 1) / leverages[optimal_idx],
             expected_return=returns[optimal_idx],
             risk_level=risks[optimal_idx],
-            sharpe_ratio=returns[optimal_idx] / risks[optimal_idx] if risks[optimal_idx] > 0 else 0,
+            sharpe_ratio=returns[optimal_idx] / risks[optimal_idx]
+            if risks[optimal_idx] > 0
+            else 0,
             leverage_curve=leverage_curve,
             efficient_frontier=frontier,
         )

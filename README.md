@@ -1,4 +1,4 @@
-# Unity Wheel Trading Bot v2.0 - Autonomous Edition
+# Unity Wheel Trading Bot v2.2 - Autonomous Edition
 
 > **⚠️ Note:** The default `config.yaml` is tuned for high risk/high return strategies.
 > For a more conservative approach, see `examples/core/conservative_config.yaml`
@@ -31,11 +31,11 @@ The project includes optimizations specifically for macOS 15.5 on the 12‑core 
 
 1. **Run the tuning script once** (requires sudo):
    ```bash
-   ./scripts/mac-optimize.sh
+   ./scripts/setup-mac-m4-optimizations.sh
    ```
 2. **Use the optimized data loader** when fetching history:
    ```bash
-   python tools/data/fetch_unity_data_optimized.py
+   python tools/download_unity_options_comprehensive.py
    ```
 3. **Increase parallelism** to match your hardware by setting:
    ```bash
@@ -48,8 +48,8 @@ The project includes optimizations specifically for macOS 15.5 on the 12‑core 
    ```
 5. **Validate the environment** before running any commands:
    ```bash
-   source .codex/.container_env
-   python .codex/check_environment.py
+   python validate.py
+   python scripts/health_check.sh
    ```
 
 
@@ -93,7 +93,7 @@ wheel-trading/
 ├── INTEGRATION_GUIDE.md         # All external integrations
 ├── DEVELOPMENT_GUIDE.md         # Setup and development
 ├── config.yaml                  # Main configuration
-├── run.py               # PRIMARY entry point (v2.0)
+├── run.py               # PRIMARY entry point (v2.2)
 ├── src/unity_wheel/             # Core implementation
 ├── tests/                       # All tests
 ├── examples/                    # Organized examples

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "detailed": {
+      "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+      "datefmt": "%Y-%m-%d %H:%M:%S"
+    },
+    "simple": {
+      "format": "%(levelname)s - %(message)s"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "INFO",
+      "formatter": "simple",
+      "stream": "ext://sys.stdout"
+    },
+    "file_all": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "DEBUG",
+      "formatter": "detailed",
+      "filename": "logs/wheel_trading.log",
+      "maxBytes": 10485760,
+      "backupCount": 5
+    },
+    "file_errors": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "ERROR",
+      "formatter": "detailed",
+      "filename": "logs/errors.log",
+      "maxBytes": 10485760,
+      "backupCount": 3
+    },
+    "file_trading": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "INFO",
+      "formatter": "detailed",
+      "filename": "logs/trading.log",
+      "maxBytes": 10485760,
+      "backupCount": 5
+    }
+  },
+  "loggers": {
+    "unity_wheel": {
+      "level": "DEBUG",
+      "handlers": [
+        "console",
+        "file_all",
+        "file_errors"
+      ],
+      "propagate": false
+    },
+    "unity_wheel.strategy": {
+      "level": "INFO",
+      "handlers": [
+        "file_trading"
+      ],
+      "propagate": true
+    },
+    "unity_wheel.risk": {
+      "level": "INFO",
+      "handlers": [
+        "file_trading"
+      ],
+      "propagate": true
+    },
+    "jarvis2": {
+      "level": "DEBUG",
+      "handlers": [
+        "console",
+        "file_all"
+      ],
+      "propagate": false
+    }
+  },
+  "root": {
+    "level": "INFO",
+    "handlers": [
+      "console",
+      "file_all"
+    ]
+  }
+}

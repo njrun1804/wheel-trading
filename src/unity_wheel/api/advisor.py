@@ -2,38 +2,43 @@
 
 from __future__ import annotations
 
-import logging
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import UTC, datetime
+from typing import Any
 
-# META INTEGRATION: Enable observation and evolution (SHARED SINGLETON)
-def get_meta():
-    """Get shared MetaPrime instance to prevent multiple spawns."""
-    # META COMPLETELY DISABLED FOR EINSTEIN TESTING
-    class MockMeta:
-        def observe(self, *args, **kwargs):
-            pass
-        def __getattr__(self, name):
-            return lambda *args, **kwargs: None
-    return MockMeta()
+
+# PERMANENT META MOCK: Trading system operates independently
+class _TradingMetaMock:
+    """Permanent meta mock for trading system independence."""
     
-    # from ..meta import get_shared_meta
-    # meta = get_shared_meta() 
-    # # Record advisor usage
-    # meta.observe("advisor_meta_access", {"timestamp": datetime.now(timezone.utc).isoformat()})
-    return meta
+    def observe(self, *args, **kwargs):
+        """No-op observation for trading metrics."""
+        pass
+    
+    def __getattr__(self, name):
+        """Return no-op function for any meta method."""
+        return lambda *args, **kwargs: None
+
+
+def get_meta():
+    """Get trading-specific meta mock instance."""
+    return _TradingMetaMock()
+
 
 from ..analytics import UnityAssignmentModel
-from ..math import probability_itm_validated
 from ..metrics import metrics_collector
 from ..models import Account, Position
-from ..risk import BorrowingCostAnalyzer, RiskAnalyzer, RiskLevel, RiskLimits
+from ..risk import (
+    BorrowingCostAnalyzer,
+    RiskAnalyzer,
+    RiskLevel,
+    RiskLimits,
+)
 from ..risk import RiskMetrics as AnalyticsMetrics
-from ..risk import analyze_borrowing_decision
 from ..risk.advanced_financial_modeling import AdvancedFinancialModeling
 from ..strategy import WheelParameters, WheelStrategy
 from ..strategy.position_evaluator import PositionEvaluator
+
 # Position switch evaluation would go here if needed
 from ..utils import (
     DecisionLogger,
@@ -44,14 +49,14 @@ from ..utils import (
     timed_operation,
     with_recovery,
 )
-from .types import Action, MarketSnapshot, OptionData, Recommendation, RiskMetrics
+from .types import MarketSnapshot, OptionData, Recommendation, RiskMetrics
 
 # Lazy imports to avoid circular dependency
 _market_validator = None
 _anomaly_detector = None
 
 
-def _get_market_validator() -> None:
+def _get_market_validator():
     """Lazy import market validator."""
     global _market_validator
     if _market_validator is None:
@@ -61,7 +66,7 @@ def _get_market_validator() -> None:
     return _market_validator
 
 
-def _get_anomaly_detector() -> None:
+def _get_anomaly_detector():
     """Lazy import anomaly detector."""
     global _anomaly_detector
     if _anomaly_detector is None:
@@ -81,7 +86,7 @@ class TradingConstraints:
 
     def __init__(self):
         """Initialize constraints from config."""
-        from src.config.loader import get_config
+        from ..config.loader import get_config
 
         config = get_config()
 
@@ -106,32 +111,74 @@ class WheelAdvisor:
 
     def __init__(
         self,
-        wheel_params: Optional[WheelParameters] = None,
-        risk_limits: Optional[RiskLimits] = None,
+        wheel_params: WheelParameters | None = None,
+        risk_limits: RiskLimits | None = None,
     ):
         """Initialize advisor with strategy and risk components."""
         self.constraints = TradingConstraints()
         self.wheel_params = wheel_params or WheelParameters()
         self.risk_limits = risk_limits or RiskLimits()
 
-        # Initialize components
-        self.strategy = WheelStrategy(self.wheel_params)
-        self.risk_analyzer = RiskAnalyzer(self.risk_limits)
-        self.assignment_model = UnityAssignmentModel()
-        self.borrowing_analyzer = BorrowingCostAnalyzer()
-        self.financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
-        self.position_evaluator = PositionEvaluator(
-            commission_per_contract=self.constraints.COMMISSION_PER_CONTRACT
-        )
+        # Lazy initialization for performance - components created on first access
+        self._strategy = None
+        self._risk_analyzer = None
+        self._assignment_model = None
+        self._borrowing_analyzer = None
+        self._financial_modeler = None
+        self._position_evaluator = None
 
         logger.info(
-            "WheelAdvisor initialized",
+            "WheelAdvisor initialized (lazy components)",
             extra={
                 "target_delta": self.wheel_params.target_delta,
                 "target_dte": self.wheel_params.target_dte,
                 "max_concurrent_puts": self.constraints.MAX_CONCURRENT_PUTS,
             },
         )
+
+    @property
+    def strategy(self) -> WheelStrategy:
+        """Lazy-loaded wheel strategy."""
+        if self._strategy is None:
+            self._strategy = WheelStrategy(self.wheel_params)
+        return self._strategy
+
+    @property
+    def risk_analyzer(self) -> RiskAnalyzer:
+        """Lazy-loaded risk analyzer."""
+        if self._risk_analyzer is None:
+            self._risk_analyzer = RiskAnalyzer(self.risk_limits)
+        return self._risk_analyzer
+
+    @property
+    def assignment_model(self) -> UnityAssignmentModel:
+        """Lazy-loaded assignment model."""
+        if self._assignment_model is None:
+            self._assignment_model = UnityAssignmentModel()
+        return self._assignment_model
+
+    @property
+    def borrowing_analyzer(self) -> BorrowingCostAnalyzer:
+        """Lazy-loaded borrowing analyzer."""
+        if self._borrowing_analyzer is None:
+            self._borrowing_analyzer = BorrowingCostAnalyzer()
+        return self._borrowing_analyzer
+
+    @property
+    def financial_modeler(self) -> AdvancedFinancialModeling:
+        """Lazy-loaded financial modeler."""
+        if self._financial_modeler is None:
+            self._financial_modeler = AdvancedFinancialModeling(self.borrowing_analyzer)
+        return self._financial_modeler
+
+    @property
+    def position_evaluator(self) -> PositionEvaluator:
+        """Lazy-loaded position evaluator."""
+        if self._position_evaluator is None:
+            self._position_evaluator = PositionEvaluator(
+                commission_per_contract=self.constraints.COMMISSION_PER_CONTRACT
+            )
+        return self._position_evaluator
 
     # === BEGIN main_recommendation_engine ===
     @timed_operation(threshold_ms=200.0)  # 200ms SLA
@@ -150,15 +197,20 @@ class WheelAdvisor:
         Recommendation
             Action recommendation with confidence and risk metrics
         """
-        start_time = datetime.now(timezone.utc)
-        
+        start_time = datetime.now(UTC)
+
         # META OBSERVATION: Record recommendation request
-        get_meta().observe("recommendation_request", {
-            "timestamp": start_time.isoformat(),
-            "current_price": market_snapshot.current_price,
-            "position_count": len(market_snapshot.positions),
-            "account_value": market_snapshot.account.total_value
-        })
+        get_meta().observe(
+            "recommendation_request",
+            {
+                "timestamp": start_time.isoformat(),
+                "current_price": market_snapshot["current_price"],
+                "position_count": len(market_snapshot["positions"]),
+                "account_value": market_snapshot[
+                    "buying_power"
+                ],  # Use buying_power as account value
+            },
+        )
         decision_id = f"wheel_{uuid.uuid4().hex[:8]}_{int(start_time.timestamp())}"
 
         # Log decision start
@@ -176,11 +228,12 @@ class WheelAdvisor:
 
         try:
             # POLICY ENGINE: Stop trading if volatility exceeds 120%
-            if market_snapshot.volatility and market_snapshot.volatility > 1.20:
+            volatility = market_snapshot.get("implied_volatility", 0)
+            if volatility and volatility > 1.20:
                 logger.warning(
-                    f"STOP TRADING: Volatility {market_snapshot.volatility:.1%} exceeds 120% threshold",
+                    f"STOP TRADING: Volatility {volatility:.1%} exceeds 120% threshold",
                     extra={
-                        "volatility": market_snapshot.volatility,
+                        "volatility": volatility,
                         "threshold": 1.20,
                         "action": "circuit_breaker",
                     },
@@ -190,7 +243,7 @@ class WheelAdvisor:
                     reasoning="Volatility exceeds 120% circuit breaker threshold",
                     confidence=1.0,
                     parameters={
-                        "current_volatility": f"{market_snapshot.volatility:.1%}",
+                        "current_volatility": f"{volatility:.1%}",
                         "threshold": "120%",
                         "policy": "stop_trading_high_vol",
                     },
@@ -201,11 +254,15 @@ class WheelAdvisor:
             validation_result = validator.validate(market_snapshot)
 
             if not validation_result.is_valid:
-                error_msg = f"Data quality issues: {len(validation_result.issues)} errors found"
+                error_msg = (
+                    f"Data quality issues: {len(validation_result.issues)} errors found"
+                )
                 logger.warning(
                     error_msg,
                     extra={
-                        "issues": [issue.message for issue in validation_result.issues[:3]],
+                        "issues": [
+                            issue.message for issue in validation_result.issues[:3]
+                        ],
                         "quality_level": validation_result.quality_level.value,
                     },
                 )
@@ -227,7 +284,9 @@ class WheelAdvisor:
 
             # Check position limits
             current_positions = self._parse_positions(market_snapshot["positions"])
-            open_puts = sum(1 for p in current_positions if p.position_type.value == "put")
+            open_puts = sum(
+                1 for p in current_positions if p.position_type.value == "put"
+            )
 
             if open_puts >= self.constraints.MAX_CONCURRENT_PUTS:
                 return self._create_hold_recommendation(
@@ -254,7 +313,10 @@ class WheelAdvisor:
                 portfolio_value=market_snapshot["buying_power"],
             )
 
-            if not strike_rec or strike_rec.confidence < self.constraints.MIN_CONFIDENCE:
+            if (
+                not strike_rec
+                or strike_rec.confidence < self.constraints.MIN_CONFIDENCE
+            ):
                 confidence = strike_rec.confidence if strike_rec else 0.0
                 return self._create_hold_recommendation(
                     f"Low confidence ({confidence:.0%}) in strike selection"
@@ -272,7 +334,7 @@ class WheelAdvisor:
             #     position_evaluator=self.position_evaluator,
             #     validate_liquidity_fn=self._validate_option_liquidity
             # )
-            # 
+            #
             # if switch_recommendation:
             #     return switch_recommendation
 
@@ -285,8 +347,12 @@ class WheelAdvisor:
             )
 
             # Analyze borrowing costs before position sizing
-            available_cash = market_snapshot.get("available_cash", 0)  # Cash without borrowing
-            initial_position_value = strike_rec.strike * 100 * 10  # Start with 10 contracts
+            available_cash = market_snapshot.get(
+                "available_cash", 0
+            )  # Cash without borrowing
+            initial_position_value = (
+                strike_rec.strike * 100 * 10
+            )  # Start with 10 contracts
 
             # Calculate expected return for borrowing analysis
             expected_return_pct = (strike_rec.premium / strike_rec.strike) * (
@@ -328,8 +394,13 @@ class WheelAdvisor:
             )
 
             # Validate position size
-            position_value = strike_rec.strike * self.constraints.CONTRACTS_PER_TRADE * contracts
-            if position_value > account.cash_balance * self.constraints.MAX_POSITION_PCT:
+            position_value = (
+                strike_rec.strike * self.constraints.CONTRACTS_PER_TRADE * contracts
+            )
+            if (
+                position_value
+                > account.cash_balance * self.constraints.MAX_POSITION_PCT
+            ):
                 return self._create_hold_recommendation(
                     f"Position size would exceed {self.constraints.MAX_POSITION_PCT:.0%} portfolio limit"
                 )
@@ -352,7 +423,9 @@ class WheelAdvisor:
             if assignment_prob.confidence > 0.7:
                 effective_assignment_prob = assignment_prob.probability
                 if assignment_prob.warnings:
-                    logger.info(f"Assignment warnings: {', '.join(assignment_prob.warnings)}")
+                    logger.info(
+                        f"Assignment warnings: {', '.join(assignment_prob.warnings)}"
+                    )
             else:
                 effective_assignment_prob = strike_rec.probability_itm
 
@@ -390,10 +463,13 @@ class WheelAdvisor:
                 portfolio_vega=0.0,
                 portfolio_theta=0.0,
                 margin_requirement=risk_metrics["margin_required"],
-                margin_utilization=risk_metrics["margin_required"] / account.cash_balance,
+                margin_utilization=risk_metrics["margin_required"]
+                / account.cash_balance,
             )
 
-            breaches = self.risk_analyzer.check_limits(dataclass_metrics, account.cash_balance)
+            breaches = self.risk_analyzer.check_limits(
+                dataclass_metrics, account.cash_balance
+            )
             risk_report = self.risk_analyzer.generate_risk_report(
                 dataclass_metrics, breaches, account.cash_balance
             )
@@ -420,7 +496,7 @@ class WheelAdvisor:
                 )
 
             # Check decision latency
-            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+            elapsed = (datetime.now(UTC) - start_time).total_seconds()
             if elapsed > self.constraints.MAX_DECISION_TIME:
                 logger.warning(
                     f"Decision latency {elapsed:.3f}s exceeds {self.constraints.MAX_DECISION_TIME}s target"
@@ -459,7 +535,9 @@ class WheelAdvisor:
                 volatility=volatility,
                 time_horizon=self.wheel_params.target_dte,
                 position_size=strike_rec.strike * 100 * contracts,
-                borrowed_amount=max(0, strike_rec.strike * 100 * contracts - available_cash),
+                borrowed_amount=max(
+                    0, strike_rec.strike * 100 * contracts - available_cash
+                ),
                 n_simulations=1000,  # Quick simulation
             )
 
@@ -529,10 +607,19 @@ class WheelAdvisor:
             return recommendation
 
         except (ValueError, KeyError, AttributeError) as e:
-            logger.error(f"Failed to generate recommendation: {e}", exc_info=True)
+            logger.error(
+                f"Failed to generate recommendation: {e}",
+                exc_info=True,
+                extra={
+                    "operation": "generate_recommendation",
+                    "symbol": market_snapshot["ticker"],
+                    "portfolio_value": account.cash_balance,
+                    "error_type": type(e).__name__,
+                },
+            )
 
             # Log failed decision
-            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+            elapsed = (datetime.now(UTC) - start_time).total_seconds()
             decision_logger.log_decision(
                 action="ERROR",
                 rationale=f"Error generating recommendation: {str(e)}",
@@ -551,7 +638,7 @@ class WheelAdvisor:
 
     # === END main_recommendation_engine ===
 
-    def _validate_snapshot(self, snapshot: MarketSnapshot) -> Tuple[bool, str]:
+    def _validate_snapshot(self, snapshot: MarketSnapshot) -> tuple[bool, str]:
         """Validate market snapshot data."""
         # Check required fields
         required = ["ticker", "current_price", "buying_power", "option_chain"]
@@ -571,7 +658,7 @@ class WheelAdvisor:
 
         return True, ""
 
-    def _parse_positions(self, positions_data: List[Any]) -> List[Position]:
+    def _parse_positions(self, positions_data: list[Any]) -> list[Position]:
         """Parse position data into Position objects."""
         positions = []
         for pos_data in positions_data:
@@ -589,11 +676,19 @@ class WheelAdvisor:
                 )
                 positions.append(position)
             except (ValueError, KeyError, AttributeError) as e:
-                logger.warning(f"Failed to parse position: {e}")
+                logger.warning(
+                    f"Failed to parse position data: {e}",
+                    exc_info=True,
+                    extra={
+                        "operation": "parse_position",
+                        "pos_data": pos_data,
+                        "error_type": type(e).__name__,
+                    },
+                )
 
         return positions
 
-    def _build_occ_symbol(self, pos_data: Dict[str, Any]) -> str:
+    def _build_occ_symbol(self, pos_data: dict[str, Any]) -> str:
         """Build OCC option symbol from position data."""
         # Format: TICKER + YYMMDD + C/P + 00000000 (strike * 1000)
         ticker = pos_data["symbol"]
@@ -611,7 +706,9 @@ class WheelAdvisor:
 
         return f"{ticker}{date_str}{opt_type}{strike_str}"
 
-    def _extract_liquid_strikes(self, option_chain: Dict[str, OptionData]) -> List[float]:
+    def _extract_liquid_strikes(
+        self, option_chain: dict[str, OptionData]
+    ) -> list[float]:
         """Extract strikes that meet liquidity requirements."""
         liquid_strikes = []
 
@@ -638,10 +735,7 @@ class WheelAdvisor:
             return False
 
         # Check open interest
-        if open_interest < self.constraints.MIN_OPEN_INTEREST:
-            return False
-
-        return True
+        return not open_interest < self.constraints.MIN_OPEN_INTEREST
 
     def _calculate_risk_metrics(
         self,
@@ -683,7 +777,9 @@ class WheelAdvisor:
         position_cvar = position_value * cvar_pct
 
         # Margin requirement
-        margin_required = strike * self.constraints.CONTRACTS_PER_TRADE * contracts * 0.20
+        margin_required = (
+            strike * self.constraints.CONTRACTS_PER_TRADE * contracts * 0.20
+        )
         metrics = RiskMetrics(
             max_loss=max_loss,
             probability_assignment=probability_itm,
@@ -714,7 +810,9 @@ class WheelAdvisor:
 
         # Assignment loss
         assignment_loss = (
-            max(0, strike - current_price) * self.constraints.CONTRACTS_PER_TRADE * contracts
+            max(0, strike - current_price)
+            * self.constraints.CONTRACTS_PER_TRADE
+            * contracts
         )
         expected_assignment_loss = assignment_loss * probability_assign
 
@@ -758,7 +856,11 @@ class WheelAdvisor:
 
         try:
             import duckdb
-        except (ValueError, KeyError, AttributeError):  # pragma: no cover - duckdb optional in some envs
+        except (
+            ValueError,
+            KeyError,
+            AttributeError,
+        ):  # pragma: no cover - duckdb optional in some envs
             return None
 
         db_path = Path(os.path.expanduser(config.storage.database_path))
@@ -772,11 +874,37 @@ class WheelAdvisor:
                 [ticker, days],
             ).fetchall()
             conn.close()
-        except (ValueError, KeyError, AttributeError) as e:  # pragma: no cover - ignore DB issues
-            logger.warning("load_returns_failed", error=str(e))
+        except (
+            ValueError,
+            KeyError,
+            AttributeError,
+            duckdb.Error,
+        ) as e:  # pragma: no cover - ignore DB issues
+            logger.warning(
+                f"Failed to load returns from database: {e}",
+                exc_info=True,
+                extra={
+                    "operation": "load_returns",
+                    "ticker": ticker,
+                    "days": days,
+                    "db_path": str(db_path),
+                    "error_type": type(e).__name__,
+                },
+            )
             return None
 
         returns = [float(r[0]) for r in rows if r[0] is not None]
         if len(returns) < 20:
             return None
         return np.array(list(reversed(returns)))
+
+
+# Aliases for backward compatibility with Agent 8 system analysis
+TradingAdvisor = WheelAdvisor
+Advisor = WheelAdvisor
+
+
+def get_recommendations(market_snapshot: MarketSnapshot) -> Recommendation:
+    """Legacy function wrapper for backward compatibility."""
+    advisor = WheelAdvisor()
+    return advisor.advise_position(market_snapshot)

@@ -10,22 +10,22 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import databento as db
 import duckdb
-import pandas as pd
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -203,7 +203,9 @@ class UnityOptionsDailyDownloader:
                     total_volume += volume
                     days_with_data += 1
 
-                    logger.info(f"✅ {current_date}: {contracts:,} contracts, {volume:,} volume")
+                    logger.info(
+                        f"✅ {current_date}: {contracts:,} contracts, {volume:,} volume"
+                    )
                 else:
                     empty_days += 1
                     if empty_days <= 10:  # Only log first 10 empty days
@@ -245,14 +247,14 @@ class UnityOptionsDailyDownloader:
         """
         ).fetchone()
 
-        logger.info(f"Download Statistics:")
+        logger.info("Download Statistics:")
         logger.info(f"  Days processed: {days_processed}")
         logger.info(f"  Days with data: {days_with_data}")
         logger.info(f"  Empty days: {empty_days}")
         logger.info(f"  Coverage: {days_with_data/days_processed*100:.1f}% of weekdays")
 
         if stats and stats[0] > 0:
-            logger.info(f"\nDatabase Statistics:")
+            logger.info("\nDatabase Statistics:")
             logger.info(f"  Trading days: {stats[0]}")
             logger.info(f"  Unique contracts: {stats[1]:,}")
             logger.info(f"  Total records: {stats[2]:,}")
@@ -265,24 +267,24 @@ class UnityOptionsDailyDownloader:
                 contracts_per_day = stats[2] / stats[0]
                 volume_per_day = stats[5] / stats[0] if stats[5] else 0
 
-                logger.info(f"\nDaily Averages:")
+                logger.info("\nDaily Averages:")
                 logger.info(f"  Contracts per day: {contracts_per_day:,.0f}")
                 logger.info(f"  Volume per day: {volume_per_day:,.0f}")
 
                 # Compare to expected numbers
-                logger.info(f"\nComparison to Your Analysis:")
-                logger.info(f"  Expected: ~55,000 contracts/day from CBOE")
+                logger.info("\nComparison to Your Analysis:")
+                logger.info("  Expected: ~55,000 contracts/day from CBOE")
                 logger.info(f"  Our data: {volume_per_day:,.0f} contracts/day")
 
                 if volume_per_day > 40000:
-                    logger.info(f"  ✅ EXCELLENT! Close to expected volume")
+                    logger.info("  ✅ EXCELLENT! Close to expected volume")
                 elif volume_per_day > 20000:
-                    logger.info(f"  ✅ Good coverage, within reasonable range")
+                    logger.info("  ✅ Good coverage, within reasonable range")
                 else:
-                    logger.info(f"  ⚠️  Lower than expected - may need investigation")
+                    logger.info("  ⚠️  Lower than expected - may need investigation")
 
             # Show recent data quality
-            logger.info(f"\nRecent Data Sample:")
+            logger.info("\nRecent Data Sample:")
             recent = self.conn.execute(
                 """
                 SELECT date, COUNT(*) as contracts, SUM(volume) as daily_volume
@@ -298,14 +300,16 @@ class UnityOptionsDailyDownloader:
                 logger.info(f"  {'Date':<12} {'Contracts':<10} {'Volume':<10}")
                 logger.info(f"  {'-'*12} {'-'*10} {'-'*10}")
                 for date, contracts, volume in recent:
-                    logger.info(f"  {str(date):<12} {contracts:<10,} {volume or 0:<10,}")
+                    logger.info(
+                        f"  {str(date):<12} {contracts:<10,} {volume or 0:<10,}"
+                    )
 
-            logger.info(f"\n✅ SUCCESS: Comprehensive Unity options data downloaded!")
+            logger.info("\n✅ SUCCESS: Comprehensive Unity options data downloaded!")
             logger.info(f"✅ Day-by-day approach captured {stats[0]} trading days")
-            logger.info(f"✅ All data is REAL from Databento OPRA feed")
+            logger.info("✅ All data is REAL from Databento OPRA feed")
 
         else:
-            logger.warning(f"\n⚠️  No data in database - check API credentials")
+            logger.warning("\n⚠️  No data in database - check API credentials")
 
     def cleanup(self):
         """Close database connection."""

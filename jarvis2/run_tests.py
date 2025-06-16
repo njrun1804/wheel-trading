@@ -4,7 +4,7 @@ import os
 import sys
 
 # Set environment variable to avoid OpenMP issues
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Import tests
 from jarvis2.tests.test_jarvis2_integration import (
@@ -32,17 +32,17 @@ async def run_all_tests():
         ("Performance Benchmarks", test_performance_benchmarks),
         ("Error Handling", test_error_handling),
     ]
-    
+
     passed = 0
     failed = 0
-    
+
     print("Running Jarvis2 Integration Tests")
     print("=" * 60)
-    
+
     for name, test_func in tests:
         print(f"\n>>> Testing: {name}")
         print("-" * 40)
-        
+
         try:
             if asyncio.iscoroutinefunction(test_func):
                 await test_func()
@@ -54,22 +54,23 @@ async def run_all_tests():
             print(f"✗ {name} FAILED: {e}")
             failed += 1
             import traceback
+
             traceback.print_exc()
-    
+
     # Run CPU test
-    print(f"\n>>> Testing: CPU Efficiency Cores")
+    print("\n>>> Testing: CPU Efficiency Cores")
     print("-" * 40)
     try:
         test_cpu_efficiency_cores()
-        print(f"✓ CPU Efficiency Cores PASSED")
+        print("✓ CPU Efficiency Cores PASSED")
         passed += 1
     except Exception as e:
         print(f"✗ CPU Efficiency Cores FAILED: {e}")
         failed += 1
-    
+
     print("\n" + "=" * 60)
     print(f"Tests completed: {passed} passed, {failed} failed")
-    
+
     return failed == 0
 
 

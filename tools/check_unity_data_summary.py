@@ -9,8 +9,8 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def show_summary():
@@ -42,7 +42,9 @@ def show_summary():
         start = datetime.strptime(str(stats[3]), "%Y-%m-%d")
         end = datetime.strptime(str(stats[4]), "%Y-%m-%d")
         total_days = (end - start).days + 1
-        weekdays = sum(1 for i in range(total_days) if (start + timedelta(days=i)).weekday() < 5)
+        weekdays = sum(
+            1 for i in range(total_days) if (start + timedelta(days=i)).weekday() < 5
+        )
         coverage = (stats[0] / weekdays) * 100 if weekdays > 0 else 0
 
         print(f"Coverage: {coverage:.1f}% of weekdays")

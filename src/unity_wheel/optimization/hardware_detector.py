@@ -1,18 +1,19 @@
 """Hardware capabilities detection for Mac optimization."""
 
-import platform
 import multiprocessing
+import platform
+from typing import Any
+
 import psutil
-from typing import Dict, Any
 
 
 class HardwareCapabilities:
     """Detect and report hardware capabilities."""
-    
+
     def __init__(self):
         self.cpu_cores = multiprocessing.cpu_count()
         self.platform_info = platform.platform()
-        
+
         # M4 Pro specific
         if "arm64" in platform.machine().lower():
             # M4 Pro has 12 cores (8 P-cores + 4 E-cores)
@@ -23,11 +24,11 @@ class HardwareCapabilities:
             self.performance_cores = self.cpu_cores
             self.efficiency_cores = 0
             self.gpu_cores = 0
-            
+
         # Memory info
         self.total_memory_gb = psutil.virtual_memory().total / (1024**3)
         self.available_memory_gb = psutil.virtual_memory().available / (1024**3)
-        
+
     def get_optimal_workers(self, task_type: str = "compute") -> int:
         """Get optimal number of workers for task type."""
         if task_type == "compute":
@@ -36,8 +37,8 @@ class HardwareCapabilities:
             return self.cpu_cores * 2
         else:
             return self.cpu_cores
-            
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "cpu_cores": self.cpu_cores,
@@ -45,5 +46,5 @@ class HardwareCapabilities:
             "efficiency_cores": self.efficiency_cores,
             "gpu_cores": self.gpu_cores,
             "total_memory_gb": self.total_memory_gb,
-            "platform": self.platform_info
+            "platform": self.platform_info,
         }

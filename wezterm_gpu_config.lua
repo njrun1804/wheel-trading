@@ -1,8 +1,8 @@
--- WezTerm GPU acceleration configuration for M4 Pro
--- Add this to your ~/.wezterm.lua or merge with existing config
+-- THIS FILE IS DEPRECATED AND SHOULD BE DELETED
+-- All configuration has been moved to .wezterm.lua
+-- This file exists only to prevent confusion - it is not loaded by WezTerm
 
-local wezterm = require 'wezterm'
-local config = {}
+return {}
 
 -- In newer versions of wezterm, use the config_builder
 if wezterm.config_builder then

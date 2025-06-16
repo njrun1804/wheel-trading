@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 from .logging import get_logger
 
@@ -36,14 +37,14 @@ class RecoveryContext:
     operation: str
     attempt: int = 0
     max_attempts: int = 3
-    errors: List[Exception] = field(default_factory=list)
-    start_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    errors: list[Exception] = field(default_factory=list)
+    start_time: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def elapsed_seconds(self) -> float:
         """Time elapsed since first attempt."""
-        return (datetime.now(timezone.utc) - self.start_time).total_seconds()
+        return (datetime.now(UTC) - self.start_time).total_seconds()
 
     @property
     def should_retry(self) -> bool:
@@ -70,7 +71,7 @@ class CircuitBreaker:
         self.half_open_max_calls = half_open_max_calls
 
         self._failure_count = 0
-        self._last_failure_time: Optional[datetime] = None
+        self._last_failure_time: datetime | None = None
         self._half_open_calls = 0
         self._state = "closed"  # closed, open, half_open
 
@@ -80,11 +81,11 @@ class CircuitBreaker:
         if self._state == "open":
             # Check if we should transition to half-open
             if self._last_failure_time:
-                elapsed = datetime.now(timezone.utc) - self._last_failure_time
+                elapsed = datetime.now(UTC) - self._last_failure_time
                 if elapsed >= self.recovery_timeout:
                     self._state = "half_open"
                     self._half_open_calls = 0
-                    logger.info(f"Circuit breaker transitioning to half-open")
+                    logger.info("Circuit breaker transitioning to half-open")
         return self._state
 
     def call_succeeded(self) -> None:
@@ -104,7 +105,7 @@ class CircuitBreaker:
     def call_failed(self) -> None:
         """Record failed call."""
         self._failure_count += 1
-        self._last_failure_time = datetime.now(timezone.utc)
+        self._last_failure_time = datetime.now(UTC)
 
         if self.state == "half_open":
             # Failure in half-open state reopens circuit
@@ -112,7 +113,9 @@ class CircuitBreaker:
             logger.warning("Circuit breaker reopened due to failure in half-open state")
         elif self._failure_count >= self.failure_threshold:
             self._state = "open"
-            logger.warning(f"Circuit breaker opened after {self._failure_count} failures")
+            logger.warning(
+                f"Circuit breaker opened after {self._failure_count} failures"
+            )
 
     def is_open(self) -> bool:
         """Check if circuit is open (calls should be blocked)."""
@@ -127,8 +130,8 @@ class RecoveryManager:
     """Manages recovery strategies for different operations."""
 
     def __init__(self):
-        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
-        self.fallback_values: Dict[str, Any] = {}
+        self.circuit_breakers: dict[str, CircuitBreaker] = {}
+        self.fallback_values: dict[str, Any] = {}
         self.degraded_operations: set[str] = set()
 
     def get_circuit_breaker(self, operation: str) -> CircuitBreaker:
@@ -166,7 +169,7 @@ def with_recovery(
     max_attempts: int = 3,
     backoff_factor: float = 2.0,
     fallback_value: Any = None,
-    operation_name: Optional[str] = None,
+    operation_name: str | None = None,
 ) -> Callable[[F], F]:
     """Decorator for adding recovery logic to functions."""
 
@@ -219,7 +222,10 @@ def with_recovery(
                         time.sleep(wait_time)
                         continue
 
-                    elif strategy == RecoveryStrategy.FALLBACK and fallback_value is not None:
+                    elif (
+                        strategy == RecoveryStrategy.FALLBACK
+                        and fallback_value is not None
+                    ):
                         logger.warning(f"Using fallback value for {operation}")
                         return fallback_value
 
@@ -282,7 +288,10 @@ def with_recovery(
                         await asyncio.sleep(wait_time)
                         continue
 
-                    elif strategy == RecoveryStrategy.FALLBACK and fallback_value is not None:
+                    elif (
+                        strategy == RecoveryStrategy.FALLBACK
+                        and fallback_value is not None
+                    ):
                         logger.warning(f"Using fallback value for {operation}")
                         return fallback_value
 
@@ -365,12 +374,14 @@ class GracefulDegradation:
 
     def __init__(self):
         self.disabled_features: set[str] = set()
-        self.feature_scores: Dict[str, float] = {}
+        self.feature_scores: dict[str, float] = {}
 
     def disable_feature(self, feature: str, reason: str) -> None:
         """Disable a feature."""
         self.disabled_features.add(feature)
-        logger.warning(f"Feature {feature} disabled", extra={"feature": feature, "reason": reason})
+        logger.warning(
+            f"Feature {feature} disabled", extra={"feature": feature, "reason": reason}
+        )
 
     def is_enabled(self, feature: str) -> bool:
         """Check if feature is enabled."""
@@ -384,7 +395,7 @@ class GracefulDegradation:
         if score < 0.3:
             self.disable_feature(feature, f"Low reliability score: {score:.2f}")
 
-    def get_enabled_features(self, features: List[str]) -> List[str]:
+    def get_enabled_features(self, features: list[str]) -> list[str]:
         """Filter list to only enabled features."""
         return [f for f in features if self.is_enabled(f)]
 

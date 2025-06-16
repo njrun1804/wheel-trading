@@ -12,17 +12,15 @@ import socket
 import ssl
 import subprocess
 import webbrowser
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Optional, Tuple
-from urllib.parse import parse_qs, urlencode
+from urllib.parse import urlencode
 
 import aiohttp
 from aiohttp import web
 
 from src.config.loader import get_config
-
 from unity_wheel.utils.logging import get_logger
+
 from .exceptions import AuthError, InvalidCredentialsError
 
 logger = get_logger(__name__)
@@ -80,7 +78,9 @@ class OAuth2Handler:
             )
 
         if not code:
-            self._auth_code_future.set_exception(AuthError("No authorization code received"))
+            self._auth_code_future.set_exception(
+                AuthError("No authorization code received")
+            )
             return web.Response(
                 text="<html><body><h1>Authentication Failed</h1><p>No authorization code received</p></body></html>",
                 content_type="text/html",
@@ -103,9 +103,6 @@ class OAuth2Handler:
 
     async def _run_callback_server(self, port: int) -> None:
         """Run the callback server to receive auth code."""
-        import os
-        import ssl
-        import tempfile
 
         app = web.Application()
         app.router.add_get("/callback", self._handle_callback)
@@ -196,7 +193,10 @@ class OAuth2Handler:
             auth_url_full = f"{self.auth_url}?{urlencode(auth_params)}"
 
             logger.info(
-                "authorize", action="opening_browser", url=auth_url_full[:50] + "...", scope=scope
+                "authorize",
+                action="opening_browser",
+                url=auth_url_full[:50] + "...",
+                scope=scope,
             )
 
             # Open browser
@@ -211,11 +211,13 @@ class OAuth2Handler:
                 config = get_config()
                 # Use a longer timeout for OAuth flow (5 minutes)
                 oauth_timeout = max(300, config.data.api_timeouts.total * 5)
-                code = await asyncio.wait_for(self._auth_code_future, timeout=oauth_timeout)
+                code = await asyncio.wait_for(
+                    self._auth_code_future, timeout=oauth_timeout
+                )
                 logger.info("authorize", status="success", has_code=bool(code))
                 return code
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 raise AuthError(
                     "Authorization timeout. Please complete the login within 5 minutes."
                 )
@@ -223,7 +225,7 @@ class OAuth2Handler:
         finally:
             await self._stop_callback_server()
 
-    async def exchange_code_for_tokens(self, code: str) -> Dict[str, any]:
+    async def exchange_code_for_tokens(self, code: str) -> dict[str, any]:
         """Exchange authorization code for access tokens.
 
         Args:
@@ -262,7 +264,9 @@ class OAuth2Handler:
                     # Validate required fields
                     required = ["access_token", "refresh_token", "expires_in"]
                     if not all(field in response_data for field in required):
-                        raise AuthError("Invalid token response - missing required fields")
+                        raise AuthError(
+                            "Invalid token response - missing required fields"
+                        )
 
                     logger.info(
                         "exchange_code_for_tokens",
@@ -277,7 +281,7 @@ class OAuth2Handler:
                 logger.error("exchange_code_for_tokens", error=str(e))
                 raise AuthError(f"Network error during token exchange: {e}")
 
-    async def refresh_access_token(self, refresh_token: str) -> Dict[str, any]:
+    async def refresh_access_token(self, refresh_token: str) -> dict[str, any]:
         """Refresh access token using refresh token.
 
         Args:

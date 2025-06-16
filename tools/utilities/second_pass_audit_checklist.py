@@ -13,8 +13,8 @@ import duckdb
 import yaml
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 class AuditChecklist:
@@ -104,9 +104,13 @@ class AuditChecklist:
 
         # Check if liquidity filters exist
         try:
-            tradeable = conn.execute("SELECT COUNT(*) FROM tradeable_options").fetchone()[0]
+            tradeable = conn.execute(
+                "SELECT COUNT(*) FROM tradeable_options"
+            ).fetchone()[0]
             self.checks["data_integrity"]["liquidity_filters"] = tradeable > 0
-            print(f"   ✓ Liquidity filters applied: ✅ ({tradeable:,} tradeable options)")
+            print(
+                f"   ✓ Liquidity filters applied: ✅ ({tradeable:,} tradeable options)"
+            )
         except:
             self.checks["data_integrity"]["liquidity_filters"] = False
             print("   ✓ Liquidity filters applied: ❌ (table not found)")
@@ -141,13 +145,19 @@ class AuditChecklist:
         print("-" * 50)
 
         # Check monitoring script
-        monitor_script = Path("src/unity_wheel/monitoring/scripts/daily_health_check.py")
-        self.checks["operational_plumbing"]["automated_monitoring"] = monitor_script.exists()
+        monitor_script = Path(
+            "src/unity_wheel/monitoring/scripts/daily_health_check.py"
+        )
+        self.checks["operational_plumbing"][
+            "automated_monitoring"
+        ] = monitor_script.exists()
         print(f"   ✓ Daily monitor script: {'✅' if monitor_script.exists() else '❌'}")
 
         # Check crontab
         try:
-            cron_output = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+            cron_output = subprocess.run(
+                ["crontab", "-l"], capture_output=True, text=True
+            )
             has_monitor = "daily_health_check" in cron_output.stdout
             print(f"   ✓ Crontab configured: {'✅' if has_monitor else '❌'}")
         except:
@@ -155,7 +165,9 @@ class AuditChecklist:
 
         # Check position tracking
         positions_file = Path("my_positions.yaml")
-        self.checks["operational_plumbing"]["position_tracking"] = positions_file.exists()
+        self.checks["operational_plumbing"][
+            "position_tracking"
+        ] = positions_file.exists()
         print(f"   ✓ Position tracking: {'✅' if positions_file.exists() else '❌'}")
 
         # Check alert configuration
@@ -177,7 +189,9 @@ class AuditChecklist:
 
             has_vol_check = "volatility > 1.20" in content or "vol > 1.20" in content
             self.checks["operational_plumbing"]["policy_engine"] = has_vol_check
-            print(f"   ✓ Policy engine (vol>120% stop): {'✅' if has_vol_check else '❌'}")
+            print(
+                f"   ✓ Policy engine (vol>120% stop): {'✅' if has_vol_check else '❌'}"
+            )
         else:
             print("   ✓ Policy engine: ❌ (advisor not found)")
 
@@ -197,7 +211,10 @@ class AuditChecklist:
             has_event_config = False
             if config and "unity" in config:
                 unity_config = config["unity"]
-                if "monitor_insider_sales" in unity_config or "vector_migration" in unity_config:
+                if (
+                    "monitor_insider_sales" in unity_config
+                    or "vector_migration" in unity_config
+                ):
                     has_event_config = True
 
             print(f"   ✓ Unity event monitoring: {'✅' if has_event_config else '❌'}")
@@ -280,9 +297,13 @@ class AuditChecklist:
                 if status:
                     completed_checks += 1
 
-        completion_rate = completed_checks / total_checks * 100 if total_checks > 0 else 0
+        completion_rate = (
+            completed_checks / total_checks * 100 if total_checks > 0 else 0
+        )
 
-        print(f"\nOverall Completion: {completed_checks}/{total_checks} ({completion_rate:.0f}%)")
+        print(
+            f"\nOverall Completion: {completed_checks}/{total_checks} ({completion_rate:.0f}%)"
+        )
 
         # Category breakdown
         print("\nCategory Breakdown:")
@@ -295,9 +316,18 @@ class AuditChecklist:
         print("\n🚨 CRITICAL ITEMS:")
         critical_items = [
             ("Data scrub complete", self.checks["data_integrity"]["negative_dte_fix"]),
-            ("Monitoring automated", self.checks["operational_plumbing"]["automated_monitoring"]),
-            ("Alert channels configured", self.checks["operational_plumbing"]["alert_channels"]),
-            ("Policy engine active", self.checks["operational_plumbing"]["policy_engine"]),
+            (
+                "Monitoring automated",
+                self.checks["operational_plumbing"]["automated_monitoring"],
+            ),
+            (
+                "Alert channels configured",
+                self.checks["operational_plumbing"]["alert_channels"],
+            ),
+            (
+                "Policy engine active",
+                self.checks["operational_plumbing"]["policy_engine"],
+            ),
         ]
 
         for item, status in critical_items:

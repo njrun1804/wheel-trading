@@ -7,11 +7,12 @@ This module provides a drop-in replacement for the existing AuthClient
 that automatically retrieves credentials from SecretManager.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
-from unity_wheel.secrets.integration import SecretInjector
 from unity_wheel.secrets import SecretManager
+from unity_wheel.secrets.integration import SecretInjector
 from unity_wheel.utils.logging import get_logger
+
 from .auth_client import AuthClient as BaseAuthClient
 
 logger = get_logger(__name__)
@@ -22,10 +23,10 @@ class AuthClient(BaseAuthClient):
 
     def __init__(
         self,
-        client_id: Optional[str] = None,
-        client_secret: Optional[str] = None,
+        client_id: str | None = None,
+        client_secret: str | None = None,
         redirect_uri: str = "https://127.0.0.1:8182/callback",
-        storage_path: Optional[str] = None,
+        storage_path: str | None = None,
         auto_refresh: bool = True,
         enable_cache: bool = True,
         cache_ttl: int = 3600,
@@ -94,7 +95,7 @@ class AuthClient(BaseAuthClient):
             await client.initialize()
             return client
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Enhanced health check that includes SecretManager status."""
         health = await super().health_check()
 

@@ -1,0 +1,5272 @@
+{
+  "files_analyzed": [
+    "requirements.txt",
+    "requirements-dev.txt",
+    "requirements-ci.txt",
+    "jarvis2_requirements.txt",
+    "requirements-updated.txt",
+    "requirements_claude_integration.txt",
+    "requirements_bolt.txt",
+    "pyproject.toml"
+  ],
+  "total_packages": 399,
+  "total_constraints": 549,
+  "overly_restrictive": {
+    "numpy": [
+      [
+        "requirements-updated.txt",
+        "==1.26.4"
+      ]
+    ],
+    "pandas": [
+      [
+        "requirements-updated.txt",
+        "==2.3.0"
+      ]
+    ],
+    "scipy": [
+      [
+        "requirements-updated.txt",
+        "==1.15.3"
+      ]
+    ],
+    "scikit-learn": [
+      [
+        "requirements-updated.txt",
+        "==1.7.0"
+      ]
+    ],
+    "databento": [
+      [
+        "requirements-updated.txt",
+        "==0.57.0"
+      ]
+    ],
+    "databento-dbn": [
+      [
+        "requirements-updated.txt",
+        "==0.36.0"
+      ]
+    ],
+    "yfinance": [
+      [
+        "requirements-updated.txt",
+        "==0.2.62"
+      ]
+    ],
+    "fredapi": [
+      [
+        "requirements-updated.txt",
+        "==0.5.2"
+      ]
+    ],
+    "duckdb": [
+      [
+        "requirements-updated.txt",
+        "==1.3.0"
+      ]
+    ],
+    "pyarrow": [
+      [
+        "requirements-updated.txt",
+        "==20.0.0"
+      ]
+    ],
+    "polars": [
+      [
+        "requirements-updated.txt",
+        "==1.30.0"
+      ]
+    ],
+    "numexpr": [
+      [
+        "requirements-updated.txt",
+        "==2.11.0"
+      ]
+    ],
+    "aiohttp": [
+      [
+        "requirements-updated.txt",
+        "==3.12.12"
+      ]
+    ],
+    "httpx": [
+      [
+        "requirements-updated.txt",
+        "==0.28.1"
+      ]
+    ],
+    "nest-asyncio": [
+      [
+        "requirements-updated.txt",
+        "==1.6.0"
+      ]
+    ],
+    "tenacity": [
+      [
+        "requirements-updated.txt",
+        "==9.1.2"
+      ]
+    ],
+    "torch": [
+      [
+        "requirements-updated.txt",
+        "==2.7.1"
+      ]
+    ],
+    "mlx": [
+      [
+        "requirements-updated.txt",
+        "==0.26.1"
+      ]
+    ],
+    "hnswlib": [
+      [
+        "requirements-updated.txt",
+        "==0.8.0"
+      ]
+    ],
+    "usearch": [
+      [
+        "requirements-updated.txt",
+        "==2.17.10"
+      ]
+    ],
+    "opentelemetry-api": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "opentelemetry-sdk": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "opentelemetry-exporter-otlp": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "logfire": [
+      [
+        "requirements-updated.txt",
+        "==3.18.0"
+      ]
+    ],
+    "pandas_market_calendars": [
+      [
+        "requirements-updated.txt",
+        "==5.1.0"
+      ]
+    ],
+    "exchange_calendars": [
+      [
+        "requirements-updated.txt",
+        "==4.10.1"
+      ]
+    ],
+    "pydantic": [
+      [
+        "requirements-updated.txt",
+        "==2.11.5"
+      ]
+    ],
+    "pydantic-settings": [
+      [
+        "requirements-updated.txt",
+        "==2.9.1"
+      ]
+    ],
+    "python-dotenv": [
+      [
+        "requirements-updated.txt",
+        "==1.1.0"
+      ]
+    ],
+    "click": [
+      [
+        "requirements-updated.txt",
+        "==8.2.1"
+      ]
+    ],
+    "rich": [
+      [
+        "requirements-updated.txt",
+        "==14.0.0"
+      ]
+    ],
+    "typer": [
+      [
+        "requirements-updated.txt",
+        "==0.16.0"
+      ]
+    ],
+    "cryptography": [
+      [
+        "requirements-updated.txt",
+        "==45.0.4"
+      ]
+    ],
+    "python-dateutil": [
+      [
+        "requirements-updated.txt",
+        "==2.9.0.post0"
+      ]
+    ],
+    "pytz": [
+      [
+        "requirements-updated.txt",
+        "==2025.2"
+      ]
+    ],
+    "tzdata": [
+      [
+        "requirements-updated.txt",
+        "==2025.2"
+      ]
+    ],
+    "joblib": [
+      [
+        "requirements-updated.txt",
+        "==1.5.1"
+      ]
+    ],
+    "attrs": [
+      [
+        "requirements-updated.txt",
+        "==25.3.0"
+      ]
+    ],
+    "cffi": [
+      [
+        "requirements-updated.txt",
+        "==1.17.1"
+      ]
+    ],
+    "pytest": [
+      [
+        "requirements-updated.txt",
+        "==8.4.0"
+      ]
+    ],
+    "pytest-cov": [
+      [
+        "requirements-updated.txt",
+        "==6.1.1"
+      ]
+    ],
+    "pytest-asyncio": [
+      [
+        "requirements-updated.txt",
+        "==1.0.0"
+      ]
+    ],
+    "pytest-mock": [
+      [
+        "requirements-updated.txt",
+        "==3.14.1"
+      ]
+    ],
+    "black": [
+      [
+        "requirements-updated.txt",
+        "==25.1.0"
+      ]
+    ],
+    "aiohappyeyeballs": [
+      [
+        "requirements-updated.txt",
+        "==2.6.1"
+      ]
+    ],
+    "aiosignal": [
+      [
+        "requirements-updated.txt",
+        "==1.3.2"
+      ]
+    ],
+    "annotated-types": [
+      [
+        "requirements-updated.txt",
+        "==0.7.0"
+      ]
+    ],
+    "colorama": [
+      [
+        "requirements-updated.txt",
+        "==0.4.6"
+      ]
+    ],
+    "frozenlist": [
+      [
+        "requirements-updated.txt",
+        "==1.6.2"
+      ]
+    ],
+    "idna": [
+      [
+        "requirements-updated.txt",
+        "==3.10"
+      ]
+    ],
+    "markdown-it-py": [
+      [
+        "requirements-updated.txt",
+        "==3.0.0"
+      ]
+    ],
+    "mdurl": [
+      [
+        "requirements-updated.txt",
+        "==0.1.2"
+      ]
+    ],
+    "multidict": [
+      [
+        "requirements-updated.txt",
+        "==6.4.4"
+      ]
+    ],
+    "propcache": [
+      [
+        "requirements-updated.txt",
+        "==0.3.1"
+      ]
+    ],
+    "pycparser": [
+      [
+        "requirements-updated.txt",
+        "==2.22"
+      ]
+    ],
+    "requests": [
+      [
+        "requirements-updated.txt",
+        "==2.32.4"
+      ]
+    ],
+    "six": [
+      [
+        "requirements-updated.txt",
+        "==1.17.0"
+      ]
+    ],
+    "threadpoolctl": [
+      [
+        "requirements-updated.txt",
+        "==3.6.0"
+      ]
+    ],
+    "tqdm": [
+      [
+        "requirements-updated.txt",
+        "==4.67.1"
+      ]
+    ],
+    "urllib3": [
+      [
+        "requirements-updated.txt",
+        "==2.4.0"
+      ]
+    ],
+    "yarl": [
+      [
+        "requirements-updated.txt",
+        "==1.20.0"
+      ]
+    ],
+    "alpaca-py": [
+      [
+        "requirements-updated.txt",
+        "==0.40.1"
+      ]
+    ],
+    "matplotlib": [
+      [
+        "requirements-updated.txt",
+        "==3.10.3"
+      ]
+    ],
+    "seaborn": [
+      [
+        "requirements-updated.txt",
+        "==0.13.2"
+      ]
+    ],
+    "plotly": [
+      [
+        "requirements-updated.txt",
+        "==6.1.2"
+      ]
+    ],
+    "mlflow": [
+      [
+        "requirements-updated.txt",
+        "==3.1.0"
+      ]
+    ],
+    "numba": [
+      [
+        "requirements-updated.txt",
+        "==0.61.2"
+      ]
+    ],
+    "asyncio": [
+      [
+        "requirements-updated.txt",
+        "==3.4.3"
+      ]
+    ],
+    "asyncpg": [
+      [
+        "requirements-updated.txt",
+        "==0.30.0"
+      ]
+    ],
+    "aiofiles": [
+      [
+        "requirements-updated.txt",
+        "==24.1.0"
+      ]
+    ],
+    "psutil": [
+      [
+        "requirements-updated.txt",
+        "==7.0.0"
+      ]
+    ],
+    "hypothesis": [
+      [
+        "requirements-updated.txt",
+        "==6.135.1"
+      ]
+    ],
+    "ast-comments": [
+      [
+        "requirements-updated.txt",
+        "==1.2.2"
+      ]
+    ],
+    "libcst": [
+      [
+        "requirements-updated.txt",
+        "==1.8.2"
+      ]
+    ],
+    "parso": [
+      [
+        "requirements-updated.txt",
+        "==0.8.4"
+      ]
+    ],
+    "transformers": [
+      [
+        "requirements-updated.txt",
+        "==4.52.4"
+      ]
+    ],
+    "tokenizers": [
+      [
+        "requirements-updated.txt",
+        "==0.21.1"
+      ]
+    ],
+    "mlx-lm": [
+      [
+        "requirements-updated.txt",
+        "==0.25.2"
+      ]
+    ],
+    "radon": [
+      [
+        "requirements-updated.txt",
+        "==6.0.1"
+      ]
+    ],
+    "jedi": [
+      [
+        "requirements-updated.txt",
+        "==0.19.2"
+      ]
+    ],
+    "memory-profiler": [
+      [
+        "requirements-updated.txt",
+        "==0.61.0"
+      ]
+    ],
+    "absl-py": [
+      [
+        "requirements-updated.txt",
+        "==2.3.0"
+      ]
+    ],
+    "aioitertools": [
+      [
+        "requirements-updated.txt",
+        "==0.12.0"
+      ]
+    ],
+    "aiosqlite": [
+      [
+        "requirements-updated.txt",
+        "==0.21.0"
+      ]
+    ],
+    "alembic": [
+      [
+        "requirements-updated.txt",
+        "==1.16.1"
+      ]
+    ],
+    "anyio": [
+      [
+        "requirements-updated.txt",
+        "==4.9.0"
+      ]
+    ],
+    "appdirs": [
+      [
+        "requirements-updated.txt",
+        "==1.4.4"
+      ]
+    ],
+    "argcomplete": [
+      [
+        "requirements-updated.txt",
+        "==3.6.2"
+      ]
+    ],
+    "arize-phoenix": [
+      [
+        "requirements-updated.txt",
+        "==10.11.0"
+      ]
+    ],
+    "arize-phoenix-client": [
+      [
+        "requirements-updated.txt",
+        "==1.10.0"
+      ]
+    ],
+    "arize-phoenix-evals": [
+      [
+        "requirements-updated.txt",
+        "==0.20.8"
+      ]
+    ],
+    "arize-phoenix-otel": [
+      [
+        "requirements-updated.txt",
+        "==0.10.3"
+      ]
+    ],
+    "asttokens": [
+      [
+        "requirements-updated.txt",
+        "==3.0.0"
+      ]
+    ],
+    "astunparse": [
+      [
+        "requirements-updated.txt",
+        "==1.6.3"
+      ]
+    ],
+    "Authlib": [
+      [
+        "requirements-updated.txt",
+        "==1.6.0"
+      ]
+    ],
+    "backoff": [
+      [
+        "requirements-updated.txt",
+        "==2.2.1"
+      ]
+    ],
+    "backports.tarfile": [
+      [
+        "requirements-updated.txt",
+        "==1.2.0"
+      ]
+    ],
+    "beautifulsoup4": [
+      [
+        "requirements-updated.txt",
+        "==4.13.4"
+      ]
+    ],
+    "blinker": [
+      [
+        "requirements-updated.txt",
+        "==1.9.0"
+      ]
+    ],
+    "boolean.py": [
+      [
+        "requirements-updated.txt",
+        "==5.0"
+      ]
+    ],
+    "boto3-stubs": [
+      [
+        "requirements-updated.txt",
+        "==1.38.35"
+      ]
+    ],
+    "botocore-stubs": [
+      [
+        "requirements-updated.txt",
+        "==1.38.30"
+      ]
+    ],
+    "Bottleneck": [
+      [
+        "requirements-updated.txt",
+        "==1.5.0"
+      ]
+    ],
+    "build": [
+      [
+        "requirements-updated.txt",
+        "==1.2.2.post1"
+      ]
+    ],
+    "CacheControl": [
+      [
+        "requirements-updated.txt",
+        "==0.14.3"
+      ]
+    ],
+    "cachetools": [
+      [
+        "requirements-updated.txt",
+        "==5.5.2"
+      ]
+    ],
+    "Cerberus": [
+      [
+        "requirements-updated.txt",
+        "==1.3.7"
+      ]
+    ],
+    "certifi": [
+      [
+        "requirements-updated.txt",
+        "==2025.4.26"
+      ]
+    ],
+    "cfgv": [
+      [
+        "requirements-updated.txt",
+        "==3.4.0"
+      ]
+    ],
+    "charset-normalizer": [
+      [
+        "requirements-updated.txt",
+        "==3.4.2"
+      ]
+    ],
+    "clarabel": [
+      [
+        "requirements-updated.txt",
+        "==0.11.1"
+      ]
+    ],
+    "cleo": [
+      [
+        "requirements-updated.txt",
+        "==2.1.0"
+      ]
+    ],
+    "cloudpickle": [
+      [
+        "requirements-updated.txt",
+        "==3.1.1"
+      ]
+    ],
+    "colorlog": [
+      [
+        "requirements-updated.txt",
+        "==6.9.0"
+      ]
+    ],
+    "contourpy": [
+      [
+        "requirements-updated.txt",
+        "==1.3.2"
+      ]
+    ],
+    "coverage": [
+      [
+        "requirements-updated.txt",
+        "==7.8.2"
+      ]
+    ],
+    "crashtest": [
+      [
+        "requirements-updated.txt",
+        "==0.4.1"
+      ]
+    ],
+    "curl_cffi": [
+      [
+        "requirements-updated.txt",
+        "==0.11.3"
+      ]
+    ],
+    "cvxpy": [
+      [
+        "requirements-updated.txt",
+        "==1.6.6"
+      ]
+    ],
+    "cycler": [
+      [
+        "requirements-updated.txt",
+        "==0.12.1"
+      ]
+    ],
+    "cyclonedx-python-lib": [
+      [
+        "requirements-updated.txt",
+        "==9.1.0"
+      ]
+    ],
+    "dash": [
+      [
+        "requirements-updated.txt",
+        "==3.0.4"
+      ]
+    ],
+    "databricks-sdk": [
+      [
+        "requirements-updated.txt",
+        "==0.56.0"
+      ]
+    ],
+    "db-dtypes": [
+      [
+        "requirements-updated.txt",
+        "==1.4.3"
+      ]
+    ],
+    "defusedxml": [
+      [
+        "requirements-updated.txt",
+        "==0.7.1"
+      ]
+    ],
+    "distlib": [
+      [
+        "requirements-updated.txt",
+        "==0.3.9"
+      ]
+    ],
+    "distro": [
+      [
+        "requirements-updated.txt",
+        "==1.9.0"
+      ]
+    ],
+    "dnspython": [
+      [
+        "requirements-updated.txt",
+        "==2.7.0"
+      ]
+    ],
+    "docker": [
+      [
+        "requirements-updated.txt",
+        "==7.1.0"
+      ]
+    ],
+    "docstring_parser": [
+      [
+        "requirements-updated.txt",
+        "==0.16"
+      ]
+    ],
+    "dulwich": [
+      [
+        "requirements-updated.txt",
+        "==0.22.8"
+      ]
+    ],
+    "einops": [
+      [
+        "requirements-updated.txt",
+        "==0.8.1"
+      ]
+    ],
+    "email_validator": [
+      [
+        "requirements-updated.txt",
+        "==2.2.0"
+      ]
+    ],
+    "executing": [
+      [
+        "requirements-updated.txt",
+        "==2.2.0"
+      ]
+    ],
+    "faiss-cpu": [
+      [
+        "requirements-updated.txt",
+        "==1.11.0"
+      ]
+    ],
+    "fastapi": [
+      [
+        "requirements-updated.txt",
+        "==0.115.12"
+      ]
+    ],
+    "fastjsonschema": [
+      [
+        "requirements-updated.txt",
+        "==2.21.1"
+      ]
+    ],
+    "filelock": [
+      [
+        "requirements-updated.txt",
+        "==3.18.0"
+      ]
+    ],
+    "findpython": [
+      [
+        "requirements-updated.txt",
+        "==0.6.3"
+      ]
+    ],
+    "Flask": [
+      [
+        "requirements-updated.txt",
+        "==3.0.3"
+      ]
+    ],
+    "flatbuffers": [
+      [
+        "requirements-updated.txt",
+        "==25.2.10"
+      ]
+    ],
+    "fonttools": [
+      [
+        "requirements-updated.txt",
+        "==4.58.2"
+      ]
+    ],
+    "frozendict": [
+      [
+        "requirements-updated.txt",
+        "==2.4.6"
+      ]
+    ],
+    "fsspec": [
+      [
+        "requirements-updated.txt",
+        "==2025.5.1"
+      ]
+    ],
+    "gast": [
+      [
+        "requirements-updated.txt",
+        "==0.6.0"
+      ]
+    ],
+    "gitdb": [
+      [
+        "requirements-updated.txt",
+        "==4.0.12"
+      ]
+    ],
+    "GitPython": [
+      [
+        "requirements-updated.txt",
+        "==3.1.44"
+      ]
+    ],
+    "google-api-core": [
+      [
+        "requirements-updated.txt",
+        "==2.25.0"
+      ]
+    ],
+    "google-auth": [
+      [
+        "requirements-updated.txt",
+        "==2.40.3"
+      ]
+    ],
+    "google-auth-oauthlib": [
+      [
+        "requirements-updated.txt",
+        "==1.2.2"
+      ]
+    ],
+    "google-cloud-bigquery": [
+      [
+        "requirements-updated.txt",
+        "==3.34.0"
+      ]
+    ],
+    "google-cloud-core": [
+      [
+        "requirements-updated.txt",
+        "==2.4.3"
+      ]
+    ],
+    "google-cloud-pubsub": [
+      [
+        "requirements-updated.txt",
+        "==2.29.1"
+      ]
+    ],
+    "google-cloud-secret-manager": [
+      [
+        "requirements-updated.txt",
+        "==2.24.0"
+      ]
+    ],
+    "google-crc32c": [
+      [
+        "requirements-updated.txt",
+        "==1.7.1"
+      ]
+    ],
+    "google-pasta": [
+      [
+        "requirements-updated.txt",
+        "==0.2.0"
+      ]
+    ],
+    "google-resumable-media": [
+      [
+        "requirements-updated.txt",
+        "==2.7.2"
+      ]
+    ],
+    "googleapis-common-protos": [
+      [
+        "requirements-updated.txt",
+        "==1.70.0"
+      ]
+    ],
+    "graphene": [
+      [
+        "requirements-updated.txt",
+        "==3.4.3"
+      ]
+    ],
+    "graphql-core": [
+      [
+        "requirements-updated.txt",
+        "==3.2.6"
+      ]
+    ],
+    "graphql-relay": [
+      [
+        "requirements-updated.txt",
+        "==3.2.0"
+      ]
+    ],
+    "greenlet": [
+      [
+        "requirements-updated.txt",
+        "==3.2.3"
+      ]
+    ],
+    "grpc-google-iam-v1": [
+      [
+        "requirements-updated.txt",
+        "==0.14.2"
+      ]
+    ],
+    "grpc-interceptor": [
+      [
+        "requirements-updated.txt",
+        "==0.15.4"
+      ]
+    ],
+    "grpcio": [
+      [
+        "requirements-updated.txt",
+        "==1.72.1"
+      ]
+    ],
+    "grpcio-status": [
+      [
+        "requirements-updated.txt",
+        "==1.72.1"
+      ]
+    ],
+    "gunicorn": [
+      [
+        "requirements-updated.txt",
+        "==23.0.0"
+      ]
+    ],
+    "h11": [
+      [
+        "requirements-updated.txt",
+        "==0.16.0"
+      ]
+    ],
+    "h5py": [
+      [
+        "requirements-updated.txt",
+        "==3.14.0"
+      ]
+    ],
+    "hf-xet": [
+      [
+        "requirements-updated.txt",
+        "==1.1.3"
+      ]
+    ],
+    "hmmlearn": [
+      [
+        "requirements-updated.txt",
+        "==0.3.3"
+      ]
+    ],
+    "httpcore": [
+      [
+        "requirements-updated.txt",
+        "==1.0.9"
+      ]
+    ],
+    "httpie": [
+      [
+        "requirements-updated.txt",
+        "==3.2.4"
+      ]
+    ],
+    "httpx-sse": [
+      [
+        "requirements-updated.txt",
+        "==0.4.0"
+      ]
+    ],
+    "huggingface-hub": [
+      [
+        "requirements-updated.txt",
+        "==0.33.0"
+      ]
+    ],
+    "icecream": [
+      [
+        "requirements-updated.txt",
+        "==2.1.4"
+      ]
+    ],
+    "identify": [
+      [
+        "requirements-updated.txt",
+        "==2.6.12"
+      ]
+    ],
+    "importlib_metadata": [
+      [
+        "requirements-updated.txt",
+        "==8.7.0"
+      ]
+    ],
+    "iniconfig": [
+      [
+        "requirements-updated.txt",
+        "==2.1.0"
+      ]
+    ],
+    "installer": [
+      [
+        "requirements-updated.txt",
+        "==0.7.0"
+      ]
+    ],
+    "itsdangerous": [
+      [
+        "requirements-updated.txt",
+        "==2.2.0"
+      ]
+    ],
+    "jaraco.classes": [
+      [
+        "requirements-updated.txt",
+        "==3.4.0"
+      ]
+    ],
+    "jaraco.context": [
+      [
+        "requirements-updated.txt",
+        "==6.0.1"
+      ]
+    ],
+    "jaraco.functools": [
+      [
+        "requirements-updated.txt",
+        "==4.1.0"
+      ]
+    ],
+    "jax": [
+      [
+        "requirements-updated.txt",
+        "==0.6.1"
+      ]
+    ],
+    "jax-metal": [
+      [
+        "requirements-updated.txt",
+        "==0.1.1"
+      ]
+    ],
+    "jaxlib": [
+      [
+        "requirements-updated.txt",
+        "==0.6.1"
+      ]
+    ],
+    "Jinja2": [
+      [
+        "requirements-updated.txt",
+        "==3.1.6"
+      ]
+    ],
+    "jiter": [
+      [
+        "requirements-updated.txt",
+        "==0.10.0"
+      ]
+    ],
+    "jsonpatch": [
+      [
+        "requirements-updated.txt",
+        "==1.33"
+      ]
+    ],
+    "jsonpointer": [
+      [
+        "requirements-updated.txt",
+        "==3.0.0"
+      ]
+    ],
+    "jsonschema": [
+      [
+        "requirements-updated.txt",
+        "==4.24.0"
+      ]
+    ],
+    "jsonschema-specifications": [
+      [
+        "requirements-updated.txt",
+        "==2025.4.1"
+      ]
+    ],
+    "kaleido": [
+      [
+        "requirements-updated.txt",
+        "==0.2.1"
+      ]
+    ],
+    "keras": [
+      [
+        "requirements-updated.txt",
+        "==3.10.0"
+      ]
+    ],
+    "keyring": [
+      [
+        "requirements-updated.txt",
+        "==25.6.0"
+      ]
+    ],
+    "kiwisolver": [
+      [
+        "requirements-updated.txt",
+        "==1.4.8"
+      ]
+    ],
+    "korean-lunar-calendar": [
+      [
+        "requirements-updated.txt",
+        "==0.3.1"
+      ]
+    ],
+    "langchain": [
+      [
+        "requirements-updated.txt",
+        "==0.3.25"
+      ]
+    ],
+    "langchain-core": [
+      [
+        "requirements-updated.txt",
+        "==0.3.65"
+      ]
+    ],
+    "langchain-mcp-adapters": [
+      [
+        "requirements-updated.txt",
+        "==0.1.7"
+      ]
+    ],
+    "langchain-openai": [
+      [
+        "requirements-updated.txt",
+        "==0.3.22"
+      ]
+    ],
+    "langchain-text-splitters": [
+      [
+        "requirements-updated.txt",
+        "==0.3.8"
+      ]
+    ],
+    "langsmith": [
+      [
+        "requirements-updated.txt",
+        "==0.3.45"
+      ]
+    ],
+    "Levenshtein": [
+      [
+        "requirements-updated.txt",
+        "==0.27.1"
+      ]
+    ],
+    "libclang": [
+      [
+        "requirements-updated.txt",
+        "==18.1.1"
+      ]
+    ],
+    "license-expression": [
+      [
+        "requirements-updated.txt",
+        "==30.4.1"
+      ]
+    ],
+    "line_profiler": [
+      [
+        "requirements-updated.txt",
+        "==4.2.0"
+      ]
+    ],
+    "litellm": [
+      [
+        "requirements-updated.txt",
+        "==1.72.4"
+      ]
+    ],
+    "llvmlite": [
+      [
+        "requirements-updated.txt",
+        "==0.44.0"
+      ]
+    ],
+    "lmdb": [
+      [
+        "requirements-updated.txt",
+        "==1.6.2"
+      ]
+    ],
+    "Mako": [
+      [
+        "requirements-updated.txt",
+        "==1.3.10"
+      ]
+    ],
+    "mando": [
+      [
+        "requirements-updated.txt",
+        "==0.7.1"
+      ]
+    ],
+    "Markdown": [
+      [
+        "requirements-updated.txt",
+        "==3.8"
+      ]
+    ],
+    "MarkupSafe": [
+      [
+        "requirements-updated.txt",
+        "==3.0.2"
+      ]
+    ],
+    "mcp": [
+      [
+        "requirements-updated.txt",
+        "==1.9.4"
+      ]
+    ],
+    "mcp-server-duckdb": [
+      [
+        "requirements-updated.txt",
+        "==1.1.0"
+      ]
+    ],
+    "ml_dtypes": [
+      [
+        "requirements-updated.txt",
+        "==0.5.1"
+      ]
+    ],
+    "mlflow-skinny": [
+      [
+        "requirements-updated.txt",
+        "==3.1.0"
+      ]
+    ],
+    "more-itertools": [
+      [
+        "requirements-updated.txt",
+        "==10.7.0"
+      ]
+    ],
+    "mpmath": [
+      [
+        "requirements-updated.txt",
+        "==1.3.0"
+      ]
+    ],
+    "msgpack": [
+      [
+        "requirements-updated.txt",
+        "==1.1.0"
+      ]
+    ],
+    "multitasking": [
+      [
+        "requirements-updated.txt",
+        "==0.0.11"
+      ]
+    ],
+    "mypy-boto3-bedrock-runtime": [
+      [
+        "requirements-updated.txt",
+        "==1.38.4"
+      ]
+    ],
+    "mypy_extensions": [
+      [
+        "requirements-updated.txt",
+        "==1.1.0"
+      ]
+    ],
+    "namex": [
+      [
+        "requirements-updated.txt",
+        "==0.1.0"
+      ]
+    ],
+    "narwhals": [
+      [
+        "requirements-updated.txt",
+        "==1.42.0"
+      ]
+    ],
+    "networkx": [
+      [
+        "requirements-updated.txt",
+        "==3.5"
+      ]
+    ],
+    "nodeenv": [
+      [
+        "requirements-updated.txt",
+        "==1.9.1"
+      ]
+    ],
+    "oauthlib": [
+      [
+        "requirements-updated.txt",
+        "==3.2.2"
+      ]
+    ],
+    "openai": [
+      [
+        "requirements-updated.txt",
+        "==1.86.0"
+      ]
+    ],
+    "openinference-instrumentation": [
+      [
+        "requirements-updated.txt",
+        "==0.1.33"
+      ]
+    ],
+    "openinference-semantic-conventions": [
+      [
+        "requirements-updated.txt",
+        "==0.1.20"
+      ]
+    ],
+    "opentelemetry-distro": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opentelemetry-exporter-otlp-proto-common": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "opentelemetry-exporter-otlp-proto-grpc": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "opentelemetry-exporter-otlp-proto-http": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "opentelemetry-instrumentation": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opentelemetry-instrumentation-logging": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opentelemetry-instrumentation-requests": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opentelemetry-instrumentation-sqlalchemy": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opentelemetry-proto": [
+      [
+        "requirements-updated.txt",
+        "==1.34.1"
+      ]
+    ],
+    "opentelemetry-semantic-conventions": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opentelemetry-util-http": [
+      [
+        "requirements-updated.txt",
+        "==0.55b1"
+      ]
+    ],
+    "opik": [
+      [
+        "requirements-updated.txt",
+        "==1.7.34"
+      ]
+    ],
+    "opt_einsum": [
+      [
+        "requirements-updated.txt",
+        "==3.4.0"
+      ]
+    ],
+    "optree": [
+      [
+        "requirements-updated.txt",
+        "==0.16.0"
+      ]
+    ],
+    "optuna": [
+      [
+        "requirements-updated.txt",
+        "==4.3.0"
+      ]
+    ],
+    "orjson": [
+      [
+        "requirements-updated.txt",
+        "==3.10.18"
+      ]
+    ],
+    "osqp": [
+      [
+        "requirements-updated.txt",
+        "==1.0.4"
+      ]
+    ],
+    "otel-cli": [
+      [
+        "requirements-updated.txt",
+        "==0.2.0"
+      ]
+    ],
+    "packageurl-python": [
+      [
+        "requirements-updated.txt",
+        "==0.17.1"
+      ]
+    ],
+    "packaging": [
+      [
+        "requirements-updated.txt",
+        "==24.2"
+      ]
+    ],
+    "pandas-gbq": [
+      [
+        "requirements-updated.txt",
+        "==0.29.0"
+      ]
+    ],
+    "pandera": [
+      [
+        "requirements-updated.txt",
+        "==0.24.0"
+      ]
+    ],
+    "pathspec": [
+      [
+        "requirements-updated.txt",
+        "==0.12.1"
+      ]
+    ],
+    "patsy": [
+      [
+        "requirements-updated.txt",
+        "==1.0.1"
+      ]
+    ],
+    "pbs-installer": [
+      [
+        "requirements-updated.txt",
+        "==2025.6.12"
+      ]
+    ],
+    "peewee": [
+      [
+        "requirements-updated.txt",
+        "==3.18.1"
+      ]
+    ],
+    "pendulum": [
+      [
+        "requirements-updated.txt",
+        "==3.1.0"
+      ]
+    ],
+    "pillow": [
+      [
+        "requirements-updated.txt",
+        "==11.2.1"
+      ]
+    ],
+    "pip-api": [
+      [
+        "requirements-updated.txt",
+        "==0.0.34"
+      ]
+    ],
+    "pip-requirements-parser": [
+      [
+        "requirements-updated.txt",
+        "==32.0.1"
+      ]
+    ],
+    "pip_audit": [
+      [
+        "requirements-updated.txt",
+        "==2.9.0"
+      ]
+    ],
+    "pipdeptree": [
+      [
+        "requirements-updated.txt",
+        "==2.26.1"
+      ]
+    ],
+    "pipx": [
+      [
+        "requirements-updated.txt",
+        "==1.7.1"
+      ]
+    ],
+    "pkginfo": [
+      [
+        "requirements-updated.txt",
+        "==1.12.1.2"
+      ]
+    ],
+    "platformdirs": [
+      [
+        "requirements-updated.txt",
+        "==4.3.8"
+      ]
+    ],
+    "pluggy": [
+      [
+        "requirements-updated.txt",
+        "==1.6.0"
+      ]
+    ],
+    "poetry": [
+      [
+        "requirements-updated.txt",
+        "==2.1.3"
+      ]
+    ],
+    "poetry-core": [
+      [
+        "requirements-updated.txt",
+        "==2.1.3"
+      ]
+    ],
+    "poetry-plugin-export": [
+      [
+        "requirements-updated.txt",
+        "==1.9.0"
+      ]
+    ],
+    "pre_commit": [
+      [
+        "requirements-updated.txt",
+        "==4.2.0"
+      ]
+    ],
+    "prometheus_client": [
+      [
+        "requirements-updated.txt",
+        "==0.22.1"
+      ]
+    ],
+    "prompt_toolkit": [
+      [
+        "requirements-updated.txt",
+        "==3.0.51"
+      ]
+    ],
+    "proto-plus": [
+      [
+        "requirements-updated.txt",
+        "==1.26.1"
+      ]
+    ],
+    "protobuf": [
+      [
+        "requirements-updated.txt",
+        "==5.29.5"
+      ]
+    ],
+    "ptpython": [
+      [
+        "requirements-updated.txt",
+        "==3.0.30"
+      ]
+    ],
+    "py-serializable": [
+      [
+        "requirements-updated.txt",
+        "==2.0.0"
+      ]
+    ],
+    "py_lets_be_rational": [
+      [
+        "requirements-updated.txt",
+        "==1.0.1"
+      ]
+    ],
+    "py_vollib": [
+      [
+        "requirements-updated.txt",
+        "==1.0.1"
+      ]
+    ],
+    "pyasn1": [
+      [
+        "requirements-updated.txt",
+        "==0.6.1"
+      ]
+    ],
+    "pyasn1_modules": [
+      [
+        "requirements-updated.txt",
+        "==0.4.2"
+      ]
+    ],
+    "pydantic_core": [
+      [
+        "requirements-updated.txt",
+        "==2.33.2"
+      ]
+    ],
+    "pydata-google-auth": [
+      [
+        "requirements-updated.txt",
+        "==1.9.1"
+      ]
+    ],
+    "Pygments": [
+      [
+        "requirements-updated.txt",
+        "==2.19.1"
+      ]
+    ],
+    "pyluach": [
+      [
+        "requirements-updated.txt",
+        "==2.2.0"
+      ]
+    ],
+    "pypager": [
+      [
+        "requirements-updated.txt",
+        "==3.0.1"
+      ]
+    ],
+    "pyparsing": [
+      [
+        "requirements-updated.txt",
+        "==3.2.3"
+      ]
+    ],
+    "pyproject_hooks": [
+      [
+        "requirements-updated.txt",
+        "==1.2.0"
+      ]
+    ],
+    "PySocks": [
+      [
+        "requirements-updated.txt",
+        "==1.7.1"
+      ]
+    ],
+    "python-json-logger": [
+      [
+        "requirements-updated.txt",
+        "==2.0.7"
+      ]
+    ],
+    "python-multipart": [
+      [
+        "requirements-updated.txt",
+        "==0.0.20"
+      ]
+    ],
+    "PyYAML": [
+      [
+        "requirements-updated.txt",
+        "==6.0.2"
+      ]
+    ],
+    "RapidFuzz": [
+      [
+        "requirements-updated.txt",
+        "==3.13.0"
+      ]
+    ],
+    "referencing": [
+      [
+        "requirements-updated.txt",
+        "==0.36.2"
+      ]
+    ],
+    "regex": [
+      [
+        "requirements-updated.txt",
+        "==2024.11.6"
+      ]
+    ],
+    "requests-oauthlib": [
+      [
+        "requirements-updated.txt",
+        "==2.0.0"
+      ]
+    ],
+    "requests-toolbelt": [
+      [
+        "requirements-updated.txt",
+        "==1.0.0"
+      ]
+    ],
+    "retrying": [
+      [
+        "requirements-updated.txt",
+        "==1.3.4"
+      ]
+    ],
+    "rpds-py": [
+      [
+        "requirements-updated.txt",
+        "==0.25.1"
+      ]
+    ],
+    "rsa": [
+      [
+        "requirements-updated.txt",
+        "==4.9.1"
+      ]
+    ],
+    "safetensors": [
+      [
+        "requirements-updated.txt",
+        "==0.5.3"
+      ]
+    ],
+    "scs": [
+      [
+        "requirements-updated.txt",
+        "==3.2.7.post2"
+      ]
+    ],
+    "sentencepiece": [
+      [
+        "requirements-updated.txt",
+        "==0.2.0"
+      ]
+    ],
+    "sentry-sdk": [
+      [
+        "requirements-updated.txt",
+        "==2.30.0"
+      ]
+    ],
+    "shellingham": [
+      [
+        "requirements-updated.txt",
+        "==1.5.4"
+      ]
+    ],
+    "simplejson": [
+      [
+        "requirements-updated.txt",
+        "==3.20.1"
+      ]
+    ],
+    "simsimd": [
+      [
+        "requirements-updated.txt",
+        "==6.4.9"
+      ]
+    ],
+    "smmap": [
+      [
+        "requirements-updated.txt",
+        "==5.0.2"
+      ]
+    ],
+    "snakeviz": [
+      [
+        "requirements-updated.txt",
+        "==2.2.2"
+      ]
+    ],
+    "sniffio": [
+      [
+        "requirements-updated.txt",
+        "==1.3.1"
+      ]
+    ],
+    "sortedcontainers": [
+      [
+        "requirements-updated.txt",
+        "==2.4.0"
+      ]
+    ],
+    "soupsieve": [
+      [
+        "requirements-updated.txt",
+        "==2.7"
+      ]
+    ],
+    "SQLAlchemy": [
+      [
+        "requirements-updated.txt",
+        "==2.0.41"
+      ]
+    ],
+    "sqlean.py": [
+      [
+        "requirements-updated.txt",
+        "==3.49.1"
+      ]
+    ],
+    "sqlparse": [
+      [
+        "requirements-updated.txt",
+        "==0.5.3"
+      ]
+    ],
+    "sse-starlette": [
+      [
+        "requirements-updated.txt",
+        "==2.3.6"
+      ]
+    ],
+    "sseclient-py": [
+      [
+        "requirements-updated.txt",
+        "==1.8.0"
+      ]
+    ],
+    "starlette": [
+      [
+        "requirements-updated.txt",
+        "==0.46.2"
+      ]
+    ],
+    "statsmodels": [
+      [
+        "requirements-updated.txt",
+        "==0.14.4"
+      ]
+    ],
+    "strawberry-graphql": [
+      [
+        "requirements-updated.txt",
+        "==0.270.1"
+      ]
+    ],
+    "structlog": [
+      [
+        "requirements-updated.txt",
+        "==25.4.0"
+      ]
+    ],
+    "sympy": [
+      [
+        "requirements-updated.txt",
+        "==1.14.0"
+      ]
+    ],
+    "tabulate": [
+      [
+        "requirements-updated.txt",
+        "==0.9.0"
+      ]
+    ],
+    "tensorboard": [
+      [
+        "requirements-updated.txt",
+        "==2.16.2"
+      ]
+    ],
+    "tensorboard-data-server": [
+      [
+        "requirements-updated.txt",
+        "==0.7.2"
+      ]
+    ],
+    "tensorflow": [
+      [
+        "requirements-updated.txt",
+        "==2.16.2"
+      ]
+    ],
+    "tensorflow-io-gcs-filesystem": [
+      [
+        "requirements-updated.txt",
+        "==0.37.1"
+      ]
+    ],
+    "tensorflow-macos": [
+      [
+        "requirements-updated.txt",
+        "==2.16.2"
+      ]
+    ],
+    "tensorflow-metal": [
+      [
+        "requirements-updated.txt",
+        "==1.2.0"
+      ]
+    ],
+    "termcolor": [
+      [
+        "requirements-updated.txt",
+        "==3.1.0"
+      ]
+    ],
+    "tiktoken": [
+      [
+        "requirements-updated.txt",
+        "==0.9.0"
+      ]
+    ],
+    "toml": [
+      [
+        "requirements-updated.txt",
+        "==0.10.2"
+      ]
+    ],
+    "tomlkit": [
+      [
+        "requirements-updated.txt",
+        "==0.13.3"
+      ]
+    ],
+    "toolz": [
+      [
+        "requirements-updated.txt",
+        "==1.0.0"
+      ]
+    ],
+    "torchvision": [
+      [
+        "requirements-updated.txt",
+        "==0.22.1"
+      ]
+    ],
+    "tornado": [
+      [
+        "requirements-updated.txt",
+        "==6.5.1"
+      ]
+    ],
+    "trove-classifiers": [
+      [
+        "requirements-updated.txt",
+        "==2025.5.9.12"
+      ]
+    ],
+    "typeguard": [
+      [
+        "requirements-updated.txt",
+        "==4.4.3"
+      ]
+    ],
+    "types-awscrt": [
+      [
+        "requirements-updated.txt",
+        "==0.27.2"
+      ]
+    ],
+    "types-s3transfer": [
+      [
+        "requirements-updated.txt",
+        "==0.13.0"
+      ]
+    ],
+    "typing-inspect": [
+      [
+        "requirements-updated.txt",
+        "==0.9.0"
+      ]
+    ],
+    "typing-inspection": [
+      [
+        "requirements-updated.txt",
+        "==0.4.1"
+      ]
+    ],
+    "typing_extensions": [
+      [
+        "requirements-updated.txt",
+        "==4.14.0"
+      ]
+    ],
+    "unity-log-growth": [
+      [
+        "requirements-updated.txt",
+        "==1.0.0"
+      ]
+    ],
+    "userpath": [
+      [
+        "requirements-updated.txt",
+        "==1.9.2"
+      ]
+    ],
+    "uuid6": [
+      [
+        "requirements-updated.txt",
+        "==2025.0.0"
+      ]
+    ],
+    "uv": [
+      [
+        "requirements-updated.txt",
+        "==0.7.12"
+      ]
+    ],
+    "uvicorn": [
+      [
+        "requirements-updated.txt",
+        "==0.34.3"
+      ]
+    ],
+    "virtualenv": [
+      [
+        "requirements-updated.txt",
+        "==20.31.2"
+      ]
+    ],
+    "watchdog": [
+      [
+        "requirements-updated.txt",
+        "==6.0.0"
+      ]
+    ],
+    "wcwidth": [
+      [
+        "requirements-updated.txt",
+        "==0.2.13"
+      ]
+    ],
+    "websockets": [
+      [
+        "requirements-updated.txt",
+        "==15.0.1"
+      ]
+    ],
+    "Werkzeug": [
+      [
+        "requirements-updated.txt",
+        "==3.0.6"
+      ]
+    ],
+    "wrapt": [
+      [
+        "requirements-updated.txt",
+        "==1.17.2"
+      ]
+    ],
+    "xattr": [
+      [
+        "requirements-updated.txt",
+        "==1.1.4"
+      ]
+    ],
+    "zipp": [
+      [
+        "requirements-updated.txt",
+        "==3.23.0"
+      ]
+    ],
+    "zstandard": [
+      [
+        "requirements-updated.txt",
+        "==0.23.0"
+      ]
+    ]
+  },
+  "version_conflicts": {},
+  "flexible_candidates": {
+    "numpy": [
+      [
+        "requirements_claude_integration.txt",
+        ">=1.24.0"
+      ]
+    ],
+    "pandas": [
+      [
+        "requirements.txt",
+        ">=2.2.3"
+      ]
+    ],
+    "scipy": [
+      [
+        "requirements.txt",
+        ">=1.14.0"
+      ]
+    ],
+    "scikit-learn": [
+      [
+        "requirements.txt",
+        ">=1.5.0"
+      ],
+      [
+        "requirements-ci.txt",
+        ">=1.5.0"
+      ]
+    ],
+    "databento": [
+      [
+        "requirements.txt",
+        ">=0.37.0"
+      ]
+    ],
+    "databento-dbn": [
+      [
+        "requirements.txt",
+        ">=0.37.0"
+      ]
+    ],
+    "yfinance": [
+      [
+        "requirements.txt",
+        ">=0.2.37"
+      ]
+    ],
+    "fredapi": [
+      [
+        "requirements.txt",
+        ">=0.5.1"
+      ]
+    ],
+    "duckdb": [
+      [
+        "requirements.txt",
+        ">=0.10.0"
+      ]
+    ],
+    "pyarrow": [
+      [
+        "requirements.txt",
+        ">=14.0.0"
+      ]
+    ],
+    "polars": [
+      [
+        "requirements.txt",
+        ">=0.20.0"
+      ]
+    ],
+    "bottleneck": [
+      [
+        "requirements.txt",
+        ">=1.3.7"
+      ]
+    ],
+    "numexpr": [
+      [
+        "requirements.txt",
+        ">=2.8.0"
+      ]
+    ],
+    "aiohttp": [
+      [
+        "requirements.txt",
+        ">=3.10.11"
+      ]
+    ],
+    "httpx": [
+      [
+        "requirements.txt",
+        ">=0.27.0"
+      ]
+    ],
+    "nest-asyncio": [
+      [
+        "requirements.txt",
+        ">=1.6.0"
+      ]
+    ],
+    "tenacity": [
+      [
+        "requirements.txt",
+        ">=8.2.0"
+      ]
+    ],
+    "torch": [
+      [
+        "requirements.txt",
+        ">=2.4.0"
+      ],
+      [
+        "requirements_bolt.txt",
+        ">=2.0.0"
+      ]
+    ],
+    "mlx": [
+      [
+        "requirements.txt",
+        ">=0.0.1"
+      ],
+      [
+        "requirements_claude_integration.txt",
+        ">=0.15.0"
+      ],
+      [
+        "requirements_bolt.txt",
+        ">=0.0.1"
+      ]
+    ],
+    "hnswlib": [
+      [
+        "requirements.txt",
+        ">=0.8.0"
+      ]
+    ],
+    "usearch": [
+      [
+        "requirements.txt",
+        ">=2.9.0"
+      ]
+    ],
+    "opentelemetry-api": [
+      [
+        "requirements.txt",
+        ">=1.22.0"
+      ]
+    ],
+    "opentelemetry-sdk": [
+      [
+        "requirements.txt",
+        ">=1.22.0"
+      ]
+    ],
+    "opentelemetry-exporter-otlp": [
+      [
+        "requirements.txt",
+        ">=1.22.0"
+      ]
+    ],
+    "logfire": [
+      [
+        "requirements.txt",
+        ">=3.18.0"
+      ]
+    ],
+    "pandas_market_calendars": [
+      [
+        "requirements.txt",
+        ">=4.0.0"
+      ]
+    ],
+    "exchange_calendars": [
+      [
+        "requirements.txt",
+        ">=4.2.0"
+      ]
+    ],
+    "quantlib": [
+      [
+        "requirements.txt",
+        ">=1.33"
+      ]
+    ],
+    "pydantic": [
+      [
+        "requirements.txt",
+        ">=2.7.0"
+      ],
+      [
+        "requirements_claude_integration.txt",
+        ">=2.0.0"
+      ]
+    ],
+    "pydantic-settings": [
+      [
+        "requirements.txt",
+        ">=2.6.1"
+      ]
+    ],
+    "python-dotenv": [
+      [
+        "requirements.txt",
+        ">=1.0.1"
+      ]
+    ],
+    "pyyaml": [
+      [
+        "requirements.txt",
+        ">=6.0.2"
+      ]
+    ],
+    "click": [
+      [
+        "requirements.txt",
+        ">=8.1.7"
+      ]
+    ],
+    "rich": [
+      [
+        "requirements.txt",
+        ">=13.7.1"
+      ],
+      [
+        "jarvis2_requirements.txt",
+        ">=13.7.1                    # Beautiful terminal output"
+      ]
+    ],
+    "typer": [
+      [
+        "requirements.txt",
+        ">=0.9.0"
+      ]
+    ],
+    "cryptography": [
+      [
+        "requirements.txt",
+        ">=45.0.4"
+      ]
+    ],
+    "python-dateutil": [
+      [
+        "requirements.txt",
+        ">=2.9.0.post0"
+      ]
+    ],
+    "pytz": [
+      [
+        "requirements.txt",
+        ">=2024.1"
+      ],
+      [
+        "requirements_bolt.txt",
+        ">=2022.1                          # Timezone handling"
+      ]
+    ],
+    "tzdata": [
+      [
+        "requirements.txt",
+        ">=2025.2"
+      ]
+    ],
+    "joblib": [
+      [
+        "requirements.txt",
+        ">=1.5.1"
+      ]
+    ],
+    "attrs": [
+      [
+        "requirements.txt",
+        ">=25.3.0"
+      ]
+    ],
+    "cffi": [
+      [
+        "requirements.txt",
+        ">=1.17.1"
+      ]
+    ],
+    "typing-extensions": [
+      [
+        "requirements.txt",
+        ">=4.14.0"
+      ]
+    ],
+    "pytest": [
+      [
+        "requirements-dev.txt",
+        ">=8.0.0"
+      ]
+    ],
+    "pytest-cov": [
+      [
+        "requirements-dev.txt",
+        ">=4.1.0"
+      ]
+    ],
+    "pytest-asyncio": [
+      [
+        "requirements-dev.txt",
+        ">=0.23.0"
+      ]
+    ],
+    "pytest-mock": [
+      [
+        "requirements-dev.txt",
+        ">=3.12.0"
+      ],
+      [
+        "jarvis2_requirements.txt",
+        ">=3.14.0             # Mocking support"
+      ]
+    ],
+    "ruff": [
+      [
+        "requirements-dev.txt",
+        ">=0.2.0"
+      ]
+    ],
+    "black": [
+      [
+        "requirements-dev.txt",
+        ">=24.2.0"
+      ],
+      [
+        "jarvis2_requirements.txt",
+        ">=24.8.0                   # Code formatting"
+      ]
+    ],
+    "isort": [
+      [
+        "requirements-dev.txt",
+        ">=5.13.0"
+      ],
+      [
+        "jarvis2_requirements.txt",
+        ">=5.13.2                   # Import sorting"
+      ]
+    ],
+    "ipython": [
+      [
+        "requirements-dev.txt",
+        ">=8.20.0"
+      ]
+    ],
+    "pre-commit": [
+      [
+        "requirements-dev.txt",
+        ">=3.6.0"
+      ]
+    ],
+    "tqdm": [
+      [
+        "jarvis2_requirements.txt",
+        ">=4.66.4                    # Progress bars"
+      ]
+    ],
+    "aiofiles": [
+      [
+        "requirements_claude_integration.txt",
+        ">=23.0.0"
+      ]
+    ],
+    "hypothesis": [
+      [
+        "jarvis2_requirements.txt",
+        ">=6.111.0             # Property-based testing"
+      ]
+    ],
+    "astor": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.8.1                    # AST to source code conversion"
+      ]
+    ],
+    "ast-comments": [
+      [
+        "jarvis2_requirements.txt",
+        ">=1.2.2             # Preserve comments in AST"
+      ]
+    ],
+    "libcst": [
+      [
+        "jarvis2_requirements.txt",
+        ">=1.4.0                   # Concrete Syntax Tree for code modification"
+      ]
+    ],
+    "parso": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.8.4                    # Python parser with error recovery"
+      ]
+    ],
+    "autopep8": [
+      [
+        "jarvis2_requirements.txt",
+        ">=2.0.4                 # Alternative formatter"
+      ]
+    ],
+    "pyflakes": [
+      [
+        "jarvis2_requirements.txt",
+        ">=3.2.0                 # Syntax checking"
+      ]
+    ],
+    "pylint": [
+      [
+        "jarvis2_requirements.txt",
+        ">=3.2.0                   # Advanced static analysis"
+      ]
+    ],
+    "transformers": [
+      [
+        "jarvis2_requirements.txt",
+        ">=4.44.0            # For CodeBERT, CodeT5, etc."
+      ]
+    ],
+    "tokenizers": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.20.0              # Fast tokenizers for code"
+      ]
+    ],
+    "sentence-transformers": [
+      [
+        "jarvis2_requirements.txt",
+        ">=3.0.0    # Semantic embeddings"
+      ]
+    ],
+    "gensim": [
+      [
+        "jarvis2_requirements.txt",
+        ">=4.3.0                   # Word2Vec, Doc2Vec for code"
+      ]
+    ],
+    "code2vec": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.0.1                 # If available"
+      ]
+    ],
+    "mlx-lm": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.18.0                  # Language models for MLX"
+      ],
+      [
+        "requirements_bolt.txt",
+        ">=0.0.1"
+      ]
+    ],
+    "radon": [
+      [
+        "jarvis2_requirements.txt",
+        ">=6.0.1                    # Code complexity metrics"
+      ]
+    ],
+    "mccabe": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.7.0                   # McCabe complexity"
+      ]
+    ],
+    "vulture": [
+      [
+        "jarvis2_requirements.txt",
+        ">=2.11                   # Dead code detection"
+      ]
+    ],
+    "bandit": [
+      [
+        "jarvis2_requirements.txt",
+        ">=1.7.8                   # Security analysis"
+      ]
+    ],
+    "mypy": [
+      [
+        "jarvis2_requirements.txt",
+        ">=1.11.0                    # Type checking"
+      ]
+    ],
+    "pytype": [
+      [
+        "jarvis2_requirements.txt",
+        ">=2024.4.11               # Google's type checker"
+      ]
+    ],
+    "docstring-parser": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.16          # Parse docstrings"
+      ]
+    ],
+    "pydocstyle": [
+      [
+        "jarvis2_requirements.txt",
+        ">=6.3.0               # Docstring style checking"
+      ]
+    ],
+    "pytest-benchmark": [
+      [
+        "jarvis2_requirements.txt",
+        ">=4.0.0         # Performance benchmarking"
+      ]
+    ],
+    "pytest-timeout": [
+      [
+        "jarvis2_requirements.txt",
+        ">=2.3.1           # Timeout handling"
+      ]
+    ],
+    "jinja2": [
+      [
+        "jarvis2_requirements.txt",
+        ">=3.1.4                   # Template-based generation"
+      ]
+    ],
+    "rope": [
+      [
+        "jarvis2_requirements.txt",
+        ">=1.13.0                    # Refactoring library"
+      ]
+    ],
+    "pygls": [
+      [
+        "jarvis2_requirements.txt",
+        ">=1.3.0                    # LSP implementation"
+      ]
+    ],
+    "jedi": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.19.1                    # Code completion"
+      ]
+    ],
+    "jedi-language-server": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.41.3    # Jedi as LSP"
+      ]
+    ],
+    "line-profiler": [
+      [
+        "jarvis2_requirements.txt",
+        ">=4.1.2            # Line-by-line profiling"
+      ]
+    ],
+    "memory-profiler": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.61.0         # Memory profiling"
+      ]
+    ],
+    "py-spy": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.3.14                  # Sampling profiler"
+      ]
+    ],
+    "ipdb": [
+      [
+        "jarvis2_requirements.txt",
+        ">=0.13.13                   # Debugger"
+      ]
+    ],
+    "anthropic": [
+      [
+        "requirements_claude_integration.txt",
+        ">=0.40.0"
+      ]
+    ],
+    "asyncio-mqtt": [
+      [
+        "requirements_claude_integration.txt",
+        ">=0.13.0"
+      ]
+    ]
+  },
+  "pinning_patterns": {
+    "exact_pins": 359,
+    "range_constraints": 24,
+    "lower_bound_only": 100,
+    "upper_bound_only": 0,
+    "no_constraints": 66,
+    "git_dependencies": 0,
+    "complex_constraints": 0,
+    "distribution": {
+      "range": 24,
+      "lower_only": 100,
+      "exact_pin": 359,
+      "no_constraints": 66
+    }
+  },
+  "recommendations": {
+    "numpy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pandas": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "scipy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "scikit-learn": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "databento": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "databento-dbn": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "yfinance": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "fredapi": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "duckdb": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pyarrow": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "polars": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "numexpr": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "aiohttp": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "httpx": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "nest-asyncio": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tenacity": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "torch": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mlx": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "hnswlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "usearch": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-api": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-sdk": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-exporter-otlp": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "logfire": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pandas_market_calendars": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "exchange_calendars": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pydantic": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pydantic-settings": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "python-dotenv": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "click": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "rich": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "typer": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cryptography": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "python-dateutil": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pytz": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tzdata": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "joblib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "attrs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cffi": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pytest": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pytest-cov": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pytest-asyncio": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pytest-mock": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "black": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "aiohappyeyeballs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "aiosignal": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "annotated-types": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "colorama": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "frozenlist": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "idna": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "markdown-it-py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mdurl": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "multidict": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "propcache": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pycparser": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "requests": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "six": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "threadpoolctl": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tqdm": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "urllib3": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "yarl": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "alpaca-py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "matplotlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "seaborn": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "plotly": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mlflow": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "numba": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "asyncio": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "asyncpg": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "aiofiles": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "psutil": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "hypothesis": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "ast-comments": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "libcst": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "parso": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "transformers": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tokenizers": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mlx-lm": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "radon": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jedi": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "memory-profiler": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "absl-py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "aioitertools": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "aiosqlite": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "alembic": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "anyio": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "appdirs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "argcomplete": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "arize-phoenix": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "arize-phoenix-client": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "arize-phoenix-evals": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "arize-phoenix-otel": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "asttokens": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "astunparse": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Authlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "backoff": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "backports.tarfile": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "beautifulsoup4": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "blinker": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "boolean.py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "boto3-stubs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "botocore-stubs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Bottleneck": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "build": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "CacheControl": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cachetools": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Cerberus": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "certifi": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cfgv": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "charset-normalizer": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "clarabel": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cleo": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cloudpickle": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "colorlog": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "contourpy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "coverage": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "crashtest": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "curl_cffi": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cvxpy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cycler": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "cyclonedx-python-lib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "dash": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "databricks-sdk": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "db-dtypes": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "defusedxml": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "distlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "distro": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "dnspython": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "docker": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "docstring_parser": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "dulwich": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "einops": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "email_validator": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "executing": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "faiss-cpu": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "fastapi": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "fastjsonschema": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "filelock": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "findpython": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Flask": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "flatbuffers": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "fonttools": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "frozendict": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "fsspec": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "gast": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "gitdb": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "GitPython": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-api-core": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-auth": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-auth-oauthlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-cloud-bigquery": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-cloud-core": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-cloud-pubsub": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-cloud-secret-manager": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-crc32c": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-pasta": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "google-resumable-media": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "googleapis-common-protos": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "graphene": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "graphql-core": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "graphql-relay": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "greenlet": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "grpc-google-iam-v1": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "grpc-interceptor": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "grpcio": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "grpcio-status": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "gunicorn": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "h11": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "h5py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "hf-xet": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "hmmlearn": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "httpcore": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "httpie": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "httpx-sse": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "huggingface-hub": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "icecream": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "identify": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "importlib_metadata": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "iniconfig": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "installer": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "itsdangerous": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jaraco.classes": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jaraco.context": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jaraco.functools": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jax": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jax-metal": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jaxlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Jinja2": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jiter": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jsonpatch": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jsonpointer": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jsonschema": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "jsonschema-specifications": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "kaleido": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "keras": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "keyring": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "kiwisolver": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "korean-lunar-calendar": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "langchain": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "langchain-core": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "langchain-mcp-adapters": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "langchain-openai": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "langchain-text-splitters": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "langsmith": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Levenshtein": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "libclang": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "license-expression": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "line_profiler": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "litellm": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "llvmlite": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "lmdb": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Mako": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mando": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Markdown": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "MarkupSafe": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mcp": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mcp-server-duckdb": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "ml_dtypes": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mlflow-skinny": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "more-itertools": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mpmath": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "msgpack": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "multitasking": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mypy-boto3-bedrock-runtime": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "mypy_extensions": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "namex": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "narwhals": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "networkx": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "nodeenv": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "oauthlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "openai": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "openinference-instrumentation": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "openinference-semantic-conventions": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-distro": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-exporter-otlp-proto-common": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-exporter-otlp-proto-grpc": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-exporter-otlp-proto-http": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-instrumentation": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-instrumentation-logging": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-instrumentation-requests": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-instrumentation-sqlalchemy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-proto": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-semantic-conventions": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opentelemetry-util-http": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opik": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "opt_einsum": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "optree": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "optuna": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "orjson": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "osqp": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "otel-cli": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "packageurl-python": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "packaging": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pandas-gbq": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pandera": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pathspec": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "patsy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pbs-installer": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "peewee": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pendulum": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pillow": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pip-api": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pip-requirements-parser": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pip_audit": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pipdeptree": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pipx": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pkginfo": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "platformdirs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pluggy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "poetry": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "poetry-core": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "poetry-plugin-export": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pre_commit": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "prometheus_client": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "prompt_toolkit": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "proto-plus": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "protobuf": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "ptpython": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "py-serializable": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "py_lets_be_rational": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "py_vollib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pyasn1": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pyasn1_modules": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pydantic_core": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pydata-google-auth": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Pygments": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pyluach": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pypager": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pyparsing": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "pyproject_hooks": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "PySocks": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "python-json-logger": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "python-multipart": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "PyYAML": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "RapidFuzz": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "referencing": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "regex": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "requests-oauthlib": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "requests-toolbelt": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "retrying": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "rpds-py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "rsa": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "safetensors": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "scs": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sentencepiece": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sentry-sdk": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "shellingham": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "simplejson": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "simsimd": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "smmap": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "snakeviz": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sniffio": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sortedcontainers": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "soupsieve": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "SQLAlchemy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sqlean.py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sqlparse": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sse-starlette": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sseclient-py": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "starlette": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "statsmodels": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "strawberry-graphql": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "structlog": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "sympy": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tabulate": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tensorboard": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tensorboard-data-server": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tensorflow": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tensorflow-io-gcs-filesystem": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tensorflow-macos": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tensorflow-metal": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "termcolor": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tiktoken": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "toml": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tomlkit": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "toolz": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "torchvision": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "tornado": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "trove-classifiers": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "typeguard": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "types-awscrt": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "types-s3transfer": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "typing-inspect": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "typing-inspection": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "typing_extensions": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "unity-log-growth": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "userpath": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "uuid6": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "uv": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "uvicorn": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "virtualenv": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "watchdog": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "wcwidth": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "websockets": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "Werkzeug": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "wrapt": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "xattr": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "zipp": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "zstandard": [
+      "Consider using compatible release (~=) or range constraints instead of exact pins"
+    ],
+    "bottleneck": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "quantlib": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "ipython": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pre-commit": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "astor": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "autopep8": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pyflakes": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pylint": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "sentence-transformers": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "gensim": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "code2vec": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "mccabe": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "vulture": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "bandit": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pytype": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "docstring-parser": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pydocstyle": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pytest-benchmark": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pytest-timeout": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "jinja2": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "rope": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "pygls": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "jedi-language-server": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "line-profiler": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "ipdb": [
+      "Consider adding upper bound to prevent breaking changes"
+    ],
+    "anthropic": [
+      "Consider adding upper bound to prevent breaking changes"
+    ]
+  },
+  "package_summary": {
+    "numpy": [
+      ">=1.26.4,<2.0",
+      "",
+      "==1.26.4",
+      ">=1.24.0",
+      ">=1.21.0,<2.0.0                   # Numerical operations"
+    ],
+    "pandas": [
+      ">=2.2.3",
+      "",
+      "==2.3.0",
+      ">=1.3.0,<3.0.0                   # Data manipulation"
+    ],
+    "scipy": [
+      ">=1.14.0",
+      "",
+      "==1.15.3",
+      ">=1.7.0,<2.0.0                    # Scientific computing"
+    ],
+    "scikit-learn": [
+      ">=1.5.0",
+      ">=1.5.0",
+      "==1.7.0"
+    ],
+    "databento": [
+      ">=0.37.0",
+      "",
+      "==0.57.0"
+    ],
+    "databento-dbn": [
+      ">=0.37.0",
+      "==0.36.0"
+    ],
+    "yfinance": [
+      ">=0.2.37",
+      "",
+      "==0.2.62"
+    ],
+    "fredapi": [
+      ">=0.5.1",
+      "",
+      "==0.5.2"
+    ],
+    "duckdb": [
+      ">=0.10.0",
+      "",
+      "==1.3.0"
+    ],
+    "pyarrow": [
+      ">=14.0.0",
+      "",
+      "==20.0.0"
+    ],
+    "polars": [
+      ">=0.20.0",
+      "",
+      "==1.30.0"
+    ],
+    "bottleneck": [
+      ">=1.3.7"
+    ],
+    "numexpr": [
+      ">=2.8.0",
+      "",
+      "==2.11.0"
+    ],
+    "aiohttp": [
+      ">=3.10.11",
+      "",
+      "==3.12.12"
+    ],
+    "httpx": [
+      ">=0.27.0",
+      "==0.28.1",
+      ">=0.24.0,<1.0.0                   # HTTP client"
+    ],
+    "nest-asyncio": [
+      ">=1.6.0",
+      "==1.6.0"
+    ],
+    "tenacity": [
+      ">=8.2.0",
+      "",
+      "==9.1.2",
+      ">=8.0.0,<9.0.0                 # Retry mechanisms"
+    ],
+    "torch": [
+      ">=2.4.0",
+      "==2.7.1",
+      ">=2.0.0"
+    ],
+    "mlx": [
+      ">=0.0.1",
+      "==0.26.1",
+      ">=0.15.0",
+      ">=0.0.1"
+    ],
+    "hnswlib": [
+      ">=0.8.0",
+      "==0.8.0"
+    ],
+    "usearch": [
+      ">=2.9.0",
+      "==2.17.10"
+    ],
+    "opentelemetry-api": [
+      ">=1.22.0",
+      "==1.34.1"
+    ],
+    "opentelemetry-sdk": [
+      ">=1.22.0",
+      "==1.34.1"
+    ],
+    "opentelemetry-exporter-otlp": [
+      ">=1.22.0",
+      "==1.34.1"
+    ],
+    "logfire": [
+      ">=3.18.0",
+      "==3.18.0"
+    ],
+    "pandas_market_calendars": [
+      ">=4.0.0",
+      "==5.1.0"
+    ],
+    "exchange_calendars": [
+      ">=4.2.0",
+      "==4.10.1"
+    ],
+    "quantlib": [
+      ">=1.33"
+    ],
+    "pydantic": [
+      ">=2.7.0",
+      "",
+      "==2.11.5",
+      ">=2.0.0",
+      ">=2.0.0,<3.0.0                 # Data validation"
+    ],
+    "pydantic-settings": [
+      ">=2.6.1",
+      "",
+      "==2.9.1"
+    ],
+    "python-dotenv": [
+      ">=1.0.1",
+      "",
+      "==1.1.0"
+    ],
+    "pyyaml": [
+      ">=6.0.2",
+      ""
+    ],
+    "click": [
+      ">=8.1.7",
+      "",
+      "==8.2.1",
+      ">=8.0.0,<9.0.0                    # CLI framework"
+    ],
+    "rich": [
+      ">=13.7.1",
+      "",
+      ">=13.7.1                    # Beautiful terminal output",
+      "==14.0.0",
+      ">=10.0.0,<14.0.0                   # Terminal output formatting"
+    ],
+    "typer": [
+      ">=0.9.0",
+      "==0.16.0"
+    ],
+    "cryptography": [
+      ">=45.0.4",
+      "",
+      "==45.0.4",
+      ">=3.4.0,<42.0.0           # Cryptographic operations"
+    ],
+    "python-dateutil": [
+      ">=2.9.0.post0",
+      "",
+      "==2.9.0.post0",
+      ">=2.8.0,<3.0.0         # Date parsing utilities"
+    ],
+    "pytz": [
+      ">=2024.1",
+      "",
+      "==2025.2",
+      ">=2022.1                          # Timezone handling"
+    ],
+    "tzdata": [
+      ">=2025.2",
+      "",
+      "==2025.2"
+    ],
+    "joblib": [
+      ">=1.5.1",
+      "",
+      "==1.5.1"
+    ],
+    "attrs": [
+      ">=25.3.0",
+      "",
+      "==25.3.0"
+    ],
+    "cffi": [
+      ">=1.17.1",
+      "",
+      "==1.17.1"
+    ],
+    "typing-extensions": [
+      ">=4.14.0",
+      ""
+    ],
+    "pytest": [
+      ">=8.0.0",
+      "",
+      "==8.4.0",
+      ">=7.0.0,<8.0.0                  # Testing framework"
+    ],
+    "pytest-cov": [
+      ">=4.1.0",
+      "",
+      "==6.1.1"
+    ],
+    "pytest-asyncio": [
+      ">=0.23.0",
+      "",
+      "==1.0.0",
+      ">=0.21.0,<1.0.0         # Async testing support"
+    ],
+    "pytest-mock": [
+      ">=3.12.0",
+      "",
+      ">=3.14.0             # Mocking support",
+      "==3.14.1"
+    ],
+    "ruff": [
+      ">=0.2.0",
+      ""
+    ],
+    "black": [
+      ">=24.2.0",
+      "",
+      ">=24.8.0                   # Code formatting",
+      "==25.1.0",
+      ">=22.0.0,<24.0.0                 # Code formatting (dev)"
+    ],
+    "isort": [
+      ">=5.13.0",
+      "",
+      ">=5.13.2                   # Import sorting"
+    ],
+    "ipython": [
+      ">=8.20.0"
+    ],
+    "pre-commit": [
+      ">=3.6.0"
+    ],
+    "aiohappyeyeballs": [
+      "",
+      "==2.6.1"
+    ],
+    "aiosignal": [
+      "",
+      "==1.3.2"
+    ],
+    "annotated-types": [
+      "",
+      "==0.7.0"
+    ],
+    "colorama": [
+      "",
+      "==0.4.6"
+    ],
+    "frozenlist": [
+      "",
+      "==1.6.2"
+    ],
+    "idna": [
+      "",
+      "==3.10"
+    ],
+    "markdown-it-py": [
+      "",
+      "==3.0.0"
+    ],
+    "mdurl": [
+      "",
+      "==0.1.2"
+    ],
+    "multidict": [
+      "",
+      "==6.4.4"
+    ],
+    "propcache": [
+      "",
+      "==0.3.1"
+    ],
+    "pycparser": [
+      "",
+      "==2.22"
+    ],
+    "pydantic-core": [
+      ""
+    ],
+    "pygments": [
+      ""
+    ],
+    "requests": [
+      "",
+      "==2.32.4"
+    ],
+    "six": [
+      "",
+      "==1.17.0"
+    ],
+    "threadpoolctl": [
+      "",
+      "==3.6.0"
+    ],
+    "tqdm": [
+      "",
+      ">=4.66.4                    # Progress bars",
+      "==4.67.1"
+    ],
+    "urllib3": [
+      "",
+      "==2.4.0"
+    ],
+    "yarl": [
+      "",
+      "==1.20.0"
+    ],
+    "alpaca-py": [
+      "",
+      "==0.40.1"
+    ],
+    "matplotlib": [
+      "",
+      "==3.10.3"
+    ],
+    "seaborn": [
+      "",
+      "==0.13.2"
+    ],
+    "plotly": [
+      "",
+      "==6.1.2"
+    ],
+    "mlflow": [
+      "",
+      "==3.1.0"
+    ],
+    "exchange-calendars": [
+      ""
+    ],
+    "pandas-market-calendars": [
+      ""
+    ],
+    "numba": [
+      "",
+      "==0.61.2"
+    ],
+    "asyncio": [
+      "",
+      "==3.4.3"
+    ],
+    "asyncpg": [
+      "",
+      "==0.30.0"
+    ],
+    "aiofiles": [
+      "",
+      "==24.1.0",
+      ">=23.0.0",
+      ">=0.7.0,<1.0.0                 # Async file operations"
+    ],
+    "psutil": [
+      "",
+      "==7.0.0",
+      ">=5.8.0,<6.0.0                   # System monitoring"
+    ],
+    "memory_profiler": [
+      ""
+    ],
+    "hypothesis": [
+      "",
+      ">=6.111.0             # Property-based testing",
+      "==6.135.1"
+    ],
+    "astor": [
+      ">=0.8.1                    # AST to source code conversion"
+    ],
+    "ast-comments": [
+      ">=1.2.2             # Preserve comments in AST",
+      "==1.2.2"
+    ],
+    "libcst": [
+      ">=1.4.0                   # Concrete Syntax Tree for code modification",
+      "==1.8.2"
+    ],
+    "parso": [
+      ">=0.8.4                    # Python parser with error recovery",
+      "==0.8.4"
+    ],
+    "autopep8": [
+      ">=2.0.4                 # Alternative formatter"
+    ],
+    "pyflakes": [
+      ">=3.2.0                 # Syntax checking"
+    ],
+    "pylint": [
+      ">=3.2.0                   # Advanced static analysis"
+    ],
+    "transformers": [
+      ">=4.44.0            # For CodeBERT, CodeT5, etc.",
+      "==4.52.4"
+    ],
+    "tokenizers": [
+      ">=0.20.0              # Fast tokenizers for code",
+      "==0.21.1"
+    ],
+    "sentence-transformers": [
+      ">=3.0.0    # Semantic embeddings"
+    ],
+    "gensim": [
+      ">=4.3.0                   # Word2Vec, Doc2Vec for code"
+    ],
+    "code2vec": [
+      ">=0.0.1                 # If available"
+    ],
+    "mlx-lm": [
+      ">=0.18.0                  # Language models for MLX",
+      "==0.25.2",
+      ">=0.0.1"
+    ],
+    "radon": [
+      ">=6.0.1                    # Code complexity metrics",
+      "==6.0.1"
+    ],
+    "mccabe": [
+      ">=0.7.0                   # McCabe complexity"
+    ],
+    "vulture": [
+      ">=2.11                   # Dead code detection"
+    ],
+    "bandit": [
+      ">=1.7.8                   # Security analysis"
+    ],
+    "mypy": [
+      ">=1.11.0                    # Type checking",
+      ">=1.0.0,<2.0.0                    # Type checking (dev)"
+    ],
+    "pytype": [
+      ">=2024.4.11               # Google's type checker"
+    ],
+    "docstring-parser": [
+      ">=0.16          # Parse docstrings"
+    ],
+    "pydocstyle": [
+      ">=6.3.0               # Docstring style checking"
+    ],
+    "pytest-benchmark": [
+      ">=4.0.0         # Performance benchmarking"
+    ],
+    "pytest-timeout": [
+      ">=2.3.1           # Timeout handling"
+    ],
+    "jinja2": [
+      ">=3.1.4                   # Template-based generation"
+    ],
+    "rope": [
+      ">=1.13.0                    # Refactoring library"
+    ],
+    "pygls": [
+      ">=1.3.0                    # LSP implementation"
+    ],
+    "jedi": [
+      ">=0.19.1                    # Code completion",
+      "==0.19.2"
+    ],
+    "jedi-language-server": [
+      ">=0.41.3    # Jedi as LSP"
+    ],
+    "line-profiler": [
+      ">=4.1.2            # Line-by-line profiling"
+    ],
+    "memory-profiler": [
+      ">=0.61.0         # Memory profiling",
+      "==0.61.0",
+      ">=0.60.0,<1.0.0        # Memory profiling (optional)"
+    ],
+    "py-spy": [
+      ">=0.3.14                  # Sampling profiler",
+      ">=0.3.0,<1.0.0                  # Performance profiling (optional)"
+    ],
+    "ipdb": [
+      ">=0.13.13                   # Debugger"
+    ],
+    "absl-py": [
+      "==2.3.0"
+    ],
+    "aioitertools": [
+      "==0.12.0"
+    ],
+    "aiosqlite": [
+      "==0.21.0"
+    ],
+    "alembic": [
+      "==1.16.1"
+    ],
+    "anyio": [
+      "==4.9.0"
+    ],
+    "appdirs": [
+      "==1.4.4"
+    ],
+    "argcomplete": [
+      "==3.6.2"
+    ],
+    "arize-phoenix": [
+      "==10.11.0"
+    ],
+    "arize-phoenix-client": [
+      "==1.10.0"
+    ],
+    "arize-phoenix-evals": [
+      "==0.20.8"
+    ],
+    "arize-phoenix-otel": [
+      "==0.10.3"
+    ],
+    "asttokens": [
+      "==3.0.0"
+    ],
+    "astunparse": [
+      "==1.6.3"
+    ],
+    "Authlib": [
+      "==1.6.0"
+    ],
+    "backoff": [
+      "==2.2.1"
+    ],
+    "backports.tarfile": [
+      "==1.2.0"
+    ],
+    "beautifulsoup4": [
+      "==4.13.4"
+    ],
+    "blinker": [
+      "==1.9.0"
+    ],
+    "boolean.py": [
+      "==5.0"
+    ],
+    "boto3-stubs": [
+      "==1.38.35"
+    ],
+    "botocore-stubs": [
+      "==1.38.30"
+    ],
+    "Bottleneck": [
+      "==1.5.0"
+    ],
+    "build": [
+      "==1.2.2.post1"
+    ],
+    "CacheControl": [
+      "==0.14.3"
+    ],
+    "cachetools": [
+      "==5.5.2"
+    ],
+    "Cerberus": [
+      "==1.3.7"
+    ],
+    "certifi": [
+      "==2025.4.26"
+    ],
+    "cfgv": [
+      "==3.4.0"
+    ],
+    "charset-normalizer": [
+      "==3.4.2"
+    ],
+    "clarabel": [
+      "==0.11.1"
+    ],
+    "cleo": [
+      "==2.1.0"
+    ],
+    "cloudpickle": [
+      "==3.1.1"
+    ],
+    "colorlog": [
+      "==6.9.0"
+    ],
+    "contourpy": [
+      "==1.3.2"
+    ],
+    "coverage": [
+      "==7.8.2"
+    ],
+    "crashtest": [
+      "==0.4.1"
+    ],
+    "curl_cffi": [
+      "==0.11.3"
+    ],
+    "cvxpy": [
+      "==1.6.6"
+    ],
+    "cycler": [
+      "==0.12.1"
+    ],
+    "cyclonedx-python-lib": [
+      "==9.1.0"
+    ],
+    "dash": [
+      "==3.0.4"
+    ],
+    "databricks-sdk": [
+      "==0.56.0"
+    ],
+    "db-dtypes": [
+      "==1.4.3"
+    ],
+    "defusedxml": [
+      "==0.7.1"
+    ],
+    "distlib": [
+      "==0.3.9"
+    ],
+    "distro": [
+      "==1.9.0"
+    ],
+    "dnspython": [
+      "==2.7.0"
+    ],
+    "docker": [
+      "==7.1.0"
+    ],
+    "docstring_parser": [
+      "==0.16"
+    ],
+    "dulwich": [
+      "==0.22.8"
+    ],
+    "einops": [
+      "==0.8.1"
+    ],
+    "email_validator": [
+      "==2.2.0"
+    ],
+    "executing": [
+      "==2.2.0"
+    ],
+    "faiss-cpu": [
+      "==1.11.0"
+    ],
+    "fastapi": [
+      "==0.115.12"
+    ],
+    "fastjsonschema": [
+      "==2.21.1"
+    ],
+    "filelock": [
+      "==3.18.0"
+    ],
+    "findpython": [
+      "==0.6.3"
+    ],
+    "Flask": [
+      "==3.0.3"
+    ],
+    "flatbuffers": [
+      "==25.2.10"
+    ],
+    "fonttools": [
+      "==4.58.2"
+    ],
+    "frozendict": [
+      "==2.4.6"
+    ],
+    "fsspec": [
+      "==2025.5.1"
+    ],
+    "gast": [
+      "==0.6.0"
+    ],
+    "gitdb": [
+      "==4.0.12"
+    ],
+    "GitPython": [
+      "==3.1.44"
+    ],
+    "google-api-core": [
+      "==2.25.0"
+    ],
+    "google-auth": [
+      "==2.40.3"
+    ],
+    "google-auth-oauthlib": [
+      "==1.2.2"
+    ],
+    "google-cloud-bigquery": [
+      "==3.34.0"
+    ],
+    "google-cloud-core": [
+      "==2.4.3"
+    ],
+    "google-cloud-pubsub": [
+      "==2.29.1"
+    ],
+    "google-cloud-secret-manager": [
+      "==2.24.0"
+    ],
+    "google-crc32c": [
+      "==1.7.1"
+    ],
+    "google-pasta": [
+      "==0.2.0"
+    ],
+    "google-resumable-media": [
+      "==2.7.2"
+    ],
+    "googleapis-common-protos": [
+      "==1.70.0"
+    ],
+    "graphene": [
+      "==3.4.3"
+    ],
+    "graphql-core": [
+      "==3.2.6"
+    ],
+    "graphql-relay": [
+      "==3.2.0"
+    ],
+    "greenlet": [
+      "==3.2.3"
+    ],
+    "grpc-google-iam-v1": [
+      "==0.14.2"
+    ],
+    "grpc-interceptor": [
+      "==0.15.4"
+    ],
+    "grpcio": [
+      "==1.72.1"
+    ],
+    "grpcio-status": [
+      "==1.72.1"
+    ],
+    "gunicorn": [
+      "==23.0.0"
+    ],
+    "h11": [
+      "==0.16.0"
+    ],
+    "h5py": [
+      "==3.14.0"
+    ],
+    "hf-xet": [
+      "==1.1.3"
+    ],
+    "hmmlearn": [
+      "==0.3.3"
+    ],
+    "httpcore": [
+      "==1.0.9"
+    ],
+    "httpie": [
+      "==3.2.4"
+    ],
+    "httpx-sse": [
+      "==0.4.0"
+    ],
+    "huggingface-hub": [
+      "==0.33.0"
+    ],
+    "icecream": [
+      "==2.1.4"
+    ],
+    "identify": [
+      "==2.6.12"
+    ],
+    "importlib_metadata": [
+      "==8.7.0"
+    ],
+    "iniconfig": [
+      "==2.1.0"
+    ],
+    "installer": [
+      "==0.7.0"
+    ],
+    "itsdangerous": [
+      "==2.2.0"
+    ],
+    "jaraco.classes": [
+      "==3.4.0"
+    ],
+    "jaraco.context": [
+      "==6.0.1"
+    ],
+    "jaraco.functools": [
+      "==4.1.0"
+    ],
+    "jax": [
+      "==0.6.1"
+    ],
+    "jax-metal": [
+      "==0.1.1"
+    ],
+    "jaxlib": [
+      "==0.6.1"
+    ],
+    "Jinja2": [
+      "==3.1.6"
+    ],
+    "jiter": [
+      "==0.10.0"
+    ],
+    "jsonpatch": [
+      "==1.33"
+    ],
+    "jsonpointer": [
+      "==3.0.0"
+    ],
+    "jsonschema": [
+      "==4.24.0"
+    ],
+    "jsonschema-specifications": [
+      "==2025.4.1"
+    ],
+    "kaleido": [
+      "==0.2.1"
+    ],
+    "keras": [
+      "==3.10.0"
+    ],
+    "keyring": [
+      "==25.6.0"
+    ],
+    "kiwisolver": [
+      "==1.4.8"
+    ],
+    "korean-lunar-calendar": [
+      "==0.3.1"
+    ],
+    "langchain": [
+      "==0.3.25"
+    ],
+    "langchain-core": [
+      "==0.3.65"
+    ],
+    "langchain-mcp-adapters": [
+      "==0.1.7"
+    ],
+    "langchain-openai": [
+      "==0.3.22"
+    ],
+    "langchain-text-splitters": [
+      "==0.3.8"
+    ],
+    "langsmith": [
+      "==0.3.45"
+    ],
+    "Levenshtein": [
+      "==0.27.1"
+    ],
+    "libclang": [
+      "==18.1.1"
+    ],
+    "license-expression": [
+      "==30.4.1"
+    ],
+    "line_profiler": [
+      "==4.2.0"
+    ],
+    "litellm": [
+      "==1.72.4"
+    ],
+    "llvmlite": [
+      "==0.44.0"
+    ],
+    "lmdb": [
+      "==1.6.2",
+      ">=1.4.0,<2.0.0                    # Fast key-value storage"
+    ],
+    "Mako": [
+      "==1.3.10"
+    ],
+    "mando": [
+      "==0.7.1"
+    ],
+    "Markdown": [
+      "==3.8"
+    ],
+    "MarkupSafe": [
+      "==3.0.2"
+    ],
+    "mcp": [
+      "==1.9.4"
+    ],
+    "mcp-server-duckdb": [
+      "==1.1.0"
+    ],
+    "ml_dtypes": [
+      "==0.5.1"
+    ],
+    "mlflow-skinny": [
+      "==3.1.0"
+    ],
+    "more-itertools": [
+      "==10.7.0"
+    ],
+    "mpmath": [
+      "==1.3.0"
+    ],
+    "msgpack": [
+      "==1.1.0"
+    ],
+    "multitasking": [
+      "==0.0.11"
+    ],
+    "mypy-boto3-bedrock-runtime": [
+      "==1.38.4"
+    ],
+    "mypy_extensions": [
+      "==1.1.0"
+    ],
+    "namex": [
+      "==0.1.0"
+    ],
+    "narwhals": [
+      "==1.42.0"
+    ],
+    "networkx": [
+      "==3.5"
+    ],
+    "nodeenv": [
+      "==1.9.1"
+    ],
+    "oauthlib": [
+      "==3.2.2"
+    ],
+    "openai": [
+      "==1.86.0"
+    ],
+    "openinference-instrumentation": [
+      "==0.1.33"
+    ],
+    "openinference-semantic-conventions": [
+      "==0.1.20"
+    ],
+    "opentelemetry-distro": [
+      "==0.55b1"
+    ],
+    "opentelemetry-exporter-otlp-proto-common": [
+      "==1.34.1"
+    ],
+    "opentelemetry-exporter-otlp-proto-grpc": [
+      "==1.34.1"
+    ],
+    "opentelemetry-exporter-otlp-proto-http": [
+      "==1.34.1"
+    ],
+    "opentelemetry-instrumentation": [
+      "==0.55b1"
+    ],
+    "opentelemetry-instrumentation-logging": [
+      "==0.55b1"
+    ],
+    "opentelemetry-instrumentation-requests": [
+      "==0.55b1"
+    ],
+    "opentelemetry-instrumentation-sqlalchemy": [
+      "==0.55b1"
+    ],
+    "opentelemetry-proto": [
+      "==1.34.1"
+    ],
+    "opentelemetry-semantic-conventions": [
+      "==0.55b1"
+    ],
+    "opentelemetry-util-http": [
+      "==0.55b1"
+    ],
+    "opik": [
+      "==1.7.34"
+    ],
+    "opt_einsum": [
+      "==3.4.0"
+    ],
+    "optree": [
+      "==0.16.0"
+    ],
+    "optuna": [
+      "==4.3.0"
+    ],
+    "orjson": [
+      "==3.10.18",
+      ">=3.8.0,<4.0.0                  # Fast JSON serialization"
+    ],
+    "osqp": [
+      "==1.0.4"
+    ],
+    "otel-cli": [
+      "==0.2.0"
+    ],
+    "packageurl-python": [
+      "==0.17.1"
+    ],
+    "packaging": [
+      "==24.2"
+    ],
+    "pandas-gbq": [
+      "==0.29.0"
+    ],
+    "pandera": [
+      "==0.24.0"
+    ],
+    "pathspec": [
+      "==0.12.1"
+    ],
+    "patsy": [
+      "==1.0.1"
+    ],
+    "pbs-installer": [
+      "==2025.6.12"
+    ],
+    "peewee": [
+      "==3.18.1"
+    ],
+    "pendulum": [
+      "==3.1.0"
+    ],
+    "pillow": [
+      "==11.2.1"
+    ],
+    "pip-api": [
+      "==0.0.34"
+    ],
+    "pip-requirements-parser": [
+      "==32.0.1"
+    ],
+    "pip_audit": [
+      "==2.9.0"
+    ],
+    "pipdeptree": [
+      "==2.26.1"
+    ],
+    "pipx": [
+      "==1.7.1"
+    ],
+    "pkginfo": [
+      "==1.12.1.2"
+    ],
+    "platformdirs": [
+      "==4.3.8"
+    ],
+    "pluggy": [
+      "==1.6.0"
+    ],
+    "poetry": [
+      "==2.1.3"
+    ],
+    "poetry-core": [
+      "==2.1.3"
+    ],
+    "poetry-plugin-export": [
+      "==1.9.0"
+    ],
+    "pre_commit": [
+      "==4.2.0"
+    ],
+    "prometheus_client": [
+      "==0.22.1"
+    ],
+    "prompt_toolkit": [
+      "==3.0.51"
+    ],
+    "proto-plus": [
+      "==1.26.1"
+    ],
+    "protobuf": [
+      "==5.29.5"
+    ],
+    "ptpython": [
+      "==3.0.30"
+    ],
+    "py-serializable": [
+      "==2.0.0"
+    ],
+    "py_lets_be_rational": [
+      "==1.0.1"
+    ],
+    "py_vollib": [
+      "==1.0.1"
+    ],
+    "pyasn1": [
+      "==0.6.1"
+    ],
+    "pyasn1_modules": [
+      "==0.4.2"
+    ],
+    "pydantic_core": [
+      "==2.33.2"
+    ],
+    "pydata-google-auth": [
+      "==1.9.1"
+    ],
+    "Pygments": [
+      "==2.19.1"
+    ],
+    "pyluach": [
+      "==2.2.0"
+    ],
+    "pypager": [
+      "==3.0.1"
+    ],
+    "pyparsing": [
+      "==3.2.3"
+    ],
+    "pyproject_hooks": [
+      "==1.2.0"
+    ],
+    "PySocks": [
+      "==1.7.1"
+    ],
+    "python-json-logger": [
+      "==2.0.7"
+    ],
+    "python-multipart": [
+      "==0.0.20"
+    ],
+    "PyYAML": [
+      "==6.0.2"
+    ],
+    "RapidFuzz": [
+      "==3.13.0"
+    ],
+    "referencing": [
+      "==0.36.2"
+    ],
+    "regex": [
+      "==2024.11.6"
+    ],
+    "requests-oauthlib": [
+      "==2.0.0"
+    ],
+    "requests-toolbelt": [
+      "==1.0.0"
+    ],
+    "retrying": [
+      "==1.3.4"
+    ],
+    "rpds-py": [
+      "==0.25.1"
+    ],
+    "rsa": [
+      "==4.9.1"
+    ],
+    "safetensors": [
+      "==0.5.3"
+    ],
+    "scs": [
+      "==3.2.7.post2"
+    ],
+    "sentencepiece": [
+      "==0.2.0"
+    ],
+    "sentry-sdk": [
+      "==2.30.0"
+    ],
+    "shellingham": [
+      "==1.5.4"
+    ],
+    "simplejson": [
+      "==3.20.1"
+    ],
+    "simsimd": [
+      "==6.4.9"
+    ],
+    "smmap": [
+      "==5.0.2"
+    ],
+    "snakeviz": [
+      "==2.2.2"
+    ],
+    "sniffio": [
+      "==1.3.1"
+    ],
+    "sortedcontainers": [
+      "==2.4.0"
+    ],
+    "soupsieve": [
+      "==2.7"
+    ],
+    "SQLAlchemy": [
+      "==2.0.41"
+    ],
+    "sqlean.py": [
+      "==3.49.1"
+    ],
+    "sqlparse": [
+      "==0.5.3"
+    ],
+    "sse-starlette": [
+      "==2.3.6"
+    ],
+    "sseclient-py": [
+      "==1.8.0"
+    ],
+    "starlette": [
+      "==0.46.2"
+    ],
+    "statsmodels": [
+      "==0.14.4"
+    ],
+    "strawberry-graphql": [
+      "==0.270.1"
+    ],
+    "structlog": [
+      "==25.4.0"
+    ],
+    "sympy": [
+      "==1.14.0"
+    ],
+    "tabulate": [
+      "==0.9.0"
+    ],
+    "tensorboard": [
+      "==2.16.2"
+    ],
+    "tensorboard-data-server": [
+      "==0.7.2"
+    ],
+    "tensorflow": [
+      "==2.16.2"
+    ],
+    "tensorflow-io-gcs-filesystem": [
+      "==0.37.1"
+    ],
+    "tensorflow-macos": [
+      "==2.16.2"
+    ],
+    "tensorflow-metal": [
+      "==1.2.0"
+    ],
+    "termcolor": [
+      "==3.1.0"
+    ],
+    "tiktoken": [
+      "==0.9.0"
+    ],
+    "toml": [
+      "==0.10.2"
+    ],
+    "tomlkit": [
+      "==0.13.3"
+    ],
+    "toolz": [
+      "==1.0.0"
+    ],
+    "torchvision": [
+      "==0.22.1"
+    ],
+    "tornado": [
+      "==6.5.1"
+    ],
+    "trove-classifiers": [
+      "==2025.5.9.12"
+    ],
+    "typeguard": [
+      "==4.4.3"
+    ],
+    "types-awscrt": [
+      "==0.27.2"
+    ],
+    "types-s3transfer": [
+      "==0.13.0"
+    ],
+    "typing-inspect": [
+      "==0.9.0"
+    ],
+    "typing-inspection": [
+      "==0.4.1"
+    ],
+    "typing_extensions": [
+      "==4.14.0"
+    ],
+    "unity-log-growth": [
+      "==1.0.0"
+    ],
+    "userpath": [
+      "==1.9.2"
+    ],
+    "uuid6": [
+      "==2025.0.0"
+    ],
+    "uv": [
+      "==0.7.12"
+    ],
+    "uvicorn": [
+      "==0.34.3"
+    ],
+    "virtualenv": [
+      "==20.31.2"
+    ],
+    "watchdog": [
+      "==6.0.0"
+    ],
+    "wcwidth": [
+      "==0.2.13"
+    ],
+    "websockets": [
+      "==15.0.1"
+    ],
+    "Werkzeug": [
+      "==3.0.6"
+    ],
+    "wrapt": [
+      "==1.17.2"
+    ],
+    "xattr": [
+      "==1.1.4"
+    ],
+    "zipp": [
+      "==3.23.0"
+    ],
+    "zstandard": [
+      "==0.23.0"
+    ],
+    "anthropic": [
+      ">=0.40.0"
+    ],
+    "asyncio-mqtt": [
+      ">=0.13.0",
+      ">=0.13.0,<1.0.0           # MQTT async support (optional)"
+    ],
+    "uvloop": [
+      ">=0.17.0,<1.0.0"
+    ],
+    "pynvml": [
+      ">=11.4.0,<12.0.0                # NVIDIA GPU monitoring (optional)"
+    ]
+  }
+}

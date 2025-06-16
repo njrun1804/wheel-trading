@@ -6,9 +6,9 @@ Response caching for graceful degradation during auth failures.
 
 import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 from unity_wheel.utils.logging import get_logger
 
@@ -22,7 +22,7 @@ class AuthCache:
 
     def __init__(
         self,
-        cache_dir: Optional[Path] = None,
+        cache_dir: Path | None = None,
         default_ttl: int = 3600,
         max_cache_size_mb: int = 100,
     ):
@@ -39,7 +39,7 @@ class AuthCache:
         self.max_size_bytes = max_cache_size_mb * 1024 * 1024
 
         # In-memory cache for hot data
-        self._memory_cache: Dict[str, Dict[str, Any]] = {}
+        self._memory_cache: dict[str, dict[str, Any]] = {}
 
         logger.info(
             "__init__",
@@ -48,7 +48,7 @@ class AuthCache:
             max_size_mb=max_cache_size_mb,
         )
 
-    def _get_cache_key(self, endpoint: str, params: Optional[Dict] = None) -> str:
+    def _get_cache_key(self, endpoint: str, params: dict | None = None) -> str:
         """Generate cache key from endpoint and params."""
         key_data = {"endpoint": endpoint, "params": params or {}}
         key_str = json.dumps(key_data, sort_keys=True)
@@ -60,8 +60,8 @@ class AuthCache:
         return self.cache_dir / cache_key[:2] / cache_key[2:4] / f"{cache_key}.cache"
 
     def get(
-        self, endpoint: str, params: Optional[Dict] = None, max_age: Optional[int] = None
-    ) -> Optional[T]:
+        self, endpoint: str, params: dict | None = None, max_age: int | None = None
+    ) -> T | None:
         """Get cached response if available and fresh.
 
         Args:
@@ -86,7 +86,7 @@ class AuthCache:
         if cache_path.exists():
             try:
                 # Use JSON instead of pickle for security
-                with open(cache_path, "r") as f:
+                with open(cache_path) as f:
                     cached = json.load(f)
 
                 if self._is_fresh(cached, max_age):
@@ -106,7 +106,7 @@ class AuthCache:
         return None
 
     def set(
-        self, endpoint: str, data: T, params: Optional[Dict] = None, ttl: Optional[int] = None
+        self, endpoint: str, data: T, params: dict | None = None, ttl: int | None = None
     ) -> None:
         """Cache response data.
 
@@ -139,7 +139,9 @@ class AuthCache:
             with open(cache_path, "w") as f:
                 json.dump(cached, f, default=str)
 
-            logger.debug("set", endpoint=endpoint, ttl=ttl, size_bytes=cache_path.stat().st_size)
+            logger.debug(
+                "set", endpoint=endpoint, ttl=ttl, size_bytes=cache_path.stat().st_size
+            )
 
             # Check cache size
             self._enforce_size_limit()
@@ -147,7 +149,7 @@ class AuthCache:
         except (ValueError, KeyError, AttributeError) as e:
             logger.error("set", endpoint=endpoint, error=str(e))
 
-    def _is_fresh(self, cached: Dict[str, Any], max_age: Optional[int] = None) -> bool:
+    def _is_fresh(self, cached: dict[str, Any], max_age: int | None = None) -> bool:
         """Check if cached data is still fresh."""
         timestamp = datetime.fromisoformat(cached["timestamp"])
         ttl = max_age or cached.get("ttl", self.default_ttl)
@@ -181,12 +183,15 @@ class AuthCache:
                 cache_file.unlink()
                 total_size -= size
                 logger.debug(
-                    "_enforce_size_limit", action="removed", file=cache_file.name, size_bytes=size
+                    "_enforce_size_limit",
+                    action="removed",
+                    file=cache_file.name,
+                    size_bytes=size,
                 )
             except (ValueError, KeyError, AttributeError):
                 pass  # File might already be deleted
 
-    def get_fallback(self, endpoint: str, params: Optional[Dict] = None) -> Optional[T]:
+    def get_fallback(self, endpoint: str, params: dict | None = None) -> T | None:
         """Get cached data regardless of age (for offline mode).
 
         Args:
@@ -214,7 +219,7 @@ class AuthCache:
         if cache_path.exists():
             try:
                 # Use JSON instead of pickle for security
-                with open(cache_path, "r") as f:
+                with open(cache_path) as f:
                     cached = json.load(f)
 
                 logger.warning(
@@ -230,13 +235,13 @@ class AuthCache:
 
         return None
 
-    def _get_age_hours(self, cached: Dict[str, Any]) -> float:
+    def _get_age_hours(self, cached: dict[str, Any]) -> float:
         """Get age of cached data in hours."""
         timestamp = datetime.fromisoformat(cached["timestamp"])
         age = datetime.utcnow() - timestamp
         return age.total_seconds() / 3600
 
-    def clear(self, endpoint: Optional[str] = None) -> None:
+    def clear(self, endpoint: str | None = None) -> None:
         """Clear cache entries.
 
         Args:
@@ -252,12 +257,13 @@ class AuthCache:
             for cache_file in self.cache_dir.rglob("*.cache"):
                 try:
                     # Use JSON instead of pickle for security
-                    with open(cache_file, "r") as f:
+                    with open(cache_file) as f:
                         cached = json.load(f)
                     if cached.get("endpoint") == endpoint:
                         cache_file.unlink()
                 except (ValueError, KeyError, AttributeError):
                     import logging
+
                     logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
         else:
@@ -268,12 +274,13 @@ class AuthCache:
                     cache_file.unlink()
                 except (ValueError, KeyError, AttributeError):
                     import logging
+
                     logging.debug(f"Exception caught: {e}", exc_info=True)
                     pass
 
         logger.info("clear", endpoint=endpoint or "all")
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         total_size = 0
         file_count = 0
@@ -285,11 +292,12 @@ class AuthCache:
 
             try:
                 # Use JSON instead of pickle for security
-                with open(cache_file, "r") as f:
+                with open(cache_file) as f:
                     cached = json.load(f)
                 endpoints.add(cached.get("endpoint", "unknown"))
             except (ValueError, KeyError, AttributeError):
                 import logging
+
                 logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
 

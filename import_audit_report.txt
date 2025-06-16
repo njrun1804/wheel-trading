@@ -1,0 +1,1080 @@
+# DEPENDENCY USAGE AUDIT REPORT
+==================================================
+
+## SUMMARY
+Einstein directory: 25 files, 428 imports, 38 unused
+Bolt directory: 88 files, 1487 imports, 270 unused
+
+## MLX/METAL USAGE ANALYSIS
+
+### MLX Usage:
+File: einstein/einstein_config.py
+  Imports: mlx.core
+  Usage lines:
+    Line 468: # Check if MLX with ANE support is available
+    Line 468: # Check if MLX with ANE support is available
+    Line 469: import mlx.core as mx
+
+File: einstein/faiss_performance_benchmarks.py
+  Imports: mlx.core
+  Usage lines:
+    Line 123: import mlx.core as mx
+    Line 123: import mlx.core as mx
+    Line 125: info['mlx_available'] = True
+
+File: einstein/metal_accelerated_faiss.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 7: - Accelerated vector operations using MLX
+    Line 7: - Accelerated vector operations using MLX
+    Line 35: import mlx.core as mx
+
+File: bolt/gpu_pipeline_optimization.py
+  Imports: mlx.core
+  Usage lines:
+    Line 18: import mlx.core as mx
+    Line 18: import mlx.core as mx
+    Line 19: MLX_AVAILABLE = True
+
+File: bolt/buffer_stride_validation.py
+  Imports: mlx.core
+  Usage lines:
+    Line 16: import mlx.core as mx
+    Line 16: import mlx.core as mx
+    Line 17: MLX_AVAILABLE = True
+
+File: bolt/ane_acceleration.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 26: import mlx.core as mx
+    Line 26: import mlx.core as mx
+    Line 27: import mlx.nn as nn
+
+File: bolt/metal_shaders.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 15: import mlx.core as mx
+    Line 15: import mlx.core as mx
+    Line 16: import mlx.nn as nn
+
+File: bolt/benchmark_m4pro.py
+  Imports: mlx.core
+  Usage lines:
+    Line 121: # Test MLX if available
+    Line 121: # Test MLX if available
+    Line 123: import mlx.core as mx
+
+File: bolt/metal_accelerated_search.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 4: Implements GPU-accelerated vector similarity search using MLX and Metal compute shaders,
+    Line 4: Implements GPU-accelerated vector similarity search using MLX and Metal compute shaders,
+    Line 15: import mlx.core as mx
+
+File: bolt/logging_config.py
+  Usage lines:
+    Line 13: - GPU/MLX operation logging
+    Line 13: - GPU/MLX operation logging
+
+File: bolt/performance_benchmark.py
+  Imports: mlx.core
+  Usage lines:
+    Line 15: import mlx.core as mx
+    Line 15: import mlx.core as mx
+    Line 16: MLX_AVAILABLE = True
+
+File: bolt/hardware_accelerated_faiss.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 3: MLX Metal-Accelerated FAISS Vector Operations for M4 Pro
+    Line 3: MLX Metal-Accelerated FAISS Vector Operations for M4 Pro
+    Line 5: Integrates MLX Metal acceleration with FAISS for optimal vector operations:
+
+File: bolt/optimized_memory_manager.py
+  Imports: mlx.core
+  Usage lines:
+    Line 32: # Try to import MLX for GPU memory management
+    Line 32: # Try to import MLX for GPU memory management
+    Line 34: import mlx.core as mx
+
+File: bolt/memory_pools.py
+  Imports: mlx.core
+  Usage lines:
+    Line 25: import mlx.core as mx
+    Line 25: import mlx.core as mx
+    Line 26: MLX_AVAILABLE = True
+
+File: bolt/gpu_acceleration_fixed.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 24: import mlx.core as mx
+    Line 24: import mlx.core as mx
+    Line 25: import mlx.nn as nn
+
+File: bolt/production_error_recovery.py
+  Usage lines:
+    Line 102: self.recovery_plans["mlx_compilation_error"] = RecoveryPlan(
+    Line 102: self.recovery_plans["mlx_compilation_error"] = RecoveryPlan(
+    Line 105: fallback_function=self._handle_mlx_fallback
+
+File: bolt/real_world_validation.py
+  Imports: mlx.core
+  Usage lines:
+    Line 384: import mlx.core as mx
+    Line 384: import mlx.core as mx
+    Line 390: # Test MLX functionality with boundary checks and normalization
+
+File: bolt/adaptive_concurrency.py
+  Imports: mlx.core
+  Usage lines:
+    Line 22: import mlx.core as mx
+    Line 22: import mlx.core as mx
+    Line 23: MLX_AVAILABLE = True
+
+File: bolt/gpu_acceleration.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 1: """GPU acceleration optimization with MLX for vector operations.
+    Line 1: """GPU acceleration optimization with MLX for vector operations.
+    Line 3: This module provides MLX-accelerated operations for the 8-agent system with:
+
+File: bolt/solve.py
+  Usage lines:
+    Line 194: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 194: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 210: print("Features: Einstein integration, Metal GPU, MLX acceleration")
+
+File: bolt/gpu_acceleration_optimized.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 1: """Optimized GPU acceleration with MLX for vector operations.
+    Line 1: """Optimized GPU acceleration with MLX for vector operations.
+    Line 16: import mlx.core as mx
+
+File: bolt/metal_monitor.py
+  Usage lines:
+    Line 185: if any(name in line.lower() for name in ['python', 'mlx', 'metal', 'gpu']):
+    Line 185: if any(name in line.lower() for name in ['python', 'mlx', 'metal', 'gpu']):
+
+File: bolt/gpu_acceleration_final.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 1: """Production-ready GPU acceleration with MLX for the 8-agent system.
+    Line 1: """Production-ready GPU acceleration with MLX for the 8-agent system.
+    Line 3: Provides MLX-accelerated operations with:
+
+File: bolt/system_validation.py
+  Imports: mlx.core
+  Usage lines:
+    Line 7: - Hardware acceleration is working (MLX, Metal)
+    Line 7: - Hardware acceleration is working (MLX, Metal)
+    Line 43: import mlx.core as mx
+
+File: bolt/unified_memory.py
+  Imports: mlx.core
+  Usage lines:
+    Line 17: import mlx.core as mx
+    Line 17: import mlx.core as mx
+    Line 18: MLX_AVAILABLE = True
+
+File: bolt/gpu_acceleration_ultimate_fix.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 2: Ultimate Buffer-Stride Fix for MLX GPU Acceleration
+    Line 2: Ultimate Buffer-Stride Fix for MLX GPU Acceleration
+    Line 5: causing 34,000x performance loss. Based on detailed analysis of MLX internals
+
+File: bolt/gpu_memory_optimizer.py
+  Imports: mlx.core, mlx.nn
+  Usage lines:
+    Line 3: GPU Memory Optimizer for M4 Pro - MLX Memory Management
+    Line 3: GPU Memory Optimizer for M4 Pro - MLX Memory Management
+    Line 27: import mlx.core as mx
+
+File: bolt/hardware/hardware_state.py
+  Usage lines:
+    Line 476: if any(gpu_key in name for gpu_key in ['python', 'mlx', 'tensorflow', 'torch']):
+    Line 476: if any(gpu_key in name for gpu_key in ['python', 'mlx', 'tensorflow', 'torch']):
+
+File: bolt/hardware/benchmarks.py
+  Imports: mlx.core
+  Usage lines:
+    Line 6: - GPU acceleration (MLX, Metal)
+    Line 6: - GPU acceleration (MLX, Metal)
+    Line 22: import mlx.core as mx
+
+File: bolt/core/config.py
+  Usage lines:
+    Line 23: prefer_mlx: bool = Field(default=True, description="Prefer MLX over other GPU backends")
+    Line 23: prefer_mlx: bool = Field(default=True, description="Prefer MLX over other GPU backends")
+    Line 91: "BOLT_PREFER_MLX": "prefer_mlx",
+
+File: bolt/core/system_info.py
+  Imports: mlx.core
+  Usage lines:
+    Line 14: import mlx.core as mx
+    Line 14: import mlx.core as mx
+    Line 15: HAS_MLX = mx.metal.is_available()
+
+File: bolt/core/integration.py
+  Imports: mlx.core
+  Usage lines:
+    Line 5: - GPU acceleration (MLX/PyTorch routing)
+    Line 5: - GPU acceleration (MLX/PyTorch routing)
+    Line 84: import mlx.core as mx
+
+File: bolt/utils/logging.py
+  Imports: mlx
+  Usage lines:
+    Line 154: # MLX and torch logging
+    Line 154: # MLX and torch logging
+    Line 156: import mlx
+
+File: bolt/cli/benchmark.py
+  Usage lines:
+    Line 90: recommendations.append("GPU acceleration not available - install MLX for Apple Silicon optimization")
+    Line 90: recommendations.append("GPU acceleration not available - install MLX for Apple Silicon optimization")
+    Line 138: - GPU acceleration (MLX, Metal)
+
+File: bolt/cli/solve.py
+  Usage lines:
+    Line 104: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 104: - Hardware-accelerated tools (MLX GPU, Metal)
+
+File: bolt/cli/main.py
+  Usage lines:
+    Line 122: • MLX GPU acceleration for Apple Silicon
+    Line 122: • MLX GPU acceleration for Apple Silicon
+
+File: bolt/error_handling/resource_guards.py
+  Imports: mlx.core
+  Usage lines:
+    Line 601: if self.gpu_backend == "auto" or self.gpu_backend == "mlx":
+    Line 601: if self.gpu_backend == "auto" or self.gpu_backend == "mlx":
+    Line 602: import mlx.core as mx
+
+File: bolt/error_handling/diagnostics.py
+  Imports: mlx.core, mlx.core
+  Usage lines:
+    Line 207: # Check MLX
+    Line 207: # Check MLX
+    Line 209: import mlx.core as mx
+
+### Metal Usage:
+File: einstein/einstein_config.py
+  Usage lines:
+    Line 432: # Try to detect Metal GPU
+    Line 432: # Try to detect Metal GPU
+    Line 432: # Try to detect Metal GPU
+
+File: einstein/faiss_performance_benchmarks.py
+  Imports: MetalAcceleratedFAISS
+  Usage lines:
+    Line 37: from .metal_accelerated_faiss import MetalAcceleratedFAISS, create_optimized_config
+    Line 37: from .metal_accelerated_faiss import MetalAcceleratedFAISS, create_optimized_config
+    Line 37: from .metal_accelerated_faiss import MetalAcceleratedFAISS, create_optimized_config
+
+File: einstein/m4_pro_optimizer.py
+  Usage lines:
+    Line 54: """Use Metal-accelerated search instead of standard FAISS"""
+    Line 54: """Use Metal-accelerated search instead of standard FAISS"""
+    Line 54: """Use Metal-accelerated search instead of standard FAISS"""
+
+File: einstein/integrated_faiss_system.py
+  Imports: MetalAcceleratedFAISS, detect_metal_capabilities
+  Usage lines:
+    Line 9: - Metal/GPU acceleration for vector operations
+    Line 9: - Metal/GPU acceleration for vector operations
+    Line 9: - Metal/GPU acceleration for vector operations
+
+File: einstein/einstein_optimized_integration.py
+  Usage lines:
+    Line 9: - Full hardware acceleration (12 cores + Metal GPU)
+    Line 9: - Full hardware acceleration (12 cores + Metal GPU)
+    Line 9: - Full hardware acceleration (12 cores + Metal GPU)
+
+File: einstein/optimized_faiss_system.py
+  Usage lines:
+    Line 8: - GPU/Metal acceleration for vector operations
+    Line 8: - GPU/Metal acceleration for vector operations
+    Line 8: - GPU/Metal acceleration for vector operations
+
+File: einstein/unified_index.py
+  Usage lines:
+    Line 7: - Uses hardware acceleration (12 cores + Metal GPU)
+    Line 7: - Uses hardware acceleration (12 cores + Metal GPU)
+    Line 7: - Uses hardware acceleration (12 cores + Metal GPU)
+
+File: einstein/metal_accelerated_faiss.py
+  Usage lines:
+    Line 3: Metal-Accelerated FAISS System
+    Line 3: Metal-Accelerated FAISS System
+    Line 3: Metal-Accelerated FAISS System
+
+File: bolt/gpu_pipeline_optimization.py
+  Usage lines:
+    Line 6: and postprocessing to maximize M4 Pro Metal core utilization.
+    Line 6: and postprocessing to maximize M4 Pro Metal core utilization.
+    Line 6: and postprocessing to maximize M4 Pro Metal core utilization.
+
+File: bolt/buffer_stride_validation.py
+  Usage lines:
+    Line 32: """Validate that buffer is properly aligned for Metal."""
+    Line 32: """Validate that buffer is properly aligned for Metal."""
+    Line 32: """Validate that buffer is properly aligned for Metal."""
+
+File: bolt/metal_shaders.py
+  Usage lines:
+    Line 3: Metal Compute Shaders for Text Processing Acceleration
+    Line 3: Metal Compute Shaders for Text Processing Acceleration
+    Line 3: Metal Compute Shaders for Text Processing Acceleration
+
+File: bolt/metal_accelerated_search.py
+  Usage lines:
+    Line 2: Metal Performance Shaders Integration for Einstein Search Acceleration
+    Line 2: Metal Performance Shaders Integration for Einstein Search Acceleration
+    Line 2: Metal Performance Shaders Integration for Einstein Search Acceleration
+
+File: bolt/hardware_state_integration_example.py
+  Usage lines:
+    Line 16: # from jarvis2.hardware.metal_monitor import MetalGPUMonitor
+    Line 16: # from jarvis2.hardware.metal_monitor import MetalGPUMonitor
+    Line 16: # from jarvis2.hardware.metal_monitor import MetalGPUMonitor
+
+File: bolt/weak_link_analyzer.py
+  Imports: get_metal_search, get_metal_search
+  Usage lines:
+    Line 214: from .metal_accelerated_search import get_metal_search
+    Line 214: from .metal_accelerated_search import get_metal_search
+    Line 214: from .metal_accelerated_search import get_metal_search
+
+File: bolt/performance_benchmark.py
+  Imports: get_metal_search
+  Usage lines:
+    Line 21: from .metal_accelerated_search import get_metal_search
+    Line 21: from .metal_accelerated_search import get_metal_search
+    Line 21: from .metal_accelerated_search import get_metal_search
+
+File: bolt/hardware_accelerated_faiss.py
+  Usage lines:
+    Line 3: MLX Metal-Accelerated FAISS Vector Operations for M4 Pro
+    Line 3: MLX Metal-Accelerated FAISS Vector Operations for M4 Pro
+    Line 3: MLX Metal-Accelerated FAISS Vector Operations for M4 Pro
+
+File: bolt/optimized_memory_manager.py
+  Usage lines:
+    Line 434: return mx.metal.get_active_memory() / (1024 * 1024)
+    Line 434: return mx.metal.get_active_memory() / (1024 * 1024)
+    Line 434: return mx.metal.get_active_memory() / (1024 * 1024)
+
+File: bolt/m4_pro_integration.py
+  Imports: get_metal_search, MetalAcceleratedSearch
+  Usage lines:
+    Line 16: from .metal_accelerated_search import get_metal_search, MetalAcceleratedSearch
+    Line 16: from .metal_accelerated_search import get_metal_search, MetalAcceleratedSearch
+    Line 16: from .metal_accelerated_search import get_metal_search, MetalAcceleratedSearch
+
+File: bolt/improved_validation_suite.py
+  Imports: get_metal_search
+  Usage lines:
+    Line 327: from bolt.metal_accelerated_search import get_metal_search
+    Line 327: from bolt.metal_accelerated_search import get_metal_search
+    Line 327: from bolt.metal_accelerated_search import get_metal_search
+
+File: bolt/gpu_acceleration_fixed.py
+  Usage lines:
+    Line 6: 1. Proper buffer alignment for Metal compute shaders
+    Line 6: 1. Proper buffer alignment for Metal compute shaders
+    Line 6: 1. Proper buffer alignment for Metal compute shaders
+
+File: bolt/production_error_recovery.py
+  Usage lines:
+    Line 95: # GPU/Metal errors
+    Line 95: # GPU/Metal errors
+    Line 95: # GPU/Metal errors
+
+File: bolt/real_world_validation.py
+  Imports: get_metal_search
+  Usage lines:
+    Line 130: from bolt.metal_accelerated_search import get_metal_search
+    Line 130: from bolt.metal_accelerated_search import get_metal_search
+    Line 130: from bolt.metal_accelerated_search import get_metal_search
+
+File: bolt/production_deployment.py
+  Imports: get_metal_search
+  Usage lines:
+    Line 22: from .metal_accelerated_search import get_metal_search
+    Line 22: from .metal_accelerated_search import get_metal_search
+    Line 22: from .metal_accelerated_search import get_metal_search
+
+File: bolt/adaptive_concurrency.py
+  Usage lines:
+    Line 5: heterogeneous core architecture (8 P-cores + 4 E-cores + 20 Metal cores).
+    Line 5: heterogeneous core architecture (8 P-cores + 4 E-cores + 20 Metal cores).
+    Line 5: heterogeneous core architecture (8 P-cores + 4 E-cores + 20 Metal cores).
+
+File: bolt/validation_runner.py
+  Imports: get_metal_search
+  Usage lines:
+    Line 162: # Agent 4: Fix Metal Search
+    Line 162: # Agent 4: Fix Metal Search
+    Line 162: # Agent 4: Fix Metal Search
+
+File: bolt/gpu_acceleration.py
+  Usage lines:
+    Line 8: - Metal compute optimizations for Apple Silicon
+    Line 8: - Metal compute optimizations for Apple Silicon
+    Line 8: - Metal compute optimizations for Apple Silicon
+
+File: bolt/solve.py
+  Usage lines:
+    Line 194: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 194: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 194: - Hardware-accelerated tools (MLX GPU, Metal)
+
+File: bolt/gpu_acceleration_optimized.py
+  Usage lines:
+    Line 75: # Metal GPU info
+    Line 75: # Metal GPU info
+    Line 75: # Metal GPU info
+
+File: bolt/metal_monitor.py
+  Usage lines:
+    Line 3: Metal GPU Monitor for M4 Pro
+    Line 3: Metal GPU Monitor for M4 Pro
+    Line 3: Metal GPU Monitor for M4 Pro
+
+File: bolt/gpu_acceleration_final.py
+  Usage lines:
+    Line 8: - Metal compute optimizations for Apple Silicon (M4 Pro)
+    Line 8: - Metal compute optimizations for Apple Silicon (M4 Pro)
+    Line 8: - Metal compute optimizations for Apple Silicon (M4 Pro)
+
+File: bolt/system_validation.py
+  Usage lines:
+    Line 7: - Hardware acceleration is working (MLX, Metal)
+    Line 7: - Hardware acceleration is working (MLX, Metal)
+    Line 7: - Hardware acceleration is working (MLX, Metal)
+
+File: bolt/unified_memory.py
+  Usage lines:
+    Line 53: from both CPU (NumPy) and GPU (Metal) operations.
+    Line 53: from both CPU (NumPy) and GPU (Metal) operations.
+    Line 53: from both CPU (NumPy) and GPU (Metal) operations.
+
+File: bolt/gpu_acceleration_ultimate_fix.py
+  Usage lines:
+    Line 6: and Metal compute shader requirements.
+    Line 6: and Metal compute shader requirements.
+    Line 6: and Metal compute shader requirements.
+
+File: bolt/gpu_memory_optimizer.py
+  Usage lines:
+    Line 11: 5. Metal cache optimization
+    Line 11: 5. Metal cache optimization
+    Line 11: 5. Metal cache optimization
+
+File: bolt/hardware/hardware_state.py
+  Usage lines:
+    Line 42: metal_supported: bool
+    Line 42: metal_supported: bool
+    Line 42: metal_supported: bool
+
+File: bolt/hardware/benchmarks.py
+  Usage lines:
+    Line 6: - GPU acceleration (MLX, Metal)
+    Line 6: - GPU acceleration (MLX, Metal)
+    Line 6: - GPU acceleration (MLX, Metal)
+
+File: bolt/core/system_info.py
+  Usage lines:
+    Line 15: HAS_MLX = mx.metal.is_available()
+    Line 15: HAS_MLX = mx.metal.is_available()
+    Line 15: HAS_MLX = mx.metal.is_available()
+
+File: bolt/core/integration.py
+  Imports: MetalMonitor
+  Usage lines:
+    Line 9: - Metal performance monitoring
+    Line 9: - Metal performance monitoring
+    Line 9: - Metal performance monitoring
+
+File: bolt/cli/benchmark.py
+  Usage lines:
+    Line 138: - GPU acceleration (MLX, Metal)
+    Line 138: - GPU acceleration (MLX, Metal)
+    Line 138: - GPU acceleration (MLX, Metal)
+
+File: bolt/cli/solve.py
+  Usage lines:
+    Line 104: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 104: - Hardware-accelerated tools (MLX GPU, Metal)
+    Line 104: - Hardware-accelerated tools (MLX GPU, Metal)
+
+File: bolt/error_handling/resource_guards.py
+  Usage lines:
+    Line 603: if mx.metal.is_available():
+    Line 603: if mx.metal.is_available():
+    Line 603: if mx.metal.is_available():
+
+File: bolt/error_handling/diagnostics.py
+  Usage lines:
+    Line 210: if mx.metal.is_available():
+    Line 210: if mx.metal.is_available():
+    Line 210: if mx.metal.is_available():
+
+File: bolt/error_handling/exceptions.py
+  Usage lines:
+    Line 583: elif any(term in exc_str for term in ['gpu', 'metal', 'cuda', 'opencl']):
+    Line 583: elif any(term in exc_str for term in ['gpu', 'metal', 'cuda', 'opencl']):
+    Line 583: elif any(term in exc_str for term in ['gpu', 'metal', 'cuda', 'opencl']):
+
+## UNUSED IMPORTS CLEANUP RECOMMENDATIONS
+
+### EINSTEIN Directory:
+File: einstein/optimized_unified_search.py
+  Line 20: import numpy - REMOVE
+
+File: einstein/incremental_faiss_indexer.py
+  Line 31: import numpy - REMOVE
+  Line 35: from optimized_faiss_system import OptimizedFAISSIndex - REMOVE
+
+File: einstein/einstein_config.py
+  Line 469: import mlx.core - REMOVE
+
+File: einstein/faiss_performance_benchmarks.py
+  Line 30: from typing import Tuple - REMOVE
+  Line 32: import numpy - REMOVE
+  Line 34: from optimized_faiss_system import FAISSManager - REMOVE
+  Line 35: from code_optimized_embeddings import CodeOptimizedEmbeddingSystem - REMOVE
+  Line 123: import mlx.core - REMOVE
+
+File: einstein/m4_pro_optimizer.py
+  Line 11: import numpy - REMOVE
+
+File: einstein/cached_query_router.py
+  Line 23: import numpy - REMOVE
+
+File: einstein/code_optimized_embeddings.py
+  Line 25: from typing import Union - REMOVE
+  Line 26: import numpy - REMOVE
+
+File: einstein/integrated_faiss_system.py
+  Line 21: from typing import Tuple - REMOVE
+  Line 23: import numpy - REMOVE
+  Line 25: from optimized_faiss_system import OptimizedFAISSIndex - REMOVE
+
+File: einstein/optimized_semantic_search.py
+  Line 14: from typing import Tuple - REMOVE
+  Line 14: from typing import Union - REMOVE
+  Line 19: import numpy - REMOVE
+
+File: einstein/optimized_result_merger.py
+  Line 20: import numpy - REMOVE
+
+File: einstein/optimized_faiss_system.py
+  Line 25: import shutil - REMOVE
+  Line 30: from typing import Union - REMOVE
+  Line 32: import numpy - REMOVE
+
+File: einstein/unified_index.py
+  Line 27: import numpy - REMOVE
+  Line 185: import numpy - REMOVE
+  Line 1368: import numpy - REMOVE
+  Line 1509: import numpy - REMOVE
+  Line 280: import numpy - REMOVE
+  Line 2432: import numpy - REMOVE
+  Line 2450: import numpy - REMOVE
+  Line 2546: import numpy - REMOVE
+  Line 2458: import numpy - REMOVE
+
+File: einstein/adaptive_router.py
+  Line 18: import numpy - REMOVE
+
+File: einstein/metal_accelerated_faiss.py
+  Line 26: from pathlib import Path - REMOVE
+  Line 27: from typing import Union - REMOVE
+  Line 29: import numpy - REMOVE
+  Line 35: import mlx.core - REMOVE
+  Line 36: import mlx.nn - REMOVE
+
+
+### BOLT Directory:
+File: bolt/gpu_pipeline_optimization.py
+  Line 14: from typing import Callable - REMOVE
+  Line 24: from unified_memory import BufferType - REMOVE
+  Line 18: import mlx.core - REMOVE
+  Line 202: import numpy - REMOVE
+
+File: bolt/buffer_stride_validation.py
+  Line 10: import numpy - REMOVE
+  Line 12: from typing import Tuple - REMOVE
+  Line 12: from typing import Optional - REMOVE
+  Line 16: import mlx.core - REMOVE
+
+File: bolt/ane_acceleration.py
+  Line 12: from typing import Tuple - REMOVE
+  Line 13: import numpy - REMOVE
+  Line 16: import coremltools - REMOVE
+  Line 26: import mlx.core - REMOVE
+  Line 27: import mlx.nn - REMOVE
+  Line 176: import coremltools.models.datatypes - REMOVE
+  Line 255: import coremltools.models.datatypes - REMOVE
+
+File: bolt/metal_shaders.py
+  Line 10: from typing import Optional - REMOVE
+  Line 12: import numpy - REMOVE
+  Line 15: import mlx.core - REMOVE
+  Line 16: import mlx.nn - REMOVE
+
+File: bolt/benchmark_m4pro.py
+  Line 9: import numpy - REMOVE
+  Line 15: from bolt.hardware.hardware_state import HardwareState - REMOVE
+  Line 123: import mlx.core - REMOVE
+
+File: bolt/metal_accelerated_search.py
+  Line 10: from typing import Tuple - REMOVE
+  Line 11: import numpy - REMOVE
+  Line 15: import mlx.core - REMOVE
+  Line 16: import mlx.nn - REMOVE
+
+File: bolt/logging_config.py
+  Line 32: from typing import Union - REMOVE
+
+File: bolt/weak_link_analyzer.py
+  Line 217: import numpy - REMOVE
+
+File: bolt/database_memory_optimizer.py
+  Line 22: import weakref - REMOVE
+  Line 23: from collections import defaultdict - REMOVE
+  Line 27: from typing import Union - REMOVE
+  Line 28: import pandas - REMOVE
+
+File: bolt/performance_benchmark.py
+  Line 12: import numpy - REMOVE
+  Line 15: import mlx.core - REMOVE
+
+File: bolt/memory_integration_examples.py
+  Line 7: import sqlite3 - REMOVE
+  Line 9: from typing import Dict - REMOVE
+
+File: bolt/hardware_accelerated_faiss.py
+  Line 20: from pathlib import Path - REMOVE
+  Line 23: import mlx.core - REMOVE
+  Line 24: import mlx.nn - REMOVE
+  Line 25: import numpy - REMOVE
+  Line 34: from gpu_acceleration import _accelerator - REMOVE
+
+File: bolt/optimized_memory_manager.py
+  Line 18: import mmap - REMOVE
+  Line 19: import os - REMOVE
+  Line 27: from dataclasses import field - REMOVE
+  Line 28: from pathlib import Path - REMOVE
+  Line 30: import asyncio - REMOVE
+  Line 34: import mlx.core - REMOVE
+
+File: bolt/memory_pools.py
+  Line 8: import asyncio - REMOVE
+  Line 15: import weakref - REMOVE
+  Line 21: from typing import Set - REMOVE
+  Line 21: from typing import Union - REMOVE
+  Line 22: import numpy - REMOVE
+  Line 25: import mlx.core - REMOVE
+
+File: bolt/database_connection_manager.py
+  Line 12: from contextlib import contextmanager - REMOVE
+  Line 14: from typing import Union - REMOVE
+  Line 15: import weakref - REMOVE
+  Line 266: import pandas - REMOVE
+
+File: bolt/memory_optimization_integration.py
+  Line 18: from pathlib import Path - REMOVE
+
+File: bolt/m4_pro_integration.py
+  Line 11: from typing import List - REMOVE
+  Line 122: import numpy - REMOVE
+  Line 148: import numpy - REMOVE
+  Line 210: import numpy - REMOVE
+
+File: bolt/thermal_dashboard.py
+  Line 10: import threading - REMOVE
+  Line 12: from dataclasses import asdict - REMOVE
+  Line 24: import matplotlib.pyplot - REMOVE
+  Line 25: import numpy - REMOVE
+
+File: bolt/improved_validation_suite.py
+  Line 328: import numpy - REMOVE
+
+File: bolt/gpu_acceleration_fixed.py
+  Line 21: import threading - REMOVE
+  Line 22: import gc - REMOVE
+  Line 24: import mlx.core - REMOVE
+  Line 25: import mlx.nn - REMOVE
+  Line 26: import numpy - REMOVE
+
+File: bolt/optimized_solve.py
+  Line 8: import json - REMOVE
+  Line 13: from typing import List - REMOVE
+
+File: bolt/production_error_recovery.py
+  Line 14: from typing import Tuple - REMOVE
+  Line 14: from typing import Union - REMOVE
+  Line 15: import weakref - REMOVE
+
+File: bolt/real_world_validation.py
+  Line 14: import numpy - REMOVE
+  Line 384: import mlx.core - REMOVE
+
+File: bolt/thermal_monitor.py
+  Line 14: from dataclasses import field - REMOVE
+  Line 18: import math - REMOVE
+
+File: bolt/production_deployment.py
+  Line 13: from pathlib import Path - REMOVE
+  Line 15: import json - REMOVE
+  Line 20: from adaptive_concurrency import TaskType - REMOVE
+  Line 384: import numpy - REMOVE
+  Line 431: import numpy - REMOVE
+  Line 483: import numpy - REMOVE
+
+File: bolt/adaptive_concurrency.py
+  Line 13: from abc import ABC - REMOVE
+  Line 13: from abc import abstractmethod - REMOVE
+  Line 14: from concurrent.futures import as_completed - REMOVE
+  Line 17: from typing import Set - REMOVE
+  Line 17: from typing import Union - REMOVE
+  Line 18: from queue import Queue - REMOVE
+  Line 19: import weakref - REMOVE
+  Line 22: import mlx.core - REMOVE
+
+File: bolt/thermal_trading_monitor.py
+  Line 11: import time - REMOVE
+
+File: bolt/macos_subprocess_wrapper.py
+  Line 24: import multiprocessing - REMOVE
+  Line 27: import signal - REMOVE
+  Line 32: from dataclasses import field - REMOVE
+  Line 34: from typing import Any - REMOVE
+  Line 34: from typing import List - REMOVE
+
+File: bolt/validation_runner.py
+  Line 9: import logging - REMOVE
+  Line 11: import json - REMOVE
+  Line 12: from pathlib import Path - REMOVE
+  Line 36: import numpy - REMOVE
+  Line 93: from bolt.agents.agent_pool import TaskPriority - REMOVE
+  Line 166: import numpy - REMOVE
+
+File: bolt/gpu_acceleration.py
+  Line 19: import mlx.core - REMOVE
+  Line 20: import mlx.nn - REMOVE
+  Line 21: import numpy - REMOVE
+
+File: bolt/trading_system_integration.py
+  Line 9: import logging - REMOVE
+  Line 13: from datetime import timedelta - REMOVE
+  Line 18: from src.unity_wheel.api.advisor import Advisor - REMOVE
+  Line 19: from src.unity_wheel.models import PositionType - REMOVE
+  Line 27: from gpu_acceleration import gpuify - REMOVE
+
+File: bolt/solve.py
+  Line 10: import json - REMOVE
+
+File: bolt/gpu_acceleration_optimized.py
+  Line 12: from typing import Any - REMOVE
+  Line 12: from typing import Dict - REMOVE
+  Line 16: import mlx.core - REMOVE
+  Line 17: import mlx.nn - REMOVE
+  Line 18: import numpy - REMOVE
+
+File: bolt/gpu_acceleration_final.py
+  Line 18: from dataclasses import field - REMOVE
+  Line 19: from collections import deque - REMOVE
+  Line 22: import mlx.core - REMOVE
+  Line 23: import mlx.nn - REMOVE
+  Line 24: import numpy - REMOVE
+
+File: bolt/unified_database_abstraction.py
+  Line 29: import weakref - REMOVE
+  Line 30: from abc import ABC - REMOVE
+  Line 30: from abc import abstractmethod - REMOVE
+  Line 32: from contextlib import contextmanager - REMOVE
+  Line 36: from typing import Union - REMOVE
+  Line 38: import pandas - REMOVE
+
+File: bolt/system_validation.py
+  Line 20: import os - REMOVE
+  Line 28: from typing import Tuple - REMOVE
+  Line 29: from uuid import uuid4 - REMOVE
+  Line 43: import mlx.core - REMOVE
+  Line 57: from einstein.einstein_config import get_einstein_config - REMOVE
+  Line 67: from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo - REMOVE
+  Line 68: from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo - REMOVE
+
+File: bolt/work_stealing_test.py
+  Line 12: from typing import List - REMOVE
+
+File: bolt/buffer_size_calculator.py
+  Line 10: from typing import Optional - REMOVE
+  Line 12: from pathlib import Path - REMOVE
+
+File: bolt/unified_memory.py
+  Line 10: from typing import List - REMOVE
+  Line 11: import numpy - REMOVE
+  Line 17: import mlx.core - REMOVE
+  Line 82: import array_api_compat - REMOVE
+
+File: bolt/orchestrator_12_agent.py
+  Line 8: import asyncio - REMOVE
+  Line 11: from typing import Tuple - REMOVE
+
+File: bolt/gpu_acceleration_ultimate_fix.py
+  Line 18: import json - REMOVE
+  Line 21: from pathlib import Path - REMOVE
+  Line 22: from typing import List - REMOVE
+  Line 22: from typing import Optional - REMOVE
+  Line 22: from typing import Tuple - REMOVE
+  Line 23: import threading - REMOVE
+  Line 24: import gc - REMOVE
+  Line 26: import mlx.core - REMOVE
+  Line 27: import mlx.nn - REMOVE
+  Line 28: import numpy - REMOVE
+
+File: bolt/memory_dashboard.py
+  Line 8: import threading - REMOVE
+  Line 10: from typing import Dict - REMOVE
+  Line 10: from typing import Tuple - REMOVE
+  Line 12: import sys - REMOVE
+
+File: bolt/unified_memory_pressure_handler.py
+  Line 21: from collections import defaultdict - REMOVE
+  Line 25: import weakref - REMOVE
+
+File: bolt/gpu_memory_optimizer.py
+  Line 24: import weakref - REMOVE
+  Line 27: import mlx.core - REMOVE
+  Line 28: import mlx.nn - REMOVE
+
+File: bolt/hardware/memory_manager.py
+  Line 11: from typing import Tuple - REMOVE
+  Line 12: from dataclasses import field - REMOVE
+  Line 13: from collections import defaultdict - REMOVE
+  Line 15: import weakref - REMOVE
+
+File: bolt/hardware/performance_monitor.py
+  Line 11: from typing import List - REMOVE
+  Line 14: import json - REMOVE
+
+File: bolt/hardware/hardware_state.py
+  Line 11: import os - REMOVE
+  Line 17: from typing import Tuple - REMOVE
+
+File: bolt/hardware/benchmarks.py
+  Line 12: import asyncio - REMOVE
+  Line 14: import numpy - REMOVE
+  Line 15: from typing import Optional - REMOVE
+  Line 22: import mlx.core - REMOVE
+
+File: bolt/core/output_token_manager.py
+  Line 12: from typing import List - REMOVE
+
+File: bolt/core/config.py
+  Line 10: from dataclasses import dataclass - REMOVE
+  Line 10: from dataclasses import field - REMOVE
+
+File: bolt/core/cpu_optimizer.py
+  Line 11: from typing import List - REMOVE
+  Line 11: from typing import Set - REMOVE
+
+File: bolt/core/task_subdivision.py
+  Line 9: import asyncio - REMOVE
+  Line 15: from typing import Union - REMOVE
+  Line 16: import numpy - REMOVE
+
+File: bolt/core/agent_token_manager.py
+  Line 9: from typing import Union - REMOVE
+
+File: bolt/core/system_info.py
+  Line 10: from typing import Optional - REMOVE
+  Line 14: import mlx.core - REMOVE
+  Line 134: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo - REMOVE
+  Line 141: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph - REMOVE
+  Line 148: from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer - REMOVE
+  Line 155: from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo - REMOVE
+  Line 162: from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo - REMOVE
+  Line 169: from src.unity_wheel.accelerated_tools.python_helpers_turbo import get_code_helper - REMOVE
+
+File: bolt/core/integration.py
+  Line 18: import json - REMOVE
+  Line 20: import os - REMOVE
+  Line 29: from concurrent.futures import ThreadPoolExecutor - REMOVE
+  Line 30: import threading - REMOVE
+  Line 31: from collections import deque - REMOVE
+  Line 32: import weakref - REMOVE
+  Line 77: import pynvml - REMOVE
+  Line 84: import mlx.core - REMOVE
+  Line 116: from einstein.unified_index import EinsteinIndexHub - REMOVE
+  Line 117: from einstein.claude_code_optimizer import ClaudeCodeOptimizer - REMOVE
+  Line 118: from einstein.memory_optimizer import MemoryOptimizer - REMOVE
+
+File: bolt/core/ultra_fast_coordination.py
+  Line 15: import threading - REMOVE
+  Line 16: from collections import deque - REMOVE
+  Line 20: from typing import Tuple - REMOVE
+  Line 21: import weakref - REMOVE
+  Line 22: import os - REMOVE
+  Line 23: import psutil - REMOVE
+
+File: bolt/core/dynamic_token_optimizer.py
+  Line 8: import asyncio - REMOVE
+  Line 12: from dataclasses import field - REMOVE
+  Line 14: import numpy - REMOVE
+
+File: bolt/core/optimized_integration.py
+  Line 15: import json - REMOVE
+  Line 18: from dataclasses import field - REMOVE
+  Line 19: from typing import Set - REMOVE
+  Line 19: from typing import Tuple - REMOVE
+  Line 19: from typing import Union - REMOVE
+  Line 22: import weakref - REMOVE
+  Line 24: from concurrent.futures import ThreadPoolExecutor - REMOVE
+
+File: bolt/core/einstein_accelerator.py
+  Line 12: import threading - REMOVE
+
+File: bolt/agents/agent_pool.py
+  Line 9: import threading - REMOVE
+  Line 10: import os - REMOVE
+  Line 11: import psutil - REMOVE
+
+File: bolt/agents/orchestrator.py
+  Line 12: from types import AgentStatus - REMOVE
+
+File: bolt/agents/task_manager.py
+  Line 7: from typing import Dict - REMOVE
+  Line 7: from typing import Set - REMOVE
+  Line 10: from types import TaskPriority - REMOVE
+
+File: bolt/utils/display.py
+  Line 12: from rich.panel import Panel - REMOVE
+
+File: bolt/cli/monitor.py
+  Line 11: from typing import Dict - REMOVE
+  Line 11: from typing import Any - REMOVE
+
+File: bolt/error_handling/resource_guards.py
+  Line 15: from contextlib import asynccontextmanager - REMOVE
+  Line 18: from typing import Union - REMOVE
+  Line 602: import mlx.core - REMOVE
+
+File: bolt/error_handling/system.py
+  Line 12: from typing import List - REMOVE
+  Line 12: from typing import Type - REMOVE
+  Line 12: from typing import Union - REMOVE
+  Line 18: from recovery import RecoveryConfiguration - REMOVE
+  Line 20: from resource_guards import ResourceGuardManager - REMOVE
+  Line 22: from monitoring import ErrorMonitor - REMOVE
+
+File: bolt/error_handling/graceful_degradation.py
+  Line 14: from typing import Tuple - REMOVE
+  Line 17: from exceptions import BoltException - REMOVE
+  Line 17: from exceptions import ErrorCategory - REMOVE
+  Line 17: from exceptions import ErrorSeverity - REMOVE
+
+File: bolt/error_handling/recovery.py
+  Line 11: from dataclasses import field - REMOVE
+  Line 13: from typing import Union - REMOVE
+
+File: bolt/error_handling/diagnostics.py
+  Line 14: import subprocess - REMOVE
+  Line 17: import traceback - REMOVE
+  Line 19: from datetime import timedelta - REMOVE
+  Line 21: from typing import Set - REMOVE
+  Line 21: from typing import Tuple - REMOVE
+  Line 21: from typing import Union - REMOVE
+  Line 24: from exceptions import BoltException - REMOVE
+  Line 24: from exceptions import ErrorCategory - REMOVE
+  Line 24: from exceptions import ErrorSeverity - REMOVE
+  Line 209: import mlx.core - REMOVE
+  Line 362: from bolt.core.integration import BoltIntegration - REMOVE
+  Line 368: from bolt.hardware.memory_manager import BoltMemoryManager - REMOVE
+  Line 374: from bolt.error_handling.recovery import ErrorRecoveryManager - REMOVE
+  Line 381: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo - REMOVE
+  Line 592: import mlx.core - REMOVE
+
+File: bolt/error_handling/monitoring.py
+  Line 9: import json - REMOVE
+  Line 14: from datetime import datetime - REMOVE
+  Line 14: from datetime import timedelta - REMOVE
+
+File: bolt/error_handling/__init__.py
+  Line 8: from exceptions import * - REMOVE
+
+File: bolt/error_handling/circuit_breaker.py
+  Line 13: from typing import Union - REMOVE
+
+File: bolt/error_handling/exceptions.py
+  Line 12: from typing import Union - REMOVE
+
+
+## CROSS-MODULE DEPENDENCIES
+
+### Einstein -> Bolt Dependencies:
+  einstein/einstein_config.py line 256: bolt_database_fixes
+  einstein/einstein_config.py line 256: bolt_database_fixes
+  einstein/m4_pro_optimizer.py line 170: bolt.adaptive_concurrency
+  einstein/m4_pro_optimizer.py line 30: bolt.m4_pro_integration
+  einstein/m4_pro_optimizer.py line 30: bolt.m4_pro_integration
+  einstein/m4_pro_optimizer.py line 98: bolt.adaptive_concurrency
+  einstein/m4_pro_optimizer.py line 129: bolt.unified_memory
+  einstein/database_adapter.py line 28: bolt_database_fixes
+  einstein/database_adapter.py line 28: bolt_database_fixes
+
+### Bolt -> Einstein Dependencies:
+  bolt/weak_link_analyzer.py line 129: einstein.unified_index
+  bolt/system_validation.py line 56: einstein.unified_index
+  bolt/system_validation.py line 57: einstein.einstein_config
+  bolt/core/integration.py line 116: einstein.unified_index
+  bolt/core/integration.py line 117: einstein.claude_code_optimizer
+  bolt/core/integration.py line 118: einstein.memory_optimizer
+
+## ACCELERATED TOOLS USAGE
+
+### Accelerated Tools Usage:
+  einstein/rapid_startup.py line 249: from src.unity_wheel.accelerated_tools.ripgrep_turbo import RipgrepTurbo
+  einstein/rapid_startup.py line 356: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import DependencyGraphTurbo
+  einstein/rapid_startup.py line 396: from src.unity_wheel.accelerated_tools.duckdb_turbo import DuckDBTurbo
+  einstein/claude_code_optimizer.py line 58: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import DependencyGraphTurbo
+  einstein/claude_code_optimizer.py line 61: from src.unity_wheel.accelerated_tools.ripgrep_turbo import RipgrepTurbo
+  einstein/optimized_semantic_search.py line 159: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  einstein/unified_index.py line 36: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+  einstein/unified_index.py line 37: from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo
+  einstein/unified_index.py line 38: from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer
+  einstein/unified_index.py line 39: from src.unity_wheel.accelerated_tools.python_helpers_turbo import get_code_helper
+  einstein/unified_index.py line 42: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  einstein/unified_index.py line 43: from src.unity_wheel.accelerated_tools.sequential_thinking_turbo import SequentialThinkingTurbo
+  einstein/unified_index.py line 44: from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo
+  bolt/system_validation.py line 64: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/system_validation.py line 65: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+  bolt/system_validation.py line 66: from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer
+  bolt/system_validation.py line 67: from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo
+  bolt/system_validation.py line 68: from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo
+  bolt/hardware/benchmarks.py line 343: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/core/system_info.py line 134: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/core/system_info.py line 141: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+  bolt/core/system_info.py line 148: from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer
+  bolt/core/system_info.py line 155: from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo
+  bolt/core/system_info.py line 162: from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo
+  bolt/core/system_info.py line 169: from src.unity_wheel.accelerated_tools.python_helpers_turbo import get_code_helper
+  bolt/core/integration.py line 97: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/core/integration.py line 98: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+  bolt/core/integration.py line 99: from src.unity_wheel.accelerated_tools.python_analysis_turbo import get_python_analyzer
+  bolt/core/integration.py line 100: from src.unity_wheel.accelerated_tools.duckdb_turbo import get_duckdb_turbo
+  bolt/core/integration.py line 101: from src.unity_wheel.accelerated_tools.trace_simple import get_trace_turbo
+  bolt/core/integration.py line 102: from src.unity_wheel.accelerated_tools.python_helpers_turbo import get_code_helper
+  bolt/core/integration.py line 218: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/core/optimized_integration.py line 129: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/core/optimized_integration.py line 130: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+  bolt/core/optimized_integration.py line 151: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo
+  bolt/core/optimized_integration.py line 159: from src.unity_wheel.accelerated_tools.dependency_graph_turbo import get_dependency_graph
+  bolt/error_handling/diagnostics.py line 381: from src.unity_wheel.accelerated_tools.ripgrep_turbo import get_ripgrep_turbo

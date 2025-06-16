@@ -5,17 +5,13 @@ when considering positions.
 """
 from __future__ import annotations
 
-
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Callable, Dict, List, Optional, Tuple
+
+from ..config.loader import get_config
 
 from ..math import CalculationResult
-
-import numpy as np
-
-from src.config.loader import get_config
 from ..utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -41,17 +37,17 @@ class BorrowingSource:
         """Monthly interest rate."""
         return self.annual_rate / 12
 
-    def daily_cost(self, amount: Optional[float] = None) -> float:
+    def daily_cost(self, amount: float | None = None) -> float:
         """Calculate daily borrowing cost."""
         principal = amount if amount is not None else self.balance
         return principal * self.daily_rate
 
-    def monthly_cost(self, amount: Optional[float] = None) -> float:
+    def monthly_cost(self, amount: float | None = None) -> float:
         """Calculate monthly borrowing cost."""
         principal = amount if amount is not None else self.balance
         return principal * self.monthly_rate
 
-    def cost_for_period(self, days: int, amount: Optional[float] = None) -> float:
+    def cost_for_period(self, days: int, amount: float | None = None) -> float:
         """Calculate borrowing cost for a specific period."""
         principal = amount if amount is not None else self.balance
         return principal * self.daily_rate * days
@@ -64,14 +60,14 @@ class CapitalAllocationResult:
     action: str  # 'invest', 'paydown_debt', 'mixed'
     invest_amount: float
     paydown_amount: float
-    source_to_use: Optional[str] = None  # Which borrowing source if investing
+    source_to_use: str | None = None  # Which borrowing source if investing
     hurdle_rate: float = 0.0  # Minimum return needed
     expected_return: float = 0.0
     borrowing_cost: float = 0.0
     net_benefit: float = 0.0
     confidence: float = 0.95
     reasoning: str = ""
-    details: Dict = None
+    details: dict = None
 
     def __post_init__(self):
         if self.details is None:
@@ -89,7 +85,11 @@ class BorrowingCostAnalyzer:
     CONFIDENCE_MULTIPLIER = 1.0  # No safety factor
     TAX_ADJUSTMENT = 1.0  # Tax-free environment
 
-    def __init__(self, rate_fetcher: Optional[Callable[[str], float]] = None, auto_update: bool = False):
+    def __init__(
+        self,
+        rate_fetcher: Callable[[str], float] | None = None,
+        auto_update: bool = False,
+    ):
         """Initialize with configuration.
 
         Parameters
@@ -101,7 +101,7 @@ class BorrowingCostAnalyzer:
             allocation analysis.
         """
         self.config = get_config()
-        self.sources: Dict[str, BorrowingSource] = {}
+        self.sources: dict[str, BorrowingSource] = {}
         self.rate_fetcher = rate_fetcher
         self.auto_update = auto_update
         self._setup_default_sources()
@@ -142,19 +142,23 @@ class BorrowingCostAnalyzer:
             },
         )
 
-    def update_rates(self) -> Dict[str, float]:
+    def update_rates(self) -> dict[str, float]:
         """Update borrowing rates using the configured fetcher."""
         if not self.rate_fetcher:
             return {}
 
-        updates: Dict[str, float] = {}
+        updates: dict[str, float] = {}
         for name, source in self.sources.items():
             try:
                 new_rate = self.rate_fetcher(name)
                 if new_rate is not None and new_rate > 0:
                     source.annual_rate = new_rate
                     updates[name] = new_rate
-            except (ValueError, KeyError, AttributeError) as exc:  # pragma: no cover - defensive
+            except (
+                ValueError,
+                KeyError,
+                AttributeError,
+            ) as exc:  # pragma: no cover - defensive
                 logger.warning(
                     "rate_update_failed",
                     extra={"source": name, "error": str(exc)},
@@ -166,7 +170,10 @@ class BorrowingCostAnalyzer:
         return updates
 
     def calculate_hurdle_rate(
-        self, borrowing_source: str, holding_period_days: int = 45, include_tax: bool = True
+        self,
+        borrowing_source: str,
+        holding_period_days: int = 45,
+        include_tax: bool = True,
     ) -> CalculationResult:
         """
         Calculate the minimum return needed to justify borrowing.
@@ -235,7 +242,9 @@ class BorrowingCostAnalyzer:
         cheapest_source = min(self.sources.values(), key=lambda s: s.annual_rate)
 
         # Calculate hurdle rate for cheapest source
-        hurdle_rate = self.calculate_hurdle_rate(cheapest_source.name, holding_period_days)
+        hurdle_rate = self.calculate_hurdle_rate(
+            cheapest_source.name, holding_period_days
+        )
 
         # Calculate expected profit from position
         period_return = adjusted_return * (holding_period_days / 365)
@@ -250,7 +259,9 @@ class BorrowingCostAnalyzer:
             # Find best source to borrow from
             source_to_use = self._select_borrowing_source(need_to_borrow)
             if source_to_use:
-                borrowing_cost = source_to_use.cost_for_period(holding_period_days, need_to_borrow)
+                borrowing_cost = source_to_use.cost_for_period(
+                    holding_period_days, need_to_borrow
+                )
 
         # Net benefit calculation
         net_benefit = expected_profit - borrowing_cost
@@ -335,7 +346,7 @@ class BorrowingCostAnalyzer:
 
         return result
 
-    def _select_borrowing_source(self, amount: float) -> Optional[BorrowingSource]:
+    def _select_borrowing_source(self, amount: float) -> BorrowingSource | None:
         """Select optimal borrowing source for given amount."""
         # Sort by rate (cheapest first)
         sorted_sources = sorted(self.sources.values(), key=lambda s: s.annual_rate)
@@ -353,7 +364,7 @@ class BorrowingCostAnalyzer:
 
     def calculate_paydown_benefit(
         self, paydown_amount: float, source_name: str, time_horizon_days: int = 365
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calculate the benefit of paying down debt.
 
@@ -390,9 +401,9 @@ class BorrowingCostAnalyzer:
     def optimize_capital_deployment(
         self,
         available_capital: float,
-        opportunities: List[Dict[str, float]],
+        opportunities: list[dict[str, float]],
         max_leverage: float = 1.5,
-    ) -> Dict[str, CapitalAllocationResult]:
+    ) -> dict[str, CapitalAllocationResult]:
         """
         Optimize capital deployment across multiple opportunities.
 
@@ -430,7 +441,8 @@ class BorrowingCostAnalyzer:
             )
 
             if result.action == "invest" and (
-                remaining_capital > 0 or total_borrowed < (max_capital - available_capital)
+                remaining_capital > 0
+                or total_borrowed < (max_capital - available_capital)
             ):
                 allocations[f"opportunity_{idx}"] = result
                 remaining_capital -= min(result.invest_amount, remaining_capital)
@@ -439,12 +451,14 @@ class BorrowingCostAnalyzer:
             else:
                 # Skip this opportunity
                 result.action = "skip"
-                result.reasoning = "Better opportunities available or leverage limit reached"
+                result.reasoning = (
+                    "Better opportunities available or leverage limit reached"
+                )
                 allocations[f"opportunity_{idx}"] = result
 
         return allocations
 
-    def get_current_borrowing_summary(self) -> Dict[str, Dict]:
+    def get_current_borrowing_summary(self) -> dict[str, dict]:
         """Get summary of current borrowing costs."""
         summary = {}
         total_daily_cost = 0
@@ -475,7 +489,9 @@ class BorrowingCostAnalyzer:
             "monthly_cost": total_monthly_cost,
             "annual_cost": total_daily_cost * 365,
             "blended_rate": (
-                f"{(total_daily_cost * 365 / total_balance):.1%}" if total_balance > 0 else "0.0%"
+                f"{(total_daily_cost * 365 / total_balance):.1%}"
+                if total_balance > 0
+                else "0.0%"
             ),
         }
 
@@ -483,7 +499,10 @@ class BorrowingCostAnalyzer:
 
 
 def analyze_borrowing_decision(
-    position_size: float, expected_return: float, confidence: float = 0.8, available_cash: float = 0
+    position_size: float,
+    expected_return: float,
+    confidence: float = 0.8,
+    available_cash: float = 0,
 ) -> CapitalAllocationResult:
     """
     Convenience function for quick borrowing analysis.

@@ -3,7 +3,7 @@
 import asyncio
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -27,14 +27,16 @@ async def check_unity_options():
     try:
         # Get available date range for OPRA
         metadata = client.metadata.get_dataset_range(dataset="OPRA.PILLAR")
-        print(f"   OPRA.PILLAR available from {metadata.start_date} to {metadata.end_date}")
+        print(
+            f"   OPRA.PILLAR available from {metadata.start_date} to {metadata.end_date}"
+        )
     except Exception as e:
         print(f"   Metadata error: {e}")
 
     # Test 2: Try to get ANY Unity options in the last month
     print("\n2️⃣ Searching for Unity options in last 30 days...")
 
-    end_date = datetime(2025, 6, 9, tzinfo=timezone.utc)
+    end_date = datetime(2025, 6, 9, tzinfo=UTC)
     start_date = end_date - timedelta(days=30)
 
     try:

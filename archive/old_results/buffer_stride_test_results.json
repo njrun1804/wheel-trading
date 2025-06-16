@@ -1,0 +1,168 @@
+{
+  "overall_passed": true,
+  "passed_count": 3,
+  "total_count": 4,
+  "test_results": {
+    "buffer_calculations": {
+      "passed": true,
+      "details": {
+        "1": {
+          "expected_bytes": 1536,
+          "actual_bytes": 1536,
+          "match": true
+        },
+        "10": {
+          "expected_bytes": 15360,
+          "actual_bytes": 15360,
+          "match": true
+        },
+        "100": {
+          "expected_bytes": 153600,
+          "actual_bytes": 153600,
+          "match": true
+        },
+        "1000": {
+          "expected_bytes": 1536000,
+          "actual_bytes": 1536000,
+          "match": true
+        },
+        "5000": {
+          "expected_bytes": 7680000,
+          "actual_bytes": 7680000,
+          "match": true
+        }
+      }
+    },
+    "semantic_search_performance": {
+      "passed": true,
+      "details": {
+        "db_100_query_1": {
+          "elapsed_ms": 7.008790969848633,
+          "db_size": 100,
+          "query_size": 1,
+          "passed": true
+        },
+        "db_100_query_5": {
+          "elapsed_ms": 1.3000965118408203,
+          "db_size": 100,
+          "query_size": 5,
+          "passed": true
+        },
+        "db_100_query_10": {
+          "elapsed_ms": 0.7691383361816406,
+          "db_size": 100,
+          "query_size": 10,
+          "passed": true
+        },
+        "db_100_query_50": {
+          "elapsed_ms": 78.92775535583496,
+          "db_size": 100,
+          "query_size": 50,
+          "passed": true
+        },
+        "db_500_query_1": {
+          "elapsed_ms": 1.7249584197998047,
+          "db_size": 500,
+          "query_size": 1,
+          "passed": true
+        },
+        "db_500_query_5": {
+          "elapsed_ms": 0.9069442749023438,
+          "db_size": 500,
+          "query_size": 5,
+          "passed": true
+        },
+        "db_500_query_10": {
+          "elapsed_ms": 0.9710788726806641,
+          "db_size": 500,
+          "query_size": 10,
+          "passed": true
+        },
+        "db_500_query_50": {
+          "elapsed_ms": 111.36794090270996,
+          "db_size": 500,
+          "query_size": 50,
+          "passed": false
+        },
+        "db_1000_query_1": {
+          "elapsed_ms": 1.6510486602783203,
+          "db_size": 1000,
+          "query_size": 1,
+          "passed": true
+        },
+        "db_1000_query_5": {
+          "elapsed_ms": 0.9851455688476562,
+          "db_size": 1000,
+          "query_size": 5,
+          "passed": true
+        },
+        "db_1000_query_10": {
+          "elapsed_ms": 1.1222362518310547,
+          "db_size": 1000,
+          "query_size": 10,
+          "passed": true
+        },
+        "db_1000_query_50": {
+          "elapsed_ms": 1.2428760528564453,
+          "db_size": 1000,
+          "query_size": 50,
+          "passed": true
+        },
+        "db_5000_query_1": {
+          "elapsed_ms": 3.0660629272460938,
+          "db_size": 5000,
+          "query_size": 1,
+          "passed": true
+        },
+        "db_5000_query_5": {
+          "elapsed_ms": 2.235889434814453,
+          "db_size": 5000,
+          "query_size": 5,
+          "passed": true
+        },
+        "db_5000_query_10": {
+          "elapsed_ms": 2.3000240325927734,
+          "db_size": 5000,
+          "query_size": 10,
+          "passed": true
+        },
+        "db_5000_query_50": {
+          "elapsed_ms": 3.076791763305664,
+          "db_size": 5000,
+          "query_size": 50,
+          "passed": true
+        }
+      },
+      "fast_searches_count": 14
+    },
+    "gpu_utilization": {
+      "passed": false,
+      "details": {
+        "initial_memory_mb": 1.52587890625e-05,
+        "peak_memory_mb": 28.064247131347656,
+        "memory_used_mb": 28.064231872558594,
+        "memory_efficiency": 1.9158515625,
+        "gpu_utilized": false
+      }
+    },
+    "edge_cases": {
+      "passed": true,
+      "details": [
+        [
+          "empty_input",
+          true
+        ],
+        [
+          "single_embedding",
+          true
+        ],
+        [
+          "mismatched_dims",
+          true
+        ]
+      ],
+      "passed_count": 3,
+      "total_count": 3
+    }
+  }
+}

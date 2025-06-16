@@ -8,11 +8,9 @@ Ensures:
 """
 from __future__ import annotations
 
-
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
-from typing import Dict, List, Tuple
 
 import pandas as pd
 
@@ -35,12 +33,12 @@ class DataValidator:
 
     def __init__(self):
         """Initialize validator."""
-        self.validation_results: List[Dict] = []
+        self.validation_results: list[dict] = []
         self.calendar = SimpleTradingCalendar()
 
     def validate_historical_completeness(
-        self, chains: List[OptionChain], start_date: datetime, end_date: datetime
-    ) -> Tuple[bool, List[str]]:
+        self, chains: list[OptionChain], start_date: datetime, end_date: datetime
+    ) -> tuple[bool, list[str]]:
         """Check for missing trading days in historical data.
 
         Returns:
@@ -77,7 +75,7 @@ class DataValidator:
         return len(missing_dates) == 0, [d.isoformat() for d in sorted(missing_dates)]
 
     def validate_chain_integrity(
-        self, chain: OptionChain, definitions: List[InstrumentDefinition]
+        self, chain: OptionChain, definitions: list[InstrumentDefinition]
     ) -> DataQuality:
         """Validate a single option chain for data quality issues."""
         issues = []
@@ -178,14 +176,14 @@ class DataValidator:
         return False
 
     def _check_arbitrage_bounds(
-        self, chain: OptionChain, definitions: List[InstrumentDefinition]
-    ) -> List[str]:
+        self, chain: OptionChain, definitions: list[InstrumentDefinition]
+    ) -> list[str]:
         """Check for violations of no-arbitrage bounds."""
         violations = []
         def_map = {d.instrument_id: d for d in definitions}
 
         # Group by strike
-        strikes_data: Dict[Decimal, Dict] = {}
+        strikes_data: dict[Decimal, dict] = {}
 
         for quote in chain.calls:
             if quote.instrument_id in def_map:
@@ -250,8 +248,8 @@ class DataValidator:
         return violations
 
     def validate_quote_sequence(
-        self, quotes: List[OptionQuote], max_gap_seconds: int = 60
-    ) -> List[str]:
+        self, quotes: list[OptionQuote], max_gap_seconds: int = 60
+    ) -> list[str]:
         """Check for gaps or anomalies in quote sequence."""
         if not quotes:
             return ["No quotes provided"]
@@ -261,7 +259,9 @@ class DataValidator:
 
         # Check for time gaps
         for i in range(1, len(quotes_sorted)):
-            gap = (quotes_sorted[i].timestamp - quotes_sorted[i - 1].timestamp).total_seconds()
+            gap = (
+                quotes_sorted[i].timestamp - quotes_sorted[i - 1].timestamp
+            ).total_seconds()
             if gap > max_gap_seconds:
                 issues.append(
                     f"Time gap of {gap:.0f}s between "
@@ -275,7 +275,9 @@ class DataValidator:
                 price_change = abs(
                     float(quotes_sorted[i].mid_price - quotes_sorted[i - 1].mid_price)
                 )
-                pct_change = (price_change / float(quotes_sorted[i - 1].mid_price)) * 100
+                pct_change = (
+                    price_change / float(quotes_sorted[i - 1].mid_price)
+                ) * 100
 
                 if pct_change > self.MAX_PRICE_CHANGE_PCT:
                     issues.append(

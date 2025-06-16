@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Unified CLI Launcher - Quick access to the intelligent routing system
+#
+# This provides a simple 'unified' command that routes queries between
+# Einstein (fast search) and Bolt (complex analysis) automatically.
+#
+
+exec python3 "$(dirname "$0")/unified_cli.py" "$@"

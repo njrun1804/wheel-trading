@@ -11,8 +11,8 @@ import duckdb
 import yaml
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def check_current_market():

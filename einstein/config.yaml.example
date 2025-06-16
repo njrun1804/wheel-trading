@@ -1,0 +1,278 @@
+# Einstein System Configuration Template
+# This file provides a complete configuration example for the Einstein system
+# Copy this file to config.yaml and customize as needed
+#
+# Environment Variable Mapping:
+# Any configuration value can be overridden using environment variables
+# Format: EINSTEIN_<SECTION>__<KEY> (double underscore separates sections)
+# Example: EINSTEIN_PERFORMANCE__MAX_STARTUP_TIME_MS=1000
+
+# =============================================================================
+# HARDWARE CONFIGURATION
+# =============================================================================
+# Note: Hardware settings are auto-detected by default
+# Override these only if auto-detection fails or you want to limit resources
+
+hardware:
+  # CPU Configuration
+  # cpu_cores: 12                    # Override detected CPU core count
+  # cpu_performance_cores: 8         # Override P-core count (Apple Silicon)
+  # cpu_efficiency_cores: 4          # Override E-core count (Apple Silicon)
+  
+  # Memory Configuration (in GB)
+  # memory_total_gb: 24.0            # Override total memory
+  # memory_available_gb: 19.2        # Override available memory
+  
+  # GPU Configuration
+  # has_gpu: true                    # Override GPU detection
+  # gpu_cores: 20                    # Override GPU core count
+  
+  # Apple Neural Engine (ANE) Configuration
+  # has_ane: true                    # Override ANE detection
+  # ane_cores: 16                    # Override ANE core count
+  
+  # Platform Override (normally auto-detected)
+  # platform_type: "apple_silicon"   # Options: apple_silicon, intel_mac, intel, amd, unknown
+  # architecture: "arm64"            # Options: arm64, x86_64
+
+# =============================================================================
+# PERFORMANCE CONFIGURATION
+# =============================================================================
+performance:
+  # Startup Performance Targets (milliseconds)
+  max_startup_time_ms: 500.0        # Maximum total startup time
+  max_critical_path_ms: 200.0       # Critical path initialization
+  max_background_init_ms: 2000.0    # Background initialization
+  
+  # Search Performance Targets (milliseconds)
+  max_search_time_ms: 50.0          # Maximum search operation time
+  target_text_search_ms: 5.0        # Text search target
+  target_semantic_search_ms: 20.0   # Semantic search target
+  target_structural_search_ms: 10.0 # Structural search target
+  target_analytical_search_ms: 15.0 # Analytical search target
+  target_embedding_ms: 50.0         # Embedding generation target
+  
+  # Memory Targets (GB and MB)
+  max_memory_usage_gb: 2.0          # Maximum total memory usage
+  cache_memory_limit_mb: 512.0      # Cache memory limit
+  
+  # Concurrency Limits (auto-adjusted based on hardware)
+  max_search_concurrency: 4         # Concurrent search operations
+  max_embedding_concurrency: 8      # Concurrent embedding operations
+  max_file_io_concurrency: 12       # Concurrent file I/O operations
+  max_analysis_concurrency: 6       # Concurrent analysis operations
+
+# =============================================================================
+# CACHE CONFIGURATION
+# =============================================================================
+cache:
+  # LRU Cache Sizes
+  hot_cache_size: 1000              # Hot cache entries
+  warm_cache_size: 5000             # Warm cache entries
+  search_cache_size: 500            # Search result cache
+  file_cache_size: 1000             # File content cache
+  
+  # Memory Management
+  index_cache_size_mb: 256          # Index cache size in MB
+  compress_threshold_bytes: 1024    # Compression threshold
+  
+  # Cache Policies
+  cache_ttl_seconds: 3600           # Cache time-to-live (1 hour)
+  max_cache_entries: 10000          # Maximum total cache entries
+  
+  # Prefetch Settings
+  prefetch_common_patterns: true    # Enable pattern prefetching
+  prefetch_cache_size: 1000         # Prefetch cache size
+
+# =============================================================================
+# PATH CONFIGURATION
+# =============================================================================
+paths:
+  # Base directory (defaults to current working directory)
+  # base_dir: "/path/to/project"
+  
+  # Cache directory (defaults to .einstein in base_dir)
+  # cache_dir: "/path/to/cache"
+  
+  # Specific directories (auto-created based on cache_dir)
+  # logs_dir: "/path/to/logs"
+  # analytics_db_path: "/path/to/analytics.db"
+  # embeddings_db_path: "/path/to/embeddings.db"
+  # rapid_cache_dir: "/path/to/rapid_cache"
+  # optimized_cache_dir: "/path/to/optimized"
+  # models_dir: "/path/to/models"
+  
+  # Database Concurrency Settings
+  enable_concurrent_db: true        # Enable concurrent database access
+  max_db_connections: 4             # Maximum database connections
+  db_connection_timeout: 30.0       # Connection timeout (seconds)
+  db_lock_timeout: 30.0             # Lock timeout (seconds)
+
+# =============================================================================
+# MACHINE LEARNING CONFIGURATION
+# =============================================================================
+ml:
+  # Learning Parameters
+  adaptive_learning_rate: 0.1       # Adaptive learning rate
+  bandit_exploration_rate: 0.1      # Multi-armed bandit exploration rate
+  
+  # Model Parameters
+  embedding_dimension: 1536         # Embedding vector dimension
+  max_sequence_length: 512          # Maximum sequence length
+  
+  # Training Parameters
+  batch_size: 32                    # Training batch size
+  max_training_samples: 10000       # Maximum training samples
+  
+  # Thresholds
+  similarity_threshold: 0.7         # Similarity threshold for matches
+  confidence_threshold: 0.3         # Minimum confidence for results
+  relevance_threshold: 0.5          # Relevance threshold for ranking
+  
+  # Apple Neural Engine (ANE) Configuration
+  enable_ane: true                  # Enable ANE acceleration
+  ane_batch_size: 256               # Optimal ANE batch size
+  ane_cache_size_mb: 512            # ANE cache size in MB
+  ane_warmup_on_startup: true       # Warm up ANE on startup
+  ane_fallback_on_error: true       # Fallback to CPU on ANE errors
+
+# =============================================================================
+# MONITORING CONFIGURATION
+# =============================================================================
+monitoring:
+  # File Watching
+  debounce_delay_ms: 250.0          # File change debounce delay
+  file_watch_interval_s: 60         # File watch check interval
+  
+  # Performance Monitoring
+  performance_history_size: 50      # Performance metrics history size
+  system_load_history_size: 20      # System load history size
+  cooldown_period_s: 5.0            # Cooldown between operations
+  
+  # Memory Monitoring
+  memory_check_interval_s: 30       # Memory check interval
+  gc_interval_s: 30.0               # Garbage collection interval
+  
+  # Logging
+  log_level: "INFO"                 # Log level: DEBUG, INFO, WARNING, ERROR
+  enable_performance_logs: true     # Enable performance logging
+  enable_cache_stats: true          # Enable cache statistics logging
+
+# =============================================================================
+# FEATURE FLAGS
+# =============================================================================
+features:
+  enable_gpu_acceleration: true     # Enable GPU acceleration
+  enable_adaptive_concurrency: true # Enable adaptive concurrency
+  enable_predictive_prefetch: true  # Enable predictive prefetching
+  enable_memory_optimization: true  # Enable memory optimization
+  enable_realtime_indexing: true    # Enable real-time indexing
+
+# =============================================================================
+# ENVIRONMENT VARIABLE EXAMPLES
+# =============================================================================
+# The following environment variables can be used to override any configuration:
+#
+# # Hardware overrides
+# export EINSTEIN_HARDWARE__CPU_CORES=8
+# export EINSTEIN_HARDWARE__MEMORY_TOTAL_GB=16.0
+# export EINSTEIN_HARDWARE__HAS_GPU=true
+#
+# # Performance overrides
+# export EINSTEIN_PERFORMANCE__MAX_STARTUP_TIME_MS=1000
+# export EINSTEIN_PERFORMANCE__MAX_SEARCH_TIME_MS=100
+# export EINSTEIN_PERFORMANCE__MAX_MEMORY_USAGE_GB=4.0
+#
+# # Cache overrides
+# export EINSTEIN_CACHE__HOT_CACHE_SIZE=2000
+# export EINSTEIN_CACHE__WARM_CACHE_SIZE=10000
+# export EINSTEIN_CACHE__INDEX_CACHE_SIZE_MB=512
+#
+# # Path overrides
+# export EINSTEIN_CACHE_DIR="/custom/cache/path"
+#
+# # ML overrides
+# export EINSTEIN_ML__SIMILARITY_THRESHOLD=0.8
+# export EINSTEIN_ML__CONFIDENCE_THRESHOLD=0.5
+# export EINSTEIN_ML__ENABLE_ANE=true
+#
+# # Monitoring overrides
+# export EINSTEIN_LOG_LEVEL=DEBUG
+# export EINSTEIN_MONITORING__DEBOUNCE_DELAY_MS=500
+#
+# # Feature flag overrides
+# export EINSTEIN_FEATURES__ENABLE_GPU_ACCELERATION=false
+# export EINSTEIN_FEATURES__ENABLE_ADAPTIVE_CONCURRENCY=true
+
+# =============================================================================
+# VALIDATION SETTINGS
+# =============================================================================
+# These settings are used by the configuration validation system
+validation:
+  # Startup validation
+  validate_on_startup: true         # Validate configuration on startup
+  fail_on_validation_error: true    # Fail startup on validation errors
+  
+  # Runtime validation
+  validate_performance_targets: true # Validate performance against targets
+  validate_resource_limits: true    # Validate resource usage limits
+  
+  # Compatibility validation
+  validate_hardware_compatibility: true # Validate hardware compatibility
+  validate_feature_compatibility: true  # Validate feature compatibility
+
+# =============================================================================
+# MIGRATION SETTINGS
+# =============================================================================
+# These settings help with migrating from hardcoded configurations
+migration:
+  # Detect hardcoded values
+  detect_hardcoded_values: true     # Scan for hardcoded configuration values
+  warn_on_hardcoded: true           # Warn when hardcoded values are found
+  
+  # Auto-migration
+  enable_auto_migration: false      # Enable automatic migration (use with caution)
+  backup_on_migration: true         # Backup original files during migration
+  
+  # Migration validation
+  validate_after_migration: true    # Validate configuration after migration
+  rollback_on_failure: true         # Rollback on migration failure
+
+# =============================================================================
+# DEVELOPMENT SETTINGS
+# =============================================================================
+# These settings are useful for development and debugging
+development:
+  # Debug settings
+  enable_debug_mode: false          # Enable debug mode
+  verbose_logging: false            # Enable verbose logging
+  
+  # Testing settings
+  enable_test_mode: false           # Enable test mode (uses test databases)
+  mock_hardware_detection: false    # Mock hardware detection for testing
+  
+  # Profiling settings
+  enable_profiling: false           # Enable performance profiling
+  profile_output_dir: "./profiles"  # Directory for profiling output
+
+# =============================================================================
+# ADVANCED CONFIGURATION
+# =============================================================================
+advanced:
+  # Experimental features (use with caution)
+  experimental_features:
+    enable_advanced_caching: false  # Advanced caching algorithms
+    enable_predictive_loading: false # Predictive content loading
+    enable_smart_scheduling: false  # Smart operation scheduling
+  
+  # Tuning parameters (for advanced users)
+  tuning:
+    scheduler_quantum_ms: 10         # Scheduler quantum in milliseconds
+    io_thread_pool_size: 4           # I/O thread pool size
+    compute_thread_pool_size: 8      # Compute thread pool size
+    
+  # Integration settings
+  integrations:
+    enable_bolt_integration: true    # Enable Bolt system integration
+    enable_mcp_integration: true     # Enable MCP server integration
+    enable_meta_integration: true    # Enable meta-system integration

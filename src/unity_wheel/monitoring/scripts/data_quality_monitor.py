@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """Real-time data quality monitoring dashboard."""
 from __future__ import annotations
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-
 import os
 import sys
 import time
-from datetime import datetime, timedelta
-from typing import Dict, Tuple
+from datetime import datetime
 
 import duckdb
 
@@ -55,7 +54,7 @@ def get_status_icon(is_good: bool, is_warning: bool = False) -> str:
         return f"{Colors.RED}❌{Colors.RESET}"
 
 
-def check_data_freshness(conn) -> Dict[str, Dict]:
+def check_data_freshness(conn) -> dict[str, dict]:
     """Check freshness of all data sources."""
     freshness = {}
 
@@ -76,7 +75,9 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
                 "latest": result[0],
                 "days_old": result[1],
                 "records": result[2],
-                "status": "good" if result[1] <= 1 else ("warning" if result[1] <= 7 else "error"),
+                "status": "good"
+                if result[1] <= 1
+                else ("warning" if result[1] <= 7 else "error"),
             }
     except duckdb.Error as exc:
         logger.error("Failed checking unity_prices: %s", exc, exc_info=exc)
@@ -104,7 +105,9 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
                 "records": result[1],
                 "days_with_data": result[2],
                 "status": (
-                    "good" if hours_old <= 24 else ("warning" if hours_old <= 72 else "error")
+                    "good"
+                    if hours_old <= 24
+                    else ("warning" if hours_old <= 72 else "error")
                 ),
             }
         else:
@@ -129,7 +132,9 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
                 "latest": result[0],
                 "days_old": result[1],
                 "series_count": result[2],
-                "status": "good" if result[1] <= 7 else ("warning" if result[1] <= 30 else "error"),
+                "status": "good"
+                if result[1] <= 7
+                else ("warning" if result[1] <= 30 else "error"),
             }
     except duckdb.Error as exc:
         logger.error("Failed checking FRED data: %s", exc, exc_info=exc)
@@ -138,7 +143,7 @@ def check_data_freshness(conn) -> Dict[str, Dict]:
     return freshness
 
 
-def check_data_quality(conn) -> Dict[str, any]:
+def check_data_quality(conn) -> dict[str, any]:
     """Check data quality metrics."""
     quality = {}
 
@@ -160,7 +165,9 @@ def check_data_quality(conn) -> Dict[str, any]:
         quality["price_gaps"] = {
             "total": gaps[0],
             "large": gaps[1],
-            "status": "good" if gaps[1] == 0 else ("warning" if gaps[1] < 5 else "error"),
+            "status": "good"
+            if gaps[1] == 0
+            else ("warning" if gaps[1] < 5 else "error"),
         }
     except duckdb.Error as exc:
         logger.error("Failed checking price gaps: %s", exc, exc_info=exc)
@@ -184,7 +191,9 @@ def check_data_quality(conn) -> Dict[str, any]:
             quality["volatility"] = {
                 "annual": vol[0] * 100,
                 "max_daily_move": vol[1] * 100,
-                "status": "good" if vol[0] < 1.0 else ("warning" if vol[0] < 1.5 else "error"),
+                "status": "good"
+                if vol[0] < 1.0
+                else ("warning" if vol[0] < 1.5 else "error"),
             }
     except duckdb.Error as exc:
         logger.error("Failed checking volatility: %s", exc, exc_info=exc)
@@ -212,7 +221,9 @@ def check_data_quality(conn) -> Dict[str, any]:
                 "max": spreads[1] * 100,
                 "wide_count": spreads[2],
                 "status": (
-                    "good" if spreads[0] < 0.1 else ("warning" if spreads[0] < 0.3 else "error")
+                    "good"
+                    if spreads[0] < 0.1
+                    else ("warning" if spreads[0] < 0.3 else "error")
                 ),
             }
     except duckdb.Error as exc:
@@ -222,19 +233,19 @@ def check_data_quality(conn) -> Dict[str, any]:
     return quality
 
 
-def calculate_health_score(freshness: Dict, quality: Dict) -> Tuple[int, str]:
+def calculate_health_score(freshness: dict, quality: dict) -> tuple[int, str]:
     """Calculate overall data health score."""
     score = 100
 
     # Freshness scoring
-    for source, data in freshness.items():
+    for _source, data in freshness.items():
         if data["status"] == "warning":
             score -= 10
         elif data["status"] == "error":
             score -= 20
 
     # Quality scoring
-    for metric, data in quality.items():
+    for _metric, data in quality.items():
         if data.get("status") == "warning":
             score -= 5
         elif data.get("status") == "error":
@@ -251,14 +262,16 @@ def calculate_health_score(freshness: Dict, quality: Dict) -> Tuple[int, str]:
     return max(score, 0), status
 
 
-def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> None:
+def display_dashboard(freshness: dict, quality: dict, refresh_count: int) -> None:
     """Display the monitoring dashboard."""
     clear_screen()
 
     # Header
     logger.info("\n{Colors.BOLD}📊 DATA QUALITY MONITOR{Colors.RESET}")
     print("=" * 60)
-    logger.info("Last refresh: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (Update #{refresh_count})")
+    logger.info(
+        "Last refresh: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (Update #{refresh_count})"
+    )
 
     # Data Freshness Section
     logger.info("\n{Colors.CYAN}⏰ DATA FRESHNESS{Colors.RESET}")
@@ -267,7 +280,7 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> Non
     # Unity Prices
     up = freshness.get("unity_prices", {})
     if up.get("records", 0) > 0:
-        icon = get_status_icon(up["status"] == "good", up["status"] == "warning")
+        get_status_icon(up["status"] == "good", up["status"] == "warning")
         logger.info("{icon} Unity Prices: {up['latest']} ({up['days_old']} days old)")
         logger.info("   Records: {up['records']:,}")
     else:
@@ -276,22 +289,28 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> Non
     # Options Data
     opt = freshness.get("options", {})
     if opt.get("records", 0) > 0:
-        icon = get_status_icon(opt["status"] == "good", opt["status"] == "warning")
+        get_status_icon(opt["status"] == "good", opt["status"] == "warning")
         hours = opt["hours_old"]
         if hours < 24:
-            age_str = f"{hours:.1f} hours"
+            pass
         else:
-            age_str = f"{hours/24:.1f} days"
-        logger.info("\n{icon} Options Data: {opt['latest'].strftime('%Y-%m-%d %H:%M')} ({age_str} old)")
-        logger.info("   Contracts: {opt['records']:,} | Days with data: {opt['days_with_data']}")
+            f"{hours/24:.1f} days"
+        logger.info(
+            "\n{icon} Options Data: {opt['latest'].strftime('%Y-%m-%d %H:%M')} ({age_str} old)"
+        )
+        logger.info(
+            "   Contracts: {opt['records']:,} | Days with data: {opt['days_with_data']}"
+        )
     else:
         logger.info("\n{get_status_icon(False)} Options Data: No data")
 
     # FRED Data
     fred = freshness.get("fred", {})
     if fred.get("series_count", 0) > 0:
-        icon = get_status_icon(fred["status"] == "good", fred["status"] == "warning")
-        logger.info("\n{icon} Economic Data: {fred['latest']} ({fred['days_old']} days old)")
+        get_status_icon(fred["status"] == "good", fred["status"] == "warning")
+        logger.info(
+            "\n{icon} Economic Data: {fred['latest']} ({fred['days_old']} days old)"
+        )
         logger.info("   Series tracked: {fred['series_count']}")
     else:
         logger.info("\n{get_status_icon(False)} Economic Data: No data")
@@ -303,24 +322,32 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> Non
     # Price Gaps
     gaps = quality.get("price_gaps", {})
     if "total" in gaps:
-        icon = get_status_icon(gaps["status"] == "good", gaps["status"] == "warning")
-        logger.info("{icon} Price Gaps: {gaps['total']} total, {gaps['large']} large (>10 days)")
+        get_status_icon(gaps["status"] == "good", gaps["status"] == "warning")
+        logger.info(
+            "{icon} Price Gaps: {gaps['total']} total, {gaps['large']} large (>10 days)"
+        )
 
     # Volatility
     vol = quality.get("volatility", {})
     if "annual" in vol:
-        icon = get_status_icon(vol["status"] == "good", vol["status"] == "warning")
-        logger.info("{icon} Volatility: {vol['annual']:.1f}% annual, {vol['max_daily_move']:.1f}% max daily")
+        get_status_icon(vol["status"] == "good", vol["status"] == "warning")
+        logger.info(
+            "{icon} Volatility: {vol['annual']:.1f}% annual, {vol['max_daily_move']:.1f}% max daily"
+        )
 
     # Spreads
     spreads = quality.get("spreads", {})
     if "average" in spreads:
-        icon = get_status_icon(spreads["status"] == "good", spreads["status"] == "warning")
-        logger.info("{icon} Option Spreads: {spreads['average']:.1f}% avg, {spreads['wide_count']} wide (>50%)")
+        get_status_icon(spreads["status"] == "good", spreads["status"] == "warning")
+        logger.info(
+            "{icon} Option Spreads: {spreads['average']:.1f}% avg, {spreads['wide_count']} wide (>50%)"
+        )
 
     # Overall Health Score
     score, status = calculate_health_score(freshness, quality)
-    logger.info("\n{Colors.BOLD}🏆 OVERALL HEALTH SCORE: {score}/100 - {status}{Colors.RESET}")
+    logger.info(
+        "\n{Colors.BOLD}🏆 OVERALL HEALTH SCORE: {score}/100 - {status}{Colors.RESET}"
+    )
 
     # Recommendations
     logger.info("\n{Colors.YELLOW}💡 RECOMMENDATIONS{Colors.RESET}")
@@ -335,7 +362,9 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> Non
         recommendations.append("🟡 Consider updating Unity price data")
 
     if freshness.get("options", {}).get("records", 0) == 0:
-        recommendations.append("🔴 No options data - run: python tools/data/fetch_unity_options.py")
+        recommendations.append(
+            "🔴 No options data - run: python tools/data/fetch_unity_options.py"
+        )
     elif freshness.get("options", {}).get("status") == "error":
         recommendations.append("🔴 Options data is stale - refresh needed")
 
@@ -344,16 +373,20 @@ def display_dashboard(freshness: Dict, quality: Dict, refresh_count: int) -> Non
         recommendations.append("🟡 High volatility detected - review risk limits")
 
     if quality.get("price_gaps", {}).get("large", 0) > 5:
-        recommendations.append("🟡 Many data gaps - consider backfilling historical data")
+        recommendations.append(
+            "🟡 Many data gaps - consider backfilling historical data"
+        )
 
     if not recommendations:
         recommendations.append("✅ All systems operational")
 
-    for rec in recommendations:
+    for _rec in recommendations:
         logger.info("  {rec}")
 
     # Footer
-    logger.info("\n{Colors.CYAN}Press Ctrl+C to exit | Refreshing every 60 seconds...{Colors.RESET}")
+    logger.info(
+        "\n{Colors.CYAN}Press Ctrl+C to exit | Refreshing every 60 seconds...{Colors.RESET}"
+    )
 
 
 def main() -> None:
@@ -362,7 +395,9 @@ def main() -> None:
 
     if not os.path.exists(db_path):
         logger.info("{Colors.RED}❌ Database not found at {db_path}{Colors.RESET}")
-        logger.info("Run data collection first: python tools/analysis/pull_unity_prices.py")
+        logger.info(
+            "Run data collection first: python tools/analysis/pull_unity_prices.py"
+        )
         sys.exit(1)
 
     refresh_count = 0

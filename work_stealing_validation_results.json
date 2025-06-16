@@ -1,0 +1,556 @@
+{
+  "timestamp": 1750068445.221337,
+  "overall_success": false,
+  "test1_comprehensive": {
+    "success": false,
+    "work_stealing_detected": true,
+    "performance_success": false,
+    "metrics": {
+      "total_tasks_submitted": 18,
+      "total_tasks_completed": 18,
+      "completion_rate": 1.0,
+      "steal_attempts": 2,
+      "successful_steals": 2,
+      "steal_success_rate": 1.0,
+      "peak_utilization": 0.0,
+      "tasks_stolen_by_agents": 2,
+      "work_redistributed": 0
+    },
+    "monitoring_timeline": [
+      {
+        "time": 0.0,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 0.5,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 1.0,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 1.5,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 2.0,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 2.5,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 3.0,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 3.5,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 4.0,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      },
+      {
+        "time": 4.5,
+        "busy_agents": 0,
+        "utilization": 0.0,
+        "steals_attempted": 2,
+        "successful_steals": 2,
+        "tasks_completed": 18,
+        "agent_details": [
+          {
+            "id": "agent_0",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 6,
+            "tasks_stolen": 1
+          },
+          {
+            "id": "agent_1",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_2",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 2,
+            "tasks_stolen": 0
+          },
+          {
+            "id": "agent_3",
+            "state": "idle",
+            "queue_load": 0,
+            "tasks_completed": 5,
+            "tasks_stolen": 1
+          }
+        ]
+      }
+    ],
+    "final_agent_stats": [
+      {
+        "id": "agent_0",
+        "state": "idle",
+        "queue_load": 0,
+        "tasks_completed": 6,
+        "tasks_stolen": 1,
+        "performance": {
+          "avg_task_duration": 0.0010361934494972232,
+          "throughput_tasks_per_sec": 411.7809945675652,
+          "steal_success_rate": 0.0,
+          "cpu_utilization": 0.0,
+          "creation_time": 1750068434.004121,
+          "last_task_time": 0.0,
+          "task_count": 0
+        }
+      },
+      {
+        "id": "agent_1",
+        "state": "idle",
+        "queue_load": 0,
+        "tasks_completed": 5,
+        "tasks_stolen": 0,
+        "performance": {
+          "avg_task_duration": 0.0007856803417205813,
+          "throughput_tasks_per_sec": 406.23422086389644,
+          "steal_success_rate": 0.0,
+          "cpu_utilization": 0.0,
+          "creation_time": 1750068434.004124,
+          "last_task_time": 0.0,
+          "task_count": 0
+        }
+      },
+      {
+        "id": "agent_2",
+        "state": "idle",
+        "queue_load": 0,
+        "tasks_completed": 2,
+        "tasks_stolen": 0,
+        "performance": {
+          "avg_task_duration": 0.0006281614303588868,
+          "throughput_tasks_per_sec": 244.2816043584154,
+          "steal_success_rate": 0.0,
+          "cpu_utilization": 0.0,
+          "creation_time": 1750068434.0041249,
+          "last_task_time": 0.0,
+          "task_count": 0
+        }
+      },
+      {
+        "id": "agent_3",
+        "state": "idle",
+        "queue_load": 0,
+        "tasks_completed": 5,
+        "tasks_stolen": 1,
+        "performance": {
+          "avg_task_duration": 0.0011690391063690188,
+          "throughput_tasks_per_sec": 349.89319218282947,
+          "steal_success_rate": 0.0,
+          "cpu_utilization": 0.0,
+          "creation_time": 1750068434.0041258,
+          "last_task_time": 0.0,
+          "task_count": 0
+        }
+      }
+    ]
+  },
+  "test2_queue_stealing": {
+    "success": true,
+    "initial_imbalance": 0,
+    "final_imbalance": 0,
+    "total_steals": 3,
+    "steal_timeline": [
+      {
+        "time": 0.5009729862213135,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 1.0011768341064453,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 1.5022900104522705,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 2.0037081241607666,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 2.5039849281311035,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 3.0035321712493896,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 3.5043091773986816,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      },
+      {
+        "time": 4.005570888519287,
+        "queue_loads": [
+          0,
+          0,
+          0
+        ],
+        "total_steals": 3,
+        "load_balance": 0
+      }
+    ]
+  }
+}

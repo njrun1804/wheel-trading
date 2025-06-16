@@ -1,0 +1,811 @@
+{
+  "summary": {
+    "total_files": 9,
+    "total_unique_packages": 108,
+    "total_declarations": 365,
+    "files_with_includes": 1,
+    "conditional_dependencies": 11
+  },
+  "file_analysis": {
+    "requirements.txt": {
+      "category": "core",
+      "total_dependencies": 43,
+      "includes": [],
+      "conditional_deps": 6,
+      "note": ""
+    },
+    "requirements-dev.txt": {
+      "category": "development",
+      "total_dependencies": 9,
+      "includes": [
+        "requirements.txt"
+      ],
+      "conditional_deps": 0,
+      "note": ""
+    },
+    "requirements-ci.txt": {
+      "category": "ci_cd",
+      "total_dependencies": 67,
+      "includes": [],
+      "conditional_deps": 0,
+      "note": ""
+    },
+    "requirements-updated.txt": {
+      "category": "updated_frozen",
+      "total_dependencies": 166,
+      "includes": [],
+      "conditional_deps": 0,
+      "note": "Frozen dependency snapshot with exact versions"
+    },
+    "requirements_claude_integration.txt": {
+      "category": "claude_integration",
+      "total_dependencies": 6,
+      "includes": [],
+      "conditional_deps": 1,
+      "note": ""
+    },
+    "requirements_bolt.txt": {
+      "category": "bolt_system",
+      "total_dependencies": 27,
+      "includes": [],
+      "conditional_deps": 4,
+      "note": ""
+    },
+    "bob/requirements.txt": {
+      "category": "bob_system",
+      "total_dependencies": 24,
+      "includes": [],
+      "conditional_deps": 0,
+      "note": ""
+    },
+    "tests/production/requirements-production-tests.txt": {
+      "category": "testing",
+      "total_dependencies": 18,
+      "includes": [],
+      "conditional_deps": 0,
+      "note": ""
+    },
+    "mcp-servers/statsource/requirements.txt": {
+      "category": "mcp_server",
+      "total_dependencies": 5,
+      "includes": [],
+      "conditional_deps": 0,
+      "note": ""
+    }
+  },
+  "categories": {
+    "core": [
+      "requirements.txt"
+    ],
+    "development": [
+      "requirements-dev.txt"
+    ],
+    "ci_cd": [
+      "requirements-ci.txt"
+    ],
+    "updated_frozen": [
+      "requirements-updated.txt"
+    ],
+    "claude_integration": [
+      "requirements_claude_integration.txt"
+    ],
+    "bolt_system": [
+      "requirements_bolt.txt"
+    ],
+    "bob_system": [
+      "bob/requirements.txt"
+    ],
+    "testing": [
+      "tests/production/requirements-production-tests.txt"
+    ],
+    "mcp_server": [
+      "mcp-servers/statsource/requirements.txt"
+    ]
+  },
+  "most_common_packages": [
+    [
+      "numpy",
+      6
+    ],
+    [
+      "pydantic",
+      6
+    ],
+    [
+      "pandas",
+      5
+    ],
+    [
+      "click",
+      5
+    ],
+    [
+      "rich",
+      5
+    ],
+    [
+      "pytest",
+      5
+    ],
+    [
+      "pytest-asyncio",
+      5
+    ],
+    [
+      "aiofiles",
+      5
+    ],
+    [
+      "httpx",
+      4
+    ],
+    [
+      "python-dotenv",
+      4
+    ],
+    [
+      "black",
+      4
+    ],
+    [
+      "psutil",
+      4
+    ],
+    [
+      "scipy",
+      3
+    ],
+    [
+      "duckdb",
+      3
+    ],
+    [
+      "tenacity",
+      3
+    ],
+    [
+      "mlx",
+      3
+    ],
+    [
+      "pyyaml",
+      3
+    ],
+    [
+      "cryptography",
+      3
+    ],
+    [
+      "python-dateutil",
+      3
+    ],
+    [
+      "pytz",
+      3
+    ]
+  ],
+  "version_conflicts": [
+    {
+      "package": "numpy",
+      "versions": [
+        "numpy>=1.26.4,<2.0",
+        "numpy",
+        "numpy>=1.24.0",
+        "numpy>=1.21.0,<2.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pandas",
+      "versions": [
+        "pandas>=1.3.0,<3.0.0",
+        "pandas>=2.2.3",
+        "pandas>=2.0.0",
+        "pandas"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "scipy",
+      "versions": [
+        "scipy",
+        "scipy>=1.14.0",
+        "scipy>=1.7.0,<2.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "databento",
+      "versions": [
+        "databento>=0.37.0",
+        "databento"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "yfinance",
+      "versions": [
+        "yfinance>=0.2.37",
+        "yfinance"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "fredapi",
+      "versions": [
+        "fredapi>=0.5.1",
+        "fredapi"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "duckdb",
+      "versions": [
+        "duckdb",
+        "duckdb>=0.9.0",
+        "duckdb>=0.10.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "pyarrow",
+      "versions": [
+        "pyarrow",
+        "pyarrow>=14.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "polars",
+      "versions": [
+        "polars",
+        "polars>=0.20.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "numexpr",
+      "versions": [
+        "numexpr",
+        "numexpr>=2.8.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "aiohttp",
+      "versions": [
+        "aiohttp>=3.10.11",
+        "aiohttp"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "httpx",
+      "versions": [
+        "httpx>=0.24.0",
+        "httpx>=0.24.0,<1.0.0",
+        "httpx>=0.27.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "tenacity",
+      "versions": [
+        "tenacity>=8.0.0,<9.0.0",
+        "tenacity>=8.2.0",
+        "tenacity"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "torch",
+      "versions": [
+        "torch>=2.0.0",
+        "torch>=2.4.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "mlx",
+      "versions": [
+        "mlx>=0.0.1",
+        "mlx>=0.15.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "opentelemetry-api",
+      "versions": [
+        "opentelemetry-api>=1.20.0",
+        "opentelemetry-api>=1.22.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "opentelemetry-sdk",
+      "versions": [
+        "opentelemetry-sdk>=1.20.0",
+        "opentelemetry-sdk>=1.22.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "pydantic",
+      "versions": [
+        "pydantic>=2.4.2,<3.0.0",
+        "pydantic>=2.0.0,<3.0.0",
+        "pydantic",
+        "pydantic>=2.0.0",
+        "pydantic>=2.7.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ]
+    },
+    {
+      "package": "pydantic-settings",
+      "versions": [
+        "pydantic-settings",
+        "pydantic-settings>=2.6.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "python-dotenv",
+      "versions": [
+        "python-dotenv",
+        "python-dotenv>=1.0.0",
+        "python-dotenv>=1.0.1",
+        "python-dotenv>=1.0.0,<2.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ]
+    },
+    {
+      "package": "pyyaml",
+      "versions": [
+        "pyyaml>=6.0",
+        "pyyaml>=6.0.2",
+        "pyyaml"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "click",
+      "versions": [
+        "click>=8.1.7",
+        "click>=8.1.0",
+        "click",
+        "click>=8.0.0,<9.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "rich",
+      "versions": [
+        "rich>=13.0.0",
+        "rich>=10.0.0,<14.0.0",
+        "rich>=13.5.0",
+        "rich",
+        "rich>=13.7.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "cryptography",
+      "versions": [
+        "cryptography",
+        "cryptography>=3.4.0,<42.0.0",
+        "cryptography>=45.0.4"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "python-dateutil",
+      "versions": [
+        "python-dateutil>=2.8.0,<3.0.0",
+        "python-dateutil",
+        "python-dateutil>=2.9.0.post0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "pytz",
+      "versions": [
+        "pytz>=2022.1",
+        "pytz>=2024.1",
+        "pytz"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "tzdata",
+      "versions": [
+        "tzdata>=2025.2",
+        "tzdata"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "joblib",
+      "versions": [
+        "joblib",
+        "joblib>=1.5.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "attrs",
+      "versions": [
+        "attrs",
+        "attrs>=25.3.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "cffi",
+      "versions": [
+        "cffi",
+        "cffi>=1.17.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "typing-extensions",
+      "versions": [
+        "typing-extensions>=4.14.0",
+        "typing-extensions"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "pytest",
+      "versions": [
+        "pytest>=8.0.0",
+        "pytest>=7.4.0",
+        "pytest>=7.0.0",
+        "pytest",
+        "pytest>=7.0.0,<8.0.0"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pytest-cov",
+      "versions": [
+        "pytest-cov>=4.1.0",
+        "pytest-cov"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pytest-asyncio",
+      "versions": [
+        "pytest-asyncio>=0.21.0,<1.0.0",
+        "pytest-asyncio>=0.21.0",
+        "pytest-asyncio>=0.23.0",
+        "pytest-asyncio"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pytest-mock",
+      "versions": [
+        "pytest-mock>=3.12.0",
+        "pytest-mock"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "ruff",
+      "versions": [
+        "ruff>=0.2.0",
+        "ruff"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "black",
+      "versions": [
+        "black>=24.2.0",
+        "black>=23.0.0",
+        "black>=22.0.0,<24.0.0",
+        "black"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "isort",
+      "versions": [
+        "isort",
+        "isort>=5.13.0"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "pre-commit",
+      "versions": [
+        "pre-commit>=3.6.0",
+        "pre-commit>=3.4.0"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "requests",
+      "versions": [
+        "requests>=2.31.0,<3.0.0",
+        "requests"
+      ],
+      "files": [
+        "requirements-ci.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ]
+    },
+    {
+      "package": "asyncio",
+      "versions": [
+        "asyncio",
+        "asyncio>=3.4.3"
+      ],
+      "files": [
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "aiofiles",
+      "versions": [
+        "aiofiles>=23.0.0",
+        "aiofiles",
+        "aiofiles>=0.7.0,<1.0.0"
+      ],
+      "files": [
+        "requirements-ci.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "psutil",
+      "versions": [
+        "psutil>=5.9.0",
+        "psutil",
+        "psutil>=5.8.0,<6.0.0"
+      ],
+      "files": [
+        "requirements-ci.txt",
+        "requirements_bolt.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "asyncio-mqtt",
+      "versions": [
+        "asyncio-mqtt>=0.13.0",
+        "asyncio-mqtt>=0.13.0,<1.0.0"
+      ],
+      "files": [
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "mypy",
+      "versions": [
+        "mypy>=1.0.0,<2.0.0",
+        "mypy>=1.5.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "py-spy",
+      "versions": [
+        "py-spy>=0.3.14",
+        "py-spy>=0.3.0,<1.0.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "memory-profiler",
+      "versions": [
+        "memory-profiler>=0.60.0,<1.0.0",
+        "memory-profiler>=0.61.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    }
+  ],
+  "version_patterns": {
+    "exact_pin": 166,
+    "minimum_version": 104,
+    "range_constraint": 29,
+    "no_version": 10
+  },
+  "platform_specific_packages": [
+    "torch",
+    "mlx",
+    "mlx-lm",
+    "quantlib",
+    "uvloop",
+    "cffi"
+  ],
+  "recommendations": [
+    {
+      "type": "file_consolidation",
+      "issue": "Multiple requirements files with overlapping dependencies",
+      "recommendation": "Consider consolidating related requirements files to reduce maintenance overhead"
+    },
+    {
+      "type": "version_strategy",
+      "issue": "Found 47 version conflicts across files",
+      "recommendation": "Standardize version specifications across all requirements files"
+    },
+    {
+      "type": "dependency_management",
+      "issue": "Mix of exact pins and range constraints",
+      "recommendation": "Use exact pins for production, range constraints for development"
+    }
+  ]
+}

@@ -1,0 +1,404 @@
+# Bolt System Configuration Template
+# This file provides a complete configuration example for the Bolt system
+# Copy this file to config.yaml and customize as needed
+#
+# Environment Variable Mapping:
+# Any configuration value can be overridden using environment variables
+# Format: BOLT_<SECTION>__<KEY> (double underscore separates sections)
+# Example: BOLT_AGENT_POOL__NUM_AGENTS=16
+
+# =============================================================================
+# SYSTEM CONFIGURATION
+# =============================================================================
+system:
+  name: "Bolt System"               # System name for identification
+  version: "1.0.0"                 # Configuration version
+  environment: "development"        # Environment: development, staging, production
+  
+  # System-wide settings
+  enable_debug: false               # Enable debug mode
+  enable_metrics: true              # Enable metrics collection
+  enable_tracing: true              # Enable distributed tracing
+
+# =============================================================================
+# AGENT POOL CONFIGURATION
+# =============================================================================
+agent_pool:
+  # Core agent settings
+  num_agents: 12                    # Number of agents (recommended: CPU cores)
+  min_agents: 4                     # Minimum number of agents
+  max_agents: 16                    # Maximum number of agents
+  
+  # Work stealing configuration
+  enable_work_stealing: true        # Enable work stealing between agents
+  steal_threshold: 0.2              # Threshold for work stealing (0.0-1.0)
+  max_steal_attempts: 4             # Maximum steal attempts per cycle
+  
+  # Batch processing
+  batch_size: 32                    # Default batch size for operations
+  batch_timeout_ms: 5               # Timeout for batch collection
+  
+  # Monitoring and rebalancing
+  monitor_interval_ms: 50           # Agent monitoring interval
+  rebalance_interval_ms: 1000       # Load rebalancing interval
+  proactive_stealing_interval_ms: 20 # Proactive stealing check interval
+
+# =============================================================================
+# TOKEN OPTIMIZATION CONFIGURATION
+# =============================================================================
+token_optimization:
+  # Dynamic token management
+  enable_dynamic_tokens: true       # Enable dynamic token allocation
+  enable_drift_compensation: true   # Compensate for context drift
+  max_context_size: 64000           # Maximum context size (tokens)
+  
+  # Token budgets by complexity level
+  complexity_budgets:
+    simple:
+      min_tokens: 1000              # Minimum tokens for simple tasks
+      target_tokens: 2000           # Target tokens for simple tasks
+      max_tokens: 3000              # Maximum tokens for simple tasks
+    moderate:
+      min_tokens: 4000              # Minimum tokens for moderate tasks
+      target_tokens: 6000           # Target tokens for moderate tasks
+      max_tokens: 8000              # Maximum tokens for moderate tasks
+    detailed:
+      min_tokens: 10000             # Minimum tokens for detailed tasks
+      target_tokens: 15000          # Target tokens for detailed tasks
+      max_tokens: 20000             # Maximum tokens for detailed tasks
+    exhaustive:
+      min_tokens: 25000             # Minimum tokens for exhaustive tasks
+      target_tokens: 40000          # Target tokens for exhaustive tasks
+      max_tokens: 50000             # Maximum tokens for exhaustive tasks
+
+# =============================================================================
+# CPU OPTIMIZATION CONFIGURATION
+# =============================================================================
+cpu_optimization:
+  # CPU optimization settings
+  enable_cpu_optimization: true     # Enable CPU optimization
+  enable_core_affinity: true        # Enable CPU core affinity
+  
+  # Hardware configuration (auto-detected if not specified)
+  total_cores: 12                   # Total CPU cores
+  p_cores: [0, 1, 2, 3, 4, 5, 6, 7] # Performance cores (Apple Silicon)
+  e_cores: [8, 9, 10, 11]           # Efficiency cores (Apple Silicon)
+  
+  # Load balancing
+  load_threshold: 0.8               # Load threshold for rebalancing
+  rebalance_interval_seconds: 1.0   # Rebalancing check interval
+  process_priority: -5              # Process priority (-20 to 19, lower = higher priority)
+
+# =============================================================================
+# MEMORY MANAGEMENT
+# =============================================================================
+memory:
+  # Memory limits
+  max_memory_usage_gb: 18.0         # Maximum memory usage (GB)
+  max_memory_usage_percent: 80.0    # Maximum memory usage (% of total)
+  
+  # Memory monitoring
+  enable_memory_monitoring: true    # Enable memory monitoring
+  memory_check_interval_ms: 1000    # Memory check interval
+  gc_threshold: 0.85                # Garbage collection threshold
+  
+  # Buffer management
+  buffer_allocation_size_mb: 16     # Buffer allocation size (MB)
+  max_buffer_pool_size_mb: 256      # Maximum buffer pool size (MB)
+
+# =============================================================================
+# PERFORMANCE CONFIGURATION
+# =============================================================================
+performance:
+  # Performance targets
+  target_cpu_utilization: 0.80     # Target CPU utilization (0.0-1.0)
+  target_tasks_per_second: 150.0   # Target task throughput
+  max_task_duration_seconds: 30.0  # Maximum task duration
+  
+  # Timeouts
+  initialization_timeout_seconds: 30 # Initialization timeout
+  shutdown_timeout_seconds: 10     # Shutdown timeout
+  task_timeout_seconds: 300        # Default task timeout
+  
+  # Queue management
+  max_queue_size: 1000              # Maximum task queue size
+  queue_timeout_ms: 100             # Queue operation timeout
+  
+  # Retry configuration
+  max_retry_attempts: 3             # Maximum retry attempts
+  retry_delay_ms: 1000              # Base retry delay
+  retry_backoff_multiplier: 2.0     # Exponential backoff multiplier
+
+# =============================================================================
+# HARDWARE ACCELERATION
+# =============================================================================
+hardware:
+  # GPU acceleration
+  enable_gpu: true                  # Enable GPU acceleration
+  gpu_memory_limit_gb: 8.0          # GPU memory limit
+  
+  # Apple-specific optimizations
+  enable_metal: true                # Enable Metal acceleration (macOS)
+  enable_mlx: true                  # Enable MLX acceleration (Apple Silicon)
+  
+  # Acceleration preferences
+  acceleration_preference: "auto"   # Options: auto, cpu, gpu, metal, mlx
+  fallback_on_error: true           # Fallback to CPU on acceleration errors
+
+# =============================================================================
+# INTEGRATION CONFIGURATION
+# =============================================================================
+integrations:
+  # System integrations
+  enable_einstein_integration: true # Enable Einstein system integration
+  enable_mcp_integration: true      # Enable MCP server integration
+  enable_trading_system_integration: true # Enable trading system integration
+  
+  # Integration timeouts
+  integration_timeout_seconds: 30   # Integration operation timeout
+  health_check_interval_seconds: 60 # Health check interval
+  
+  # Retry configuration for integrations
+  integration_retry_attempts: 3     # Retry attempts for failed integrations
+  integration_retry_delay_ms: 5000  # Retry delay for integrations
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+logging:
+  # Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"                     # Default log level
+  
+  # File logging
+  enable_file_logging: true         # Enable logging to file
+  log_file: "bolt.log"              # Log file name
+  log_directory: "./logs"           # Log directory
+  max_log_size_mb: 100              # Maximum log file size (MB)
+  backup_count: 5                   # Number of backup log files
+  
+  # Console logging
+  enable_console_logging: true      # Enable console logging
+  console_format: "detailed"        # Console format: simple, detailed, json
+  
+  # Specialized logging
+  enable_performance_logging: true  # Enable performance logging
+  enable_error_logging: true        # Enable error logging
+  enable_audit_logging: false       # Enable audit logging
+  
+  # Log rotation
+  rotation_policy: "size"           # Rotation policy: size, time, both
+  rotation_interval: "daily"        # Rotation interval: hourly, daily, weekly
+
+# =============================================================================
+# VALIDATION CONFIGURATION
+# =============================================================================
+validation:
+  # Validation thresholds
+  success_rate_threshold: 0.90      # Minimum success rate threshold
+  
+  # Validation types
+  enable_startup_validation: true   # Enable startup validation
+  enable_runtime_validation: true   # Enable runtime validation
+  enable_performance_validation: true # Enable performance validation
+  enable_integration_validation: true # Enable integration validation
+  
+  # Validation timeouts
+  validation_timeout_seconds: 60    # Validation timeout
+  health_check_timeout_seconds: 30  # Health check timeout
+  
+  # Validation behavior
+  fail_fast_on_validation_error: true # Fail fast on validation errors
+  continue_on_minor_errors: true     # Continue on minor validation errors
+
+# =============================================================================
+# ERROR HANDLING
+# =============================================================================
+error_handling:
+  # Graceful degradation
+  enable_graceful_degradation: true # Enable graceful degradation
+  degradation_levels: 3             # Number of degradation levels
+  
+  # Retry configuration
+  max_retry_attempts: 3             # Maximum retry attempts
+  retry_delay_seconds: 1.0          # Base retry delay
+  retry_backoff_factor: 2.0         # Exponential backoff factor
+  
+  # Circuit breaker
+  enable_circuit_breaker: true      # Enable circuit breaker
+  circuit_breaker_threshold: 5      # Circuit breaker failure threshold
+  circuit_breaker_timeout_seconds: 30 # Circuit breaker timeout
+  circuit_breaker_recovery_timeout: 60 # Circuit breaker recovery timeout
+  
+  # Error reporting
+  enable_error_reporting: true      # Enable error reporting
+  error_report_endpoint: null       # Error reporting endpoint (optional)
+
+# =============================================================================
+# MONITORING CONFIGURATION
+# =============================================================================
+monitoring:
+  # System monitoring
+  enable_system_monitoring: true    # Enable system monitoring
+  system_metrics_interval_seconds: 10 # System metrics collection interval
+  
+  # Performance monitoring
+  enable_performance_monitoring: true # Enable performance monitoring
+  performance_metrics_interval_seconds: 5 # Performance metrics interval
+  
+  # Resource monitoring
+  enable_resource_monitoring: true  # Enable resource monitoring
+  resource_metrics_interval_seconds: 30 # Resource metrics interval
+  
+  # Health checks
+  enable_health_checks: true        # Enable health checks
+  health_check_interval_seconds: 60 # Health check interval
+  
+  # Metrics storage
+  metrics_retention_days: 30        # Metrics retention period
+  enable_metrics_export: false      # Enable metrics export
+  metrics_export_endpoint: null     # Metrics export endpoint (optional)
+
+# =============================================================================
+# ACCELERATED TOOLS CONFIGURATION
+# =============================================================================
+accelerated_tools:
+  # Tool enablement
+  ripgrep_turbo: true               # Enable ripgrep turbo
+  dependency_graph: true            # Enable dependency graph turbo
+  python_analysis: true             # Enable python analysis turbo
+  duckdb_turbo: true                # Enable DuckDB turbo
+  trace_turbo: true                 # Enable tracing turbo
+  python_helpers: true              # Enable python helpers turbo
+  
+  # Tool-specific settings
+  ripgrep:
+    max_parallel_searches: 12       # Maximum parallel ripgrep searches
+    search_timeout_seconds: 30      # Search timeout
+    
+  dependency_graph:
+    max_parallel_analysis: 8        # Maximum parallel analysis
+    cache_size: 1000                # Cache size for dependency graph
+    
+  python_analysis:
+    enable_gpu_acceleration: true   # Enable GPU acceleration for analysis
+    batch_size: 64                  # Analysis batch size
+    
+  duckdb:
+    max_connections: 24             # Maximum DuckDB connections
+    connection_timeout_seconds: 30  # Connection timeout
+    
+  trace:
+    enable_all_backends: true       # Enable all tracing backends
+    buffer_size: 10000              # Trace buffer size
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+security:
+  # Authentication
+  enable_authentication: false     # Enable authentication (development default)
+  auth_token_expiry_hours: 24      # Authentication token expiry
+  
+  # Authorization
+  enable_authorization: false      # Enable authorization (development default)
+  default_permissions: ["read", "write"] # Default permissions
+  
+  # Data security
+  enable_data_encryption: false    # Enable data encryption at rest
+  encryption_algorithm: "AES256"   # Encryption algorithm
+  
+  # Network security
+  enable_tls: false                 # Enable TLS (development default)
+  tls_cert_path: null               # TLS certificate path
+  tls_key_path: null                # TLS private key path
+
+# =============================================================================
+# DEVELOPMENT CONFIGURATION
+# =============================================================================
+development:
+  # Debug settings
+  enable_debug_mode: false         # Enable debug mode
+  debug_log_level: "DEBUG"         # Debug log level
+  
+  # Testing settings
+  enable_test_mode: false          # Enable test mode
+  mock_external_services: false    # Mock external services
+  
+  # Profiling settings
+  enable_profiling: false          # Enable profiling
+  profiling_output_dir: "./profiles" # Profiling output directory
+  
+  # Hot reload
+  enable_hot_reload: false         # Enable hot reload (development)
+  watch_directories: ["./src"]     # Directories to watch for changes
+
+# =============================================================================
+# PRODUCTION OVERRIDES
+# =============================================================================
+# These settings are automatically applied when environment is set to "production"
+production_overrides:
+  # Security
+  security:
+    enable_authentication: true
+    enable_authorization: true
+    enable_data_encryption: true
+    enable_tls: true
+  
+  # Logging
+  logging:
+    level: "INFO"
+    enable_debug_logging: false
+    enable_audit_logging: true
+  
+  # Performance
+  performance:
+    target_cpu_utilization: 0.85
+    target_tasks_per_second: 200.0
+  
+  # Monitoring
+  monitoring:
+    enable_metrics_export: true
+    metrics_retention_days: 90
+  
+  # Error handling
+  error_handling:
+    enable_error_reporting: true
+    max_retry_attempts: 5
+
+# =============================================================================
+# ENVIRONMENT VARIABLE EXAMPLES
+# =============================================================================
+# The following environment variables can be used to override any configuration:
+#
+# # System configuration
+# export BOLT_SYSTEM__ENVIRONMENT=production
+# export BOLT_SYSTEM__ENABLE_DEBUG=false
+#
+# # Agent pool configuration
+# export BOLT_AGENT_POOL__NUM_AGENTS=16
+# export BOLT_AGENT_POOL__BATCH_SIZE=64
+# export BOLT_AGENT_POOL__ENABLE_WORK_STEALING=true
+#
+# # CPU optimization
+# export BOLT_CPU_OPTIMIZATION__ENABLE_CPU_OPTIMIZATION=true
+# export BOLT_CPU_OPTIMIZATION__TOTAL_CORES=16
+#
+# # Memory management
+# export BOLT_MEMORY__MAX_MEMORY_USAGE_GB=32.0
+# export BOLT_MEMORY__GC_THRESHOLD=0.9
+#
+# # Performance targets
+# export BOLT_PERFORMANCE__TARGET_CPU_UTILIZATION=0.85
+# export BOLT_PERFORMANCE__TARGET_TASKS_PER_SECOND=200.0
+#
+# # Hardware acceleration
+# export BOLT_HARDWARE__ENABLE_GPU=true
+# export BOLT_HARDWARE__ENABLE_MLX=true
+#
+# # Logging
+# export BOLT_LOGGING__LEVEL=INFO
+# export BOLT_LOGGING__ENABLE_FILE_LOGGING=true
+#
+# # Accelerated tools
+# export BOLT_ACCELERATED_TOOLS__RIPGREP_TURBO=true
+# export BOLT_ACCELERATED_TOOLS__DEPENDENCY_GRAPH=true

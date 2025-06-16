@@ -9,7 +9,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import databento as db
 import duckdb
 import pandas as pd
 
@@ -17,14 +16,16 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -79,9 +80,9 @@ class UnityOptionsCorrectDownloader:
         logger.info("=" * 60)
         logger.info("DOWNLOADING UNITY OPTIONS DATA - CORRECT METHOD")
         logger.info("=" * 60)
-        logger.info(f"Dataset: OPRA.PILLAR")
-        logger.info(f"Schema: ohlcv-1d (daily candles)")
-        logger.info(f"Symbol: U.OPT (using parent symbol)")
+        logger.info("Dataset: OPRA.PILLAR")
+        logger.info("Schema: ohlcv-1d (daily candles)")
+        logger.info("Symbol: U.OPT (using parent symbol)")
         logger.info(f"Date range: {START} to {END} (exclusive)")
         logger.info("=" * 60)
 
@@ -182,10 +183,18 @@ class UnityOptionsCorrectDownloader:
                                 expiration,
                                 strike,
                                 option_type,
-                                float(row.get("open", 0)) / 1e9 if row.get("open") else None,
-                                float(row.get("high", 0)) / 1e9 if row.get("high") else None,
-                                float(row.get("low", 0)) / 1e9 if row.get("low") else None,
-                                float(row.get("close", 0)) / 1e9 if row.get("close") else None,
+                                float(row.get("open", 0)) / 1e9
+                                if row.get("open")
+                                else None,
+                                float(row.get("high", 0)) / 1e9
+                                if row.get("high")
+                                else None,
+                                float(row.get("low", 0)) / 1e9
+                                if row.get("low")
+                                else None,
+                                float(row.get("close", 0)) / 1e9
+                                if row.get("close")
+                                else None,
                                 row.get("volume", 0),
                             ),
                         )
@@ -228,7 +237,7 @@ class UnityOptionsCorrectDownloader:
         ).fetchone()
 
         if stats and stats[0] > 0:
-            logger.info(f"\nData Coverage:")
+            logger.info("\nData Coverage:")
             logger.info(f"  Trading days with data: {stats[0]}")
             logger.info(f"  Unique option contracts: {stats[1]:,}")
             logger.info(f"  Total records: {stats[2]:,}")
@@ -240,12 +249,18 @@ class UnityOptionsCorrectDownloader:
                 end = datetime.strptime(str(stats[4]), "%Y-%m-%d")
                 total_days = (end - start).days + 1
                 weekdays = sum(
-                    1 for i in range(total_days) if (start + timedelta(days=i)).weekday() < 5
+                    1
+                    for i in range(total_days)
+                    if (start + timedelta(days=i)).weekday() < 5
                 )
                 coverage = (stats[0] / weekdays) * 100 if weekdays > 0 else 0
 
                 logger.info(f"  Coverage: {coverage:.1f}% of weekdays")
-                logger.info(f"  Total volume: {stats[5]:,}" if stats[5] else "  Total volume: N/A")
+                logger.info(
+                    f"  Total volume: {stats[5]:,}"
+                    if stats[5]
+                    else "  Total volume: N/A"
+                )
                 logger.info(
                     f"  Average daily volume: {stats[8]:.0f}"
                     if stats[8]
@@ -272,10 +287,14 @@ class UnityOptionsCorrectDownloader:
 
             if daily_coverage:
                 logger.info("  Recent days (newest first):")
-                logger.info(f"  {'Date':<12} {'Total Options':<15} {'Traded':<10} {'Volume':<10}")
+                logger.info(
+                    f"  {'Date':<12} {'Total Options':<15} {'Traded':<10} {'Volume':<10}"
+                )
                 logger.info(f"  {'-'*12} {'-'*15} {'-'*10} {'-'*10}")
                 for date, total, traded, volume in daily_coverage:
-                    logger.info(f"  {str(date):<12} {total:<15,} {traded:<10,} {volume or 0:<10,}")
+                    logger.info(
+                        f"  {str(date):<12} {total:<15,} {traded:<10,} {volume or 0:<10,}"
+                    )
 
             # Monthly summary
             logger.info("\nMonthly Summary:")
@@ -294,10 +313,14 @@ class UnityOptionsCorrectDownloader:
             ).fetchall()
 
             if monthly:
-                logger.info(f"  {'Month':<10} {'Days':<6} {'Records':<12} {'Unique Options':<15}")
+                logger.info(
+                    f"  {'Month':<10} {'Days':<6} {'Records':<12} {'Unique Options':<15}"
+                )
                 logger.info(f"  {'-'*10} {'-'*6} {'-'*12} {'-'*15}")
                 for month, days, records, options in monthly:
-                    logger.info(f"  {month:<10} {days:<6} {records:<12,} {options:<15,}")
+                    logger.info(
+                        f"  {month:<10} {days:<6} {records:<12,} {options:<15,}"
+                    )
 
             # Sample recent options
             logger.info("\nSample Recent Options (with volume):")
@@ -318,13 +341,19 @@ class UnityOptionsCorrectDownloader:
                         f"  {date} {symbol}: ${strike} {otype} close={close_str} vol={volume:,}"
                     )
 
-            logger.info("\n✅ Unity options data successfully downloaded using CORRECT method")
+            logger.info(
+                "\n✅ Unity options data successfully downloaded using CORRECT method"
+            )
             logger.info("✅ Used parent symbol 'U' to get ALL Unity options")
-            logger.info("✅ All data is REAL from Databento OPRA feed - NO SYNTHETIC DATA")
+            logger.info(
+                "✅ All data is REAL from Databento OPRA feed - NO SYNTHETIC DATA"
+            )
 
             # Check if we got better coverage than before
             if stats[0] > 26:
-                logger.info(f"✅ SUCCESS: Got {stats[0]} days of data (vs only 26 before)")
+                logger.info(
+                    f"✅ SUCCESS: Got {stats[0]} days of data (vs only 26 before)"
+                )
             else:
                 logger.warning(
                     f"⚠️  Still only {stats[0]} days - Unity options may have limited trading"

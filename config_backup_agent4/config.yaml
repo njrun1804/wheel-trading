@@ -1,0 +1,511 @@
+# Wheel Trading Configuration - Aggressive Unity Edition v1.1
+#
+# This configuration is optimized for aggressive Unity (U) wheel trading with:
+# - Higher risk tolerance (15% VaR, 25% CVaR)
+# - Wider strike ranges (70-110% moneyness)
+# - Faster data refresh (5 min options cache)
+# - Unity-specific parameters (earnings, gaps, correlations)
+# - ML enabled for edge detection
+# - Position sizes up to 40% per trade
+#
+# All parameters for the Unity (U) wheel strategy system
+# Environment variables can override any value using WHEEL_ prefix
+# Example: WHEEL_STRATEGY__DELTA_TARGET=0.25 overrides strategy.delta_target
+
+# Dynamic optimization parameters
+optimization:
+  # Enable dynamic parameter adjustment (vs static)
+  enabled: true
+  # Optimization mode: 'dynamic' or 'tiered'
+  mode: 'dynamic'
+  # Minimum confidence score to use optimized parameters - very low
+  min_confidence: 0.20
+  # Lookback period for volatility calculations
+  volatility_lookback: 20
+  # History required for optimization
+  min_history_days: 250
+  # Bounds for dynamic parameters
+  bounds:
+    delta_min: 0.10
+    delta_max: 0.40
+    dte_min: 21
+    dte_max: 49
+    kelly_min: 0.10
+    kelly_max: 0.50
+
+# Strategy parameters (used as fallback if optimization disabled)
+strategy:
+  # Target delta for short puts (0-1)
+  delta_target: 0.30
+  # Target days to expiry
+  days_to_expiry_target: 35
+  # Minimum days to expiry before considering roll
+  min_days_to_expiry: 7   # Can hold much closer to expiry
+  # Maximum delta for short puts
+  max_delta_short_put: 0.45  # Sell higher delta for more premium
+  # Strike selection intervals
+  strike_intervals: [1.0, 2.5, 5.0]
+  # Strike range filters - adjusted for Unity's wider strikes
+  strike_range:
+    min_moneyness: 0.70  # 70% of spot price (30% OTM) - Unity has liquid strikes here
+    max_moneyness: 1.10  # 110% of spot price
+  # Position sizing parameters - capture all opportunities
+  min_premium_yield: 0.005  # 0.5% minimum - don't miss small wins
+  # Roll triggers - take profits quickly
+  roll_triggers:
+    # Roll when profit target reached
+    profit_target_percent: 0.25     # Take quick 25% wins
+    # Roll when delta breached
+    delta_breach_threshold: 0.70
+    # Roll when DTE below minimum
+    dte_threshold: 5                # Hold closer to expiry
+    # Additional roll thresholds
+    profit_threshold_1: 0.25  # Quick 25% profit trigger
+    profit_threshold_2: 0.50  # 50% for bigger wins
+
+# Risk management parameters
+risk:
+  # Maximum position size as fraction of portfolio
+  # User preference: 100% allocation allowed (no cash reserve requirement)
+  max_position_size: 1.00
+  # Maximum margin utilization
+  # Aggressive but with safety buffer
+  max_margin_percent: 0.85
+  # Maximum drawdown before halting
+  max_drawdown_percent: 0.50  # Increased for aggressive strategy
+  # CVaR percentile for risk calculations
+  cvar_percentile: 0.95
+  # Risk weight in objective function (CAGR - λ * |CVaR|)
+  objective_risk_weight: 0.20
+  # Kelly criterion fraction (0.5 = Half-Kelly)
+  kelly_fraction: 0.50
+  # Value at Risk limits - aggressive settings for Unity
+  limits:
+    max_var_95: 0.15  # 15% VaR limit - Unity can move 10%+ daily
+    max_cvar_95: 0.25  # 25% CVaR limit - accept tail risk
+    max_kelly_fraction: 0.75  # 75% Kelly - aggressive but not full Kelly
+    # Greek limits moved to greeks section below to avoid duplication
+    max_contracts_per_trade: 1000  # High limit - let position sizing determine
+    max_notional_percent: 1.50  # 150% notional - reasonable margin usage
+
+  # Greek limits for risk management - SINGLE SOURCE OF TRUTH
+  greeks:
+    max_delta_exposure: 200.0       # Maximum delta exposure
+    max_gamma_exposure: 50.0        # Maximum gamma exposure
+    max_vega_exposure: 5000.0       # Maximum vega exposure ($)
+    max_theta_decay: 500.0          # Maximum daily theta decay
+    max_rho_exposure: 1000.0        # Maximum rho exposure
+
+  # Margin and leverage limits
+  margin:
+    max_utilization: 0.85           # Match max_margin_percent above
+    safety_factor: 0.80             # 80% of available margin
+    margin_requirement: 0.20        # Simplified 20% margin requirement
+    margin_multiplier: 0.50         # Safety multiplier for margin
+
+  # Circuit breakers - adjusted for Unity's volatility
+  circuit_breakers:
+    # Position-level circuit breakers - aligned with max_position_size
+    max_position_pct: 1.00          # No artificial cap - let volatility scaling handle safety
+    max_contracts: 100              # Align with contracts_per_trade
+    min_portfolio_value: 10000      # Stop trading below this
+
+    # Market condition circuit breakers - Unity specific
+    max_volatility: 2.0             # 200% annual vol - Unity can hit this
+    max_gap_percent: 0.15           # 15% gap - Unity gaps 10%+ on news
+    min_volume_ratio: 0.3           # 30% of normal - Unity volume varies widely
+
+    # Loss circuit breakers - match Unity's volatility
+    max_daily_loss_pct: 0.15        # 15% daily loss - Unity can drop and recover
+    max_weekly_loss_pct: 0.25       # 25% weekly loss - appropriate for Unity
+    max_consecutive_losses: 10      # Unity streaks can be long
+
+    # System health circuit breakers
+    min_confidence: 0.25            # Trade with lower confidence
+    max_warnings: 5                 # Allow more warnings
+    blackout_hours: []              # Hours to avoid trading (24h format)
+
+  # Adaptive limits - smart adjustments based on conditions
+  adaptive_limits:
+    # Enable adaptive parameter adjustment
+    enabled: true
+
+    # Base values that can be scaled
+    base_max_position_pct: 1.00     # No artificial base limit - volatility scaling provides safety
+    base_min_confidence: 0.30       # Raises in uncertain markets
+
+    # Scaling features
+    volatility_scaling: true        # Reduce size in high vol
+    confidence_scaling: true        # Reduce size with low confidence
+    performance_scaling: true       # Reduce after losses
+    regime_scaling: true            # Adjust by market regime
+
+    # ML integration
+    ml_blend_max: 0.80             # Max 80% weight to ML recommendations
+    ml_confidence_threshold: 0.60   # Min confidence to use ML
+
+# Market data parameters
+data:
+  # Cache time-to-live in seconds - reduced for Unity's rapid changes
+  cache_ttl:
+    options_chain: 300      # 5 minutes - Unity options reprice quickly
+    stock_quotes: 30        # 30 seconds - Unity is volatile
+    volatility: 300         # 5 minutes - IV changes rapidly
+    greeks: 60              # 1 minute - critical for risk management
+    account_data: 30        # 30 seconds
+    historical: 86400       # 1 day
+    market_data: 30         # 30 seconds - Unity moves fast
+    intraday: 300           # 5 minutes for intraday data
+  # API timeout settings
+  api_timeouts:
+    connect: 5.0
+    read: 30.0
+    write: 10.0
+    total: 60.0
+  # Retry configuration
+  retry:
+    max_attempts: 3                 # Maximum retry attempts
+    delays: [1, 2, 5]               # Exponential backoff delays (seconds)
+    rate_limit_wait: 60             # Wait after rate limit (seconds)
+  # Data quality thresholds - realistic for Unity options
+  quality:
+    stale_data_seconds: 30          # Options don't reprice that fast
+    min_confidence_score: 0.30      # Low bar - let risk sizing handle safety
+    max_spread_pct: 10.0            # Unity spreads widen in volatility
+    min_quote_size: 1               # Minimum quote size
+    max_price_change_pct: 50.0      # Unity can move 20%+ on news
+    min_options_per_expiry: 5       # Some expirations are thin
+    stale_data_minutes: 10          # More tolerance
+    min_liquidity:
+      volume: 10                    # Unity options often <100 volume
+      open_interest: 25             # Many valid strikes have low OI
+      bid_size: 1                   # Accept any bid
+      max_bid_ask_spread: 0.50      # MAXIMUM spread allowed
+
+# Databento configuration
+databento:
+  # Data filtering parameters - capture all opportunities
+  filters:
+    moneyness_range: 0.35           # 35% around spot - capture far OTM premium
+    max_expirations: 6              # Keep 6 expirations - more opportunities
+    min_volume: 1                   # At least SOME volume required
+
+  # Storage configuration
+  storage:
+    local_retention_days: 30        # Keep 30 days locally
+    compression: true               # Enable compression
+    partitioning: "daily"           # Partition by day
+
+  # Rate limits (provider-specific, don't change)
+  rate_limits:
+    max_concurrent_live: 10         # Max concurrent live connections
+    max_historical_rps: 100         # Max requests per second for historical
+    max_symbols_per_request: 2000   # Max symbols per request
+    max_file_size_gb: 2             # Max file size in GB
+
+  # Data loader configuration
+  loader:
+    max_workers: 12                 # Parallel processing workers (M4 Pro)
+    chunk_size: 250                 # Symbols per chunk
+    max_requests_per_second: 100    # Rate limit
+    retry_delays: [1, 2, 5, 10]     # Retry delays in seconds
+    required_days: 750              # Required historical days
+    minimum_days: 500               # Minimum acceptable days
+
+# Trading environment
+trading:
+  # Mode: live, paper, or backtest
+  mode: paper
+  # Broker settings
+  broker:
+    name: none
+    api_key: ""  # Set via WHEEL_TRADING__BROKER__API_KEY env var
+    api_secret: ""  # Set via WHEEL_TRADING__BROKER__API_SECRET env var
+  # Market hours (Eastern Time)
+  market_hours:
+    open: "09:30:00"
+    close: "16:00:00"
+    pre_market_open: "07:00:00"
+    after_hours_close: "20:00:00"
+  # Trading execution parameters
+  execution:
+    commission_per_contract: 0.65   # Commission per options contract
+    contracts_per_trade: 1          # Minimal default, dynamic sizing applied
+    max_concurrent_puts: 10         # Allow many positions across strikes/dates
+
+# Unity-specific settings
+unity:
+  ticker: "U"
+  company_name: "Unity Software Inc."
+  # Typical implied volatility characteristics - updated for reality
+  volatility:
+    typical_range: [0.50, 1.20]    # Unity regularly exceeds 100% IV
+    average: 0.75                   # Higher average for Unity
+    # Volatility regime thresholds
+    regimes:
+      low: 0.50                     # Low vol for Unity is 50%
+      normal: 0.75                  # Normal is 75%
+      high: 1.00                    # High is 100%
+      extreme: 1.50                 # Can hit 150% in crises
+  # Earnings behavior - Unity moves big
+  earnings:
+    typical_move_pct: 0.20          # ±20% moves on earnings
+    blackout_days_before: 2         # Trade up to 2 days before - capture IV expansion
+    iv_expansion_factor: 1.5        # IV expands 50% into earnings
+  # Gap behavior - Unity gaps frequently
+  gap_behavior:
+    typical_overnight_move: 0.05    # 5% overnight moves common
+    max_acceptable_gap: 0.15        # Don't trade after >15% gaps
+    gap_recovery_hours: 48          # Wait 48 hours after major gaps
+  # Market correlations
+  correlations:
+    qqq_correlation: 0.65           # Tracks tech sector
+    vix_sensitivity: 1.5            # 1.5x beta to volatility
+    sector_etfs: ["GAMR", "METV", "XLC"]  # Gaming/metaverse/communication
+
+# Adaptive system configuration
+adaptive:
+  # Regime detection parameters
+  regime_persistence_days: 3        # Days to confirm regime change
+
+  # Base position sizing - let market determine limits
+  base_position_pct: 0.25          # 25% base position size
+  max_position_pct: 1.00           # No artificial cap - let risk modeling limit naturally
+
+  # Volatility-based position sizing factors - natural risk-based scaling
+  volatility_factors:
+    low: 3.00      # <50% vol: 300% of base - capture rare low vol opportunity
+    normal: 1.00   # 50-75% vol: 100% of base - standard
+    high: 0.40     # 75-100% vol: 40% of base - significant risk reduction
+    extreme: 0.10  # >100% vol: 10% of base - minimal exposure
+
+  # Volatility thresholds for position sizing - Unity specific
+  volatility_thresholds:
+    low: 0.50      # Low vol for Unity is 50%
+    normal: 0.75   # Normal is 75%
+    high: 1.00     # High is 100%
+    extreme: 1.50  # Extreme is 150%
+
+  # Per-regime parameters
+  regime_params:
+    normal:
+      put_delta: 0.30               # Target delta for puts
+      target_dte: 35                # Days to expiration
+      roll_profit_target: 0.50      # Roll at 50% profit
+      position_size_factor: 1.0     # 100% of base size
+
+    volatile:
+      put_delta: 0.25               # Lower delta in volatile markets
+      target_dte: 28                # Shorter duration
+      roll_profit_target: 0.25      # Take profits quickly
+      position_size_factor: 0.7     # 70% of base size
+
+    stressed:
+      put_delta: 0.20               # Much lower delta
+      target_dte: 21                # Shortest duration
+      roll_profit_target: 0.25      # Quick profits
+      position_size_factor: 0.5     # 50% of base size
+
+    low_volatility:
+      put_delta: 0.35               # Higher delta for more premium
+      target_dte: 42                # Longer duration
+      roll_profit_target: 0.50      # Standard profit target
+      position_size_factor: 1.2     # 120% of base size (opportunity)
+
+  # Stop conditions for adaptive system - maximize opportunity
+  stop_conditions:
+    max_volatility: 3.0             # Keep trading even in extreme volatility
+    max_drawdown: 0.50              # Allow 50% drawdown - Unity recovers
+    min_days_to_earnings: 2         # Trade up to 2 days before earnings
+
+  # Outcome tracking database
+  outcome_tracking:
+    enabled: true
+    database_path: "~/.wheel_trading/wheel_outcomes.db"
+    retention_days: 365             # Keep 1 year of outcomes
+
+# Machine learning settings
+ml:
+  # ML components exist but aren't actively used - system uses rules-based approach
+  enabled: false
+  # Model storage path
+  model_path: "./models/"
+  # Feature flags - available but not implemented
+  features:
+    use_iv_rank: true
+    use_iv_skew: true
+    use_realized_vol: true
+    use_macro_factors: false       # Not implemented
+    use_sentiment: false           # Not implemented
+  # Model parameters
+  models:
+    # Probability adjustment model
+    probability_model:
+      type: "gradient_boost"
+      retrain_days: 30
+      min_samples: 1000
+    # Volatility forecast model
+    volatility_model:
+      type: "garch"
+      lookback_days: 252
+
+# Analytics configuration
+analytics:
+  # IV surface parameters
+  iv_surface:
+    lookback_days: 252              # 1 year of history
+    min_history: 30                 # Minimum days required
+    default_iv_rank: 50.0           # Default when unavailable
+    default_half_life: 30.0         # Default decay rate
+
+  # Seasonality analysis
+  seasonality:
+    min_samples: 10                 # Minimum samples per period
+    min_years: 2                    # Minimum years of data
+
+  # Performance tracker
+  performance_tracker:
+    database_path: "~/.wheel_trading/performance.db"
+    track_all_decisions: true
+
+  # Dynamic optimization
+  dynamic_optimization:
+    cvar_penalty: 0.20              # CVaR penalty in objective
+    base_kelly: 0.50                # Half-Kelly base
+
+# Operational settings
+operations:
+  # Logging configuration
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    format: "json"  # json or text
+    file: "./logs/wheel_trading.log"
+    rotation: "daily"
+    retention_days: 30
+  # Alert thresholds
+  alerts:
+    # Alert when margin utilization exceeds
+    margin_warning_percent: 0.40
+    # Alert when position delta exceeds
+    delta_warning: 0.40
+    # Alert when unrealized loss exceeds
+    loss_warning_percent: 0.10
+  # Performance tracking
+  performance:
+    track_decisions: true
+    track_parameters: true
+    export_format: "csv"  # csv or json
+    export_path: "./data/performance/"
+  # API parameters - maximize opportunities
+  api:
+    max_concurrent_puts: 10         # Many positions across strikes/dates
+    max_position_pct: 1.00          # No artificial cap - risk modeling decides
+    min_confidence: 0.25            # Very low - trust position sizing to manage risk
+    max_decision_time: 1.0          # 1 second - Unity needs analysis time
+    max_bid_ask_spread: 0.50        # MAXIMUM spread (was min_bid_ask_spread - backwards!)
+    min_volume: 10                  # Unity options often thin
+    min_open_interest: 50           # Many good Unity strikes have 50-150 OI
+
+# Backtesting configuration
+backtest:
+  # Start date for backtests
+  start_date: "2023-01-01"
+  # End date (null for current date)
+  end_date: null
+  # Initial capital
+  initial_capital: 100000
+  # Commission per contract
+  commission_per_contract: 0.65
+  # Slippage model
+  slippage:
+    type: "fixed"  # fixed or proportional
+    value: 0.05  # $0.05 per contract or 0.05%
+
+# System configuration
+system:
+  # Performance targets and SLAs
+  performance:
+    max_decision_time_ms: 300       # Allow more time for complex Unity decisions
+    max_memory_mb: 1024             # Unity data needs more memory
+    # Operation-specific SLAs (milliseconds)
+    sla:
+      black_scholes_ms: 50          # Black-Scholes calculation
+      greeks_ms: 100                # Greeks calculation
+      risk_metrics_ms: 300          # More complex risk for Unity
+      decision_ms: 750              # Total decision time - Unity needs analysis
+      api_call_ms: 5000             # External API calls
+      event_analysis_ms: 50         # Unity events more complex
+      iv_calculation_ms: 20         # IV harder with wide strikes
+    # Monitoring configuration
+    monitoring:
+      metrics_retention_days: 90    # Keep metrics for 90 days
+      alert_threshold_pct: 200      # Alert if >200% of SLA - Unity is complex
+      sample_rate: 0.2              # Sample 20% - need more data
+  # Health checks
+  health_checks:
+    - math_library_sanity
+    - configuration_validity
+    - type_consistency
+    - data_connectivity
+    - risk_limits_valid
+  # Feature flags
+  features:
+    enable_diagnostics: true
+    enable_self_tuning: false      # Rules-based, not ML tuning
+    enable_config_tracking: true
+    enable_auto_recovery: true
+  # Storage paths
+  storage:
+    databases:
+      performance: "~/.wheel_trading/performance.db"
+      cache: "~/.wheel_trading/cache/wheel_cache.duckdb"
+    backup_interval_hours: 24
+
+# Authentication configuration
+auth:
+  # OAuth credentials (set via environment variables for security)
+  # WHEEL_AUTH__CLIENT_ID and WHEEL_AUTH__CLIENT_SECRET
+  client_id: null
+  client_secret: null
+
+  # OAuth endpoints
+  redirect_uri: "http://localhost:8182/callback"
+  auth_url: ""
+  token_url: ""
+  scope: "AccountsRead MarketDataRead"
+
+  # Token management
+  auto_refresh: true
+  token_refresh_buffer_minutes: 5
+
+  # Cache settings
+  enable_cache: true
+  cache_ttl_seconds: 3600  # 1 hour
+  cache_max_size_mb: 100
+
+  # Rate limiting
+  rate_limit_rps: 10.0
+  rate_limit_burst: 20
+  enable_circuit_breaker: true
+  circuit_breaker_threshold: 5
+  circuit_breaker_recovery_seconds: 60
+
+  # Retry settings
+  max_retry_attempts: 3
+  retry_backoff_factor: 2.0
+
+# Configuration metadata
+metadata:
+  version: "1.1.0"  # Updated for aggressive Unity configuration
+  last_updated: "2025-01-06"
+  environment: "production"  # Ready for aggressive trading
+  # Parameter tracking
+  tracking:
+    # Track which parameters affect outcomes
+    track_usage: true
+    # Suggest parameter adjustments
+    suggest_tuning: true
+    # Warn about unused parameters
+    warn_unused: true
+    # Auto-disable broken features
+    auto_disable_broken: true

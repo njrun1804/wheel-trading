@@ -5,10 +5,9 @@ Main authentication client with automatic token management.
 """
 
 import asyncio
-import time
-from datetime import datetime
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 import aiohttp
 
@@ -17,6 +16,7 @@ from unity_wheel.storage.auth_storage import SecureTokenStorage
 # Cache functionality handled by AuthCache, not general cache
 from unity_wheel.storage.cache.auth_cache import AuthCache
 from unity_wheel.utils.logging import get_logger
+
 from .exceptions import (
     AuthError,
     InvalidCredentialsError,
@@ -98,7 +98,7 @@ class AuthClient:
         client_id: str,
         client_secret: str,
         redirect_uri: str = "https://127.0.0.1:8182/callback",
-        storage_path: Optional[str] = None,
+        storage_path: str | None = None,
         auto_refresh: bool = True,
         enable_cache: bool = True,
         cache_ttl: int = 3600,
@@ -128,16 +128,17 @@ class AuthClient:
             client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri
         )
 
-        self._access_token: Optional[str] = None
+        self._access_token: str | None = None
         self._token_lock = asyncio.Lock()
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: aiohttp.ClientSession | None = None
         self._rate_limit_remaining = 100
         self._rate_limit_reset = 0
 
         # Initialize cache and rate limiter
         self.cache = AuthCache(default_ttl=cache_ttl) if enable_cache else None
         self.rate_limiter = RateLimiter(
-            requests_per_second=rate_limit_rps, enable_circuit_breaker=enable_circuit_breaker
+            requests_per_second=rate_limit_rps,
+            enable_circuit_breaker=enable_circuit_breaker,
         )
 
     async def __aenter__(self):
@@ -197,7 +198,9 @@ class AuthClient:
             auth_code = await self.oauth_handler.authorize()
 
             # Exchange code for tokens
-            token_response = await self.oauth_handler.exchange_code_for_tokens(auth_code)
+            token_response = await self.oauth_handler.exchange_code_for_tokens(
+                auth_code
+            )
 
             # Store tokens
             self.storage.save_tokens(
@@ -210,7 +213,11 @@ class AuthClient:
 
             self._access_token = token_response["access_token"]
 
-            logger.info("authenticate", status="success", expires_in=token_response["expires_in"])
+            logger.info(
+                "authenticate",
+                status="success",
+                expires_in=token_response["expires_in"],
+            )
 
         except (ValueError, KeyError, AttributeError) as e:
             logger.error("authenticate", error=str(e))
@@ -243,7 +250,9 @@ class AuthClient:
                     access_token=token_response["access_token"],
                     refresh_token=token_response.get(
                         "refresh_token",
-                        token_data["refresh_token"],  # Some providers reuse refresh token
+                        token_data[
+                            "refresh_token"
+                        ],  # Some providers reuse refresh token
                     ),
                     expires_in=token_response["expires_in"],
                     scope=token_response.get("scope", token_data.get("scope", "")),
@@ -252,12 +261,16 @@ class AuthClient:
                 self._access_token = token_response["access_token"]
 
                 logger.info(
-                    "refresh_token", status="success", expires_in=token_response["expires_in"]
+                    "refresh_token",
+                    status="success",
+                    expires_in=token_response["expires_in"],
                 )
 
             except (ValueError, KeyError, AttributeError) as e:
                 logger.error("refresh_token", error=str(e))
-                raise InvalidCredentialsError(f"Token refresh failed: {e}. Please re-authenticate.")
+                raise InvalidCredentialsError(
+                    f"Token refresh failed: {e}. Please re-authenticate."
+                )
 
     async def validate_token(self) -> bool:
         """Validate current token with a test API call."""
@@ -275,7 +288,9 @@ class AuthClient:
                     return True
                 else:
                     logger.warning(
-                        "validate_token", status_code=response.status, reason=response.reason
+                        "validate_token",
+                        status_code=response.status,
+                        reason=response.reason,
                     )
                     return False
 
@@ -283,14 +298,17 @@ class AuthClient:
             logger.error("validate_token", error=str(e))
             raise NetworkError(f"Failed to validate token: {e}")
 
-    def _get_auth_headers(self) -> Dict[str, str]:
+    def _get_auth_headers(self) -> dict[str, str]:
         """Get authorization headers for API requests."""
         if not self._access_token:
             raise InvalidCredentialsError("No access token available")
 
-        return {"Authorization": f"Bearer {self._access_token}", "Accept": "application/json"}
+        return {
+            "Authorization": f"Bearer {self._access_token}",
+            "Accept": "application/json",
+        }
 
-    def _update_rate_limits(self, headers: Dict[str, str]) -> None:
+    def _update_rate_limits(self, headers: dict[str, str]) -> None:
         """Update rate limit tracking from response headers."""
         if "X-RateLimit-Remaining" in headers:
             self._rate_limit_remaining = int(headers["X-RateLimit-Remaining"])
@@ -303,9 +321,9 @@ class AuthClient:
         method: str,
         url: str,
         use_cache: bool = True,
-        cache_ttl: Optional[int] = None,
+        cache_ttl: int | None = None,
         **kwargs,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Make authenticated API request with automatic retry and token refresh.
 
         Args:
@@ -341,7 +359,9 @@ class AuthClient:
         headers.update(self._get_auth_headers())
 
         try:
-            async with self._session.request(method, url, headers=headers, **kwargs) as response:
+            async with self._session.request(
+                method, url, headers=headers, **kwargs
+            ) as response:
                 # Update rate limits
                 self._update_rate_limits(dict(response.headers))
 
@@ -352,7 +372,9 @@ class AuthClient:
                 elif response.status == 429:
                     self.rate_limiter.report_failure(is_rate_limit=True)
                     retry_after = response.headers.get("Retry-After")
-                    raise RateLimitError(retry_after=int(retry_after) if retry_after else None)
+                    raise RateLimitError(
+                        retry_after=int(retry_after) if retry_after else None
+                    )
                 elif response.status >= 500:
                     self.rate_limiter.report_failure()
                     raise NetworkError(f"Server error: {response.status}")
@@ -372,7 +394,7 @@ class AuthClient:
 
                 return response_data
 
-        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        except (TimeoutError, aiohttp.ClientError) as e:
             self.rate_limiter.report_failure()
 
             # Try cache fallback for GET requests
@@ -381,13 +403,16 @@ class AuthClient:
                 fallback_data = self.cache.get_fallback(url, cache_params)
                 if fallback_data is not None:
                     logger.warning(
-                        "make_request", action="using_stale_cache", url=url, error=str(e)
+                        "make_request",
+                        action="using_stale_cache",
+                        url=url,
+                        error=str(e),
                     )
                     return fallback_data
 
             raise NetworkError(f"Request failed: {e}")
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform comprehensive health check.
 
         Returns:

@@ -6,13 +6,17 @@ Replaces static parameters with dynamic ones based on market conditions.
 """
 
 from datetime import datetime
-from typing import Dict, List, Optional
+
+from unity_wheel.models import Greeks, Position
+from unity_wheel.strategy.adaptive_base import (
+    OutcomeTracker,
+    UnityAdaptiveSystem,
+    UnityConditions,
+)
+from unity_wheel.strategy.wheel import WheelParameters, WheelStrategy
+from unity_wheel.utils import get_logger
 
 from ..data.market_data import MarketDataFetcher, UnityEarningsCalendar
-from unity_wheel.models import Greeks, Position
-from unity_wheel.strategy.adaptive_base import OutcomeTracker, UnityAdaptiveSystem, UnityConditions
-from unity_wheel.strategy.wheel import StrikeRecommendation, WheelParameters, WheelStrategy
-from unity_wheel.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -40,8 +44,8 @@ class AdaptiveWheelStrategy:
         self.base_wheel = WheelStrategy()
 
     def get_current_conditions(
-        self, unity_price: float, portfolio_drawdown: Optional[float] = None
-    ) -> Optional[UnityConditions]:
+        self, unity_price: float, portfolio_drawdown: float | None = None
+    ) -> UnityConditions | None:
         """
         Get current Unity market conditions.
 
@@ -83,11 +87,11 @@ class AdaptiveWheelStrategy:
     def get_recommendation(
         self,
         unity_price: float,
-        available_strikes: List[float],
-        available_expirations: List[int],  # Days to expiry
-        portfolio_drawdown: Optional[float] = None,
+        available_strikes: list[float],
+        available_expirations: list[int],  # Days to expiry
+        portfolio_drawdown: float | None = None,
         risk_free_rate: float = 0.05,
-    ) -> Dict:
+    ) -> dict:
         """
         Get adaptive wheel recommendation.
 
@@ -118,7 +122,9 @@ class AdaptiveWheelStrategy:
 
         # Track recommendation if enabled
         if self.outcome_tracker:
-            rec_id = self.outcome_tracker.track_recommendation(conditions, recommendation)
+            rec_id = self.outcome_tracker.track_recommendation(
+                conditions, recommendation
+            )
         else:
             rec_id = None
 
@@ -156,7 +162,9 @@ class AdaptiveWheelStrategy:
         temp_wheel = WheelStrategy(parameters=adaptive_params)
 
         # Find best expiration date
-        best_dte = min(available_expirations, key=lambda x: abs(x - recommendation.target_dte))
+        best_dte = min(
+            available_expirations, key=lambda x: abs(x - recommendation.target_dte)
+        )
 
         # Find optimal strike
         strike_rec = temp_wheel.find_optimal_put_strike(
@@ -199,7 +207,7 @@ class AdaptiveWheelStrategy:
 
     def should_roll_position(
         self, position: Position, current_price: float, current_volatility: float
-    ) -> Dict:
+    ) -> dict:
         """
         Determine if position should be rolled using adaptive rules.
         """
@@ -218,7 +226,7 @@ class AdaptiveWheelStrategy:
         dte_remaining = position.days_to_expiry - days_held
 
         # Get Greeks for current assessment
-        greeks = Greeks(
+        Greeks(
             delta=-position.delta,  # Short put has negative delta
             gamma=position.gamma,
             vega=position.vega,
@@ -267,12 +275,16 @@ class AdaptiveWheelStrategy:
             "market_conditions": conditions.regime.value,
         }
 
-    def record_outcome(self, recommendation_id: str, actual_pnl: float, was_assigned: bool):
+    def record_outcome(
+        self, recommendation_id: str, actual_pnl: float, was_assigned: bool
+    ):
         """Record actual outcome for a recommendation."""
         if self.outcome_tracker:
-            self.outcome_tracker.record_outcome(recommendation_id, actual_pnl, was_assigned)
+            self.outcome_tracker.record_outcome(
+                recommendation_id, actual_pnl, was_assigned
+            )
 
-    def get_performance_summary(self) -> Dict:
+    def get_performance_summary(self) -> dict:
         """Get summary of adaptive system performance."""
         if self.outcome_tracker:
             return self.outcome_tracker.get_performance_summary()

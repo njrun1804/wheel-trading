@@ -17,6 +17,7 @@ from typing import Any
 import numpy as np
 
 from src.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -228,7 +229,9 @@ class IntelligentBucketingOptimizer:
         # Evaluate candidates in parallel
         with ThreadPoolExecutor(max_workers=4) as executor:
             evaluations = list(
-                executor.map(lambda c: self._evaluate_portfolio(c, market_data), candidates)
+                executor.map(
+                    lambda c: self._evaluate_portfolio(c, market_data), candidates
+                )
             )
 
         # Select best portfolio based on Sharpe ratio
@@ -250,7 +253,11 @@ class IntelligentBucketingOptimizer:
         )
 
     def _generate_candidates(
-        self, capital: float, stock_price: float, space: PositionSpace, market_data: dict
+        self,
+        capital: float,
+        stock_price: float,
+        space: PositionSpace,
+        market_data: dict,
     ) -> list[list[dict]]:
         """Generate candidate portfolios using intelligent bucketing"""
         candidates = []
@@ -288,7 +295,9 @@ class IntelligentBucketingOptimizer:
                     put_premium = self._estimate_option_premium(
                         stock_price, put_strike, exp, market_data, "put"
                     )
-                    max_put_contracts = int(remaining_capital * 0.4 / (put_premium * 100))
+                    max_put_contracts = int(
+                        remaining_capital * 0.4 / (put_premium * 100)
+                    )
 
                     if max_put_contracts > 0:
                         portfolio.append(
@@ -326,7 +335,12 @@ class IntelligentBucketingOptimizer:
         return candidates[:100]  # Limit to top 100 candidates
 
     def _estimate_option_premium(
-        self, stock_price: float, strike: float, days: int, market_data: dict, option_type: str
+        self,
+        stock_price: float,
+        strike: float,
+        days: int,
+        market_data: dict,
+        option_type: str,
     ) -> float:
         """Estimate option premium using simplified Black-Scholes"""
         iv = market_data.get("implied_vol", 0.25)
@@ -422,7 +436,9 @@ class PortfolioOptimizer:
         if method is None:
             method = self._select_optimization_method(capital, len(current_positions))
 
-        logger.info(f"Running {method.value} optimization for ${capital:,.0f} portfolio")
+        logger.info(
+            f"Running {method.value} optimization for ${capital:,.0f} portfolio"
+        )
 
         if method == OptimizationMethod.HEURISTIC:
             return self.heuristic.optimize(capital, current_positions, market_data)
@@ -433,7 +449,9 @@ class PortfolioOptimizer:
             logger.warning(f"Method {method.value} not implemented, using heuristic")
             return self.heuristic.optimize(capital, current_positions, market_data)
 
-    def _select_optimization_method(self, capital: float, num_positions: int) -> OptimizationMethod:
+    def _select_optimization_method(
+        self, capital: float, num_positions: int
+    ) -> OptimizationMethod:
         """Auto-select optimization method based on portfolio characteristics"""
 
         if capital < 50_000:
@@ -473,7 +491,9 @@ def run_optimization_demo() -> None:
     """Demo of the optimization engine"""
 
     constraints = OptimizationConstraints(
-        max_position_size = config.trading.max_position_size, target_return=0.15, risk_tolerance=0.12
+        max_position_size=config.trading.max_position_size,
+        target_return=0.15,
+        risk_tolerance=0.12,
     )
 
     optimizer = PortfolioOptimizer(constraints)

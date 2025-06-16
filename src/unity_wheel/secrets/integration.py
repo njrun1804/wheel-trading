@@ -1,17 +1,16 @@
 """Integration module to update existing code to use SecretManager."""
 from __future__ import annotations
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-
 import os
 from functools import lru_cache
-from typing import Any, Dict, Optional
 
 from unity_wheel.utils import get_logger
-from .exceptions import SecretNotFoundError
+
 from .manager import SecretManager
 
 logger = get_logger(__name__)
@@ -80,7 +79,9 @@ def migrate_env_to_secrets() -> None:
 
     if migrated > 0:
         logger.info(f"Migrated {migrated} environment variables to SecretManager")
-        logger.info("\n✓ Migrated {migrated} credentials from environment to SecretManager")
+        logger.info(
+            "\n✓ Migrated {migrated} credentials from environment to SecretManager"
+        )
         logger.info("You can now remove these from your environment variables.")
 
 
@@ -90,7 +91,9 @@ class SecretInjector:
     Useful for libraries that only read from environment variables.
     """
 
-    def __init__(self, service: Optional[str] = None, secrets: Optional[Dict[str, str]] = None):
+    def __init__(
+        self, service: str | None = None, secrets: dict[str, str] | None = None
+    ):
         """Initialize secret injector.
 
         Args:
@@ -109,7 +112,9 @@ class SecretInjector:
         # Handle service credentials
         if self.service:
             if self.service == "databento":
-                self.secrets["DATABENTO_API_KEY"] = manager.get_secret("databento_api_key")
+                self.secrets["DATABENTO_API_KEY"] = manager.get_secret(
+                    "databento_api_key"
+                )
             elif self.service == "fred":
                 self.secrets["FRED_API_KEY"] = manager.get_secret("ofred_api_key")
 

@@ -4,36 +4,38 @@ Create optimized DuckDB schema with M4 Pro hardware acceleration
 Simplified version without partial indexes (not supported in DuckDB)
 """
 
-import duckdb
 import os
-from pathlib import Path
+
+import duckdb
+
 
 def create_optimized_database():
     """Create the optimized database with hardware-specific settings"""
-    
+
     db_path = "data/wheel_trading_optimized.duckdb"
-    
+
     # Remove if exists
     if os.path.exists(db_path):
         print(f"⚠️  Removing existing {db_path}")
         os.remove(db_path)
-    
+
     print(f"🚀 Creating optimized database at {db_path}")
     conn = duckdb.connect(db_path)
-    
+
     # Configure for M4 Pro hardware acceleration
     print("⚡ Configuring for M4 Pro (12 cores, 24GB RAM)...")
     conn.execute("SET memory_limit='8GB'")  # Use 8GB (33% of 24GB)
     conn.execute("SET threads TO 10")  # Use 10 cores (leaving 2 for system)
-    
+
     # Create schemas
     print("📁 Creating schemas...")
-    for schema in ['market', 'options', 'trading', 'analytics', 'system']:
+    for schema in ["market", "options", "trading", "analytics", "system"]:
         conn.execute(f"CREATE SCHEMA IF NOT EXISTS {schema}")
-    
+
     # Create market data table
     print("📊 Creating market data tables...")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE market.price_data (
             symbol VARCHAR NOT NULL,
             date DATE NOT NULL,
@@ -48,11 +50,13 @@ def create_optimized_database():
             year_month INTEGER,
             PRIMARY KEY (symbol, date)
         )
-    """)
-    
+    """
+    )
+
     # Create options table
     print("📈 Creating options tables...")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE options.contracts (
             symbol VARCHAR NOT NULL,
             expiration DATE NOT NULL,
@@ -75,46 +79,58 @@ def create_optimized_database():
             year_month INTEGER,
             PRIMARY KEY (symbol, expiration, strike, option_type, timestamp)
         )
-    """)
-    
+    """
+    )
+
     # Create indexes without WHERE clauses
     print("🏎️  Creating performance indexes...")
-    
+
     # Options indexes
-    conn.execute("""
+    conn.execute(
+        """
         CREATE INDEX idx_wheel_candidates ON options.contracts(
             symbol, option_type, delta, expiration, timestamp DESC
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_options_lookup ON options.contracts(
             symbol, expiration, strike, option_type, timestamp DESC
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_recent_options ON options.contracts(
             timestamp DESC, symbol
         )
-    """)
-    
+    """
+    )
+
     # Market data indexes
-    conn.execute("""
+    conn.execute(
+        """
         CREATE INDEX idx_market_symbol_date ON market.price_data(
             symbol, date DESC
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_market_volatility ON market.price_data(
             date DESC, symbol, volatility_20d
         )
-    """)
-    
+    """
+    )
+
     # Trading tables
     print("💼 Creating trading tables...")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE trading.positions (
             position_id VARCHAR PRIMARY KEY,
             account_id VARCHAR NOT NULL,
@@ -134,21 +150,27 @@ def create_optimized_database():
             margin_required DECIMAL(12,2),
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_active_positions ON trading.positions(
             status, account_id, symbol
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_expiring_positions ON trading.positions(
             status, expiration, symbol
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE TABLE trading.decisions (
             decision_id VARCHAR PRIMARY KEY,
             timestamp TIMESTAMP NOT NULL,
@@ -162,17 +184,21 @@ def create_optimized_database():
             expected_return DECIMAL(8,4),
             risk_score DECIMAL(4,3)
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_pending_decisions ON trading.decisions(
             executed, symbol, timestamp DESC
         )
-    """)
-    
+    """
+    )
+
     # Analytics tables
     print("🧮 Creating analytics tables...")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE analytics.ml_features (
             symbol VARCHAR NOT NULL,
             feature_date DATE NOT NULL,
@@ -190,18 +216,22 @@ def create_optimized_database():
             bollinger_position DECIMAL(4,3),
             PRIMARY KEY (symbol, feature_date)
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE INDEX idx_ml_recent ON analytics.ml_features(
             feature_date DESC, symbol
         )
-    """)
-    
+    """
+    )
+
     # System tables
     print("⚙️  Creating system tables...")
     conn.execute("USE system")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE migration_log (
             migration_id INTEGER PRIMARY KEY,
             table_name VARCHAR NOT NULL,
@@ -211,16 +241,20 @@ def create_optimized_database():
             status VARCHAR(20),
             error_message TEXT
         )
-    """)
-    
-    conn.execute("""
+    """
+    )
+
+    conn.execute(
+        """
         CREATE SEQUENCE migration_seq START 1
-    """)
+    """
+    )
     conn.execute("USE main")  # Switch back
-    
+
     # Create views for common queries
     print("👁️  Creating optimized views...")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE VIEW analytics.wheel_opportunities AS
         SELECT 
             o.symbol,
@@ -251,35 +285,41 @@ def create_optimized_database():
                 AND o2.option_type = o.option_type
             )
         ORDER BY premium_yield DESC
-    """)
-    
+    """
+    )
+
     print("✅ Schema creation complete!")
-    
+
     # Show configuration
-    result = conn.execute("""
+    result = conn.execute(
+        """
         SELECT 
             current_setting('memory_limit') as memory_limit,
             current_setting('threads') as threads
-    """).fetchone()
-    
-    print(f"\n🔧 Configuration:")
+    """
+    ).fetchone()
+
+    print("\n🔧 Configuration:")
     print(f"   Memory Limit: {result[0]}")
     print(f"   Threads: {result[1]}")
-    
+
     # Show created objects
-    tables = conn.execute("""
+    tables = conn.execute(
+        """
         SELECT table_schema, table_name 
         FROM information_schema.tables 
         WHERE table_schema NOT IN ('information_schema', 'pg_catalog', 'main')
         ORDER BY table_schema, table_name
-    """).fetchall()
-    
+    """
+    ).fetchall()
+
     print(f"\n📊 Created {len(tables)} tables:")
     for schema, table in tables:
         print(f"   {schema}.{table}")
-    
+
     conn.close()
     print(f"\n✨ Database created successfully at {db_path}")
+
 
 if __name__ == "__main__":
     create_optimized_database()

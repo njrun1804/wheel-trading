@@ -3,10 +3,9 @@
 from datetime import datetime, timedelta
 
 from src.unity_wheel.utils import SimpleTradingCalendar
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def find_optimal_expiration(target_dte: int = 45) -> datetime:
@@ -52,7 +51,9 @@ def validate_expiration_selection(expiry_date: datetime) -> bool:
 
     # Check it's a valid expiry Friday
     if not calendar.is_expiry_friday(expiry_date):
-        print(f"Warning: {expiry_date.strftime('%Y-%m-%d')} is not a standard expiry Friday")
+        print(
+            f"Warning: {expiry_date.strftime('%Y-%m-%d')} is not a standard expiry Friday"
+        )
         return False
 
     # Check it's a trading day
@@ -62,7 +63,9 @@ def validate_expiration_selection(expiry_date: datetime) -> bool:
 
     # Unity-specific: Avoid January expiries due to year-end volatility
     if expiry_date.month == 1:
-        print("Warning: January expiries have higher vol due to Unity's year-end patterns")
+        print(
+            "Warning: January expiries have higher vol due to Unity's year-end patterns"
+        )
 
     return True
 
@@ -124,7 +127,7 @@ def main():
     today = datetime.now()
     metrics = calculate_trading_days_metrics(today, optimal_expiry)
 
-    print(f"\nExpiration Metrics:")
+    print("\nExpiration Metrics:")
     print(f"  Calendar days: {metrics['total_calendar_days']}")
     print(f"  Trading days: {metrics['trading_days']}")
     print(f"  Weekends: {metrics['weekends']}")
@@ -137,7 +140,7 @@ def main():
     print(f"\nNext Monthly Expiries (from {today.strftime('%Y-%m-%d')}):")
     calendar = SimpleTradingCalendar()
     check_date = today
-    for i in range(3):
+    for _i in range(3):
         expiry = calendar.get_next_expiry_friday(check_date)
         days = calendar.days_to_next_expiry(check_date)
         print(f"  {expiry.strftime('%Y-%m-%d')}: {days} trading days")

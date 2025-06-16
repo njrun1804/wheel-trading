@@ -5,14 +5,12 @@ DuckDB-based local cache for all market data.
 Provides SQL interface with automatic TTL and LRU eviction.
 """
 
-import asyncio
-import os
 import re
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 try:
     import duckdb
@@ -31,11 +29,32 @@ except ImportError:
             raise ImportError("DuckDB not available on this platform")
 
 
-import pandas as pd
+# Import concurrent database management
+try:
+    from ....bolt_database_fixes import ConcurrentDatabase, DatabaseConfig
 
-from unity_wheel.utils import get_logger
+    HAS_CONCURRENT_DB = True
+except ImportError:
+    HAS_CONCURRENT_DB = False
+
+    # Fallback implementations
+    class ConcurrentDatabase:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def query(self, *args, **kwargs):
+            return []
+
+        def close(self):
+            pass
+
+    class DatabaseConfig:
+        pass
+
 
 from src.config.loader import get_config
+from unity_wheel.utils import get_logger
+
 config = get_config()
 
 
@@ -67,15 +86,41 @@ class CacheConfig:
 
 
 class DuckDBCache:
-    """Local-first cache using DuckDB for all data types."""
+    """Local-first cache using DuckDB with concurrent access support."""
 
-    def __init__(self, config: Optional[CacheConfig] = None):
+    def __init__(self, config: CacheConfig | None = None):
         self.config = config or CacheConfig()
         self.config.cache_dir.mkdir(parents=True, exist_ok=True)
         # Use a simple default database name instead of accessing non-existent storage attribute
         self.db_path = self.config.cache_dir / "wheel_trading_cache.duckdb"
-        self._conn: Optional[duckdb.DuckDBPyConnection] = None
+        self._conn: duckdb.DuckDBPyConnection | None = None
         self._last_vacuum = datetime.min
+
+        # Initialize concurrent database manager if available
+        self._concurrent_db: ConcurrentDatabase | None = None
+        if HAS_CONCURRENT_DB and _HAS_DUCKDB:
+            try:
+                db_config = DatabaseConfig(
+                    path=self.db_path,
+                    max_connections=4,  # Conservative for cache
+                    connection_timeout=15.0,
+                    lock_timeout=15.0,
+                    retry_attempts=2,
+                    retry_delay=0.5,
+                    enable_wal_mode=True,
+                    enable_connection_pooling=True,
+                )
+                self._concurrent_db = ConcurrentDatabase(
+                    str(self.db_path), **db_config.__dict__
+                )
+                logger.info(
+                    f"Initialized concurrent database for cache: {self.db_path}"
+                )
+            except Exception as e:
+                logger.warning(
+                    f"Failed to initialize concurrent database, using fallback: {e}"
+                )
+                self._concurrent_db = None
 
         if not _HAS_DUCKDB:
             logger.warning("DuckDB not available - cache will be disabled")
@@ -83,12 +128,27 @@ class DuckDBCache:
     def _check_duckdb_available(self):
         """Check if DuckDB is available, raise error if not."""
         if not _HAS_DUCKDB:
-            raise ImportError("DuckDB not available on this platform - storage operations disabled")
+            raise ImportError(
+                "DuckDB not available on this platform - storage operations disabled"
+            )
 
     @asynccontextmanager
     async def connection(self):
-        """Get thread-safe connection to DuckDB."""
+        """Get thread-safe connection to DuckDB with concurrent access support."""
         self._check_duckdb_available()
+
+        # Use concurrent database manager if available
+        if self._concurrent_db:
+            try:
+                with self._concurrent_db.connection() as conn:
+                    yield conn
+                return
+            except Exception as e:
+                logger.warning(
+                    f"Concurrent database connection failed, using fallback: {e}"
+                )
+
+        # Fallback to direct connection
         conn = duckdb.connect(str(self.db_path))
         try:
             yield conn
@@ -166,7 +226,9 @@ class DuckDBCache:
             )
 
             # Create indexes
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_chains_symbol ON option_chains(symbol)")
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_chains_symbol ON option_chains(symbol)"
+            )
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_chains_created ON option_chains(created_at)"
             )
@@ -186,9 +248,26 @@ class DuckDBCache:
         expiration: datetime,
         timestamp: datetime,
         spot_price: float,
-        chain_data: Dict[str, Any],
+        chain_data: dict[str, Any],
     ):
-        """Store option chain data."""
+        """Store option chain data with concurrent access support."""
+        # Use concurrent database for writes if available
+        if self._concurrent_db:
+            try:
+                self._concurrent_db.execute(
+                    """
+                    INSERT OR REPLACE INTO option_chains
+                    (symbol, expiration, timestamp, spot_price, data)
+                    VALUES (?, ?, ?, ?, ?)
+                """,
+                    (symbol, expiration.date(), timestamp, spot_price, chain_data),
+                )
+                await self._check_vacuum()
+                return
+            except Exception as e:
+                logger.warning(f"Concurrent store failed, using fallback: {e}")
+
+        # Fallback to regular connection
         async with self.connection() as conn:
             conn.execute(
                 """
@@ -203,7 +282,7 @@ class DuckDBCache:
 
     async def get_option_chain(
         self, symbol: str, expiration: datetime, max_age_minutes: int = 15
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get option chain if exists and fresh."""
         cutoff = datetime.utcnow() - timedelta(minutes=max_age_minutes)
 
@@ -229,7 +308,7 @@ class DuckDBCache:
             return None
 
     async def store_positions(
-        self, account_id: str, positions: List[Dict], account_data: Dict[str, Any]
+        self, account_id: str, positions: list[dict], account_data: dict[str, Any]
     ):
         """Store position snapshot."""
         timestamp = datetime.utcnow()
@@ -247,7 +326,7 @@ class DuckDBCache:
 
     async def get_latest_positions(
         self, account_id: str, max_age_minutes: int = 30
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get latest position snapshot if fresh."""
         cutoff = datetime.utcnow() - timedelta(minutes=max_age_minutes)
 
@@ -277,12 +356,16 @@ class DuckDBCache:
         """Export table to Parquet for GCS backup."""
         table = validate_table_name(table)
         async with self.connection() as conn:
-            df = conn.execute(f"SELECT * FROM {table}").df()  # nosec B608 - table validated
+            df = conn.execute(
+                f"SELECT * FROM {table}"
+            ).df()  # nosec B608 - table validated
 
             output_file = output_dir / f"{table}_{datetime.utcnow():%Y%m%d}.parquet"
             df.to_parquet(output_file, compression="snappy")
 
-            logger.info("exported_to_parquet", table=table, rows=len(df), file=str(output_file))
+            logger.info(
+                "exported_to_parquet", table=table, rows=len(df), file=str(output_file)
+            )
 
             return output_file
 
@@ -299,13 +382,18 @@ class DuckDBCache:
                 [str(parquet_file)],
             )
 
-    async def get_storage_stats(self) -> Dict[str, Any]:
+    async def get_storage_stats(self) -> dict[str, Any]:
         """Get cache storage statistics."""
         async with self.connection() as conn:
             stats = {}
 
             # Get table sizes
-            tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
+            tables = [
+                "option_chains",
+                "position_snapshots",
+                "greeks_cache",
+                "predictions_cache",
+            ]
             for table in tables:
                 safe_table = validate_table_name(table)
                 count = conn.execute(f"SELECT COUNT(*) FROM {safe_table}").fetchone()[
@@ -320,7 +408,9 @@ class DuckDBCache:
             # Get age of oldest records
             for table in tables:
                 safe_table = validate_table_name(table)
-                oldest = conn.execute(f"SELECT MIN(created_at) FROM {safe_table}").fetchone()[
+                oldest = conn.execute(
+                    f"SELECT MIN(created_at) FROM {safe_table}"
+                ).fetchone()[
                     0
                 ]  # nosec B608
                 if oldest:
@@ -342,11 +432,17 @@ class DuckDBCache:
 
         async with self.connection() as conn:
             # Delete old records
-            tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
+            tables = [
+                "option_chains",
+                "position_snapshots",
+                "greeks_cache",
+                "predictions_cache",
+            ]
             for table in tables:
                 safe_table = validate_table_name(table)
                 deleted = conn.execute(
-                    f"DELETE FROM {safe_table} WHERE created_at < ?", [cutoff]  # nosec B608
+                    f"DELETE FROM {safe_table} WHERE created_at < ?",
+                    [cutoff],  # nosec B608
                 ).rowcount
 
                 if deleted > 0:
@@ -360,9 +456,42 @@ class DuckDBCache:
     async def clear_all(self):
         """Clear all cached data."""
         async with self.connection() as conn:
-            tables = ["option_chains", "position_snapshots", "greeks_cache", "predictions_cache"]
+            tables = [
+                "option_chains",
+                "position_snapshots",
+                "greeks_cache",
+                "predictions_cache",
+            ]
             for table in tables:
                 safe_table = validate_table_name(table)
                 conn.execute(f"DELETE FROM {safe_table}")  # nosec B608
 
         logger.warning("cache_cleared_all")
+
+    def close(self):
+        """Close the cache and cleanup resources."""
+        if self._concurrent_db:
+            try:
+                self._concurrent_db.close()
+                logger.info("Concurrent database cache closed")
+            except Exception as e:
+                logger.warning(f"Error closing concurrent database cache: {e}")
+
+        if self._conn:
+            try:
+                self._conn.close()
+                self._conn = None
+            except Exception as e:
+                logger.warning(f"Error closing direct DuckDB connection: {e}")
+
+    def get_lock_info(self) -> dict[str, Any] | None:
+        """Get information about current database locks."""
+        if self._concurrent_db and hasattr(self._concurrent_db, "get_lock_info"):
+            return self._concurrent_db.get_lock_info()
+        return None
+
+    def force_unlock(self) -> bool:
+        """Force unlock the database (use with caution)."""
+        if self._concurrent_db and hasattr(self._concurrent_db, "force_unlock"):
+            return self._concurrent_db.force_unlock()
+        return False

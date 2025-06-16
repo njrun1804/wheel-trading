@@ -9,27 +9,33 @@ Implements:
 """
 from __future__ import annotations
 
-
 import asyncio
 import logging
-import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import AsyncIterator, Dict, List, Optional, Set
+
+from databento_dbn import Schema, SType
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 import databento as db
-import pandas as pd
-from databento_dbn import Schema, SType
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
-
 from src.config.loader import get_config
 from unity_wheel.secrets.integration import get_databento_api_key
 from unity_wheel.utils.data_validator import die
 from unity_wheel.utils.logging import StructuredLogger
-from unity_wheel.utils.recovery import RecoveryContext
 
 from ..audit_logger import get_audit_logger
-from .types import DataQuality, InstrumentDefinition, OptionChain, OptionQuote, UnderlyingPrice
+from .types import (
+    DataQuality,
+    InstrumentDefinition,
+    OptionChain,
+    OptionQuote,
+    UnderlyingPrice,
+)
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -39,7 +45,7 @@ class DatabentoClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         use_cache: bool = True,
         cache_dir: str = ".databento_cache",
     ):
@@ -77,24 +83,25 @@ class DatabentoClient:
         self._request_interval = 1.0 / self.MAX_HISTORICAL_RPS
 
         # Instrument mapping cache
-        self._instrument_map: Optional[db.common.symbology.InstrumentMap] = None
+        self._instrument_map: db.common.symbology.InstrumentMap | None = None
 
         # Initialize audit logger for data tracking
         self.audit_logger = get_audit_logger()
-        self._definitions_cache: Dict[str, InstrumentDefinition] = {}
+        self._definitions_cache: dict[str, InstrumentDefinition] = {}
 
         # Cache successful symbol formats for Unity
-        self._symbol_format_cache: Dict[str, Tuple[List[str], SType]] = {}
+        self._symbol_format_cache: dict[str, Tuple[list[str], SType]] = {}
 
         # Live session management
-        self._live_sessions: Dict[str, db.Live] = {}
+        self._live_sessions: dict[str, db.Live] = {}
 
         logger.info(
-            "databento_client_initialized", extra={"use_cache": use_cache, "cache_dir": cache_dir}
+            "databento_client_initialized",
+            extra={"use_cache": use_cache, "cache_dir": cache_dir},
         )
 
     async def get_option_chain(
-        self, underlying: str, expiration: datetime, timestamp: Optional[datetime] = None
+        self, underlying: str, expiration: datetime, timestamp: datetime | None = None
     ) -> OptionChain:
         """Get complete option chain for given underlying and expiration.
 
@@ -148,7 +155,7 @@ class DatabentoClient:
 
     async def _get_definitions(
         self, underlying: str, expiration: datetime
-    ) -> List[InstrumentDefinition]:
+    ) -> list[InstrumentDefinition]:
         """Get instrument definitions with caching and retry."""
         # Use default retry config
         max_attempts = 3
@@ -176,7 +183,7 @@ class DatabentoClient:
 
             # Request definitions using most recent available date
             # Options definitions are available on trading days before expiration
-            today = datetime.now(timezone.utc)
+            today = datetime.now(UTC)
 
             # Find last trading day (skip weekends)
             if today.weekday() >= 5:  # Saturday or Sunday
@@ -186,7 +193,9 @@ class DatabentoClient:
                 # Use previous day for weekdays
                 last_trading_day = today - timedelta(days=1)
 
-            last_trading_day = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
+            last_trading_day = last_trading_day.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
 
             if expiration > today:
                 # Use last trading day for future expirations
@@ -235,7 +244,11 @@ class DatabentoClient:
                 try:
                     logger.debug(
                         "Trying symbol format",
-                        extra={"underlying": underlying, "symbols": symbols, "stype": stype_in},
+                        extra={
+                            "underlying": underlying,
+                            "symbols": symbols,
+                            "stype": stype_in,
+                        },
                     )
 
                     response = self.client.timeseries.get_range(
@@ -269,7 +282,8 @@ class DatabentoClient:
                             f"Cannot proceed without real market data. Please check your subscription."
                         )
                     logger.debug(
-                        "Symbol format failed", extra={"symbols": symbols, "error": str(e)}
+                        "Symbol format failed",
+                        extra={"symbols": symbols, "error": str(e)},
                     )
                     continue
 
@@ -291,7 +305,8 @@ class DatabentoClient:
                         definitions.append(defn)
                 except (ValueError, KeyError, AttributeError) as e:
                     logger.warning(
-                        "definition_parse_error", extra={"error": str(e), "record": record}
+                        "definition_parse_error",
+                        extra={"error": str(e), "record": record},
                     )
 
             # Cache results
@@ -313,8 +328,8 @@ class DatabentoClient:
         return await _get_with_retry()
 
     async def _get_quotes_by_ids(
-        self, instrument_ids: List[int], timestamp: Optional[datetime] = None
-    ) -> Dict[int, OptionQuote]:
+        self, instrument_ids: list[int], timestamp: datetime | None = None
+    ) -> dict[int, OptionQuote]:
         """Get quotes for multiple instruments efficiently."""
         quotes = {}
 
@@ -334,8 +349,8 @@ class DatabentoClient:
         return quotes
 
     async def _get_historical_quotes(
-        self, instrument_ids: List[int], timestamp: datetime
-    ) -> Dict[int, OptionQuote]:
+        self, instrument_ids: list[int], timestamp: datetime
+    ) -> dict[int, OptionQuote]:
         """Get historical quotes for given instruments."""
         async with self._historical_semaphore:
             await self._rate_limit()
@@ -362,7 +377,8 @@ class DatabentoClient:
                     # Keep only the latest quote per instrument
                     if (
                         quote.instrument_id not in latest_quotes
-                        or quote.timestamp > latest_quotes[quote.instrument_id].timestamp
+                        or quote.timestamp
+                        > latest_quotes[quote.instrument_id].timestamp
                     ):
                         latest_quotes[quote.instrument_id] = quote
                 except (ValueError, KeyError, AttributeError) as e:
@@ -370,7 +386,9 @@ class DatabentoClient:
 
             return latest_quotes
 
-    async def _get_live_quotes(self, instrument_ids: List[int]) -> Dict[int, OptionQuote]:
+    async def _get_live_quotes(
+        self, instrument_ids: list[int]
+    ) -> dict[int, OptionQuote]:
         """Get latest quotes using REST API (pull-when-asked)."""
         # In pull-when-asked architecture, we use REST API for latest data
         # This method is kept for compatibility but uses REST instead of WebSocket
@@ -378,7 +396,7 @@ class DatabentoClient:
         return {}
 
     async def _get_underlying_price(
-        self, symbol: str, timestamp: Optional[datetime] = None
+        self, symbol: str, timestamp: datetime | None = None
     ) -> UnderlyingPrice:
         """Get underlying equity price."""
         async with self._historical_semaphore:
@@ -389,7 +407,7 @@ class DatabentoClient:
                 end = timestamp
             else:
                 # Get latest available data from last trading day
-                today = datetime.now(timezone.utc)
+                today = datetime.now(UTC)
 
                 # Find last trading day (skip weekends)
                 if today.weekday() >= 5:  # Saturday or Sunday
@@ -400,7 +418,9 @@ class DatabentoClient:
                     last_trading_day = today - timedelta(days=1)
 
                 # Use a wider date range to ensure we get data
-                end = last_trading_day.replace(hour=23, minute=59, second=59, microsecond=0)
+                end = last_trading_day.replace(
+                    hour=23, minute=59, second=59, microsecond=0
+                )
                 start = last_trading_day.replace(
                     hour=0, minute=0, second=0, microsecond=0
                 ) - timedelta(days=5)
@@ -433,7 +453,9 @@ class DatabentoClient:
                     # Convert MBP-1 record to UnderlyingPrice
                     from decimal import Decimal
 
-                    bid = Decimal(str(last_record.bid_px / 1e9))  # Convert from fixed-point
+                    bid = Decimal(
+                        str(last_record.bid_px / 1e9)
+                    )  # Convert from fixed-point
                     ask = Decimal(str(last_record.ask_px / 1e9))
                     mid = (bid + ask) / 2
 
@@ -443,7 +465,7 @@ class DatabentoClient:
                         bid_price=bid,
                         ask_price=ask,
                         timestamp=datetime.fromtimestamp(
-                            last_record.ts_event / 1e9, tz=timezone.utc
+                            last_record.ts_event / 1e9, tz=UTC
                         ),
                     )
 
@@ -519,8 +541,6 @@ class DatabentoClient:
         if min_size is None:
             min_size = config.data.quality.min_quote_size
 
-        issues = []
-
         # Check spreads
         wide_spreads = 0
         for opt in chain.calls + chain.puts:
@@ -539,7 +559,7 @@ class DatabentoClient:
 
         # Check staleness
         staleness = (
-            datetime.now(timezone.utc).replace(tzinfo=None) - chain.timestamp
+            datetime.now(UTC).replace(tzinfo=None) - chain.timestamp
         ).total_seconds()
 
         # Calculate confidence

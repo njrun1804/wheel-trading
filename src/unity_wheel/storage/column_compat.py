@@ -4,12 +4,12 @@
 COLUMN_MAPPINGS = {
     "options.contracts": {
         "strike": "strike_price",
-        "bid": "bid_price", 
+        "bid": "bid_price",
         "ask": "ask_price",
     },
     "market.price_data": {
         # Add any other mappings here
-    }
+    },
 }
 
 
@@ -17,7 +17,7 @@ def map_column_names(table: str, columns: list) -> list:
     """Map old column names to new ones."""
     if table not in COLUMN_MAPPINGS:
         return columns
-        
+
     mapping = COLUMN_MAPPINGS[table]
     return [mapping.get(col, col) for col in columns]
 
@@ -33,5 +33,5 @@ def get_compatible_query(query: str) -> str:
                 query = query.replace(f" {old},", f" {new},")
                 query = query.replace(f".{old} ", f".{new} ")
                 query = query.replace(f".{old},", f".{new},")
-                
+
     return query

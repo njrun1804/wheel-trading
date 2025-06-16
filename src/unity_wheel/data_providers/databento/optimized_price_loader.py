@@ -6,9 +6,7 @@ Handles Databento API limitations and maximizes throughput.
 """
 
 import asyncio
-import os
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
 
 import pandas as pd
 from databento_dbn import Schema
@@ -119,7 +117,9 @@ class OptimizedPriceHistoryLoader:
                         f"Fetching chunk {i+1}/{len(chunks)}: {chunk_start.date()} to {chunk_end.date()}"
                     )
 
-                    bars = await self._fetch_chunk_with_retry(symbol, chunk_start, chunk_end)
+                    bars = await self._fetch_chunk_with_retry(
+                        symbol, chunk_start, chunk_end
+                    )
 
                     if bars:
                         all_bars.extend(bars)
@@ -130,7 +130,7 @@ class OptimizedPriceHistoryLoader:
                             await self._store_bars_batch(symbol, all_bars)
                             all_bars = []
                     else:
-                        logger.warning(f"  No data for chunk")
+                        logger.warning("  No data for chunk")
 
                 except (ValueError, KeyError, AttributeError) as e:
                     errors += 1
@@ -154,7 +154,9 @@ class OptimizedPriceHistoryLoader:
             logger.error(f"Critical error loading price history: {e}")
             return False
 
-    def _calculate_date_chunks(self, total_days: int, end_date: datetime) -> List[tuple]:
+    def _calculate_date_chunks(
+        self, total_days: int, end_date: datetime
+    ) -> list[tuple]:
         """Calculate optimal date chunks for fetching."""
         chunks = []
 
@@ -167,7 +169,9 @@ class OptimizedPriceHistoryLoader:
             chunk_start = current_end - timedelta(days=chunk_days)
 
             # Adjust for weekends - extend range
-            chunk_start = chunk_start - timedelta(days=int(chunk_days * 0.4))  # Add 40% buffer
+            chunk_start = chunk_start - timedelta(
+                days=int(chunk_days * 0.4)
+            )  # Add 40% buffer
 
             chunks.append((chunk_start, current_end))
 
@@ -178,17 +182,23 @@ class OptimizedPriceHistoryLoader:
 
     async def _fetch_chunk_with_retry(
         self, symbol: str, start: datetime, end: datetime, attempt: int = 0
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """Fetch a chunk with retry logic."""
         try:
             async with self._request_semaphore:
                 dataset = self._get_dataset_for_symbol(symbol)
 
                 # Log request details
-                logger.debug(f"API Request: {dataset} {symbol} {start.date()} to {end.date()}")
+                logger.debug(
+                    f"API Request: {dataset} {symbol} {start.date()} to {end.date()}"
+                )
 
                 response = self.client.client.timeseries.get_range(
-                    dataset=dataset, schema=Schema.OHLCV_1D, start=start, end=end, symbols=[symbol]
+                    dataset=dataset,
+                    schema=Schema.OHLCV_1D,
+                    start=start,
+                    end=end,
+                    symbols=[symbol],
                 )
 
                 bars = []
@@ -211,7 +221,9 @@ class OptimizedPriceHistoryLoader:
                 delay = self.RETRY_DELAYS[attempt]
                 logger.warning(f"Retry {attempt + 1} after {delay}s: {e}")
                 await asyncio.sleep(delay)
-                return await self._fetch_chunk_with_retry(symbol, start, end, attempt + 1)
+                return await self._fetch_chunk_with_retry(
+                    symbol, start, end, attempt + 1
+                )
             else:
                 raise
 
@@ -225,7 +237,7 @@ class OptimizedPriceHistoryLoader:
 
         self._last_request_time = asyncio.get_event_loop().time()
 
-    async def _store_bars_batch(self, symbol: str, bars: List[Dict]):
+    async def _store_bars_batch(self, symbol: str, bars: list[dict]):
         """Store bars efficiently in batch."""
         if not bars:
             return
@@ -237,7 +249,9 @@ class OptimizedPriceHistoryLoader:
         for i in range(1, len(bars)):
             prev_close = bars[i - 1]["close"]
             curr_close = bars[i]["close"]
-            bars[i]["returns"] = (curr_close - prev_close) / prev_close if prev_close > 0 else 0
+            bars[i]["returns"] = (
+                (curr_close - prev_close) / prev_close if prev_close > 0 else 0
+            )
 
         bars[0]["returns"] = 0
 
@@ -274,7 +288,7 @@ class OptimizedPriceHistoryLoader:
                 conn.execute("COMMIT")
                 logger.info(f"Stored {len(records)} price records")
 
-            except (ValueError, KeyError, AttributeError) as e:
+            except (ValueError, KeyError, AttributeError):
                 conn.execute("ROLLBACK")
                 raise
 
@@ -283,7 +297,8 @@ class OptimizedPriceHistoryLoader:
         try:
             async with self.storage.cache.connection() as conn:
                 result = conn.execute(
-                    "SELECT COUNT(DISTINCT date) FROM price_history WHERE symbol = ?", [symbol]
+                    "SELECT COUNT(DISTINCT date) FROM price_history WHERE symbol = ?",
+                    [symbol],
                 ).fetchone()
 
                 return result[0] if result else 0
@@ -302,7 +317,7 @@ class OptimizedPriceHistoryLoader:
         else:
             return "XNAS.BASIC"  # Default
 
-    async def verify_data_quality(self, symbol: str) -> Dict[str, any]:
+    async def verify_data_quality(self, symbol: str) -> dict[str, any]:
         """Verify data quality after loading."""
         async with self.storage.cache.connection() as conn:
             # Check for gaps

@@ -4,12 +4,12 @@ Extract daily summaries from existing REAL data.
 NO SYNTHETIC DATA - only summarizes what's actually in the database.
 """
 
-from datetime import datetime
 from pathlib import Path
 
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 

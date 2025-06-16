@@ -7,10 +7,9 @@ Tracks Unity-specific patterns and learns from actual results.
 
 import json
 import sqlite3
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 from ..utils import get_logger
 
@@ -29,20 +28,20 @@ class TradeOutcome:
     kelly_fraction: float
     confidence: float
     predicted_return: float
-    actual_return: Optional[float] = None
-    days_held: Optional[int] = None
-    exit_reason: Optional[str] = None
-    market_regime: Optional[str] = None
+    actual_return: float | None = None
+    days_held: int | None = None
+    exit_reason: str | None = None
+    market_regime: str | None = None
     warnings_count: int = 0
     # Unity-specific fields
-    unity_price: Optional[float] = None
-    unity_volatility: Optional[float] = None
-    iv_rank: Optional[float] = None
-    near_earnings: Optional[bool] = None
-    days_to_earnings: Optional[int] = None
-    was_assigned: Optional[bool] = None
-    portfolio_drawdown: Optional[float] = None
-    volatility_tier: Optional[str] = None  # 'low', 'normal', 'high', 'extreme'
+    unity_price: float | None = None
+    unity_volatility: float | None = None
+    iv_rank: float | None = None
+    near_earnings: bool | None = None
+    days_to_earnings: int | None = None
+    was_assigned: bool | None = None
+    portfolio_drawdown: float | None = None
+    volatility_tier: str | None = None  # 'low', 'normal', 'high', 'extreme'
 
 
 @dataclass
@@ -54,8 +53,8 @@ class UnityOutcome:
     was_assigned: bool
     days_held: int
     exit_reason: str  # 'expired', 'rolled', 'assigned', 'closed_early'
-    final_stock_price: Optional[float] = None
-    assignment_loss: Optional[float] = None  # If assigned, unrealized loss
+    final_stock_price: float | None = None
+    assignment_loss: float | None = None  # If assigned, unrealized loss
 
 
 class PerformanceTracker:
@@ -77,7 +76,7 @@ class PerformanceTracker:
         else:
             return "extreme"
 
-    def near_earnings_window(self, days_to_earnings: Optional[int] = None) -> bool:
+    def near_earnings_window(self, days_to_earnings: int | None = None) -> bool:
         """Check if within earnings window (7 days)."""
         if days_to_earnings is None:
             return False
@@ -131,7 +130,7 @@ class PerformanceTracker:
             """
             )
 
-    def record_recommendation(self, recommendation: Dict) -> int:
+    def record_recommendation(self, recommendation: dict) -> int:
         """Record a new trade recommendation."""
         # Extract Unity-specific fields
         unity_price = recommendation.get("current_price", 0)
@@ -195,7 +194,9 @@ class PerformanceTracker:
                 ),
             )
 
-        logger.info(f"Recorded {trade.action} recommendation", trade_id=cursor.lastrowid)
+        logger.info(
+            f"Recorded {trade.action} recommendation", trade_id=cursor.lastrowid
+        )
         return cursor.lastrowid
 
     def update_outcome(
@@ -224,7 +225,7 @@ class PerformanceTracker:
             was_assigned=was_assigned,
         )
 
-    def track_unity_recommendation(self, rec: Dict, actual_outcome: UnityOutcome):
+    def track_unity_recommendation(self, rec: dict, actual_outcome: UnityOutcome):
         """Track Unity-specific patterns with outcomes."""
         # Get current market conditions for tracking
         volatility = rec.get("volatility", 0)
@@ -283,7 +284,7 @@ class PerformanceTracker:
 
         logger.info("Unity outcome recorded", **outcome_data)
 
-    def get_performance_stats(self, days: int = 90) -> Dict:
+    def get_performance_stats(self, days: int = 90) -> dict:
         """Get performance statistics for recent trades."""
         with sqlite3.connect(str(self.db_path)) as conn:
             # Completed trades only
@@ -314,8 +315,12 @@ class PerformanceTracker:
         for low, high in buckets:
             bucket_trades = [t for t in completed if low <= t[7] < high]
             if bucket_trades:
-                actual_win_rate = sum(1 for t in bucket_trades if t[9] > 0) / len(bucket_trades)
-                expected_win_rate = sum(t[7] for t in bucket_trades) / len(bucket_trades)
+                actual_win_rate = sum(1 for t in bucket_trades if t[9] > 0) / len(
+                    bucket_trades
+                )
+                expected_win_rate = sum(t[7] for t in bucket_trades) / len(
+                    bucket_trades
+                )
                 stats["confidence_calibration"][f"{low:.0%}-{high:.0%}"] = {
                     "expected": expected_win_rate,
                     "actual": actual_win_rate,
@@ -324,7 +329,7 @@ class PerformanceTracker:
 
         return stats
 
-    def get_regime_performance(self) -> Dict[str, Dict]:
+    def get_regime_performance(self) -> dict[str, dict]:
         """Analyze performance by market regime."""
         with sqlite3.connect(str(self.db_path)) as conn:
             regimes = conn.execute(
@@ -340,11 +345,15 @@ class PerformanceTracker:
             ).fetchall()
 
         return {
-            regime[0]: {"trades": regime[1], "avg_return": regime[2], "win_rate": regime[3]}
+            regime[0]: {
+                "trades": regime[1],
+                "avg_return": regime[2],
+                "win_rate": regime[3],
+            }
             for regime in regimes
         }
 
-    def suggest_improvements(self) -> List[str]:
+    def suggest_improvements(self) -> list[str]:
         """Suggest parameter adjustments based on performance."""
         suggestions = []
         stats = self.get_performance_stats()
@@ -377,7 +386,7 @@ class PerformanceTracker:
 
         return suggestions
 
-    def get_unity_volatility_performance(self) -> Dict[str, Dict]:
+    def get_unity_volatility_performance(self) -> dict[str, dict]:
         """Analyze Unity performance by volatility tier."""
         with sqlite3.connect(str(self.db_path)) as conn:
             vol_tiers = conn.execute(
@@ -412,7 +421,7 @@ class PerformanceTracker:
             for tier in vol_tiers
         }
 
-    def get_earnings_impact(self) -> Dict[str, Dict]:
+    def get_earnings_impact(self) -> dict[str, dict]:
         """Analyze impact of earnings proximity on outcomes."""
         with sqlite3.connect(str(self.db_path)) as conn:
             earnings_data = conn.execute(
@@ -431,9 +440,15 @@ class PerformanceTracker:
 
         return {
             "near_earnings": {
-                "trades": earnings_data[0][1] if earnings_data and earnings_data[0][0] else 0,
-                "avg_return": earnings_data[0][2] if earnings_data and earnings_data[0][0] else 0,
-                "win_rate": earnings_data[0][3] if earnings_data and earnings_data[0][0] else 0,
+                "trades": earnings_data[0][1]
+                if earnings_data and earnings_data[0][0]
+                else 0,
+                "avg_return": earnings_data[0][2]
+                if earnings_data and earnings_data[0][0]
+                else 0,
+                "win_rate": earnings_data[0][3]
+                if earnings_data and earnings_data[0][0]
+                else 0,
                 "assignment_rate": (
                     earnings_data[0][4] / earnings_data[0][1]
                     if earnings_data and earnings_data[0][0] and earnings_data[0][1] > 0
@@ -447,36 +462,46 @@ class PerformanceTracker:
                 "trades": (
                     earnings_data[1][1]
                     if len(earnings_data) > 1
-                    else earnings_data[0][1] if earnings_data and not earnings_data[0][0] else 0
+                    else earnings_data[0][1]
+                    if earnings_data and not earnings_data[0][0]
+                    else 0
                 ),
                 "avg_return": (
                     earnings_data[1][2]
                     if len(earnings_data) > 1
-                    else earnings_data[0][2] if earnings_data and not earnings_data[0][0] else 0
+                    else earnings_data[0][2]
+                    if earnings_data and not earnings_data[0][0]
+                    else 0
                 ),
                 "win_rate": (
                     earnings_data[1][3]
                     if len(earnings_data) > 1
-                    else earnings_data[0][3] if earnings_data and not earnings_data[0][0] else 0
+                    else earnings_data[0][3]
+                    if earnings_data and not earnings_data[0][0]
+                    else 0
                 ),
                 "assignment_rate": (
                     earnings_data[1][4] / earnings_data[1][1]
                     if len(earnings_data) > 1 and earnings_data[1][1] > 0
                     else (
                         earnings_data[0][4] / earnings_data[0][1]
-                        if earnings_data and not earnings_data[0][0] and earnings_data[0][1] > 0
+                        if earnings_data
+                        and not earnings_data[0][0]
+                        and earnings_data[0][1] > 0
                         else 0
                     )
                 ),
                 "avg_prediction_error": (
                     earnings_data[1][5]
                     if len(earnings_data) > 1
-                    else earnings_data[0][5] if earnings_data and not earnings_data[0][0] else 0
+                    else earnings_data[0][5]
+                    if earnings_data and not earnings_data[0][0]
+                    else 0
                 ),
             },
         }
 
-    def get_unity_insights(self) -> List[str]:
+    def get_unity_insights(self) -> list[str]:
         """Generate Unity-specific trading insights."""
         insights = []
 

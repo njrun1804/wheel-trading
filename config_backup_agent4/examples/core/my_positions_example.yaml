@@ -1,0 +1,28 @@
+# Example: Your Current Positions
+# Copy this content to my_positions.yaml and update with your actual values
+
+account:
+  cash: 25000.00  # Update with your actual cash
+  margin_available: 0.00
+  account_type: "cash"
+
+positions:
+  stocks:
+    # Your stock position
+    - symbol: "XYZ"      # Replace with your stock symbol
+      quantity: 100      # Number of shares you own
+      cost_basis: 50.00  # Your purchase price per share
+
+  options:
+    # Your covered call
+    - symbol: "XYZ"                # Replace with option symbol
+      position_type: "covered_call"
+      strike: 55                   # Strike price of your call
+      expiry: "2025-07-18"        # Expiration date (YYYY-MM-DD)
+      quantity: -1                 # -1 for short 1 contract
+      premium_collected: 2.50      # Premium per share you collected
+      underlying_symbol: "XYZ"     # Must match stock symbol above
+
+# After updating with your real data:
+# 1. Save as my_positions.yaml
+# 2. Run: python get_recommendation.py

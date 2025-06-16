@@ -12,7 +12,7 @@ Run this each morning to verify everything is working properly.
 
 import asyncio
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 # Add src to path
@@ -21,7 +21,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 from src.config.loader import get_config
 from unity_wheel.analytics import IntegratedDecisionEngine
 from unity_wheel.analytics.performance_tracker import PerformanceTracker
-from unity_wheel.data_providers.databento import DatabentoClient
 from unity_wheel.secrets import SecretManager
 from unity_wheel.storage import UnifiedStorage
 from unity_wheel.utils import get_logger
@@ -66,10 +65,14 @@ def check_configuration() -> dict:
 
         # Check critical parameters
         if config.strategy.delta_target < 0.1 or config.strategy.delta_target > 0.5:
-            results["issues"].append(f"Delta target {config.strategy.delta_target} seems unusual")
+            results["issues"].append(
+                f"Delta target {config.strategy.delta_target} seems unusual"
+            )
 
         if config.risk.kelly_fraction > 0.5:
-            results["issues"].append(f"Kelly fraction {config.risk.kelly_fraction} is aggressive")
+            results["issues"].append(
+                f"Kelly fraction {config.risk.kelly_fraction} is aggressive"
+            )
 
         # Get health report
         health = loader.generate_health_report()
@@ -114,12 +117,11 @@ async def test_decision_engine() -> dict:
 
     try:
         config = get_config()
-        engine = IntegratedDecisionEngine(config.unity.ticker, 100000)
+        IntegratedDecisionEngine(config.unity.ticker, 100000)
 
         # Try to fetch real Unity data from Databento
         try:
             from unity_wheel.cli.databento_integration import get_market_data_sync
-            from unity_wheel.data_providers.databento import DatabentoClient
 
             # Get real market data
             market_data, confidence = get_market_data_sync(100000, config.unity.ticker)
@@ -127,7 +129,9 @@ async def test_decision_engine() -> dict:
                 f"Decision engine check using real {config.unity.ticker} data",
                 extra={"confidence": confidence},
             )
-            results["issues"].append("Decision engine initialized with real market data")
+            results["issues"].append(
+                "Decision engine initialized with real market data"
+            )
 
         except (ValueError, KeyError, AttributeError) as e:
             # FAIL if real data is not available - no fallbacks allowed
@@ -160,9 +164,9 @@ def check_performance() -> dict:
             if suggestions:
                 results["issues"].extend(suggestions[:2])  # Top 2 suggestions
 
-    except (ValueError, KeyError, AttributeError) as e:
+    except (ValueError, KeyError, AttributeError):
         # Performance tracking is optional
-        results["issues"].append(f"No performance data yet")
+        results["issues"].append("No performance data yet")
 
     return results
 
@@ -188,9 +192,9 @@ async def main():
 
     # Display results
     all_good = True
-    for name, result in checks.items():
+    for _name, result in checks.items():
         logger.info("{name}: {result['status']}")
-        for issue in result["issues"]:
+        for _issue in result["issues"]:
             logger.info("   → {issue}")
             if result["status"] != "✅":
                 all_good = False

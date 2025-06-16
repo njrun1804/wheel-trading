@@ -7,13 +7,14 @@ Provides IV rank, percentile, term structure, and skew analysis.
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
 from src.config.loader import get_config
+
 from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
@@ -26,7 +27,7 @@ class IVMetrics(NamedTuple):
     iv_rank: float  # 0-100 percentile over lookback period
     iv_percentile: float  # % of days below current IV
     iv_zscore: float  # Standard deviations from mean
-    term_structure: Dict[int, float]  # DTE -> IV
+    term_structure: dict[int, float]  # DTE -> IV
     put_call_skew: float  # 25 delta put IV / 25 delta call IV
     vol_of_vol: float  # Volatility of implied volatility
     mean_reversion_speed: float  # Half-life in days
@@ -49,13 +50,15 @@ class SkewMetrics:
 class IVSurfaceAnalyzer:
     """Analyzes implied volatility patterns for trading decisions."""
 
-    def __init__(self, lookback_days: int = 252, min_history: int = 30):  # 1 year for IV rank
+    def __init__(
+        self, lookback_days: int = 252, min_history: int = 30
+    ):  # 1 year for IV rank
         self.lookback_days = lookback_days
         self.min_history = min_history
-        self.iv_history: Dict[str, pd.DataFrame] = {}
+        self.iv_history: dict[str, pd.DataFrame] = {}
 
     @timed_operation(threshold_ms=50)
-    def analyze_iv_surface(self, option_chain: Dict, symbol: str = None) -> IVMetrics:
+    def analyze_iv_surface(self, option_chain: dict, symbol: str = None) -> IVMetrics:
         """
         Analyze current IV surface and historical patterns.
 
@@ -113,7 +116,9 @@ class IVSurfaceAnalyzer:
 
         return metrics
 
-    def update_iv_history(self, symbol: str, date: datetime, iv: float, dte: int = 30) -> None:
+    def update_iv_history(
+        self, symbol: str, date: datetime, iv: float, dte: int = 30
+    ) -> None:
         """Update historical IV data for a symbol."""
         if symbol not in self.iv_history:
             self.iv_history[symbol] = pd.DataFrame()
@@ -121,7 +126,9 @@ class IVSurfaceAnalyzer:
         # Add new data point
         new_data = pd.DataFrame({"date": [date], "iv": [iv], "dte": [dte]})
 
-        self.iv_history[symbol] = pd.concat([self.iv_history[symbol], new_data], ignore_index=True)
+        self.iv_history[symbol] = pd.concat(
+            [self.iv_history[symbol], new_data], ignore_index=True
+        )
 
         # Keep only lookback period
         cutoff_date = datetime.now() - timedelta(days=self.lookback_days)
@@ -129,7 +136,7 @@ class IVSurfaceAnalyzer:
             self.iv_history[symbol]["date"] >= cutoff_date
         ]
 
-    def _get_atm_iv(self, option_chain: Dict) -> float:
+    def _get_atm_iv(self, option_chain: dict) -> float:
         """Extract at-the-money implied volatility."""
         spot = option_chain.get("spot_price", 0)
 
@@ -141,9 +148,12 @@ class IVSurfaceAnalyzer:
         atm_put = min(puts, key=lambda x: abs(x["strike"] - spot))
         return atm_put.get("implied_volatility", 0.30)
 
-    def _calculate_iv_rank(self, symbol: str, current_iv: float) -> Tuple[float, float]:
+    def _calculate_iv_rank(self, symbol: str, current_iv: float) -> tuple[float, float]:
         """Calculate IV rank and percentile."""
-        if symbol not in self.iv_history or len(self.iv_history[symbol]) < self.min_history:
+        if (
+            symbol not in self.iv_history
+            or len(self.iv_history[symbol]) < self.min_history
+        ):
             return 50.0, 50.0  # Default to middle
 
         historical_ivs = self.iv_history[symbol]["iv"].values
@@ -164,7 +174,10 @@ class IVSurfaceAnalyzer:
 
     def _calculate_iv_zscore(self, symbol: str, current_iv: float) -> float:
         """Calculate how many standard deviations IV is from mean."""
-        if symbol not in self.iv_history or len(self.iv_history[symbol]) < self.min_history:
+        if (
+            symbol not in self.iv_history
+            or len(self.iv_history[symbol]) < self.min_history
+        ):
             return 0.0
 
         historical_ivs = self.iv_history[symbol]["iv"].values
@@ -175,7 +188,9 @@ class IVSurfaceAnalyzer:
             return (current_iv - mean_iv) / std_iv
         return 0.0
 
-    def _analyze_term_structure(self, option_chain: Dict) -> Tuple[Dict[int, float], str]:
+    def _analyze_term_structure(
+        self, option_chain: dict
+    ) -> tuple[dict[int, float], str]:
         """Analyze IV term structure across expirations."""
         term_structure = {}
 
@@ -211,7 +226,7 @@ class IVSurfaceAnalyzer:
 
         return term_structure, regime
 
-    def _calculate_skew(self, option_chain: Dict) -> SkewMetrics:
+    def _calculate_skew(self, option_chain: dict) -> SkewMetrics:
         """Calculate option skew metrics."""
         spot = option_chain.get("spot_price", 0)
         puts = option_chain.get("puts", [])
@@ -237,27 +252,36 @@ class IVSurfaceAnalyzer:
         # Calculate skew metrics
         skew_25delta = 0
         if put_25d and call_25d and atm_iv > 0:
-            skew_25delta = (put_25d["implied_volatility"] - call_25d["implied_volatility"]) / atm_iv
+            skew_25delta = (
+                put_25d["implied_volatility"] - call_25d["implied_volatility"]
+            ) / atm_iv
 
         skew_10delta = 0
         if put_10d and call_10d and atm_iv > 0:
-            skew_10delta = (put_10d["implied_volatility"] - call_10d["implied_volatility"]) / atm_iv
+            skew_10delta = (
+                put_10d["implied_volatility"] - call_10d["implied_volatility"]
+            ) / atm_iv
 
         risk_reversal = 0
         if put_25d and call_25d:
-            risk_reversal = call_25d["implied_volatility"] - put_25d["implied_volatility"]
+            risk_reversal = (
+                call_25d["implied_volatility"] - put_25d["implied_volatility"]
+            )
 
         butterfly = 0
         if put_25d and call_25d and atm_iv > 0:
             butterfly = (
-                0.5 * (put_25d["implied_volatility"] + call_25d["implied_volatility"]) - atm_iv
+                0.5 * (put_25d["implied_volatility"] + call_25d["implied_volatility"])
+                - atm_iv
             )
 
         # Estimate skew slope
         skew_slope = self._calculate_skew_slope(puts)
 
         # Crash indicator (0-1)
-        crash_indicator = self._calculate_crash_indicator(skew_25delta, skew_10delta, risk_reversal)
+        crash_indicator = self._calculate_crash_indicator(
+            skew_25delta, skew_10delta, risk_reversal
+        )
 
         return SkewMetrics(
             skew_25delta=skew_25delta,
@@ -268,7 +292,9 @@ class IVSurfaceAnalyzer:
             crash_indicator=crash_indicator,
         )
 
-    def _find_delta_option(self, options: List[Dict], target_delta: float) -> Optional[Dict]:
+    def _find_delta_option(
+        self, options: list[dict], target_delta: float
+    ) -> dict | None:
         """Find option closest to target delta."""
         if not options:
             return None
@@ -285,7 +311,7 @@ class IVSurfaceAnalyzer:
 
         return best_option if min_diff < 0.05 else None
 
-    def _calculate_skew_slope(self, puts: List[Dict]) -> float:
+    def _calculate_skew_slope(self, puts: list[dict]) -> float:
         """Calculate IV change per 10 delta points."""
         if len(puts) < 3:
             return 0.0
@@ -372,7 +398,7 @@ class IVSurfaceAnalyzer:
 
         return 30.0
 
-    def _calculate_confidence(self, symbol: str, option_chain: Dict) -> float:
+    def _calculate_confidence(self, symbol: str, option_chain: dict) -> float:
         """Calculate confidence in IV analysis."""
         confidence = 1.0
 
@@ -385,7 +411,9 @@ class IVSurfaceAnalyzer:
             confidence *= 0.5
 
         # Option chain quality
-        n_strikes = len(option_chain.get("puts", [])) + len(option_chain.get("calls", []))
+        n_strikes = len(option_chain.get("puts", [])) + len(
+            option_chain.get("calls", [])
+        )
         chain_conf = min(1.0, n_strikes / 20)
         confidence *= chain_conf
 

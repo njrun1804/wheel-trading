@@ -5,11 +5,8 @@ decisions in a tax-free environment.
 """
 from __future__ import annotations
 
-
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from scipy.optimize import brentq
@@ -36,7 +33,7 @@ class LoanTerms:
         """Exact daily rate for compounding."""
         return self.annual_rate / self.compound_frequency
 
-    def compound_interest(self, days: int, amount: Optional[float] = None) -> float:
+    def compound_interest(self, days: int, amount: float | None = None) -> float:
         """Calculate compound interest for given days."""
         p = amount if amount is not None else self.principal
         # Compound interest formula: A = P(1 + r/n)^(nt)
@@ -59,7 +56,7 @@ class InvestmentAnalysis:
 
     action: str  # 'invest', 'paydown', 'indifferent'
     npv: float  # Net Present Value
-    irr: Optional[float]  # Internal Rate of Return
+    irr: float | None  # Internal Rate of Return
     break_even_return: float  # Exact return needed to break even
     opportunity_cost: float  # Cost of not paying down debt
 
@@ -70,11 +67,11 @@ class InvestmentAnalysis:
 
     # Detailed metrics
     effective_borrowing_rate: float
-    days_to_break_even: Optional[int]
+    days_to_break_even: int | None
     return_multiple: float  # Expected return / borrowing cost
 
     # Sensitivity analysis
-    sensitivity: Dict[str, float] = None
+    sensitivity: dict[str, float] = None
 
     def __post_init__(self):
         if self.sensitivity is None:
@@ -87,7 +84,7 @@ class PureBorrowingAnalyzer:
     def __init__(self):
         """Initialize with loan terms."""
         self.config = get_config()
-        self.loans: Dict[str, LoanTerms] = {}
+        self.loans: dict[str, LoanTerms] = {}
         self._setup_loans()
 
     def _setup_loans(self):
@@ -99,10 +96,15 @@ class PureBorrowingAnalyzer:
 
         # Schwab margin
         self.loans["schwab"] = LoanTerms(
-            name="schwab", principal=0, annual_rate=0.10, is_revolving=True  # No current balance
+            name="schwab",
+            principal=0,
+            annual_rate=0.10,
+            is_revolving=True,  # No current balance
         )
 
-    def calculate_npv(self, cash_flows: List[Tuple[int, float]], discount_rate: float) -> float:
+    def calculate_npv(
+        self, cash_flows: list[tuple[int, float]], discount_rate: float
+    ) -> float:
         """
         Calculate Net Present Value of cash flows.
 
@@ -121,7 +123,7 @@ class PureBorrowingAnalyzer:
 
         return npv
 
-    def calculate_irr(self, cash_flows: List[Tuple[int, float]]) -> Optional[float]:
+    def calculate_irr(self, cash_flows: list[tuple[int, float]]) -> float | None:
         """
         Calculate Internal Rate of Return.
 
@@ -206,7 +208,9 @@ class PureBorrowingAnalyzer:
             break_even_return = 0
 
         # Opportunity cost of not paying down existing debt
-        opportunity_cost = self._calculate_opportunity_cost(investment_amount, holding_days)
+        opportunity_cost = self._calculate_opportunity_cost(
+            investment_amount, holding_days
+        )
 
         # Days to break even (when cumulative return exceeds borrowing cost)
         days_to_break_even = None
@@ -282,7 +286,7 @@ class PureBorrowingAnalyzer:
         holding_days: int,
         borrow_amount: float,
         loan: LoanTerms,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Perform sensitivity analysis on key parameters."""
         sensitivity = {}
 
@@ -338,8 +342,8 @@ class PureBorrowingAnalyzer:
         return sensitivity
 
     def compare_opportunities(
-        self, opportunities: List[Dict[str, float]], available_capital: float
-    ) -> Dict[str, InvestmentAnalysis]:
+        self, opportunities: list[dict[str, float]], available_capital: float
+    ) -> dict[str, InvestmentAnalysis]:
         """
         Compare multiple investment opportunities.
 
@@ -362,11 +366,13 @@ class PureBorrowingAnalyzer:
             results[f"opportunity_{i}"] = analysis
 
         # Sort by NPV
-        sorted_results = dict(sorted(results.items(), key=lambda x: x[1].npv, reverse=True))
+        sorted_results = dict(
+            sorted(results.items(), key=lambda x: x[1].npv, reverse=True)
+        )
 
         return sorted_results
 
-    def calculate_portfolio_irr(self, positions: List[Dict[str, any]]) -> float:
+    def calculate_portfolio_irr(self, positions: list[dict[str, any]]) -> float:
         """
         Calculate portfolio-wide IRR for multiple positions.
 

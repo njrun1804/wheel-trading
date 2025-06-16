@@ -9,8 +9,8 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def cleanup_database():
@@ -55,7 +55,9 @@ def cleanup_database():
             ).fetchone()[0]
 
             if exists:
-                record_count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+                record_count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[
+                    0
+                ]
 
                 if record_count > 0:
                     print(f"\nDropping {table}: {record_count:,} records")

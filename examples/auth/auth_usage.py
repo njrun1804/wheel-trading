@@ -10,9 +10,7 @@ This demonstrates:
 - Error recovery
 """
 import asyncio
-import os
 from datetime import datetime
-from typing import Any, Dict
 
 from src.config.loader import get_config_loader
 from src.unity_wheel.auth.client_v2 import AuthClient
@@ -109,7 +107,7 @@ async def demo_api_usage():
 
             # Second call - should hit cache
             start = datetime.now()
-            cached_chain = await auth_client.make_request(
+            await auth_client.make_request(
                 "GET",
                 "https://api.schwabapi.com/v1/marketdata/chains",
                 params={"symbol": "U", "contractType": "PUT", "strikeCount": 10},
@@ -148,7 +146,9 @@ async def demo_error_recovery():
         # Pre-populate cache
         logger.info("Pre-populating cache...")
         await auth_client.make_request(
-            "GET", "https://api.schwabapi.com/v1/marketdata/quotes", params={"symbols": "U"}
+            "GET",
+            "https://api.schwabapi.com/v1/marketdata/quotes",
+            params={"symbols": "U"},
         )
 
         # Simulate network error (cache fallback)

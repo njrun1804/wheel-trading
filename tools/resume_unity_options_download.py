@@ -17,14 +17,16 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -90,8 +92,16 @@ class UnityOptionsResumer:
 
                 for _, row in batch.iterrows():
                     # Convert prices from integer representation
-                    bid_px = row.get("bid_px_01", 0) / 10000.0 if "bid_px_01" in row else None
-                    ask_px = row.get("ask_px_01", 0) / 10000.0 if "ask_px_01" in row else None
+                    bid_px = (
+                        row.get("bid_px_01", 0) / 10000.0
+                        if "bid_px_01" in row
+                        else None
+                    )
+                    ask_px = (
+                        row.get("ask_px_01", 0) / 10000.0
+                        if "ask_px_01" in row
+                        else None
+                    )
 
                     # Get the raw symbol, handling both possible column names
                     raw_symbol = row.get("raw_symbol", row.get("symbol", ""))

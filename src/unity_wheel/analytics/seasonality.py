@@ -8,13 +8,14 @@ Identifies recurring patterns to optimize entry timing.
 import calendar
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
-from scipy import signal, stats
+from scipy import stats
 
 from src.config.loader import get_config
+
 from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
@@ -51,12 +52,12 @@ class SeasonalityDetector:
             symbol = config.unity.ticker
         self.symbol = symbol
         self.min_samples = min_samples
-        self.patterns: Dict[str, SeasonalPattern] = {}
+        self.patterns: dict[str, SeasonalPattern] = {}
 
     @timed_operation(threshold_ms=100)
     def analyze_seasonality(
         self, historical_data: pd.DataFrame, min_years: int = 2
-    ) -> List[SeasonalPattern]:
+    ) -> list[SeasonalPattern]:
         """
         Analyze all types of seasonality patterns.
 
@@ -70,7 +71,9 @@ class SeasonalityDetector:
         patterns = []
 
         # Ensure we have enough data
-        years_of_data = (historical_data.index[-1] - historical_data.index[0]).days / 365
+        years_of_data = (
+            historical_data.index[-1] - historical_data.index[0]
+        ).days / 365
         if years_of_data < min_years:
             logger.warning(f"Only {years_of_data:.1f} years of data, need {min_years}")
             return patterns
@@ -118,7 +121,7 @@ class SeasonalityDetector:
 
         return patterns
 
-    def _analyze_day_of_week(self, data: pd.DataFrame) -> Optional[SeasonalPattern]:
+    def _analyze_day_of_week(self, data: pd.DataFrame) -> SeasonalPattern | None:
         """Analyze day of week effects."""
         if "returns" not in data.columns:
             return None
@@ -129,7 +132,9 @@ class SeasonalityDetector:
 
         # Test for significance
         groups = [data[data["dow"] == i]["returns"].values for i in range(5)]  # Mon-Fri
-        f_stat, p_value = stats.f_oneway(*[g for g in groups if len(g) > self.min_samples])
+        f_stat, p_value = stats.f_oneway(
+            *[g for g in groups if len(g) > self.min_samples]
+        )
 
         if p_value < 0.05:  # Significant day of week effect
             # Find best and worst days
@@ -148,7 +153,7 @@ class SeasonalityDetector:
             )
 
             logger.info(
-                f"Day of week pattern detected",
+                "Day of week pattern detected",
                 extra={
                     "best_day": calendar.day_name[best_day],
                     "worst_day": calendar.day_name[worst_day],
@@ -160,7 +165,7 @@ class SeasonalityDetector:
 
         return None
 
-    def _analyze_monthly_patterns(self, data: pd.DataFrame) -> List[SeasonalPattern]:
+    def _analyze_monthly_patterns(self, data: pd.DataFrame) -> list[SeasonalPattern]:
         """Analyze monthly patterns (turn of month, mid-month, etc)."""
         patterns = []
 
@@ -173,7 +178,10 @@ class SeasonalityDetector:
         tom_returns = data[data["is_turn_of_month"]]["returns"]
         other_returns = data[~data["is_turn_of_month"]]["returns"]
 
-        if len(tom_returns) > self.min_samples and len(other_returns) > self.min_samples:
+        if (
+            len(tom_returns) > self.min_samples
+            and len(other_returns) > self.min_samples
+        ):
             t_stat, p_value = stats.ttest_ind(tom_returns, other_returns)
 
             if p_value < 0.05:
@@ -194,7 +202,9 @@ class SeasonalityDetector:
                 patterns.append(pattern)
 
         # Mid-month effect (days 10-20)
-        data["is_mid_month"] = (data["day_of_month"] >= 10) & (data["day_of_month"] <= 20)
+        data["is_mid_month"] = (data["day_of_month"] >= 10) & (
+            data["day_of_month"] <= 20
+        )
 
         mid_returns = data[data["is_mid_month"]]["returns"]
         other_returns = data[~data["is_mid_month"]]["returns"]
@@ -211,7 +221,9 @@ class SeasonalityDetector:
                     strength=1 - p_value,
                     effect_size=effect_size,
                     best_action=(
-                        "Mid-month typically favorable" if effect_size > 0 else "Avoid mid-month"
+                        "Mid-month typically favorable"
+                        if effect_size > 0
+                        else "Avoid mid-month"
                     ),
                     confidence=min(1.0, len(mid_returns) / 100),
                 )
@@ -219,7 +231,7 @@ class SeasonalityDetector:
 
         return patterns
 
-    def _analyze_quarterly_patterns(self, data: pd.DataFrame) -> Optional[SeasonalPattern]:
+    def _analyze_quarterly_patterns(self, data: pd.DataFrame) -> SeasonalPattern | None:
         """Analyze quarterly patterns (earnings seasons)."""
         # Unity typically reports in early Feb, May, Aug, Nov
         data["quarter"] = data.index.quarter
@@ -239,7 +251,10 @@ class SeasonalityDetector:
 
             # F-test for variance
             f_stat = (earnings_vol**2) / (other_vol**2)
-            p_value = stats.f.sf(f_stat, len(earnings_returns) - 1, len(other_returns) - 1) * 2
+            p_value = (
+                stats.f.sf(f_stat, len(earnings_returns) - 1, len(other_returns) - 1)
+                * 2
+            )
 
             if p_value < 0.05 or earnings_vol > other_vol * 1.3:
                 pattern = SeasonalPattern(
@@ -252,7 +267,7 @@ class SeasonalityDetector:
                 )
 
                 logger.info(
-                    f"Earnings cycle pattern detected",
+                    "Earnings cycle pattern detected",
                     extra={
                         "earnings_vol": earnings_vol,
                         "other_vol": other_vol,
@@ -264,7 +279,7 @@ class SeasonalityDetector:
 
         return None
 
-    def _analyze_annual_patterns(self, data: pd.DataFrame) -> Optional[SeasonalPattern]:
+    def _analyze_annual_patterns(self, data: pd.DataFrame) -> SeasonalPattern | None:
         """Analyze annual patterns (tax loss, year-end, etc)."""
         data["month"] = data.index.month
 
@@ -295,7 +310,7 @@ class SeasonalityDetector:
 
         return None
 
-    def _analyze_opex_patterns(self, data: pd.DataFrame) -> Optional[SeasonalPattern]:
+    def _analyze_opex_patterns(self, data: pd.DataFrame) -> SeasonalPattern | None:
         """Analyze options expiration patterns."""
         # Third Friday of each month
         data["is_opex_week"] = self._mark_opex_weeks(data.index)
@@ -325,7 +340,7 @@ class SeasonalityDetector:
 
         return None
 
-    def _analyze_gaming_seasonality(self, data: pd.DataFrame) -> List[SeasonalPattern]:
+    def _analyze_gaming_seasonality(self, data: pd.DataFrame) -> list[SeasonalPattern]:
         """Analyze gaming industry specific patterns."""
         patterns = []
         data["month"] = data.index.month
@@ -398,8 +413,8 @@ class SeasonalityDetector:
         return is_opex
 
     def apply_seasonal_adjustments(
-        self, base_params: Dict[str, float], current_date: datetime
-    ) -> Dict[str, float]:
+        self, base_params: dict[str, float], current_date: datetime
+    ) -> dict[str, float]:
         """
         Apply seasonal adjustments to strategy parameters.
 
@@ -419,14 +434,16 @@ class SeasonalityDetector:
 
             if pattern.period == "weekly":
                 if "day_of_week" in pattern_type:
-                    current_dow = current_date.weekday()
+                    current_date.weekday()
                     # Apply adjustment based on day
                     applies = True
 
             elif pattern.period == "monthly":
                 if "turn_of_month" in pattern_type:
                     day = current_date.day
-                    days_in_month = calendar.monthrange(current_date.year, current_date.month)[1]
+                    days_in_month = calendar.monthrange(
+                        current_date.year, current_date.month
+                    )[1]
                     applies = day <= 3 or day >= days_in_month - 1
 
                 elif "opex" in pattern_type:
@@ -458,8 +475,11 @@ class SeasonalityDetector:
 
         if adjustments_applied:
             logger.info(
-                f"Applied seasonal adjustments",
-                extra={"patterns": adjustments_applied, "date": current_date.strftime("%Y-%m-%d")},
+                "Applied seasonal adjustments",
+                extra={
+                    "patterns": adjustments_applied,
+                    "date": current_date.strftime("%Y-%m-%d"),
+                },
             )
 
         return adjusted
@@ -472,7 +492,7 @@ class SeasonalityDetector:
 
         return abs((date - third_friday).days) <= 3
 
-    def generate_seasonality_report(self) -> List[str]:
+    def generate_seasonality_report(self) -> list[str]:
         """Generate human-readable seasonality report."""
         report = ["=== SEASONALITY ANALYSIS ===", ""]
 
@@ -481,7 +501,9 @@ class SeasonalityDetector:
             return report
 
         # Sort by strength
-        sorted_patterns = sorted(self.patterns.values(), key=lambda x: x.strength, reverse=True)
+        sorted_patterns = sorted(
+            self.patterns.values(), key=lambda x: x.strength, reverse=True
+        )
 
         for pattern in sorted_patterns:
             report.append(f"{pattern.pattern_type.upper()}")

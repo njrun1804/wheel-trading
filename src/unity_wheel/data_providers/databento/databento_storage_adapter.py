@@ -5,17 +5,14 @@ Databento storage adapter implementing the documented storage plan.
 Integrates with unified storage layer for options data.
 """
 
-import asyncio
-import json
 from datetime import datetime, timedelta
-from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from src.config.loader import get_config
 from unity_wheel.storage import Storage
 from unity_wheel.utils import get_logger
 
-from .types import InstrumentDefinition, OptionChain, OptionQuote
+from .types import InstrumentDefinition, OptionChain
 from .validation import DataValidator
 
 logger = get_logger(__name__)
@@ -38,7 +35,9 @@ class DatabentoStorageAdapter:
         self.INTRADAY_TTL_MINUTES = (
             config.data.cache_ttl.intraday / 60
         )  # Convert seconds to minutes
-        self.GREEKS_TTL_MINUTES = config.data.cache_ttl.greeks / 60  # Convert seconds to minutes
+        self.GREEKS_TTL_MINUTES = (
+            config.data.cache_ttl.greeks / 60
+        )  # Convert seconds to minutes
 
         # Track storage metrics
         self._metrics = {
@@ -127,7 +126,10 @@ class DatabentoStorageAdapter:
         logger.info("databento_storage_initialized")
 
     async def store_option_chain(
-        self, chain: OptionChain, definitions: List[InstrumentDefinition], enriched: bool = False
+        self,
+        chain: OptionChain,
+        definitions: list[InstrumentDefinition],
+        enriched: bool = False,
     ) -> bool:
         """Store option chain with moneyness filtering.
 
@@ -257,7 +259,9 @@ class DatabentoStorageAdapter:
             "moneyness_filter_applied",
             original=original_count,
             filtered=filtered_count,
-            reduction_pct=(1 - filtered_count / original_count) if original_count > 0 else 0,
+            reduction_pct=(1 - filtered_count / original_count)
+            if original_count > 0
+            else 0,
         )
 
         return chain
@@ -266,9 +270,9 @@ class DatabentoStorageAdapter:
         self,
         symbol: str,
         expiration: datetime,
-        fetch_func: Optional[Any] = None,
+        fetch_func: Any | None = None,
         max_age_minutes: int = None,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get option chain using get_or_fetch pattern.
 
         Args:
@@ -315,7 +319,7 @@ class DatabentoStorageAdapter:
 
     async def _get_cached_chain(
         self, symbol: str, expiration: datetime, max_age_minutes: int
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get cached option chain from DuckDB."""
         cutoff = datetime.utcnow() - timedelta(minutes=max_age_minutes)
 
@@ -334,7 +338,13 @@ class DatabentoStorageAdapter:
 
         result = await self.storage.cache.conn.execute(
             query,
-            [symbol, expiration.date(), cutoff, 1 - self.MONEYNESS_RANGE, 1 + self.MONEYNESS_RANGE],
+            [
+                symbol,
+                expiration.date(),
+                cutoff,
+                1 - self.MONEYNESS_RANGE,
+                1 + self.MONEYNESS_RANGE,
+            ],
         ).fetchall()
 
         if not result:
@@ -347,7 +357,21 @@ class DatabentoStorageAdapter:
         timestamp = None
 
         for row in result:
-            strike, opt_type, bid, ask, mid, volume, iv, delta, gamma, theta, vega, ts, spot = row
+            (
+                strike,
+                opt_type,
+                bid,
+                ask,
+                mid,
+                volume,
+                iv,
+                delta,
+                gamma,
+                theta,
+                vega,
+                ts,
+                spot,
+            ) = row
 
             option_data = {
                 "strike": float(strike),
@@ -381,7 +405,7 @@ class DatabentoStorageAdapter:
         }
 
     async def store_wheel_candidates(
-        self, symbol: str, target_delta: float, candidates: List[Dict[str, Any]]
+        self, symbol: str, target_delta: float, candidates: list[dict[str, Any]]
     ):
         """Store pre-filtered wheel candidates."""
         records = []
@@ -434,7 +458,7 @@ class DatabentoStorageAdapter:
                 f"INSERT OR REPLACE INTO wheel_candidates VALUES {placeholders}", values
             )
 
-    async def get_storage_stats(self) -> Dict[str, Any]:
+    async def get_storage_stats(self) -> dict[str, Any]:
         """Get storage statistics."""
         # Get table sizes
         stats = await self.storage.cache.conn.execute(
@@ -475,7 +499,7 @@ class DatabentoStorageAdapter:
             ),
         }
 
-    async def _batch_insert_options(self, records: List[Dict]):
+    async def _batch_insert_options(self, records: list[dict]):
         """Efficiently insert multiple option records."""
         if not records:
             return
@@ -529,7 +553,7 @@ class DatabentoStorageAdapter:
             [today],
         )
 
-    def _format_chain_response(self, data: Dict) -> Dict[str, Any]:
+    def _format_chain_response(self, data: dict) -> dict[str, Any]:
         """Format chain data for application use."""
         chain = data["chain"]
         definitions = data["definitions"]
@@ -569,7 +593,9 @@ class DatabentoStorageAdapter:
 
         return {
             "symbol": chain.underlying,
-            "expiration": chain.expiration.isoformat() if hasattr(chain, "expiration") else None,
+            "expiration": chain.expiration.isoformat()
+            if hasattr(chain, "expiration")
+            else None,
             "spot_price": float(chain.spot_price),
             "timestamp": chain.timestamp.isoformat(),
             "calls": sorted(calls, key=lambda x: x["strike"]),

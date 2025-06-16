@@ -1,0 +1,299 @@
+#!/usr/bin/env python3
+"""
+Bolt - 8-Agent Hardware-Accelerated Problem Solver
+Production-ready main executable for the Bolt system
+"""
+
+import os
+import sys
+import traceback
+from pathlib import Path
+
+
+def setup_environment():
+    """Setup Python path and environment."""
+    # Get the script directory and add to Python path
+    script_dir = Path(__file__).parent.resolve()
+    bolt_dir = script_dir / "bolt"
+    
+    # Add directories to Python path
+    for path in [str(script_dir), str(bolt_dir), str(script_dir / "src")]:
+        if path not in sys.path:
+            sys.path.insert(0, path)
+    
+    # Set working directory
+    os.chdir(script_dir)
+
+def check_requirements():
+    """Check if basic requirements are available."""
+    requirements = []
+    
+    # Check Python version
+    if sys.version_info < (3, 8):
+        requirements.append("Python 3.8 or higher is required")
+    
+    # Check essential modules
+    try:
+        import asyncio
+
+        import click
+        import psutil
+    except ImportError as e:
+        requirements.append(f"Missing required module: {e}")
+    
+    return requirements
+
+def show_system_info():
+    """Show system information and status."""
+    try:
+        from bolt.core.system_info import get_system_status
+        status = get_system_status()
+        
+        print("🔧 Bolt System Information")
+        print("=" * 50)
+        print(f"Hardware: {status['hardware']}")
+        print(f"Platform: {status['platform']} ({status['machine']})")
+        print(f"Python: {status['python_version']}")
+        print(f"Memory: {status['memory_gb']:.1f}GB")
+        print(f"CPU Cores: {status['cpu_cores']} cores, {status['cpu_threads']} threads")
+        print(f"GPU Backend: {status['gpu_backend']}")
+        
+        if status.get('gpu_memory_gb'):
+            print(f"GPU Memory: {status['gpu_memory_gb']:.1f}GB")
+        
+        print("\n🔧 Accelerated Tools Status:")
+        tools = status.get('accelerated_tools', {})
+        for tool, available in tools.items():
+            status_icon = "✅" if available else "❌"
+            print(f"  {status_icon} {tool}")
+            
+    except Exception as e:
+        print(f"⚠️  Could not retrieve system info: {e}")
+
+def show_help():
+    """Show comprehensive help information."""
+    print("""
+🚀 Bolt - 8-Agent Hardware-Accelerated Problem Solver
+
+DESCRIPTION:
+    Bolt is a production-ready system for solving complex programming problems
+    using 8 parallel Claude Code agents with M4 Pro hardware acceleration.
+
+USAGE:
+    bolt <command> [options]
+
+COMMANDS:
+    solve      Solve problems using integrated 8-agent system
+    monitor    Monitor system performance and hardware utilization  
+    benchmark  Run performance benchmarks for hardware acceleration
+    status     Show system status and configuration
+
+GLOBAL OPTIONS:
+    --help     Show this help message
+    --version  Show version information
+    --debug    Enable debug mode for detailed error information
+
+SOLVE COMMAND:
+    bolt solve "query" [options]
+    
+    Options:
+        --analyze-only    Only analyze, don't execute changes
+        --agents N        Number of agents to use (default: 8)
+        --verbose         Enable verbose output
+        --debug           Enable debug mode
+    
+    Examples:
+        bolt solve "optimize database queries"
+        bolt solve "fix memory leak in trading module" --analyze-only
+        bolt solve "refactor wheel strategy code" --agents 4
+        bolt solve "analyze performance bottlenecks" --debug
+
+MONITOR COMMAND:
+    bolt monitor [options]
+    
+    Options:
+        --duration N      Monitoring duration in seconds (default: 60)
+        --interval N      Update interval in seconds (default: 1.0)
+        --verbose         Enable verbose output
+    
+    Examples:
+        bolt monitor --duration 120
+        bolt monitor --interval 0.5 --verbose
+
+BENCHMARK COMMAND:
+    bolt benchmark [options]
+    
+    Options:
+        --quick          Run quick benchmark (30 seconds)
+        --full           Run comprehensive benchmark (5+ minutes)
+        --verbose        Enable verbose output
+    
+    Examples:
+        bolt benchmark --quick
+        bolt benchmark --full --verbose
+
+STATUS COMMAND:
+    bolt status
+    
+    Shows system information including:
+    • Hardware capabilities and GPU status
+    • Memory and CPU information
+    • Accelerated tools availability
+    • Einstein integration status
+
+FEATURES:
+    • 8 parallel Claude Code agents with task orchestration
+    • Hardware-accelerated tools (MLX GPU, Metal, 12-core M4 Pro)
+    • Real-time system monitoring with memory safety
+    • Einstein semantic search integration
+    • Intelligent task decomposition and execution
+    • Comprehensive error handling and fallback modes
+
+SYSTEM REQUIREMENTS:
+    • Python 3.8 or higher
+    • macOS with Apple Silicon (M1/M2/M3/M4) for optimal performance
+    • Required Python packages (see requirements.txt)
+
+For more information, visit: https://github.com/njrun1804/wheel-trading
+""")
+
+def main():
+    """Main entry point with comprehensive error handling."""
+    try:
+        # Setup environment
+        setup_environment()
+        
+        # Check basic requirements
+        missing_reqs = check_requirements()
+        if missing_reqs:
+            print("❌ Missing requirements:", file=sys.stderr)
+            for req in missing_reqs:
+                print(f"   - {req}", file=sys.stderr)
+            print("\nPlease install missing requirements and try again.")
+            sys.exit(1)
+        
+        # Handle no arguments
+        if len(sys.argv) < 2:
+            print("Bolt - 8-Agent Hardware-Accelerated Problem Solver")
+            print("Usage: bolt <command> [options]")
+            print("")
+            print("Commands:")
+            print("  solve      Solve problems using 8-agent system")
+            print("  monitor    Monitor system performance")
+            print("  benchmark  Run performance benchmarks")
+            print("  status     Show system status")
+            print("  --help     Show detailed help")
+            print("  --version  Show version information")
+            print("")
+            print("Examples:")
+            print("  bolt solve \"optimize database queries\"")
+            print("  bolt solve \"fix memory leak\" --analyze-only")
+            print("  bolt monitor --duration 60")
+            print("  bolt benchmark --quick")
+            print("  bolt status")
+            sys.exit(1)
+        
+        # Handle global options - only if they're the first argument
+        if len(sys.argv) >= 2 and sys.argv[1] in ["--version", "-v"]:
+            print("Bolt 8-Agent Problem Solver v1.0.0")
+            print("Hardware-accelerated AI agents for M4 Pro")
+            print("Features: Einstein integration, Metal GPU, MLX acceleration")
+            return
+        
+        if len(sys.argv) >= 2 and sys.argv[1] in ["--help", "-h"]:
+            show_help()
+            return
+        
+        # Get command
+        command = sys.argv[1].lower()
+        
+        # Route to appropriate handler
+        if command == "solve":
+            handle_solve_command()
+        elif command == "monitor":
+            handle_monitor_command()
+        elif command == "benchmark":
+            handle_benchmark_command()
+        elif command == "status":
+            show_system_info()
+        else:
+            print(f"❌ Unknown command: {command}")
+            print("Use 'bolt --help' for available commands")
+            sys.exit(1)
+            
+    except KeyboardInterrupt:
+        print("\n⚠️  Operation cancelled by user")
+        sys.exit(130)
+    except Exception as e:
+        print(f"💥 Unexpected error: {e}")
+        if "--debug" in sys.argv:
+            traceback.print_exc()
+        else:
+            print("Use --debug for detailed error information")
+        sys.exit(1)
+
+def handle_solve_command():
+    """Handle the solve command."""
+    try:
+        # Try fallback solve implementation directly for more reliability
+        handle_solve_fallback()
+    except Exception as e:
+        print(f"❌ Error in solve command: {e}")
+        if "--debug" in sys.argv:
+            traceback.print_exc()
+        sys.exit(1)
+
+def handle_solve_fallback():
+    """Fallback solve implementation."""
+    try:
+        from bolt.solve import main as solve_main
+
+        # Adjust argv for the solve module - remove 'solve' and pass the rest
+        sys.argv = [sys.argv[0]] + sys.argv[2:]
+        solve_main()
+        
+    except ImportError as e:
+        print(f"❌ Fallback solve also failed: {e}")
+        print("Please check your installation")
+        sys.exit(1)
+
+def handle_monitor_command():
+    """Handle the monitor command."""
+    try:
+        from bolt.cli.monitor import main as monitor_main
+
+        # Remove 'monitor' from argv
+        sys.argv = [sys.argv[0]] + sys.argv[2:]
+        monitor_main()
+        
+    except ImportError as e:
+        print(f"❌ Error importing monitor command: {e}")
+        print("Monitor functionality not available")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error in monitor command: {e}")
+        if "--debug" in sys.argv:
+            traceback.print_exc()
+        sys.exit(1)
+
+def handle_benchmark_command():
+    """Handle the benchmark command."""
+    try:
+        from bolt.cli.benchmark import main as benchmark_main
+
+        # Remove 'benchmark' from argv
+        sys.argv = [sys.argv[0]] + sys.argv[2:]
+        benchmark_main()
+        
+    except ImportError as e:
+        print(f"❌ Error importing benchmark command: {e}")
+        print("Benchmark functionality not available")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error in benchmark command: {e}")
+        if "--debug" in sys.argv:
+            traceback.print_exc()
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

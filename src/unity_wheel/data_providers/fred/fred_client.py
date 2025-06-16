@@ -3,26 +3,27 @@
 from __future__ import annotations
 
 import asyncio
-import os
 import time
 from datetime import date as Date
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional, Union
+from datetime import timedelta
 
-import aiohttp
-from aiohttp import ClientError, ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from unity_wheel.secrets.integration import get_fred_api_key
 from unity_wheel.storage.cache.general_cache import cached
-from unity_wheel.utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
+from unity_wheel.utils import (
+    RecoveryStrategy,
+    get_logger,
+    timed_operation,
+    with_recovery,
+)
 from unity_wheel.utils.data_validator import die
 
 from .fred_models import (
     FREDDataset,
     FREDObservation,
     FREDSeries,
-    UpdateFrequency,
     WheelStrategyFREDSeries,
 )
 
@@ -60,7 +61,7 @@ class FREDClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         rpm_limit: int = 90,
         timeout: int = 30,
     ):
@@ -87,9 +88,12 @@ class FREDClient:
 
         self.rate_limiter = FREDRateLimiter(min(rpm_limit, 115))
         self.timeout = ClientTimeout(total=timeout)
-        self._session: Optional[ClientSession] = None
+        self._session: ClientSession | None = None
 
-        logger.info("FRED client initialized", extra={"rpm_limit": rpm_limit, "timeout": timeout})
+        logger.info(
+            "FRED client initialized",
+            extra={"rpm_limit": rpm_limit, "timeout": timeout},
+        )
 
     async def __aenter__(self):
         """Async context manager entry."""
@@ -105,7 +109,9 @@ class FREDClient:
     def session(self) -> ClientSession:
         """Get active session."""
         if not self._session:
-            raise RuntimeError("Client not initialized. Use 'async with FREDClient() as client:'")
+            raise RuntimeError(
+                "Client not initialized. Use 'async with FREDClient() as client:'"
+            )
         return self._session
 
     @retry(
@@ -116,8 +122,8 @@ class FREDClient:
     async def _request(
         self,
         endpoint: str,
-        params: Dict[str, Union[str, int]],
-    ) -> Dict:
+        params: dict[str, str | int],
+    ) -> dict:
         """Make rate-limited request to FRED API."""
         await self.rate_limiter.acquire()
 
@@ -135,7 +141,9 @@ class FREDClient:
 
                 # Check for API errors
                 if "error_code" in data:
-                    raise ValueError(f"FRED API error: {data.get('error_message', 'Unknown')}")
+                    raise ValueError(
+                        f"FRED API error: {data.get('error_message', 'Unknown')}"
+                    )
 
                 return data
 
@@ -174,7 +182,9 @@ class FREDClient:
             observation_end=series_data["observation_end"],
             frequency=series_data["frequency_short"],
             units=series_data["units"],
-            seasonal_adjustment=series_data.get("seasonal_adjustment", "Not Applicable"),
+            seasonal_adjustment=series_data.get(
+                "seasonal_adjustment", "Not Applicable"
+            ),
             last_updated=series_data["last_updated"],
             popularity=series_data.get("popularity", 0),
             notes=series_data.get("notes"),
@@ -196,11 +206,11 @@ class FREDClient:
     async def get_observations(
         self,
         series_id: str,
-        start_date: Optional[Date] = None,
-        end_date: Optional[Date] = None,
+        start_date: Date | None = None,
+        end_date: Date | None = None,
         limit: int = 100000,
         include_vintage: bool = False,
-    ) -> List[FREDObservation]:
+    ) -> list[FREDObservation]:
         """
         Get series observations.
 
@@ -283,8 +293,8 @@ class FREDClient:
     async def get_dataset(
         self,
         series_id: str,
-        start_date: Optional[Date] = None,
-        end_date: Optional[Date] = None,
+        start_date: Date | None = None,
+        end_date: Date | None = None,
     ) -> FREDDataset:
         """
         Get complete dataset with metadata and observations.
@@ -308,7 +318,7 @@ class FREDClient:
     async def get_wheel_strategy_data(
         self,
         lookback_days: int = 1825,  # 5 years
-    ) -> Dict[str, FREDDataset]:
+    ) -> dict[str, FREDDataset]:
         """
         Get all data series relevant to wheel strategy.
 
@@ -331,7 +341,10 @@ class FREDClient:
         )
 
         # Create tasks for concurrent fetching
-        tasks = {series_id: self.get_dataset(series_id, start_date) for series_id in series_ids}
+        tasks = {
+            series_id: self.get_dataset(series_id, start_date)
+            for series_id in series_ids
+        }
 
         # Use semaphore to limit concurrent requests
         semaphore = asyncio.Semaphore(8)
@@ -350,7 +363,9 @@ class FREDClient:
         )
 
         # Build results dictionary, filtering out failures
-        datasets = {series_id: dataset for series_id, dataset in results if dataset is not None}
+        datasets = {
+            series_id: dataset for series_id, dataset in results if dataset is not None
+        }
 
         logger.info(
             f"Successfully fetched {len(datasets)}/{len(series_ids)} series",

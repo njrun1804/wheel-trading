@@ -17,14 +17,16 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -64,7 +66,7 @@ class UnityOptionsEODDownloader:
 
             if df.empty:
                 # Try alternative approach - get last trades of the day
-                logger.debug(f"No statistics data, trying trades...")
+                logger.debug("No statistics data, trying trades...")
 
                 data = self.client.client.timeseries.get_range(
                     dataset="OPRA.PILLAR",
@@ -134,7 +136,9 @@ class UnityOptionsEODDownloader:
 
                 bid = convert_price(row.get("bid_close", row.get("bid_px", None)))
                 ask = convert_price(row.get("ask_close", row.get("ask_px", None)))
-                last = convert_price(row.get("close_price", row.get("last_price", None)))
+                last = convert_price(
+                    row.get("close_price", row.get("last_price", None))
+                )
 
                 # Insert into database
                 self.conn.execute(
@@ -197,7 +201,9 @@ class UnityOptionsEODDownloader:
                     continue
 
                 last_price = (
-                    last_trade.get("price", 0) / 10000.0 if last_trade.get("price") else None
+                    last_trade.get("price", 0) / 10000.0
+                    if last_trade.get("price")
+                    else None
                 )
 
                 self.conn.execute(
@@ -207,7 +213,15 @@ class UnityOptionsEODDownloader:
                      last, volume)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
-                    (date, symbol, expiration, strike, option_type, last_price, daily_volume),
+                    (
+                        date,
+                        symbol,
+                        expiration,
+                        strike,
+                        option_type,
+                        last_price,
+                        daily_volume,
+                    ),
                 )
 
                 eod_data.append(symbol)
@@ -340,7 +354,9 @@ class UnityOptionsEODDownloader:
             logger.info("\n✅ Unity options EOD data successfully downloaded")
             logger.info("✅ All data is REAL from Databento - NO SYNTHETIC DATA")
         else:
-            logger.warning("\n⚠️  No Unity options data found - check Databento subscription")
+            logger.warning(
+                "\n⚠️  No Unity options data found - check Databento subscription"
+            )
 
     def cleanup(self):
         """Close database connection."""

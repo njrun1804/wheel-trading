@@ -1,0 +1,75 @@
+# Project-wide secrets & paths
+# Uncomment the following line if you have global secrets
+# env_chain ~/.global_secrets
+
+# GitHub integration
+export GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+
+# API Keys
+export BRAVE_API_KEY="${BRAVE_API_KEY:-}"
+export DATABENTO_API_KEY="${DATABENTO_API_KEY:-}"
+export FRED_API_KEY="${FRED_API_KEY:-}"
+
+# Database paths
+export DUCKDB_PATH="$PWD/data/cache/wheel_cache.duckdb"
+export WHEEL_TRADING_DB="$PWD/data/wheel_trading_master.duckdb"
+
+# OpenTelemetry configuration
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://127.0.0.1:4318"
+export OTEL_BSP_MAX_EXPORT_BATCH_SIZE="256"
+export OTEL_SERVICE_NAME="wheel-trading"
+
+# Claude Code optimization settings - Balanced for orchestrator use
+
+# Auto-accept settings for streamlined workflow
+export CLAUDE_CODE_AUTO_ACCEPT="true"
+export CLAUDE_CODE_AUTO_APPROVE="true"
+export BASH_MAX_TIMEOUT_MS="1800000"
+export BASH_MAX_OUTPUT_LENGTH="500000"
+
+# Claude model configuration - Use Opus (claude-opus-4-20250514)
+# To use this model, you would normally run: claude model claude-opus-4-20250514
+# But we can set it as default here:
+# export ANTHROPIC_MODEL="claude-opus-4-20250514"
+
+# Python optimization
+export PYTHONUNBUFFERED="1"
+export PYTHONDONTWRITEBYTECODE="1"
+export PYTHONPATH="$PWD:$PYTHONPATH"
+
+# MCP configuration
+export MCP_CONFIG="$PWD/mcp-servers.json"
+export MCP_ROOT="$PWD"
+export MCP_PERFORMANCE_MODE="true"
+
+# Node.js optimization for NPX servers (2GB for 24GB system)
+export NODE_OPTIONS="--max-old-space-size=2048"
+
+# M4 Mac optimization
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES"
+
+# Hardware acceleration settings
+export JARVIS2_WORKERS=12
+export METAL_AVAILABLE_MEMORY=20401094656  # 19GB in bytes
+export JARVIS2_PARALLEL_WORKERS=12
+export OMP_NUM_THREADS=12
+export USE_TURBO_MODE=1
+export CLAUDE_HARDWARE_ACCEL=1
+export KMP_DUPLICATE_LIB_OK=TRUE
+
+# Project-specific paths
+export PROJECT_ROOT="$PWD"
+export LOG_DIR="$PWD/logs"
+export CACHE_DIR="$PWD/data/cache"
+
+# Create necessary directories
+mkdir -p "$LOG_DIR" "$CACHE_DIR"
+
+# Logging
+export LOG_LEVEL="${LOG_LEVEL:-INFO}"
+
+# Commented out - uncomment if you want the message back
+# echo "✓ Environment loaded for wheel-trading project"
+# JAX Metal GPU acceleration
+export JAX_PLATFORM_NAME="METAL"
+export JAX_ENABLE_X64="True"

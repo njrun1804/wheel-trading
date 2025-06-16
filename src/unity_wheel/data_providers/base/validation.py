@@ -4,11 +4,9 @@ from __future__ import annotations
 
 import statistics
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
-
-import numpy as np
+from typing import Any
 
 from unity_wheel.utils import StructuredLogger, get_logger
 
@@ -35,7 +33,7 @@ class ValidationRule:
     severity: str  # "error", "warning", "info"
     check_func: callable
     auto_correct: bool = False
-    correction_func: Optional[callable] = None
+    correction_func: callable | None = None
 
 
 @dataclass
@@ -44,9 +42,9 @@ class ValidationResult:
 
     is_valid: bool
     quality_level: DataQualityLevel
-    issues: List[ValidationIssue] = field(default_factory=list)
-    corrections_applied: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    issues: list[ValidationIssue] = field(default_factory=list)
+    corrections_applied: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def has_errors(self) -> bool:
@@ -66,10 +64,10 @@ class ValidationIssue:
     rule_name: str
     severity: str
     message: str
-    field_name: Optional[str] = None  # Renamed to avoid conflict with dataclass field
+    field_name: str | None = None  # Renamed to avoid conflict with dataclass field
     value: Any = None
     expected: Any = None
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class MarketDataValidator:
@@ -87,7 +85,7 @@ class MarketDataValidator:
 
     def __init__(self):
         """Initialize validator with default rules."""
-        self.rules: Dict[str, ValidationRule] = {}
+        self.rules: dict[str, ValidationRule] = {}
         self._initialize_default_rules()
 
         # Validation statistics
@@ -184,7 +182,7 @@ class MarketDataValidator:
         severity: str,
         check_func: callable,
         auto_correct: bool = False,
-        correction_func: Optional[callable] = None,
+        correction_func: callable | None = None,
     ) -> None:
         """Add a validation rule."""
         self.rules[name] = ValidationRule(
@@ -198,8 +196,8 @@ class MarketDataValidator:
 
     def validate(
         self,
-        data: Dict[str, Any],
-        rules: Optional[List[str]] = None,
+        data: dict[str, Any],
+        rules: list[str] | None = None,
         auto_correct: bool = True,
     ) -> ValidationResult:
         """
@@ -253,7 +251,9 @@ class MarketDataValidator:
                             corrections.append(f"Applied correction for {rule.name}")
                             self.validation_stats["auto_corrected"] += 1
                         except (ValueError, KeyError, AttributeError) as e:
-                            logger.error(f"Failed to apply correction for {rule.name}: {e}")
+                            logger.error(
+                                f"Failed to apply correction for {rule.name}: {e}"
+                            )
 
             except (ValueError, KeyError, AttributeError) as e:
                 logger.error(f"Validation rule {rule_name} failed: {e}")
@@ -289,7 +289,7 @@ class MarketDataValidator:
         # Log validation results
         if is_valid:
             logger.info(
-                f"Data validation passed",
+                "Data validation passed",
                 extra={
                     "function": "validate",
                     "quality_level": quality_level.value,
@@ -300,7 +300,7 @@ class MarketDataValidator:
             )
         else:
             logger.warning(
-                f"Data validation failed",
+                "Data validation failed",
                 extra={
                     "function": "validate",
                     "quality_level": quality_level.value,
@@ -316,7 +316,7 @@ class MarketDataValidator:
             issues=issues,
             corrections_applied=corrections,
             metadata={
-                "validation_time": datetime.now(timezone.utc),
+                "validation_time": datetime.now(UTC),
                 "rules_checked": len(rules_to_check),
             },
         )
@@ -337,19 +337,19 @@ class MarketDataValidator:
             return False
 
         # Ensure both timestamps are timezone-aware for comparison
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # If timestamp is timezone-naive, assume UTC
         if timestamp.tzinfo is None:
-            timestamp = timestamp.replace(tzinfo=timezone.utc)
+            timestamp = timestamp.replace(tzinfo=UTC)
         # If timestamp has timezone, convert to UTC
-        elif timestamp.tzinfo != timezone.utc:
-            timestamp = timestamp.astimezone(timezone.utc)
+        elif timestamp.tzinfo != UTC:
+            timestamp = timestamp.astimezone(UTC)
 
         age = now - timestamp
         return age < timedelta(minutes=minutes)
 
-    def _validate_option_chain_consistency(self, data: Dict[str, Any]) -> bool:
+    def _validate_option_chain_consistency(self, data: dict[str, Any]) -> bool:
         """Validate option chain internal consistency."""
         option_chain = data.get("option_chain", {})
         if not option_chain:
@@ -391,30 +391,28 @@ class MarketDataValidator:
                 issues.append(f"Strike {strike_str}: Validation error {e}")
 
         if issues:
-            logger.warning(f"Option chain consistency issues: {issues[:3]}")  # Log first 3
+            logger.warning(
+                f"Option chain consistency issues: {issues[:3]}"
+            )  # Log first 3
 
         return len(issues) == 0
 
-    def _validate_spreads(self, data: Dict[str, Any]) -> bool:
+    def _validate_spreads(self, data: dict[str, Any]) -> bool:
         """Validate bid-ask spreads."""
         option_chain = data.get("option_chain", {})
 
         invalid_spreads = 0
-        for strike_str, option_data in option_chain.items():
+        for _strike_str, option_data in option_chain.items():
             bid = option_data.get("bid", 0)
             ask = option_data.get("ask", 0)
 
             # Check for valid spread
-            if bid < 0 or ask < 0:
-                invalid_spreads += 1
-            elif ask > 0 and bid > ask:
-                invalid_spreads += 1
-            elif ask == 0 and bid > 0:
+            if bid < 0 or ask < 0 or ask > 0 and bid > ask or ask == 0 and bid > 0:
                 invalid_spreads += 1
 
         return invalid_spreads == 0
 
-    def _validate_greeks_relationships(self, data: Dict[str, Any]) -> bool:
+    def _validate_greeks_relationships(self, data: dict[str, Any]) -> bool:
         """Validate Greeks satisfy known relationships."""
         option_chain = data.get("option_chain", {})
 
@@ -442,7 +440,7 @@ class MarketDataValidator:
 
         return len(issues) == 0
 
-    def _validate_iv_range(self, data: Dict[str, Any]) -> bool:
+    def _validate_iv_range(self, data: dict[str, Any]) -> bool:
         """Validate implied volatility is in reasonable range."""
         # Check overall IV
         iv = data.get("implied_volatility", 0)
@@ -451,20 +449,20 @@ class MarketDataValidator:
 
         # Check option chain IVs
         option_chain = data.get("option_chain", {})
-        for strike_str, option_data in option_chain.items():
+        for _strike_str, option_data in option_chain.items():
             opt_iv = option_data.get("implied_volatility", 0)
             if not (0.05 <= opt_iv <= 3.0):
                 return False
 
         return True
 
-    def _validate_liquidity(self, data: Dict[str, Any]) -> bool:
+    def _validate_liquidity(self, data: dict[str, Any]) -> bool:
         """Validate minimum liquidity requirements."""
         option_chain = data.get("option_chain", {})
 
         # At least some options should have decent liquidity
         liquid_options = 0
-        for strike_str, option_data in option_chain.items():
+        for _strike_str, option_data in option_chain.items():
             volume = option_data.get("volume", 0)
             open_interest = option_data.get("open_interest", 0)
 
@@ -474,7 +472,7 @@ class MarketDataValidator:
         # At least 20% of options should be liquid
         return liquid_options >= len(option_chain) * 0.2
 
-    def validate_position_data(self, position_data: Dict[str, Any]) -> ValidationResult:
+    def validate_position_data(self, position_data: dict[str, Any]) -> ValidationResult:
         """Validate position-specific data."""
         # Add position-specific rules temporarily
         self.add_rule(
@@ -507,7 +505,7 @@ class MarketDataValidator:
 
         return result
 
-    def get_validation_stats(self) -> Dict[str, Any]:
+    def get_validation_stats(self) -> dict[str, Any]:
         """Get validation statistics."""
         total = self.validation_stats["total_validations"]
         if total == 0:
@@ -532,7 +530,7 @@ class DataAnomalyDetector:
     def __init__(self, lookback_periods: int = 20):
         """Initialize anomaly detector."""
         self.lookback_periods = lookback_periods
-        self.historical_data: Dict[str, List[float]] = {}
+        self.historical_data: dict[str, list[float]] = {}
 
     def update(self, key: str, value: float) -> None:
         """Update historical data for a key."""
@@ -543,9 +541,13 @@ class DataAnomalyDetector:
 
         # Keep only lookback periods
         if len(self.historical_data[key]) > self.lookback_periods:
-            self.historical_data[key] = self.historical_data[key][-self.lookback_periods :]
+            self.historical_data[key] = self.historical_data[key][
+                -self.lookback_periods :
+            ]
 
-    def is_anomaly(self, key: str, value: float, n_std: float = 3.0) -> Tuple[bool, Dict[str, Any]]:
+    def is_anomaly(
+        self, key: str, value: float, n_std: float = 3.0
+    ) -> tuple[bool, dict[str, Any]]:
         """
         Check if value is anomalous based on historical data.
 
@@ -565,7 +567,9 @@ class DataAnomalyDetector:
             # No variation in historical data
             is_anomaly = value != mean
             return is_anomaly, {
-                "reason": "No historical variation" if is_anomaly else "Matches constant",
+                "reason": "No historical variation"
+                if is_anomaly
+                else "Matches constant",
                 "historical_mean": mean,
                 "value": value,
             }
@@ -583,12 +587,14 @@ class DataAnomalyDetector:
             "percentile": self._calculate_percentile(value, historical),
         }
 
-    def _calculate_percentile(self, value: float, historical: List[float]) -> float:
+    def _calculate_percentile(self, value: float, historical: list[float]) -> float:
         """Calculate what percentile the value falls in."""
         below = sum(1 for h in historical if h < value)
         return (below / len(historical)) * 100
 
-    def detect_market_anomalies(self, market_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def detect_market_anomalies(
+        self, market_data: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Detect anomalies in market data."""
         anomalies = []
 
@@ -610,7 +616,9 @@ class DataAnomalyDetector:
         iv = market_data.get("implied_volatility", 0)
         if iv > 0:
             self.update("iv", iv)
-            is_anomaly, info = self.is_anomaly("iv", iv, n_std=2.5)  # More sensitive for IV
+            is_anomaly, info = self.is_anomaly(
+                "iv", iv, n_std=2.5
+            )  # More sensitive for IV
             if is_anomaly:
                 anomalies.append(
                     {
@@ -629,7 +637,9 @@ class DataAnomalyDetector:
             if ask > 0:
                 spread_pct = (ask - bid) / ask
                 self.update(f"spread_{strike_str}", spread_pct)
-                is_anomaly, info = self.is_anomaly(f"spread_{strike_str}", spread_pct, n_std=2.0)
+                is_anomaly, info = self.is_anomaly(
+                    f"spread_{strike_str}", spread_pct, n_std=2.0
+                )
                 if is_anomaly:
                     anomalies.append(
                         {
@@ -644,8 +654,8 @@ class DataAnomalyDetector:
 
 
 # Global instances
-_market_validator: Optional[MarketDataValidator] = None
-_anomaly_detector: Optional[DataAnomalyDetector] = None
+_market_validator: MarketDataValidator | None = None
+_anomaly_detector: DataAnomalyDetector | None = None
 
 
 def get_market_validator() -> MarketDataValidator:

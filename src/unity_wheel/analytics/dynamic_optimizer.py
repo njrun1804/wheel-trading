@@ -7,12 +7,13 @@ Directly optimizes: CAGR - 0.20 × |CVaR₉₅| with autonomous operation.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
 
 from src.config.loader import get_config
+
 from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
@@ -28,7 +29,7 @@ class OptimizationResult(NamedTuple):
     expected_cvar: float
     objective_value: float
     confidence_score: float
-    diagnostics: Dict[str, float]
+    diagnostics: dict[str, float]
 
 
 @dataclass
@@ -39,8 +40,8 @@ class MarketState:
     volatility_percentile: float  # 0-1, where in historical distribution
     price_momentum: float  # 20-day price return
     volume_ratio: float  # Current vs 20-day average
-    iv_rank: Optional[float] = None  # 0-100 if available
-    days_to_earnings: Optional[int] = None
+    iv_rank: float | None = None  # 0-100 if available
+    days_to_earnings: int | None = None
 
 
 class DynamicOptimizer:
@@ -53,16 +54,16 @@ class DynamicOptimizer:
     CVAR_PENALTY = 0.20  # Penalty weight for CVaR
     BASE_KELLY = 0.50  # Half-Kelly as specified
 
-    def __init__(self, symbol: str = None, config: Optional[Dict] = None):
+    def __init__(self, symbol: str = None, config: dict | None = None):
         if symbol is None:
             app_config = get_config()
             symbol = app_config.unity.ticker
         self.symbol = symbol
         self.config = config or {}
-        self.vol_history: Optional[pd.Series] = None
+        self.vol_history: pd.Series | None = None
         self.optimization_history: list = []
 
-    def _get_config_bounds(self, param_type: str) -> Tuple[float, float]:
+    def _get_config_bounds(self, param_type: str) -> tuple[float, float]:
         """Get min/max bounds from config or defaults."""
         defaults = {"delta": (0.10, 0.40), "dte": (21, 49), "kelly": (0.10, 0.50)}
         if self.config:
@@ -98,8 +99,12 @@ class DynamicOptimizer:
         kelly_fraction = self._calculate_dynamic_kelly(market_state, historical_returns)
 
         # 4. Estimate expected outcomes
-        expected_cagr = self._estimate_cagr(delta_target, dte_target, kelly_fraction, market_state)
-        expected_cvar = self._estimate_cvar(delta_target, kelly_fraction, historical_returns)
+        expected_cagr = self._estimate_cagr(
+            delta_target, dte_target, kelly_fraction, market_state
+        )
+        expected_cvar = self._estimate_cvar(
+            delta_target, kelly_fraction, historical_returns
+        )
 
         # 5. Calculate objective value
         objective_value = expected_cagr - self.CVAR_PENALTY * abs(expected_cvar)
@@ -112,7 +117,9 @@ class DynamicOptimizer:
             "vol_impact": (market_state.realized_volatility - 0.50) / 0.50,
             "momentum_impact": market_state.price_momentum,
             "data_sufficiency": min(1.0, len(historical_returns) / 500),
-            "parameter_stability": self._check_parameter_stability(delta_target, dte_target),
+            "parameter_stability": self._check_parameter_stability(
+                delta_target, dte_target
+            ),
             "objective_improvement": self._calculate_improvement(objective_value),
         }
 
@@ -129,7 +136,11 @@ class DynamicOptimizer:
 
         # Store for stability checking
         self.optimization_history.append(
-            {"timestamp": datetime.now(), "result": result, "market_state": market_state}
+            {
+                "timestamp": datetime.now(),
+                "result": result,
+                "market_state": market_state,
+            }
         )
 
         # Log for autonomous monitoring
@@ -171,7 +182,11 @@ class DynamicOptimizer:
             earnings_adjustment = -0.05 * (1 - state.days_to_earnings / 30)
 
         delta = (
-            base_delta + vol_adjustment + momentum_adjustment + iv_adjustment + earnings_adjustment
+            base_delta
+            + vol_adjustment
+            + momentum_adjustment
+            + iv_adjustment
+            + earnings_adjustment
         )
 
         # Get bounds and apply
@@ -201,7 +216,9 @@ class DynamicOptimizer:
         dte_min, dte_max = self._get_config_bounds("dte")
         return int(np.clip(dte_target, dte_min, dte_max))
 
-    def _calculate_dynamic_kelly(self, state: MarketState, historical_returns: np.ndarray) -> float:
+    def _calculate_dynamic_kelly(
+        self, state: MarketState, historical_returns: np.ndarray
+    ) -> float:
         """
         Calculate Kelly fraction dynamically based on edge and uncertainty.
         """
@@ -211,7 +228,9 @@ class DynamicOptimizer:
         # Calculate current Sharpe ratio
         if len(historical_returns) > 60:
             recent_returns = historical_returns[-60:]
-            sharpe = np.mean(recent_returns) / (np.std(recent_returns) + 1e-6) * np.sqrt(252)
+            sharpe = (
+                np.mean(recent_returns) / (np.std(recent_returns) + 1e-6) * np.sqrt(252)
+            )
         else:
             sharpe = 0.5  # Conservative default
 
@@ -232,7 +251,9 @@ class DynamicOptimizer:
         kelly_min, kelly_max = self._get_config_bounds("kelly")
         return np.clip(kelly, kelly_min, kelly_max)
 
-    def _estimate_cagr(self, delta: float, dte: int, kelly: float, state: MarketState) -> float:
+    def _estimate_cagr(
+        self, delta: float, dte: int, kelly: float, state: MarketState
+    ) -> float:
         """Estimate expected CAGR for given parameters."""
         # Simplified model - would use ML in production
 
@@ -252,7 +273,9 @@ class DynamicOptimizer:
         # Scale by Kelly fraction
         return cagr * kelly
 
-    def _estimate_cvar(self, delta: float, kelly: float, historical_returns: np.ndarray) -> float:
+    def _estimate_cvar(
+        self, delta: float, kelly: float, historical_returns: np.ndarray
+    ) -> float:
         """Estimate CVaR (Conditional Value at Risk) at 95% level."""
         if len(historical_returns) < 100:
             # Fallback for insufficient data
@@ -276,7 +299,9 @@ class DynamicOptimizer:
         # Parameter stability
         stability_conf = 1.0
         if len(self.optimization_history) > 5:
-            recent_deltas = [h["result"].delta_target for h in self.optimization_history[-5:]]
+            recent_deltas = [
+                h["result"].delta_target for h in self.optimization_history[-5:]
+            ]
             stability_conf = 1.0 - np.std(recent_deltas) / 0.1
 
         # Market normalcy (not in extreme conditions)
@@ -312,13 +337,16 @@ class DynamicOptimizer:
         if not self.optimization_history:
             return 0.0
 
-        if len(self.optimization_history) > 0 and "result" in self.optimization_history[-1]:
+        if (
+            len(self.optimization_history) > 0
+            and "result" in self.optimization_history[-1]
+        ):
             prev_objective = self.optimization_history[-1]["result"].objective_value
             return (objective_value - prev_objective) / (abs(prev_objective) + 1e-6)
         else:
             return 0.0
 
-    def validate_optimization(self, result: OptimizationResult) -> Dict[str, bool]:
+    def validate_optimization(self, result: OptimizationResult) -> dict[str, bool]:
         """Autonomous validation of optimization results."""
         checks = {
             "delta_in_range": 0.10 <= result.delta_target <= 0.40,

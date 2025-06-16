@@ -5,7 +5,6 @@ Checks what dates are already downloaded and continues.
 """
 
 import logging
-import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -16,14 +15,16 @@ import duckdb
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tools.download_unity_options_only import UnityOptionsOnlyDownloader
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ def check_download_progress():
         logger.info("No Unity options data downloaded yet")
         return None
 
-    logger.info(f"\nCURRENT DOWNLOAD STATUS:")
+    logger.info("\nCURRENT DOWNLOAD STATUS:")
     logger.info(f"Days downloaded: {stats[0]}")
     logger.info(f"Date range: {stats[1]} to {stats[2]}")
     logger.info(f"Total records: {stats[3]:,}")

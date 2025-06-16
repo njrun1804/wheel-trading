@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Fixed orchestrator launcher with all imports working."""
 
+import asyncio
 import os
 import sys
-import asyncio
 import time
 from pathlib import Path
 
@@ -19,12 +19,13 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 async def main():
     """Launch orchestrator with hardware acceleration."""
-    
+
     # Import the fixed orchestrator
     from unity_wheel.orchestrator.orchestrator_consolidated import (
-        ConsolidatedOrchestrator, StrategyType
+        ConsolidatedOrchestrator,
+        StrategyType,
     )
-    
+
     # Get command
     if len(sys.argv) > 1:
         command = " ".join(sys.argv[1:])
@@ -37,19 +38,19 @@ async def main():
         print("  ./launch_orchestrator_fixed.py 'optimize wheel strategy code'")
         print("  ./launch_orchestrator_fixed.py 'list all Python files'")
         return
-    
-    print(f"\n🚀 Launching orchestrator...")
+
+    print("\n🚀 Launching orchestrator...")
     print(f"📋 Command: {command}")
     print("-" * 70)
-    
+
     # Create orchestrator
     orchestrator = ConsolidatedOrchestrator(".")
-    
+
     # Initialize
     start_init = time.time()
     await orchestrator.initialize()
     print(f"✅ Initialized in {time.time() - start_init:.2f}s")
-    
+
     # Auto-select strategy based on command
     if "optimize" in command.lower() or "performance" in command.lower():
         strategy = StrategyType.GPU_ACCELERATED
@@ -59,17 +60,17 @@ async def main():
         strategy = StrategyType.FAST
     else:
         strategy = StrategyType.ENHANCED
-    
+
     print(f"📊 Using strategy: {strategy.value}")
-    
+
     # Execute
     start_exec = time.time()
     try:
         result = await orchestrator.execute(command, strategy)
-        
+
         # Display results
         print(f"\n✅ Execution completed in {time.time() - start_exec:.2f}s")
-        
+
         # Show phase results
         if "phases" in result:
             print("\n📈 Phase Results:")
@@ -81,51 +82,54 @@ async def main():
                             print(f"  • {key}: {value}")
                     if "duration_ms" in phase_data:
                         print(f"  ⏱️  Duration: {phase_data['duration_ms']:.1f}ms")
-        
+
         # Show performance
         if "performance" in result:
             perf = result["performance"]
-            print(f"\n⚡ Performance:")
+            print("\n⚡ Performance:")
             print(f"  • Total time: {perf.get('total_time_ms', 0):.1f}ms")
             print(f"  • Success: {perf.get('success', False)}")
             if "memory_peak_mb" in perf:
                 print(f"  • Memory peak: {perf['memory_peak_mb']:.1f}MB")
-        
+
         # Show any errors
         if "error" in result:
             print(f"\n❌ Error: {result['error']}")
-    
+
     except Exception as e:
         print(f"\n❌ Execution failed: {e}")
         import traceback
+
         traceback.print_exc()
-    
+
     # Shutdown
     await orchestrator.shutdown()
-    
+
     # Hardware status
     print("\n" + "-" * 70)
     print("💻 Hardware Status:")
-    
+
     try:
         import psutil
+
         print(f"  • CPU cores: {psutil.cpu_count()}")
         print(f"  • CPU usage: {psutil.cpu_percent(interval=0.5):.1f}%")
-        
+
         mem = psutil.virtual_memory()
         print(f"  • Memory: {mem.used/1024**3:.1f}GB / {mem.total/1024**3:.1f}GB")
-    except:
-        pass
-    
+    except (ImportError, AttributeError, OSError) as e:
+        print(f"  • System info: Unable to get system status ({e})")
+
     try:
         import torch
+
         if torch.backends.mps.is_available():
             print("  • GPU: Metal Performance Shaders ✅")
         else:
             print("  • GPU: Not available ❌")
-    except:
-        print("  • GPU: PyTorch not installed ⚠️")
-    
+    except (ImportError, AttributeError, RuntimeError) as e:
+        print(f"  • GPU: PyTorch not available ({e})")
+
     print("\n✨ Done!")
 
 

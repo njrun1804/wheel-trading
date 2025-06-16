@@ -8,7 +8,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.unity_wheel.risk.pure_borrowing_analyzer import (
     PureBorrowingAnalyzer,
-    analyze_pure_borrowing,
 )
 
 
@@ -49,7 +48,9 @@ def demo_pure_math_analysis():
     print(
         f"Expected Return: {position['expected_return']:.1%} over {position['holding_days']} days"
     )
-    print(f"Annualized Return: {position['expected_return'] * 365 / position['holding_days']:.1%}")
+    print(
+        f"Annualized Return: {position['expected_return'] * 365 / position['holding_days']:.1%}"
+    )
     print()
 
     # Analyze with different cash scenarios

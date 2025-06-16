@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 from ..math.options import (
     black_scholes_price_validated,
@@ -184,10 +183,14 @@ class PositionEvaluator:
             # Expected loss if assigned
             if position.position_type == PositionType.PUT:
                 # If put is assigned, we buy at strike, sell at market
-                loss_if_assigned = max(position.strike - current_price, 0) * 100 * contracts
+                loss_if_assigned = (
+                    max(position.strike - current_price, 0) * 100 * contracts
+                )
             else:  # CALL
                 # If call is assigned, we sell at strike, buy at market
-                loss_if_assigned = max(current_price - position.strike, 0) * 100 * contracts
+                loss_if_assigned = (
+                    max(current_price - position.strike, 0) * 100 * contracts
+                )
 
             # Expected profit = premium kept * P(OTM) - loss * P(ITM)
             expected_profit = (
@@ -206,9 +209,13 @@ class PositionEvaluator:
 
             # Expected profit if ITM
             if position.position_type == PositionType.PUT:
-                profit_if_itm = max(position.strike - current_price, 0) * 100 * contracts
+                profit_if_itm = (
+                    max(position.strike - current_price, 0) * 100 * contracts
+                )
             else:  # CALL
-                profit_if_itm = max(current_price - position.strike, 0) * 100 * contracts
+                profit_if_itm = (
+                    max(current_price - position.strike, 0) * 100 * contracts
+                )
 
             # Expected profit = profit * P(ITM) - premium
             expected_profit = profit_if_itm * probability_itm - max_loss
@@ -243,9 +250,13 @@ class PositionEvaluator:
             max_risk=max_risk,
             # Approximate Greeks
             delta=(
-                -probability_itm if position.position_type == PositionType.PUT else probability_itm
+                -probability_itm
+                if position.position_type == PositionType.PUT
+                else probability_itm
             ),
-            theta=-time_value / days_to_expiry if days_to_expiry > 0 else 0,  # Simplified
+            theta=-time_value / days_to_expiry
+            if days_to_expiry > 0
+            else 0,  # Simplified
             gamma=0.0,  # Would need separate calculation
             vega=0.0,  # Would need separate calculation
             confidence=confidence,
@@ -372,11 +383,15 @@ class PositionEvaluator:
         )
 
         # Daily return improvement
-        daily_improvement = new_eval.daily_expected_return - current_eval.daily_expected_return
+        daily_improvement = (
+            new_eval.daily_expected_return - current_eval.daily_expected_return
+        )
 
         # Days required to recover switching cost
         breakeven_days = (
-            total_switch_cost / daily_improvement if daily_improvement > 0 else float("inf")
+            total_switch_cost / daily_improvement
+            if daily_improvement > 0
+            else float("inf")
         )
 
         # Risk-adjusted benefit (penalize if new position is riskier)
@@ -436,12 +451,14 @@ class PositionEvaluator:
         current_bid: float,
         current_ask: float,
         current_dte: int,
-        available_strikes: List[Tuple[float, int, float, float]],  # (strike, dte, bid, ask)
+        available_strikes: list[
+            tuple[float, int, float, float]
+        ],  # (strike, dte, bid, ask)
         underlying_price: float,
         volatility: float,
         risk_free_rate: float,
         contracts: int = 1,
-    ) -> Optional[SwitchAnalysis]:
+    ) -> SwitchAnalysis | None:
         """
         Find the best switching opportunity from available strikes.
 
@@ -476,7 +493,10 @@ class PositionEvaluator:
 
         for strike, dte, bid, ask in available_strikes:
             # Skip if too close to current position
-            if abs(strike - current_position.strike) < 0.50 and abs(dte - current_dte) < 7:
+            if (
+                abs(strike - current_position.strike) < 0.50
+                and abs(dte - current_dte) < 7
+            ):
                 continue
 
             # Analyze this switch opportunity

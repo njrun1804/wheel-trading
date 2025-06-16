@@ -84,7 +84,7 @@ async def main():
     ).fetchone()
 
     days, start_date, end_date = existing
-    print(f"\n📊 Current data status:")
+    print("\n📊 Current data status:")
     print(f"   Symbol: {TICKER}")
     print(f"   Days available: {days}")
     if days > 0:
@@ -108,7 +108,7 @@ async def main():
         ).fetchone()
 
         annual_return, annual_vol, worst_day, best_day = stats
-        print(f"\n📈 Unity Statistics:")
+        print("\n📈 Unity Statistics:")
         print(f"   Annual return: {annual_return*100:.1f}%")
         print(f"   Annual volatility: {annual_vol*100:.1f}%")
         print(f"   Worst day: {worst_day*100:.1f}%")
@@ -118,7 +118,7 @@ async def main():
         return
 
     # Initialize Databento client
-    print(f"\n🔄 Initializing Databento client...")
+    print("\n🔄 Initializing Databento client...")
     client = DatabentoClient(api_key=api_key)
 
     # Calculate date range
@@ -165,7 +165,9 @@ async def main():
                 if dataset.startswith("XNYS"):
                     # NYSE datasets have delayed data, try 7 days earlier
                     adjusted_end = end_date - timedelta(days=7)
-                    print(f"   Adjusting end date to {adjusted_end.date()} for NYSE dataset")
+                    print(
+                        f"   Adjusting end date to {adjusted_end.date()} for NYSE dataset"
+                    )
 
                 if dataset == "DBEQ.BASIC":
                     # DBEQ has delayed data and limited history
@@ -211,7 +213,9 @@ async def main():
                             data = None
 
                     except Exception as symbol_error:
-                        print(f"   ❌ Symbol {symbol} failed: {str(symbol_error)[:50]}...")
+                        print(
+                            f"   ❌ Symbol {symbol} failed: {str(symbol_error)[:50]}..."
+                        )
                         data = None
                         continue
 
@@ -223,11 +227,17 @@ async def main():
             except Exception as e:
                 error_msg = str(e)
                 if "data_end_after_available_end" in error_msg:
-                    print(f"❌ {dataset} failed: Data not available up to {end_date.date()}")
+                    print(
+                        f"❌ {dataset} failed: Data not available up to {end_date.date()}"
+                    )
                 elif "data_start_before_available_start" in error_msg:
-                    print(f"❌ {dataset} failed: Data not available from {start_date.date()}")
+                    print(
+                        f"❌ {dataset} failed: Data not available from {start_date.date()}"
+                    )
                 elif "dataset_unavailable" in error_msg:
-                    print(f"❌ {dataset} failed: Dataset not available with current subscription")
+                    print(
+                        f"❌ {dataset} failed: Dataset not available with current subscription"
+                    )
                 else:
                     print(f"❌ {dataset} failed: {error_msg[:100]}...")
                 continue
@@ -315,13 +325,13 @@ async def main():
 
             start_date, end_date, annual_return, annual_vol = stats
 
-            print(f"\n📊 Final Data Summary:")
+            print("\n📊 Final Data Summary:")
             print(f"   Date range: {start_date} to {end_date}")
             print(f"   Annual return: {annual_return*100:.1f}%")
             print(f"   Annual volatility: {annual_vol*100:.1f}%")
 
             if final_days >= REQUIRED_DAYS:
-                print(f"\n✅ Sufficient data for all risk calculations!")
+                print("\n✅ Sufficient data for all risk calculations!")
             elif final_days >= 500:
                 print(f"\n⚠️  Have {final_days} days - adequate for most calculations")
             else:

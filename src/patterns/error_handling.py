@@ -6,16 +6,10 @@ these patterns when generating new code.
 """
 from __future__ import annotations
 
-
-import logging
-from dataclasses import dataclass
-from datetime import timedelta
-from typing import Optional, Tuple, Union
-
 import numpy as np
 
 from ..models.greeks import CalculationResult
-from ..utils.decorators import RecoveryStrategy, cached, timed_operation, with_recovery
+from ..utils.decorators import RecoveryStrategy, timed_operation, with_recovery
 from ..utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -95,7 +89,7 @@ async def fetch_external_data(
     endpoint: str,
     params: dict,
     timeout: float = 5.0,
-) -> Tuple[Optional[dict], float]:
+) -> tuple[dict | None, float]:
     """
     Pattern for external API calls with proper error handling.
 
@@ -105,47 +99,45 @@ async def fetch_external_data(
     3. Log with full context
     4. Return data with confidence
     """
-    import asyncio
 
     import aiohttp
 
     confidence = 1.0
 
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                endpoint, params=params, timeout=aiohttp.ClientTimeout(total=timeout)
-            ) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    logger.info(
-                        "API call successful",
-                        extra={
-                            "endpoint": endpoint,
-                            "status": response.status,
-                            "response_time": response.headers.get("X-Response-Time"),
-                        },
-                    )
-                    return data, confidence
+        async with aiohttp.ClientSession() as session, session.get(
+            endpoint, params=params, timeout=aiohttp.ClientTimeout(total=timeout)
+        ) as response:
+            if response.status == 200:
+                data = await response.json()
+                logger.info(
+                    "API call successful",
+                    extra={
+                        "endpoint": endpoint,
+                        "status": response.status,
+                        "response_time": response.headers.get("X-Response-Time"),
+                    },
+                )
+                return data, confidence
 
-                elif response.status == 429:  # Rate limited
-                    logger.warning(
-                        "Rate limited",
-                        extra={
-                            "endpoint": endpoint,
-                            "retry_after": response.headers.get("Retry-After"),
-                        },
-                    )
-                    return None, 0.0
+            elif response.status == 429:  # Rate limited
+                logger.warning(
+                    "Rate limited",
+                    extra={
+                        "endpoint": endpoint,
+                        "retry_after": response.headers.get("Retry-After"),
+                    },
+                )
+                return None, 0.0
 
-                else:
-                    logger.error(
-                        f"API error: {response.status}",
-                        extra={"endpoint": endpoint, "response": await response.text()},
-                    )
-                    return None, 0.3  # Low confidence fallback
+            else:
+                logger.error(
+                    f"API error: {response.status}",
+                    extra={"endpoint": endpoint, "response": await response.text()},
+                )
+                return None, 0.3  # Low confidence fallback
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.error("API timeout", extra={"endpoint": endpoint, "timeout": timeout})
         return None, 0.0
 
@@ -192,13 +184,16 @@ def validate_required_data(market_data: dict) -> dict:
     # Optional fields with defaults
     volume = market_data.get("volume", 0)
     if volume < 0:
-        logger.warning("Negative volume, using 0", extra={"ticker": ticker, "volume": volume})
+        logger.warning(
+            "Negative volume, using 0", extra={"ticker": ticker, "volume": volume}
+        )
         volume = 0
 
     volatility = market_data.get("volatility")
     if volatility is None:
         logger.info(
-            "No volatility provided, using default", extra={"ticker": ticker, "default": 0.20}
+            "No volatility provided, using default",
+            extra={"ticker": ticker, "default": 0.20},
         )
         volatility = 0.20
 
@@ -214,7 +209,7 @@ def validate_required_data(market_data: dict) -> dict:
 def process_batch_with_recovery(
     items: list,
     processor_func: callable,
-) -> Tuple[list, list, float]:
+) -> tuple[list, list, float]:
     """
     Pattern for processing batches where some items may fail.
 
@@ -307,14 +302,19 @@ class CircuitBreakerPattern:
             if time.time() - self.last_failure_time > self.reset_timeout:
                 logger.info(
                     "Circuit breaker reset",
-                    extra={"failures": self.consecutive_failures, "timeout": self.reset_timeout},
+                    extra={
+                        "failures": self.consecutive_failures,
+                        "timeout": self.reset_timeout,
+                    },
                 )
                 self.is_open = False
                 self.consecutive_failures = 0
 
         # If circuit is open, fail fast
         if self.is_open:
-            logger.warning("Circuit breaker is open", extra={"failures": self.consecutive_failures})
+            logger.warning(
+                "Circuit breaker is open", extra={"failures": self.consecutive_failures}
+            )
             raise Exception("Circuit breaker is open")
 
         try:
@@ -354,7 +354,7 @@ class CircuitBreakerPattern:
 # PATTERN 6: Graceful degradation with fallbacks
 def calculate_with_fallback(
     primary_func: callable, fallback_func: callable, *args, **kwargs
-) -> Tuple[any, float, str]:
+) -> tuple[any, float, str]:
     """
     Pattern for graceful degradation when primary method fails.
 
@@ -370,7 +370,9 @@ def calculate_with_fallback(
         result = primary_func(*args, **kwargs)
         confidence = 0.99
 
-        logger.debug("Primary method succeeded", extra={"function": primary_func.__name__})
+        logger.debug(
+            "Primary method succeeded", extra={"function": primary_func.__name__}
+        )
 
         return result, confidence, method_used
 
@@ -393,7 +395,7 @@ def calculate_with_fallback(
 
         except (ValueError, KeyError, AttributeError) as fallback_error:
             logger.error(
-                f"Both primary and fallback failed",
+                "Both primary and fallback failed",
                 extra={
                     "primary_error": str(e),
                     "fallback_error": str(fallback_error),

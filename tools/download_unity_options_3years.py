@@ -17,8 +17,8 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -53,7 +53,9 @@ class UnityOptions3YearDownloader:
                     if symbol[i].isdigit():
                         exp_str = symbol[i : i + 6]
                         if len(exp_str) == 6 and exp_str.isdigit():
-                            expiration = datetime.strptime("20" + exp_str, "%Y%m%d").date()
+                            expiration = datetime.strptime(
+                                "20" + exp_str, "%Y%m%d"
+                            ).date()
                         break
 
                 # Extract type (C or P)
@@ -125,7 +127,7 @@ class UnityOptions3YearDownloader:
                     def convert_price(val):
                         if val is None:
                             return None
-                        if isinstance(val, (int, float)) and val > 1000:
+                        if isinstance(val, int | float) and val > 1000:
                             return val / 10000.0
                         return float(val)
 
@@ -233,12 +235,18 @@ class UnityOptions3YearDownloader:
             # Calculate coverage
             days_diff = (stats[4] - stats[3]).days if stats[3] and stats[4] else 0
             expected_trading_days = int(days_diff * 252 / 365)
-            coverage = (stats[1] / expected_trading_days * 100) if expected_trading_days > 0 else 0
+            coverage = (
+                (stats[1] / expected_trading_days * 100)
+                if expected_trading_days > 0
+                else 0
+            )
 
             logger.info(f"Coverage: {coverage:.1f}% of expected trading days")
             logger.info(f"Unique expirations: {stats[5]}")
             logger.info(f"Unique strikes: {stats[6]}")
-            logger.info(f"Total volume: {stats[7]:,}" if stats[7] else "Total volume: N/A")
+            logger.info(
+                f"Total volume: {stats[7]:,}" if stats[7] else "Total volume: N/A"
+            )
 
             # Monthly breakdown
             logger.info("\nMonthly data coverage:")
@@ -257,7 +265,9 @@ class UnityOptions3YearDownloader:
             ).fetchall()
 
             for month, days, options, volume in monthly:
-                logger.info(f"  {month}: {days} days, {options:,} options, {volume:,} volume")
+                logger.info(
+                    f"  {month}: {days} days, {options:,} options, {volume:,} volume"
+                )
 
             # Recent sample
             logger.info("\nMost recent active options:")
@@ -274,10 +284,14 @@ class UnityOptions3YearDownloader:
 
             if recent:
                 for date, symbol, strike, otype, last, volume in recent:
-                    logger.info(f"  {symbol}: ${strike} {otype} last=${last:.2f} vol={volume}")
+                    logger.info(
+                        f"  {symbol}: ${strike} {otype} last=${last:.2f} vol={volume}"
+                    )
 
             logger.info("\n✅ SUCCESSFULLY DOWNLOADED 3 YEARS OF UNITY OPTIONS DATA")
-            logger.info("✅ All data is REAL from Databento OPRA feed - NO SYNTHETIC DATA")
+            logger.info(
+                "✅ All data is REAL from Databento OPRA feed - NO SYNTHETIC DATA"
+            )
         else:
             logger.warning("\n⚠️  No Unity options data found")
 

@@ -85,7 +85,9 @@ class MILPSolver:
             elif _HAS_PULP:
                 return "pulp"
             else:
-                raise ImportError("No MILP solver available. Install ortools, gurobi, or pulp.")
+                raise ImportError(
+                    "No MILP solver available. Install ortools, gurobi, or pulp."
+                )
 
         # Check if requested backend is available
         if requested == "gurobi" and not _HAS_GUROBI:
@@ -137,7 +139,9 @@ class MILPSolver:
 
         # Cash allocation
         cash = solver.NumVar(
-            problem.portfolio_value * problem.min_cash_pct, problem.portfolio_value, "cash"
+            problem.portfolio_value * problem.min_cash_pct,
+            problem.portfolio_value,
+            "cash",
         )
         variables["cash"] = cash
 
@@ -152,7 +156,9 @@ class MILPSolver:
         option_positions = {}
         for symbol, chain in problem.option_chains.items():
             for option in chain:
-                option_id = f"{symbol}_{option['strike']}_{option['expiry']}_{option['type']}"
+                option_id = (
+                    f"{symbol}_{option['strike']}_{option['expiry']}_{option['type']}"
+                )
                 option_positions[option_id] = solver.IntVar(
                     0, 100, f"option_{option_id}"  # Max 100 contracts
                 )
@@ -226,7 +232,9 @@ class MILPSolver:
         # Extract results
         if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
             solution = {
-                "status": "optimal" if status == pywraplp.Solver.OPTIMAL else "feasible",
+                "status": "optimal"
+                if status == pywraplp.Solver.OPTIMAL
+                else "feasible",
                 "objective_value": solver.Objective().Value(),
                 "cash": cash.solution_value(),
                 "positions": {},
@@ -240,7 +248,9 @@ class MILPSolver:
             # Option positions
             for option_id, var in option_positions.items():
                 if var.solution_value() > 0:
-                    solution["positions"][f"option_{option_id}"] = int(var.solution_value())
+                    solution["positions"][f"option_{option_id}"] = int(
+                        var.solution_value()
+                    )
 
             # Calculate optimality gap
             if hasattr(solver, "Objective"):
@@ -288,7 +298,9 @@ class MILPSolver:
         option_vars = {}
         for symbol, chain in problem.option_chains.items():
             for option in chain:
-                option_id = f"{symbol}_{option['strike']}_{option['expiry']}_{option['type']}"
+                option_id = (
+                    f"{symbol}_{option['strike']}_{option['expiry']}_{option['type']}"
+                )
                 option_vars[option_id] = model.addVar(
                     lb=0, ub=100, vtype=GRB.INTEGER, name=f"option_{option_id}"
                 )
@@ -356,7 +368,9 @@ class MILPSolver:
             "message": "PuLP solver not fully implemented - use OR-Tools or Gurobi",
         }
 
-    def _find_option_data(self, option_id: str, option_chains: dict[str, list[dict]]) -> dict:
+    def _find_option_data(
+        self, option_id: str, option_chains: dict[str, list[dict]]
+    ) -> dict:
         """Find option data from chains."""
 
         parts = option_id.split("_")

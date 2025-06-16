@@ -1,0 +1,7141 @@
+{
+  "timestamp": "2025-06-15T20:18:53.424873",
+  "databases_found": 35,
+  "databases_accessible": 30,
+  "total_size_mb": 376.02734375,
+  "recommendations": [
+    "Fix database accessibility issues immediately",
+    "Consider archiving or optimizing 1 large databases (>100MB)",
+    "Found duplicate databases: ['jarvis2_strategy.db', 'analytics.db', 'meta_monitoring.db', 'meta_evolution.db', 'jarvis2_audit.db', 'meta_reality_learning.db', 'rapid_cache.db', 'wheel_trading_optimized.duckdb', 'wheel_trading_master.duckdb', 'wheel_cache.duckdb']",
+    "Fix database file permissions for security"
+  ],
+  "critical_issues": [
+    "5 databases are inaccessible",
+    "34 databases are world-readable"
+  ],
+  "database_details": [
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/error_handling_analysis.db",
+      "size_mb": 2.0390625,
+      "modified": "2025-06-15 19:32:06.976998",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "exception_handlers",
+        "sqlite_sequence",
+        "analysis_summary"
+      ],
+      "schema_info": {
+        "exception_handlers": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "line_number",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "handler_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "exception_types",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "has_logging",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "has_context",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "recommendation",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "code_snippet",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "notnull": 0,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "analysis_summary": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "total_handlers",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "bare_except_count",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "generic_exception_count",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "specific_exception_count",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "handlers_with_logging",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "handlers_with_context",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "quality_score",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "notnull": 0,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0040531158447265625,
+        "table_counts": {
+          "exception_handlers": 4221,
+          "sqlite_sequence": 2,
+          "analysis_summary": 2
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/jarvis2_strategy.db",
+      "size_mb": 0.00390625,
+      "modified": "2025-06-15 19:32:06.977824",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.0030994415283203125,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/analytics.db",
+      "size_mb": 0.0078125,
+      "modified": "2025-06-15 19:32:06.978403",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "test_table"
+      ],
+      "schema_info": {
+        "test_table": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "data",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0019073486328125,
+        "table_counts": {
+          "test_table": 1
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_monitoring.db",
+      "size_mb": 2.05078125,
+      "modified": "2025-06-15 20:01:24.821284",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "metrics",
+        "sqlite_sequence",
+        "health_checks",
+        "alerts"
+      ],
+      "schema_info": {
+        "metrics": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "metric_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "value",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "tags_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "health_checks": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "message",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "metrics_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "alerts": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "alert_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "message",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "resolved",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "FALSE",
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0019073486328125,
+        "table_counts": {
+          "metrics": 15288,
+          "sqlite_sequence": 3,
+          "health_checks": 6061,
+          "alerts": 2
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_daemon.db",
+      "size_mb": 0.01953125,
+      "modified": "2025-06-15 19:32:06.979976",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "audit_results",
+        "sqlite_sequence",
+        "audit_patterns",
+        "auditor_events"
+      ],
+      "schema_info": {
+        "audit_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "step_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "findings_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "concerns_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "audit_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_regex",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "claude_verified",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "TRUE",
+            "pk": 0
+          }
+        ],
+        "auditor_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.003814697265625,
+        "table_counts": {
+          "audit_results": 0,
+          "sqlite_sequence": 1,
+          "audit_patterns": 0,
+          "auditor_events": 6
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_evolution.db",
+      "size_mb": 13.87109375,
+      "modified": "2025-06-15 19:23:27.260822",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "observations",
+        "sqlite_sequence",
+        "design_decisions",
+        "evolution_history",
+        "evolution_plans",
+        "coordination_events",
+        "capability_evolution",
+        "code_generations",
+        "generation_patterns",
+        "audit_results",
+        "audit_patterns",
+        "code_modifications",
+        "safety_events",
+        "test_integration"
+      ],
+      "schema_info": {
+        "observations": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "file_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "design_decisions": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "decision",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "rationale",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "alternatives_considered",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "predicted_outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "evolution_history": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "change_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "before_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "after_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "change_description",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "trigger_pattern",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "evolution_plans": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "plan_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "evolution_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "rationale",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "implementation",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "expected_benefit",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "risk_assessment",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": "'planned'",
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "execution_timestamp",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 12,
+            "name": "outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "coordination_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "source_component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "target_component",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "impact_assessment",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "capability_evolution": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "capability_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "evolution_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "implementation_code",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "performance_metrics",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "success_indicators",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_generations": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "task_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_file",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "generation_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "purpose",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "generated_code",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "safety_level",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "backup_created",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "FALSE",
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "applied",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "FALSE",
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 12,
+            "name": "performance_impact",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "generation_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "usage_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "0",
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "code_template",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "example_usage",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "step_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "findings_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "concerns_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "audit_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_regex",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "claude_verified",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "TRUE",
+            "pk": 0
+          }
+        ],
+        "code_modifications": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "modification_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_file",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "backup_file",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "change_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "original_hash",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "modified_hash",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "validation_passed",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "applied",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "rollback_available",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 12,
+            "name": "error_message",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "safety_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "safety_check",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "passed",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "test_integration": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "data",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0040531158447265625,
+        "table_counts": {
+          "observations": 122172,
+          "sqlite_sequence": 7,
+          "design_decisions": 1739,
+          "evolution_history": 0,
+          "evolution_plans": 146,
+          "coordination_events": 741,
+          "capability_evolution": 0,
+          "code_generations": 0,
+          "generation_patterns": 0,
+          "audit_results": 624,
+          "audit_patterns": 0,
+          "code_modifications": 1,
+          "safety_events": 4,
+          "test_integration": 1
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/jarvis2_audit.db",
+      "size_mb": 0.00390625,
+      "modified": "2025-06-15 19:32:06.982885",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.0030994415283203125,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/test.db",
+      "size_mb": 0.01171875,
+      "modified": "2025-06-15 10:55:15.238794",
+      "db_type": "sqlite",
+      "accessible": false,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {},
+      "integrity_check": {},
+      "error_msg": "file is not a database"
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_reality_learning.db",
+      "size_mb": 0.015625,
+      "modified": "2025-06-14 23:56:37.257652",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "reality_events",
+        "sqlite_sequence",
+        "claude_patterns"
+      ],
+      "schema_info": {
+        "reality_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "details_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "claude_context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "learned_pattern",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "claude_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_data",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "frequency",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "1",
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": "0.5",
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0030994415283203125,
+        "table_counts": {
+          "reality_events": 1,
+          "sqlite_sequence": 1,
+          "claude_patterns": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/embeddings.db",
+      "size_mb": 46.51171875,
+      "modified": "2025-06-15 18:39:15.531258",
+      "db_type": "sqlite",
+      "accessible": false,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {},
+      "integrity_check": {},
+      "error_msg": "file is not a database"
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/rapid_analytics.db",
+      "size_mb": 0.01171875,
+      "modified": "2025-06-15 19:41:54.714356",
+      "db_type": "sqlite",
+      "accessible": false,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {},
+      "integrity_check": {},
+      "error_msg": "file is not a database"
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/analytics.db",
+      "size_mb": 3.51171875,
+      "modified": "2025-06-15 19:42:44.814175",
+      "db_type": "sqlite",
+      "accessible": false,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {},
+      "integrity_check": {},
+      "error_msg": "file is not a database"
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/experience.db",
+      "size_mb": 2.51171875,
+      "modified": "2025-06-14 07:03:59.819417",
+      "db_type": "sqlite",
+      "accessible": false,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {},
+      "integrity_check": {},
+      "error_msg": "file is not a database"
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/experience/experiences.db",
+      "size_mb": 0.03515625,
+      "modified": "2025-06-15 19:32:06.989003",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "experiences",
+        "sqlite_sequence",
+        "experience_stats"
+      ],
+      "schema_info": {
+        "experiences": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "query",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "context_json",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "solution_json",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "metrics_json",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "reward",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "was_selected",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "user_feedback",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "execution_success",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "priority",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": "1.0",
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "experience_stats": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "hour_bucket",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "total_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "success_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "avg_reward",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "avg_confidence",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "avg_generation_time",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.00286102294921875,
+        "table_counts": {
+          "experiences": 12,
+          "sqlite_sequence": 1,
+          "experience_stats": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/indexes/fts/code_fts.db",
+      "size_mb": 0.03125,
+      "modified": "2025-06-13 21:39:33.024780",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "code_search",
+        "code_search_data",
+        "code_search_idx",
+        "code_search_content",
+        "code_search_docsize",
+        "code_search_config",
+        "file_metadata"
+      ],
+      "schema_info": {
+        "code_search": [
+          {
+            "cid": 0,
+            "name": "file_path",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "content",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "language",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "symbols",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "imports",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_search_data": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "block",
+            "type": "BLOB",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_search_idx": [
+          {
+            "cid": 0,
+            "name": "segid",
+            "type": "",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "term",
+            "type": "",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 2
+          },
+          {
+            "cid": 2,
+            "name": "pgno",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_search_content": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "c0",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "c1",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "c2",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "c3",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "c4",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_search_docsize": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "sz",
+            "type": "BLOB",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_search_config": [
+          {
+            "cid": 0,
+            "name": "k",
+            "type": "",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "v",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "file_metadata": [
+          {
+            "cid": 0,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "file_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "last_modified",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "lines",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "complexity_score",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "ast_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0021457672119140625,
+        "table_counts": {
+          "code_search": 0,
+          "code_search_data": 2,
+          "code_search_idx": 0,
+          "code_search_content": 0,
+          "code_search_docsize": 0,
+          "code_search_config": 1,
+          "file_metadata": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/meta_daemon_continuous.db",
+      "size_mb": 0.01953125,
+      "modified": "2025-06-15 19:32:06.993203",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "audit_results",
+        "sqlite_sequence",
+        "audit_patterns",
+        "auditor_events"
+      ],
+      "schema_info": {
+        "audit_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "step_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "findings_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "concerns_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "audit_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_regex",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "claude_verified",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "TRUE",
+            "pk": 0
+          }
+        ],
+        "auditor_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0021457672119140625,
+        "table_counts": {
+          "audit_results": 0,
+          "sqlite_sequence": 1,
+          "audit_patterns": 0,
+          "auditor_events": 6
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/jarvis2_reaudit.db",
+      "size_mb": 0.015625,
+      "modified": "2025-06-15 19:32:06.994089",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "audit_results",
+        "sqlite_sequence",
+        "audit_patterns"
+      ],
+      "schema_info": {
+        "audit_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "step_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "findings_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "concerns_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "audit_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_regex",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "claude_verified",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "TRUE",
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0021457672119140625,
+        "table_counts": {
+          "audit_results": 0,
+          "sqlite_sequence": 0,
+          "audit_patterns": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/jarvis2_strategy.db",
+      "size_mb": 0.0234375,
+      "modified": "2025-06-15 19:32:06.994942",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "strategic_decisions",
+        "sqlite_sequence",
+        "user_preferences",
+        "exploration_results"
+      ],
+      "schema_info": {
+        "strategic_decisions": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "decision_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "context",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "options_explored",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "chosen_option",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "rationale",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "estimated_tokens",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "actual_tokens",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "user_feedback",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "success_outcome",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "user_preferences": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "preference_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "preference_value",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "evidence_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "1",
+            "pk": 0
+          }
+        ],
+        "exploration_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "option_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "dimensions_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "outcome_quality",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "token_efficiency",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "user_satisfaction",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "learned_patterns",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.00286102294921875,
+        "table_counts": {
+          "strategic_decisions": 1,
+          "sqlite_sequence": 2,
+          "user_preferences": 4,
+          "exploration_results": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/meta_monitoring.db",
+      "size_mb": 0.23046875,
+      "modified": "2025-06-14 23:56:37.256642",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "metrics",
+        "sqlite_sequence",
+        "health_checks",
+        "alerts"
+      ],
+      "schema_info": {
+        "metrics": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "metric_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "value",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "tags_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "health_checks": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "message",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "metrics_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "alerts": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "alert_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "message",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "resolved",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "FALSE",
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0016689300537109375,
+        "table_counts": {
+          "metrics": 1638,
+          "sqlite_sequence": 2,
+          "health_checks": 592,
+          "alerts": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/meta_evolution.db",
+      "size_mb": 9.74609375,
+      "modified": "2025-06-14 23:56:37.255718",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "observations",
+        "sqlite_sequence",
+        "design_decisions",
+        "evolution_history",
+        "evolution_plans",
+        "coordination_events",
+        "capability_evolution",
+        "code_generations",
+        "generation_patterns",
+        "audit_results",
+        "audit_patterns",
+        "code_modifications",
+        "safety_events"
+      ],
+      "schema_info": {
+        "observations": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "file_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "design_decisions": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "decision",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "rationale",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "alternatives_considered",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "predicted_outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "evolution_history": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "change_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "before_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "after_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "change_description",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "trigger_pattern",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "evolution_plans": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "plan_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "evolution_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "rationale",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "implementation",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "expected_benefit",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "risk_assessment",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": "'planned'",
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "execution_timestamp",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 12,
+            "name": "outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "coordination_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "source_component",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "target_component",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "impact_assessment",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "capability_evolution": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "capability_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "evolution_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "implementation_code",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "performance_metrics",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "success_indicators",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "code_generations": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "task_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_file",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "generation_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "purpose",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "generated_code",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "safety_level",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "backup_created",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "FALSE",
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "applied",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "FALSE",
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 12,
+            "name": "performance_impact",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "generation_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "usage_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "0",
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "code_template",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "example_usage",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "step_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "findings_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "concerns_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "audit_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_regex",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "claude_verified",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "TRUE",
+            "pk": 0
+          }
+        ],
+        "code_modifications": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "modification_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_file",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "backup_file",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "change_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "original_hash",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "modified_hash",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "validation_passed",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "applied",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "rollback_available",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "outcome",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 12,
+            "name": "error_message",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "safety_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "safety_check",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "passed",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0030994415283203125,
+        "table_counts": {
+          "observations": 103834,
+          "sqlite_sequence": 7,
+          "design_decisions": 131,
+          "evolution_history": 0,
+          "evolution_plans": 146,
+          "coordination_events": 223,
+          "capability_evolution": 0,
+          "code_generations": 0,
+          "generation_patterns": 0,
+          "audit_results": 624,
+          "audit_patterns": 0,
+          "code_modifications": 1,
+          "safety_events": 4
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/jarvis2_audit.db",
+      "size_mb": 0.02734375,
+      "modified": "2025-06-15 19:32:06.999402",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "audit_results",
+        "sqlite_sequence",
+        "audit_patterns",
+        "observations"
+      ],
+      "schema_info": {
+        "audit_results": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "file_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "step_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "findings_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "concerns_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "audit_generation",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "audit_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_regex",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "claude_verified",
+            "type": "BOOLEAN",
+            "notnull": 0,
+            "dflt_value": "TRUE",
+            "pk": 0
+          }
+        ],
+        "observations": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0030994415283203125,
+        "table_counts": {
+          "audit_results": 36,
+          "sqlite_sequence": 2,
+          "audit_patterns": 0,
+          "observations": 1
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/backups/database_consolidation/meta_reality_learning.db",
+      "size_mb": 0.015625,
+      "modified": "2025-06-14 23:56:37.257652",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "reality_events",
+        "sqlite_sequence",
+        "claude_patterns"
+      ],
+      "schema_info": {
+        "reality_events": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "event_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "target_path",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "details_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "claude_context",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "learned_pattern",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "claude_patterns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "timestamp",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "pattern_type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "pattern_data",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "frequency",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "1",
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "confidence",
+            "type": "REAL",
+            "notnull": 0,
+            "dflt_value": "0.5",
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0019073486328125,
+        "table_counts": {
+          "reality_events": 1,
+          "sqlite_sequence": 1,
+          "claude_patterns": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/query_cache/rapid_cache.db",
+      "size_mb": 2.140625,
+      "modified": "2025-06-15 19:44:40.658850",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "search_cache",
+        "cache_performance",
+        "sqlite_sequence"
+      ],
+      "schema_info": {
+        "search_cache": [
+          {
+            "cid": 0,
+            "name": "query_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "query",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "results",
+            "type": "BLOB",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "access_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "1",
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "last_access",
+            "type": "TIMESTAMP",
+            "notnull": 1,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "notnull": 1,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "result_size",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "0",
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "query_type",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": "'general'",
+            "pk": 0
+          }
+        ],
+        "cache_performance": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "query_hash",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "execution_time_ms",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "cache_hit",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "notnull": 0,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0021457672119140625,
+        "table_counts": {
+          "search_cache": 5,
+          "cache_performance": 0,
+          "sqlite_sequence": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/file_cache/rapid_cache.db",
+      "size_mb": 0.04296875,
+      "modified": "2025-06-15 19:41:54.689449",
+      "db_type": "sqlite",
+      "accessible": true,
+      "tables": [
+        "search_cache",
+        "cache_performance",
+        "sqlite_sequence"
+      ],
+      "schema_info": {
+        "search_cache": [
+          {
+            "cid": 0,
+            "name": "query_hash",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "query",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "results",
+            "type": "BLOB",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "access_count",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "1",
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "last_access",
+            "type": "TIMESTAMP",
+            "notnull": 1,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "notnull": 1,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "result_size",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": "0",
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "query_type",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": "'general'",
+            "pk": 0
+          }
+        ],
+        "cache_performance": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "query_hash",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "execution_time_ms",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "cache_hit",
+            "type": "BOOLEAN",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "notnull": 0,
+            "dflt_value": "CURRENT_TIMESTAMP",
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.0030994415283203125,
+        "table_counts": {
+          "search_cache": 0,
+          "cache_performance": 0,
+          "sqlite_sequence": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true,
+        "pragma_check": "ok"
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.mcp_index/filesystem.duckdb",
+      "size_mb": 0.26171875,
+      "modified": "2025-06-15 09:51:28.140209",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [
+        "code_index"
+      ],
+      "schema_info": {
+        "code_index": [
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "content",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "file_hash",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "size_bytes",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "last_modified",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "extension",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "directory",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "function_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "class_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "import_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "complexity_score",
+            "type": "INTEGER",
+            "null": "YES"
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.07796287536621094,
+        "table_counts": {
+          "code_index": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/wheel_trading_optimized.duckdb",
+      "size_mb": 6.26171875,
+      "modified": "2025-06-14 07:36:47.701107",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.11515617370605469,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/unified_wheel_trading.duckdb",
+      "size_mb": 0.01171875,
+      "modified": "2025-06-15 13:54:11.033990",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.06008148193359375,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/test_wheel_trading.duckdb",
+      "size_mb": 1.01171875,
+      "modified": "2025-06-14 06:42:36.984690",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.06604194641113281,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/wheel_trading_master.duckdb",
+      "size_mb": 0.01171875,
+      "modified": "2025-06-15 18:30:07.547466",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.0629425048828125,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/indexes/structured/code_analytics.duckdb",
+      "size_mb": 0.26171875,
+      "modified": "2025-06-13 21:39:33.023881",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [
+        "code_metrics",
+        "function_signatures",
+        "patterns"
+      ],
+      "schema_info": {
+        "code_metrics": [
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "language",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "total_lines",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "code_lines",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "comment_lines",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "complexity",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "num_functions",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "num_classes",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "avg_function_length",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "max_nesting_depth",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "technical_debt_score",
+            "type": "DOUBLE",
+            "null": "YES"
+          }
+        ],
+        "function_signatures": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "null": "NO"
+          },
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "function_name",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "line_number",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "parameters",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "return_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "decorators",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "complexity",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "is_async",
+            "type": "BOOLEAN",
+            "null": "YES"
+          }
+        ],
+        "patterns": [
+          {
+            "name": "pattern_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "pattern_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "description",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "occurrences",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "files",
+            "type": "VARCHAR",
+            "null": "YES"
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.03790855407714844,
+        "table_counts": {
+          "code_metrics": 0,
+          "function_signatures": 0,
+          "patterns": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/unified_trading.duckdb",
+      "size_mb": 0.26171875,
+      "modified": "2025-06-11 08:54:10",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [
+        "market_data"
+      ],
+      "schema_info": {
+        "market_data": [
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "returns",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "data_type",
+            "type": "VARCHAR",
+            "null": "NO"
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.057697296142578125,
+        "table_counts": {
+          "market_data": 0
+        }
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/wheel_trading_optimized.duckdb",
+      "size_mb": 4.51171875,
+      "modified": "2025-06-13 19:26:42.348430",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [],
+      "schema_info": {},
+      "performance_stats": {
+        "query_latency_ms": 0.08225440979003906,
+        "table_counts": {}
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/wheel_cache.duckdb",
+      "size_mb": 78.76171875,
+      "modified": "2025-06-13 07:33:25.454533",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [
+        "bug_history",
+        "code_complexity_cache",
+        "code_performance_metrics",
+        "greeks_cache",
+        "opra_symbology",
+        "optimization_experiments",
+        "option_chains",
+        "options_data",
+        "position_snapshots",
+        "predictions_cache",
+        "slice_cache",
+        "unity_options_ohlcv",
+        "unity_options_ohlcv_intraday_backup"
+      ],
+      "schema_info": {
+        "bug_history": [
+          {
+            "name": "error_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "fix_applied",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "code_complexity_cache": [
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "complexity_score",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "lines_of_code",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "dependencies",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "last_analyzed",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "code_performance_metrics": [
+          {
+            "name": "function_name",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "execution_time_ms",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "memory_usage_mb",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "greeks_cache": [
+          {
+            "name": "option_symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "spot_price",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "risk_free_rate",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "DECIMAL(8,6)",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "DECIMAL(8,4)",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "DECIMAL(8,4)",
+            "null": "YES"
+          },
+          {
+            "name": "rho",
+            "type": "DECIMAL(8,4)",
+            "null": "YES"
+          },
+          {
+            "name": "iv",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "opra_symbology": [
+          {
+            "name": "raw_symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "instrument_id",
+            "type": "BIGINT",
+            "null": "NO"
+          },
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          }
+        ],
+        "optimization_experiments": [
+          {
+            "name": "experiment_id",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "approach",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "parameters",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "performance_metrics",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "option_chains": [
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "spot_price",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "data",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "options_data": [
+          {
+            "name": "ts_event",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "instrument_id",
+            "type": "BIGINT",
+            "null": "NO"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "strike",
+            "type": "DECIMAL(10,2)",
+            "null": "NO"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "data_source",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "position_snapshots": [
+          {
+            "name": "account_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "positions",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "account_data",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "predictions_cache": [
+          {
+            "name": "prediction_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "input_features",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "predictions",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "model_version",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "slice_cache": [
+          {
+            "name": "hash",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "content",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "embedding",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "model_name",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "last_accessed",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "access_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "token_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "start_line",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "end_line",
+            "type": "INTEGER",
+            "null": "YES"
+          }
+        ],
+        "unity_options_ohlcv": [
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "ts_event",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "open",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          }
+        ],
+        "unity_options_ohlcv_intraday_backup": [
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "ts_event",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "open",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.03314018249511719,
+        "table_counts": {
+          "bug_history": 0,
+          "code_complexity_cache": 0,
+          "code_performance_metrics": 0,
+          "greeks_cache": 0,
+          "opra_symbology": 759994,
+          "optimization_experiments": 0,
+          "option_chains": 0,
+          "options_data": 0,
+          "position_snapshots": 0,
+          "predictions_cache": 0,
+          "slice_cache": 0,
+          "unity_options_ohlcv": 178724,
+          "unity_options_ohlcv_intraday_backup": 1040215
+        }
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/wheel_trading_master.duckdb",
+      "size_mb": 4.26171875,
+      "modified": "2025-06-12 20:34:35.959561",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [
+        "active_options",
+        "cc_candidates",
+        "csp_candidates",
+        "decisions",
+        "high_iv_options",
+        "market_data",
+        "option_statistics",
+        "options_data",
+        "recent_market",
+        "slice_cache",
+        "todays_opportunities"
+      ],
+      "schema_info": {
+        "active_options": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "implied_volatility",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ],
+        "cc_candidates": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "implied_volatility",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ],
+        "csp_candidates": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "implied_volatility",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ],
+        "decisions": [
+          {
+            "name": "decision_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "action",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "contracts",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "expected_value",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "confidence",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ],
+        "high_iv_options": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "implied_volatility",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ],
+        "market_data": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "open",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          }
+        ],
+        "option_statistics": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "total_options",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "avg_iv",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "max_iv",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "min_iv",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "avg_put_bid",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "avg_call_bid",
+            "type": "DOUBLE",
+            "null": "YES"
+          },
+          {
+            "name": "unique_expirations",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "unique_strikes",
+            "type": "BIGINT",
+            "null": "YES"
+          }
+        ],
+        "options_data": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "implied_volatility",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ],
+        "recent_market": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "open",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          }
+        ],
+        "slice_cache": [
+          {
+            "name": "hash",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "content",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "embedding",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "model_name",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "last_accessed",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "access_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "token_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "file_path",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "start_line",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "end_line",
+            "type": "INTEGER",
+            "null": "YES"
+          }
+        ],
+        "todays_opportunities": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "strike",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "implied_volatility",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "stock_price",
+            "type": "FLOAT",
+            "null": "YES"
+          },
+          {
+            "name": "strike_distance_pct",
+            "type": "FLOAT",
+            "null": "YES"
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.10013580322265625,
+        "table_counts": {
+          "active_options": 36,
+          "cc_candidates": 0,
+          "csp_candidates": 0,
+          "decisions": 0,
+          "high_iv_options": 0,
+          "market_data": 30,
+          "option_statistics": 5,
+          "options_data": 45,
+          "recent_market": 27,
+          "slice_cache": 0,
+          "todays_opportunities": 4
+        }
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    },
+    {
+      "path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/consolidated_20250614_060231/wheel_cache.duckdb",
+      "size_mb": 197.51171875,
+      "modified": "2025-06-13 23:03:29.395863",
+      "db_type": "duckdb",
+      "accessible": true,
+      "tables": [
+        "fred_features",
+        "fred_observations",
+        "fred_series",
+        "greeks_cache",
+        "option_chains",
+        "position_snapshots",
+        "predictions_cache",
+        "price_history",
+        "unity_options_all_daily",
+        "unity_options_comprehensive",
+        "unity_options_daily",
+        "unity_options_highperf",
+        "unity_stock_1min"
+      ],
+      "schema_info": {
+        "fred_features": [
+          {
+            "name": "series_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "feature_name",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "calculation_date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "value",
+            "type": "DECIMAL(18,6)",
+            "null": "YES"
+          },
+          {
+            "name": "confidence",
+            "type": "DECIMAL(4,3)",
+            "null": "YES"
+          },
+          {
+            "name": "parameters",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "fred_observations": [
+          {
+            "name": "series_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "observation_date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "value",
+            "type": "DECIMAL(18,6)",
+            "null": "YES"
+          },
+          {
+            "name": "is_revised",
+            "type": "BOOLEAN",
+            "null": "YES"
+          },
+          {
+            "name": "revision_date",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "fred_series": [
+          {
+            "name": "series_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "title",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "observation_start",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "observation_end",
+            "type": "DATE",
+            "null": "YES"
+          },
+          {
+            "name": "frequency",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "units",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "seasonal_adjustment",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "last_updated",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "popularity",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "notes",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          },
+          {
+            "name": "updated_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "greeks_cache": [
+          {
+            "name": "option_symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "spot_price",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "risk_free_rate",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "DECIMAL(8,6)",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "DECIMAL(8,4)",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "DECIMAL(8,4)",
+            "null": "YES"
+          },
+          {
+            "name": "rho",
+            "type": "DECIMAL(8,4)",
+            "null": "YES"
+          },
+          {
+            "name": "iv",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "option_chains": [
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "spot_price",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "data",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "position_snapshots": [
+          {
+            "name": "account_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "positions",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "account_data",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "predictions_cache": [
+          {
+            "name": "prediction_id",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "timestamp",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "input_features",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "predictions",
+            "type": "JSON",
+            "null": "YES"
+          },
+          {
+            "name": "model_version",
+            "type": "VARCHAR",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "price_history": [
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "returns",
+            "type": "DECIMAL(8,6)",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "unity_options_all_daily": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "strike",
+            "type": "DECIMAL(10,2)",
+            "null": "NO"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "settlement",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "bid_close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "ask_close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "bid_size",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "ask_size",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "underlying_close",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "iv",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "delta",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "gamma",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "theta",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          },
+          {
+            "name": "vega",
+            "type": "DECIMAL(6,4)",
+            "null": "YES"
+          }
+        ],
+        "unity_options_comprehensive": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "strike",
+            "type": "DECIMAL(10,2)",
+            "null": "NO"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "trades_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "vwap",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "underlying_price",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "unity_options_daily": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "strike",
+            "type": "DECIMAL(10,2)",
+            "null": "NO"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "bid",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "last",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "bid_size",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "ask_size",
+            "type": "INTEGER",
+            "null": "YES"
+          }
+        ],
+        "unity_options_highperf": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "symbol",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "expiration",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "strike",
+            "type": "DECIMAL(10,2)",
+            "null": "NO"
+          },
+          {
+            "name": "option_type",
+            "type": "VARCHAR",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "trades_count",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "vwap",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "bid",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "ask",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "bid_size",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "ask_size",
+            "type": "INTEGER",
+            "null": "YES"
+          },
+          {
+            "name": "open_interest",
+            "type": "BIGINT",
+            "null": "YES"
+          },
+          {
+            "name": "underlying_price",
+            "type": "DECIMAL(10,2)",
+            "null": "YES"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "null": "YES"
+          }
+        ],
+        "unity_stock_1min": [
+          {
+            "name": "date",
+            "type": "DATE",
+            "null": "NO"
+          },
+          {
+            "name": "ts_event",
+            "type": "TIMESTAMP",
+            "null": "NO"
+          },
+          {
+            "name": "open",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "high",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "low",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "close",
+            "type": "DECIMAL(10,4)",
+            "null": "YES"
+          },
+          {
+            "name": "volume",
+            "type": "BIGINT",
+            "null": "YES"
+          }
+        ]
+      },
+      "performance_stats": {
+        "query_latency_ms": 0.05316734313964844,
+        "table_counts": {
+          "fred_features": 26401,
+          "fred_observations": 8706,
+          "fred_series": 9,
+          "greeks_cache": 0,
+          "option_chains": 0,
+          "position_snapshots": 0,
+          "predictions_cache": 0,
+          "price_history": 861,
+          "unity_options_all_daily": 0,
+          "unity_options_comprehensive": 2490,
+          "unity_options_daily": 14564,
+          "unity_options_highperf": 2244,
+          "unity_stock_1min": 72441
+        }
+      },
+      "integrity_check": {
+        "basic_query": true
+      },
+      "error_msg": null
+    }
+  ]
+}

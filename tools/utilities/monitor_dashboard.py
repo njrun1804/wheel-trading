@@ -10,8 +10,8 @@ import duckdb
 import yaml
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def clear_screen():
@@ -49,7 +49,9 @@ def get_current_metrics():
         with open(positions_file) as f:
             data = yaml.safe_load(f) or {}
 
-        open_positions = [p for p in data.get("positions", []) if p.get("status") == "open"]
+        open_positions = [
+            p for p in data.get("positions", []) if p.get("status") == "open"
+        ]
         metrics["open_puts"] = len(open_positions)
         metrics["cash_available"] = data.get("cash_available", 0)
 
@@ -62,7 +64,9 @@ def display_dashboard():
         metrics = get_current_metrics()
 
         print("=" * 60)
-        print(f"UNITY WHEEL TRADING MONITOR - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(
+            f"UNITY WHEEL TRADING MONITOR - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
         print("=" * 60)
 
         print("\nMARKET DATA:")

@@ -9,6 +9,7 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -61,8 +62,12 @@ samples = conn.execute(
 
 if samples:
     print("  First 10 records with symbols:")
-    print("  Date       Time                 Instrument  Symbol              Bid    Ask")
-    print("  ---------- -------------------- ----------- ------------------- ------ ------")
+    print(
+        "  Date       Time                 Instrument  Symbol              Bid    Ask"
+    )
+    print(
+        "  ---------- -------------------- ----------- ------------------- ------ ------"
+    )
     for row in samples:
         print(
             f"  {row[0]} {str(row[1])[:19]} {row[2]:11d} {row[3]:19s} {row[4] or 0:6.2f} {row[5] or 0:6.2f}"
@@ -141,7 +146,7 @@ if tick_summary[2] == 0 or tick_summary[2] == 1:
 else:
     print("✓ Options data contains multiple unique symbols")
 
-print(f"\n✓ All data shown is REAL from Databento")
+print("\n✓ All data shown is REAL from Databento")
 print("✓ NO SYNTHETIC DATA exists in the database")
 
 conn.close()

@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""
+BOB - Unified Command Line Interface
+====================================
+
+Single entry point for all BOB system functionality:
+- Natural language command processing
+- 8-agent Bolt problem solving  
+- Einstein semantic search
+- Trading system operations
+- Hardware-accelerated M4 Pro optimizations
+
+Usage Examples:
+  ./bob "optimize Unity wheel trading performance"
+  ./bob solve "analyze risk management bottlenecks"
+  ./bob search "WheelStrategy implementation"
+  ./bob system status
+  ./bob interactive
+  ./bob help
+
+This replaces:
+- bob_cli.py (natural language interface)
+- bolt_cli.py (8-agent problem solving)
+- bob_unified.py (unified interface attempt)  
+- unified_cli.py (intelligent router)
+"""
+
+import sys
+from pathlib import Path
+
+# Add project root to Python path for imports
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+
+try:
+    # Import the unified CLI system
+    from bob.cli.unified_router import UnifiedBobCLI
+    
+    def main():
+        """Main entry point - delegate to unified CLI system."""
+        cli = UnifiedBobCLI()
+        return cli.main()
+        
+    if __name__ == "__main__":
+        sys.exit(main())
+        
+except ImportError as e:
+    print(f"❌ Failed to import BOB system: {e}")
+    print("📋 Please ensure BOB dependencies are installed:")
+    print("   pip install -r requirements.txt")
+    print("   python -m pip install -e .")
+    sys.exit(1)
+except KeyboardInterrupt:
+    print("\n⚠️ Operation cancelled by user")
+    sys.exit(130)
+except Exception as e:
+    print(f"💥 Unexpected error: {e}")
+    sys.exit(1)

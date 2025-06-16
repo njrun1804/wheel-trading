@@ -5,10 +5,8 @@ No external dependencies required.
 """
 from __future__ import annotations
 
-
 import calendar
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, Set, Union
 
 
 class SimpleTradingCalendar:
@@ -50,7 +48,7 @@ class SimpleTradingCalendar:
 
     def __init__(self) -> None:
         """Initialize the trading calendar."""
-        self._holiday_cache: Dict[int, Set[date]] = {}
+        self._holiday_cache: dict[int, set[date]] = {}
 
     def _calculate_floating_holiday(
         self, year: int, month: int, occurrence: int, weekday: int
@@ -85,7 +83,7 @@ class SimpleTradingCalendar:
             # Add weeks to get to nth occurrence
             return first_occurrence + timedelta(weeks=occurrence - 1)
 
-    def _get_holidays_for_year(self, year: int) -> Set[date]:
+    def _get_holidays_for_year(self, year: int) -> set[date]:
         """Get all market holidays for a given year.
 
         Returns:
@@ -118,7 +116,9 @@ class SimpleTradingCalendar:
 
         # Floating holidays
         for month, occurrence, weekday in self.FLOATING_HOLIDAYS:
-            holidays.add(self._calculate_floating_holiday(year, month, occurrence, weekday))
+            holidays.add(
+                self._calculate_floating_holiday(year, month, occurrence, weekday)
+            )
 
         # Thanksgiving Friday (day after Thanksgiving)
         thanksgiving = self._calculate_floating_holiday(year, 11, 4, 3)
@@ -133,7 +133,7 @@ class SimpleTradingCalendar:
         self._holiday_cache[year] = holidays
         return holidays
 
-    def is_trading_day(self, check_date: Union[datetime, date]) -> bool:
+    def is_trading_day(self, check_date: datetime | date) -> bool:
         """Check if a given date is a trading day.
 
         Args:
@@ -182,7 +182,9 @@ class SimpleTradingCalendar:
             prev_day -= timedelta(days=1)
         return prev_day
 
-    def get_trading_days_between(self, start_date: datetime, end_date: datetime) -> List[date]:
+    def get_trading_days_between(
+        self, start_date: datetime, end_date: datetime
+    ) -> list[date]:
         """Get all trading days between two dates (inclusive).
 
         Args:
@@ -233,7 +235,9 @@ class SimpleTradingCalendar:
         third_friday = self._get_third_friday(year, month)
         return datetime.combine(third_friday, datetime.min.time())
 
-    def get_monthly_expiries(self, year: int, months: Optional[List[int]] = None) -> List[date]:
+    def get_monthly_expiries(
+        self, year: int, months: list[int] | None = None
+    ) -> list[date]:
         """Get all monthly option expiration dates for a year.
 
         Args:

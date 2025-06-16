@@ -6,6 +6,7 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -57,7 +58,9 @@ sample_returns = conn.execute(
 print("  Date        | Close  | Stored Return | Prev Close | Calc Return")
 print("  ------------|--------|---------------|------------|------------")
 for date, close, ret, prev_close, calc_ret in sample_returns:
-    print(f"  {date} | ${close:>6.2f} | {ret:>13.4f} | ${prev_close:>9.2f} | {calc_ret:>11.4f}")
+    print(
+        f"  {date} | ${close:>6.2f} | {ret:>13.4f} | ${prev_close:>9.2f} | {calc_ret:>11.4f}"
+    )
 
 # 3. Check the backtest_features table
 print("\n3. Checking backtest_features volatility:")

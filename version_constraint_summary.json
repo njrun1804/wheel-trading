@@ -1,0 +1,179 @@
+{
+  "version_analysis_summary": {
+    "overly_restrictive": {
+      "count": 359,
+      "description": "Packages with exact version pins (==) that prevent updates",
+      "primary_source": "requirements-updated.txt",
+      "examples": [
+        {
+          "package": "numpy",
+          "constraint": "==1.26.4",
+          "file": "requirements-updated.txt",
+          "recommendation": "Use numpy>=1.26.4,<2.0.0"
+        },
+        {
+          "package": "pandas", 
+          "constraint": "==2.3.0",
+          "file": "requirements-updated.txt",
+          "recommendation": "Use pandas>=2.3.0,<3.0.0"
+        },
+        {
+          "package": "scipy",
+          "constraint": "==1.15.3", 
+          "file": "requirements-updated.txt",
+          "recommendation": "Use scipy>=1.15.3,<2.0.0"
+        },
+        {
+          "package": "databento",
+          "constraint": "==0.57.0",
+          "file": "requirements-updated.txt", 
+          "recommendation": "Use databento>=0.57.0,<0.60.0"
+        },
+        {
+          "package": "duckdb",
+          "constraint": "==1.3.0",
+          "file": "requirements-updated.txt",
+          "recommendation": "Use duckdb>=1.3.0,<2.0.0"
+        }
+      ],
+      "impact": "Blocks security updates, prevents dependency resolution flexibility"
+    },
+    
+    "version_conflicts": {
+      "count": 0,
+      "description": "No conflicting version requirements found across files",
+      "examples": [],
+      "impact": "None - no compatibility issues detected"
+    },
+    
+    "flexible_candidates": {
+      "count": 89,
+      "description": "Packages with only lower bounds that should add upper bounds",
+      "examples": [
+        {
+          "package": "pandas",
+          "constraint": ">=2.2.3",
+          "file": "requirements.txt",
+          "recommendation": "Add upper bound: pandas>=2.2.3,<3.0.0"
+        },
+        {
+          "package": "scipy", 
+          "constraint": ">=1.14.0",
+          "file": "requirements.txt",
+          "recommendation": "Add upper bound: scipy>=1.14.0,<2.0.0"
+        },
+        {
+          "package": "scikit-learn",
+          "constraint": ">=1.5.0",
+          "file": "requirements.txt", 
+          "recommendation": "Add upper bound: scikit-learn>=1.5.0,<2.0.0"
+        },
+        {
+          "package": "databento",
+          "constraint": ">=0.37.0",
+          "file": "requirements.txt",
+          "recommendation": "Add upper bound: databento>=0.37.0,<0.40.0"
+        },
+        {
+          "package": "pyarrow",
+          "constraint": ">=14.0.0", 
+          "file": "requirements.txt",
+          "recommendation": "Add upper bound: pyarrow>=14.0.0,<21.0.0"
+        }
+      ],
+      "impact": "Risk of breaking changes from major version updates"
+    },
+    
+    "pinning_patterns": {
+      "exact_pins": {
+        "count": 359,
+        "percentage": 65.4,
+        "assessment": "Overly restrictive - blocks updates"
+      },
+      "range_constraints": {
+        "count": 24,
+        "percentage": 4.4,
+        "assessment": "Ideal - allows safe updates within bounds"
+      },
+      "lower_bound_only": {
+        "count": 100, 
+        "percentage": 18.2,
+        "assessment": "Needs upper bounds for safety"
+      },
+      "no_constraints": {
+        "count": 66,
+        "percentage": 12.0,
+        "assessment": "Risky - could install incompatible versions"
+      }
+    },
+
+    "file_assessment": {
+      "requirements_bolt.txt": {
+        "status": "excellent",
+        "pattern": "range_constraints",
+        "example": "click>=8.0.0,<9.0.0",
+        "recommendation": "Use as template for other files"
+      },
+      "requirements.txt": {
+        "status": "good", 
+        "pattern": "lower_bound_with_selective_upper",
+        "example": "numpy>=1.26.4,<2.0",
+        "recommendation": "Add upper bounds to remaining packages"
+      },
+      "requirements-updated.txt": {
+        "status": "problematic",
+        "pattern": "exact_pins",
+        "example": "numpy==1.26.4",
+        "recommendation": "Remove or replace - appears to be pip freeze output"
+      },
+      "requirements-dev.txt": {
+        "status": "acceptable",
+        "pattern": "mixed_lower_bounds",
+        "recommendation": "Add upper bounds for critical dev tools"
+      }
+    },
+
+    "recommendations": {
+      "immediate": [
+        "Remove or replace requirements-updated.txt (359 exact pins)",
+        "Add upper bounds to core dependencies in requirements.txt",
+        "Standardize on requirements_bolt.txt constraint pattern"
+      ],
+      "short_term": [
+        "Add upper bounds to all 89 lower-bound-only packages",
+        "Implement automated dependency scanning",
+        "Set up pre-commit hooks to prevent exact pins"
+      ],
+      "long_term": [
+        "Establish dependency update policy",
+        "Regular security and compatibility audits", 
+        "Automated dependency management pipeline"
+      ]
+    },
+
+    "best_practices": {
+      "constraint_format": "package>=min_version,<next_major_version",
+      "examples": {
+        "core_deps": "numpy>=1.24.0,<2.0.0",
+        "data_providers": "databento>=0.37.0,<0.40.0", 
+        "utilities": "click>=8.0.0,<9.0.0"
+      },
+      "rationale": "Allows security updates while preventing breaking changes"
+    },
+
+    "risk_assessment": {
+      "high_risk": {
+        "issue": "359 exact pins in requirements-updated.txt",
+        "impact": "Blocks all updates including security patches"
+      },
+      "medium_risk": {
+        "issue": "89 packages without upper bounds",
+        "impact": "Potential breaking changes from major version updates"
+      },
+      "low_risk": {
+        "issue": "Inconsistent strategies across files", 
+        "impact": "Developer confusion and maintenance overhead"
+      }
+    }
+  }
+}

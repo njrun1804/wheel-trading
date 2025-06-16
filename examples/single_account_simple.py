@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.api import SimpleWheelAdvisor
 from src.unity_wheel.execution import UnityFillModel
-from src.unity_wheel.portfolio import SingleAccountManager, die
+from src.unity_wheel.portfolio import SingleAccountManager
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
     print(f"Account ID: {account.account_id}")
     print(f"Total Value: ${account.total_value:,.2f}")
     print(f"Buying Power: ${account.buying_power:,.2f}")
-    print(f"\nUnity Exposure:")
+    print("\nUnity Exposure:")
     print(f"  Shares: {account.unity_shares:,}")
     print(f"  Short Puts: {account.unity_puts}")
     print(f"  Total Notional: ${account.unity_notional:,.2f}")
@@ -126,13 +126,13 @@ def main():
 
     if "fill_estimate" in recommendation.get("details", {}):
         fill_est = recommendation["details"]["fill_estimate"]
-        print(f"\nFill Estimate:")
+        print("\nFill Estimate:")
         print(f"  Price: ${fill_est['estimated_fill']:.2f}")
         print(f"  Total Cost: ${fill_est['total_cost']:.2f}")
 
     if "account_summary" in recommendation.get("details", {}):
         acc_sum = recommendation["details"]["account_summary"]
-        print(f"\nAccount Summary:")
+        print("\nAccount Summary:")
         print(f"  Buying Power: ${acc_sum['buying_power']:,.2f}")
         print(f"  Unity Exposure: ${acc_sum['unity_notional']:,.2f}")
 
@@ -143,19 +143,10 @@ def demonstrate_failures():
     """Demonstrate various failure modes - uncomment to test."""
 
     # Missing account data
-    bad_account = {"securitiesAccount": {}}  # Missing currentBalances
     # manager = SingleAccountManager()
     # manager.parse_account(bad_account)  # Dies: Missing 'currentBalances'
 
     # Missing balance field
-    bad_account2 = {
-        "securitiesAccount": {
-            "currentBalances": {
-                "liquidationValue": 100000
-                # Missing cashBalance
-            }
-        }
-    }
     # manager.parse_account(bad_account2)  # Dies: Missing 'cashBalance'
 
     # Invalid fill parameters
@@ -163,11 +154,6 @@ def demonstrate_failures():
     # fill_model.estimate_fill_price(bid=-1, ask=2, size=5, is_opening=True)  # Dies: Invalid bid
 
     # Missing option data
-    market_snapshot_bad = {
-        "ticker": "U",
-        "current_price": 35,
-        "option_chain": {},  # Empty - no options
-    }
     # advisor = SimpleWheelAdvisor()
     # advisor.advise_with_fills(market_snapshot_bad, account_data)  # Dies: No option data
 

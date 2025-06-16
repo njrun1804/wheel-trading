@@ -5,9 +5,7 @@ from __future__ import annotations
 import importlib
 import logging
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 from rich.console import Console
@@ -30,13 +28,15 @@ class EnvironmentValidator:
 
     def __init__(self):
         """Initialize validator."""
-        self.results: Dict[str, Tuple[bool, str]] = {}
+        self.results: dict[str, tuple[bool, str]] = {}
         self.critical_failures = 0
         self.warnings = 0
 
     def run_all_checks(self) -> bool:
         """Run all validation checks."""
-        console.print("\n[bold blue]Unity Wheel Bot - Environment Validation[/bold blue]\n")
+        console.print(
+            "\n[bold blue]Unity Wheel Bot - Environment Validation[/bold blue]\n"
+        )
 
         # Check Python version
         self._check_python_version()
@@ -199,7 +199,9 @@ class EnvironmentValidator:
             from unity_wheel.risk.analytics import RiskAnalyzer, RiskLimits
 
             # Create analyzer
-            limits = RiskLimits(max_var_95 = config.risk.max_var_95, max_cvar_95 = config.risk.max_cvar_95)
+            limits = RiskLimits(
+                max_var_95=config.risk.max_var_95, max_cvar_95=config.risk.max_cvar_95
+            )
             analyzer = RiskAnalyzer(limits)
 
             # Test VaR calculation
@@ -275,7 +277,7 @@ class EnvironmentValidator:
         total_checks = len(self.results)
         passed_checks = sum(1 for passed, _ in self.results.values() if passed)
 
-        console.print(f"\n[bold]Summary:[/bold]")
+        console.print("\n[bold]Summary:[/bold]")
         console.print(f"Total checks: {total_checks}")
         console.print(f"Passed: [green]{passed_checks}[/green]")
         console.print(f"Failed: [red]{total_checks - passed_checks}[/red]")
@@ -318,7 +320,9 @@ def self_diagnostic_test() -> None:
         else:
             status = "[red]FAIL[/red]"
 
-        table.add_row(case_str, f"{result.value:.3f}", f"{result.confidence:.2f}", status)
+        table.add_row(
+            case_str, f"{result.value:.3f}", f"{result.confidence:.2f}", status
+        )
 
     console.print(table)
 

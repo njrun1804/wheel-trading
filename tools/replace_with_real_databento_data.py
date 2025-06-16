@@ -13,8 +13,7 @@ NO SYNTHETIC/MOCK/DUMMY DATA ALLOWED.
 import asyncio
 import os
 import sys
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
+from datetime import UTC, datetime, timedelta
 
 import duckdb
 
@@ -26,8 +25,8 @@ import logging
 
 from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.utils.logging import StructuredLogger
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -54,7 +53,7 @@ class RealDataCollector:
         # Initialize Databento client - this will fetch real API key from Google Secrets
         try:
             self.client = DatabentoClient()
-            print(f"✅ Databento client initialized with real API credentials")
+            print("✅ Databento client initialized with real API credentials")
         except Exception as e:
             print(f"❌ CRITICAL: Cannot initialize Databento client: {e}")
             print(
@@ -114,7 +113,7 @@ class RealDataCollector:
         print("\n📅 Finding real Unity option expirations...")
 
         # Find next few monthly expirations
-        today = datetime.now(timezone.utc)
+        today = datetime.now(UTC)
         expirations_to_check = []
 
         # Check next 3 months for real expirations
@@ -124,7 +123,7 @@ class RealDataCollector:
             year, month = check_date.year, check_date.month
 
             # First day of month
-            first_day = datetime(year, month, 1, tzinfo=timezone.utc)
+            first_day = datetime(year, month, 1, tzinfo=UTC)
 
             # Find first Friday (weekday 4)
             days_to_friday = (4 - first_day.weekday()) % 7
@@ -165,7 +164,7 @@ class RealDataCollector:
                 print(f"   📊 Spot price verification: ${chain.spot_price:.2f}")
 
                 if total_options == 0:
-                    print(f"   ⚠️  No real options found for this expiration")
+                    print("   ⚠️  No real options found for this expiration")
                     continue
 
                 # Store real options data
@@ -178,7 +177,7 @@ class RealDataCollector:
                 )
                 continue
 
-        print(f"\n✅ REAL DATA COLLECTION COMPLETE")
+        print("\n✅ REAL DATA COLLECTION COMPLETE")
         print(f"📊 Total real options collected: {total_options_collected:,}")
 
         # Verify data authenticity
@@ -235,9 +234,9 @@ class RealDataCollector:
         for call in chain.calls:
             try:
                 # Calculate moneyness for validation
-                moneyness = (float(call.strike_price) - float(chain.spot_price)) / float(
-                    chain.spot_price
-                )
+                moneyness = (
+                    float(call.strike_price) - float(chain.spot_price)
+                ) / float(chain.spot_price)
 
                 # Insert real option data
                 self.conn.execute(
@@ -282,7 +281,7 @@ class RealDataCollector:
 
     async def verify_data_authenticity(self):
         """Verify that all data is real (not synthetic)."""
-        print(f"\n🔍 VERIFYING DATA AUTHENTICITY")
+        print("\n🔍 VERIFYING DATA AUTHENTICITY")
         print("=" * 60)
 
         # Check total options now in database
@@ -300,24 +299,28 @@ class RealDataCollector:
         """
         ).fetchone()
 
-        print(f"📊 REAL DATA VERIFICATION RESULTS:")
+        print("📊 REAL DATA VERIFICATION RESULTS:")
         print(f"   Total options: {result[0]:,}")
         print(f"   Expirations: {result[1]}")
         print(f"   Unique strikes: {result[2]}")
         print(f"   Date range: {result[3]} to {result[4]}")
-        print(f"   Average spread: ${result[5]:.3f}" if result[5] else "   Average spread: N/A")
+        print(
+            f"   Average spread: ${result[5]:.3f}"
+            if result[5]
+            else "   Average spread: N/A"
+        )
 
         # Verify this looks like real data
         if result[0] > 0:
-            print(f"\n✅ DATA AUTHENTICITY VERIFIED:")
-            print(f"   ✅ All data sourced from Databento API")
-            print(f"   ✅ No synthetic/mock/dummy data present")
-            print(f"   ✅ Real market timestamps")
-            print(f"   ✅ Genuine bid/ask spreads from market makers")
-            print(f"   ✅ Authentic Unity option contracts")
+            print("\n✅ DATA AUTHENTICITY VERIFIED:")
+            print("   ✅ All data sourced from Databento API")
+            print("   ✅ No synthetic/mock/dummy data present")
+            print("   ✅ Real market timestamps")
+            print("   ✅ Genuine bid/ask spreads from market makers")
+            print("   ✅ Authentic Unity option contracts")
         else:
-            print(f"\n❌ NO REAL DATA COLLECTED")
-            print(f"   This may indicate subscription or connectivity issues")
+            print("\n❌ NO REAL DATA COLLECTED")
+            print("   This may indicate subscription or connectivity issues")
 
         # Check for any suspicious patterns that would indicate synthetic data
         suspicious = self.conn.execute(
@@ -334,9 +337,9 @@ class RealDataCollector:
 
         if suspicious > 0:
             print(f"\n⚠️  WARNING: {suspicious} records have suspicious patterns")
-            print(f"   This could indicate synthetic data contamination")
+            print("   This could indicate synthetic data contamination")
         else:
-            print(f"\n✅ No suspicious synthetic data patterns detected")
+            print("\n✅ No suspicious synthetic data patterns detected")
 
     async def close(self):
         """Clean up resources."""
@@ -355,18 +358,18 @@ async def main():
         await collector.clear_synthetic_data()
         await collector.collect_real_unity_data()
 
-        print(f"\n🎉 SUCCESS: REAL UNITY OPTIONS DATA COLLECTION COMPLETE")
-        print(f"🚨 NO SYNTHETIC DATA POLICY ENFORCED")
-        print(f"✅ All Unity options data is now authentic market data from Databento")
+        print("\n🎉 SUCCESS: REAL UNITY OPTIONS DATA COLLECTION COMPLETE")
+        print("🚨 NO SYNTHETIC DATA POLICY ENFORCED")
+        print("✅ All Unity options data is now authentic market data from Databento")
 
     except Exception as e:
         print(f"\n❌ CRITICAL ERROR: {e}")
-        print(f"Cannot proceed without real market data.")
-        print(f"Please check:")
-        print(f"  - Databento API credentials")
-        print(f"  - Google Cloud authentication")
-        print(f"  - Network connectivity")
-        print(f"  - Databento subscription includes Unity options")
+        print("Cannot proceed without real market data.")
+        print("Please check:")
+        print("  - Databento API credentials")
+        print("  - Google Cloud authentication")
+        print("  - Network connectivity")
+        print("  - Databento subscription includes Unity options")
         raise
 
     finally:

@@ -10,8 +10,8 @@ from datetime import datetime
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def daily_health_check():
@@ -74,7 +74,9 @@ def daily_health_check():
         total_opts, missing_greeks, wrong_puts, wrong_calls, pos_theta = option_stats
 
         # Calculate issues percentage
-        issues_pct = ((wrong_puts + wrong_calls) / total_opts * 100) if total_opts > 0 else 100
+        issues_pct = (
+            ((wrong_puts + wrong_calls) / total_opts * 100) if total_opts > 0 else 100
+        )
 
         if issues_pct < 1:  # Less than 1% issues
             health_score += 1
@@ -86,7 +88,9 @@ def daily_health_check():
         # Report positive theta (warning, not failure)
         pos_theta_pct = (pos_theta / total_opts * 100) if total_opts > 0 else 0
         if pos_theta_pct > 15:
-            print(f"⚠️  Positive Theta: {pos_theta_pct:.1f}% of options ({pos_theta:,})")
+            print(
+                f"⚠️  Positive Theta: {pos_theta_pct:.1f}% of options ({pos_theta:,})"
+            )
 
     except Exception as e:
         print(f"❌ Option Data Check Failed: {e}")
@@ -111,7 +115,9 @@ def daily_health_check():
             health_score += 1
             print(f"✅ Price Data: {total_prices:,} records, no negative values")
         else:
-            print(f"❌ Price Data: {neg_prices} negative prices, {neg_vol} negative volumes")
+            print(
+                f"❌ Price Data: {neg_prices} negative prices, {neg_vol} negative volumes"
+            )
             issues.append(f"Price data has {neg_prices + neg_vol} invalid values")
 
     except Exception as e:
@@ -137,9 +143,13 @@ def daily_health_check():
 
             if days_old <= 2 and close > 0 and volume > 0:
                 health_score += 1
-                print(f"✅ Unity Data: ${close:.2f}, volume {volume:,}, {days_old} days old")
+                print(
+                    f"✅ Unity Data: ${close:.2f}, volume {volume:,}, {days_old} days old"
+                )
             else:
-                print(f"❌ Unity Data: Stale or invalid (${close:.2f}, {days_old} days old)")
+                print(
+                    f"❌ Unity Data: Stale or invalid (${close:.2f}, {days_old} days old)"
+                )
                 issues.append("Unity data is stale or invalid")
         else:
             print("❌ Unity Data: No recent data found")
@@ -168,11 +178,17 @@ def daily_health_check():
         if chain_data:
             expirations, total_opts, min_dte, max_dte = chain_data
 
-            if expirations >= 3 and total_opts >= 50:  # At least 3 expirations, 50 options
+            if (
+                expirations >= 3 and total_opts >= 50
+            ):  # At least 3 expirations, 50 options
                 health_score += 1
-                print(f"✅ Unity Options: {expirations} expirations, {total_opts} options")
+                print(
+                    f"✅ Unity Options: {expirations} expirations, {total_opts} options"
+                )
             else:
-                print(f"❌ Unity Options: Only {expirations} expirations, {total_opts} options")
+                print(
+                    f"❌ Unity Options: Only {expirations} expirations, {total_opts} options"
+                )
                 issues.append("Insufficient Unity option coverage")
         else:
             print("❌ Unity Options: No option data found")
@@ -190,7 +206,9 @@ def daily_health_check():
     print("\n" + "=" * 60)
     print("HEALTH CHECK SUMMARY")
     print("=" * 60)
-    print(f"Overall Health Score: {final_score:.1f}% ({health_score}/{total_checks} checks passed)")
+    print(
+        f"Overall Health Score: {final_score:.1f}% ({health_score}/{total_checks} checks passed)"
+    )
 
     # Determine trading readiness
     if final_score >= 80 and len(issues) == 0:

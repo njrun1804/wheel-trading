@@ -1,14 +1,14 @@
 """Data validation with hard failures - no missing data allowed."""
 from __future__ import annotations
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-
 import sys
 from datetime import datetime
-from typing import Any, Dict, List, NoReturn, Optional
+from typing import Any, NoReturn
 
 from .logging import get_logger
 
@@ -26,7 +26,7 @@ class DataValidator:
     """Validates all data with hard exits on ANY missing fields."""
 
     @staticmethod
-    def validate_market_snapshot(snapshot: Dict[str, Any]) -> None:
+    def validate_market_snapshot(snapshot: dict[str, Any]) -> None:
         """
         Validate market snapshot data. Dies if ANY required field is missing.
 
@@ -83,7 +83,7 @@ class DataValidator:
             die("Missing 'risk_free_rate' in market snapshot")
 
     @staticmethod
-    def validate_option_data(option: Dict[str, Any], key: str) -> None:
+    def validate_option_data(option: dict[str, Any], key: str) -> None:
         """
         Validate single option data. Dies if ANY required field is missing.
 
@@ -115,7 +115,9 @@ class DataValidator:
             die(f"Invalid ask price for {key}: {option['ask']}")
 
         if option["bid"] > option["ask"]:
-            die(f"Invalid bid/ask for {key}: bid ({option['bid']}) > ask ({option['ask']})")
+            die(
+                f"Invalid bid/ask for {key}: bid ({option['bid']}) > ask ({option['ask']})"
+            )
 
         if "volume" not in option:
             die(f"Missing 'volume' in option {key}")
@@ -138,7 +140,7 @@ class DataValidator:
             die(f"Invalid IV for {key}: {option['implied_volatility']}")
 
     @staticmethod
-    def validate_option_chain(chain: Dict[str, Dict[str, Any]]) -> None:
+    def validate_option_chain(chain: dict[str, dict[str, Any]]) -> None:
         """Validate entire option chain. Dies if ANY option has missing data."""
         if not chain:
             die("Option chain is empty")
@@ -147,7 +149,7 @@ class DataValidator:
             DataValidator.validate_option_data(option_data, key)
 
     @staticmethod
-    def validate_position(position: Dict[str, Any]) -> None:
+    def validate_position(position: dict[str, Any]) -> None:
         """
         Validate position data. Dies if required fields missing.
 
@@ -176,7 +178,9 @@ class DataValidator:
             if "error" in response:
                 die(f"API error from {endpoint}: {response['error']}")
             if "status" in response and response["status"] != "success":
-                die(f"API failure from {endpoint}: {response.get('message', 'Unknown error')}")
+                die(
+                    f"API failure from {endpoint}: {response.get('message', 'Unknown error')}"
+                )
 
     @staticmethod
     def validate_config_value(value: Any, key: str, expected_type: type = None) -> None:
@@ -190,7 +194,7 @@ class DataValidator:
             )
 
     @staticmethod
-    def validate_schwab_order_response(response: Dict[str, Any]) -> None:
+    def validate_schwab_order_response(response: dict[str, Any]) -> None:
         """Validate Schwab order response. Dies if missing required fields."""
         if not response:
             die("Schwab order response is None or empty")
@@ -223,7 +227,7 @@ class DataValidator:
         return data
 
     @staticmethod
-    def validate_risk_metrics(metrics: Dict[str, Any]) -> None:
+    def validate_risk_metrics(metrics: dict[str, Any]) -> None:
         """Validate risk metrics. Dies if critical values missing."""
         if not metrics:
             die("Risk metrics are None or empty")
@@ -243,7 +247,9 @@ class DataValidator:
                 die(f"Risk metric '{field}' is None")
 
     @staticmethod
-    def validate_historical_data(data: List[Any], symbol: str, min_points: int = 20) -> None:
+    def validate_historical_data(
+        data: list[Any], symbol: str, min_points: int = 20
+    ) -> None:
         """Validate historical data. Dies if insufficient data points."""
         if not data:
             die(f"No historical data for {symbol}")
@@ -260,7 +266,9 @@ class DataValidator:
             die(f"{calculation} returned None")
 
         if hasattr(result, "value"):
-            if result.value is None or (hasattr(result.value, "isnan") and result.value.isnan()):
+            if result.value is None or (
+                hasattr(result.value, "isnan") and result.value.isnan()
+            ):
                 die(f"{calculation} returned NaN")
             if hasattr(result, "confidence") and result.confidence < 0.5:
                 die(f"{calculation} has low confidence: {result.confidence}")
@@ -272,13 +280,15 @@ class DataValidator:
 
 
 # Convenience functions for common validations
-def validate_market_data(snapshot: Dict[str, Any]) -> None:
+def validate_market_data(snapshot: dict[str, Any]) -> None:
     """Validate complete market data including option chain."""
     DataValidator.validate_market_snapshot(snapshot)
     DataValidator.validate_option_chain(snapshot["option_chain"])
 
 
-def validate_for_trading(snapshot: Dict[str, Any], account_data: Dict[str, Any]) -> None:
+def validate_for_trading(
+    snapshot: dict[str, Any], account_data: dict[str, Any]
+) -> None:
     """Validate all data needed for trading decision."""
     # Market data
     validate_market_data(snapshot)

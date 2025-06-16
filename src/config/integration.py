@@ -1,18 +1,14 @@
 """
+Integration layer between new YAML configuration system and existing codebase.
+Provides compatibility and migration utilities.
+"""
 from __future__ import annotations
+
 import logging
 
 logger = logging.getLogger(__name__)
 
-
-Integration layer between new YAML configuration system and existing codebase.
-Provides compatibility and migration utilities.
-"""
-
 from decimal import Decimal
-from typing import Optional
-
-from pydantic import SecretStr
 
 from .base import Settings
 from .loader import get_config, get_config_loader
@@ -22,7 +18,7 @@ from .schema import WheelConfig
 class ConfigAdapter:
     """Adapts new WheelConfig to existing Settings interface."""
 
-    def __init__(self, wheel_config: Optional[WheelConfig] = None):
+    def __init__(self, wheel_config: WheelConfig | None = None):
         self.wheel_config = wheel_config or get_config()
         self._loader = get_config_loader()
 
@@ -143,19 +139,19 @@ class ConfigAdapter:
 
         if not health.get("valid", False):
             logger.info("Configuration validation failed!")
-            for error in health.get("errors", []):
+            for _error in health.get("errors", []):
                 logger.info("  ERROR: {error}")
             return False
 
         # Show warnings but don't fail
-        for warning in health.get("warnings", []):
+        for _warning in health.get("warnings", []):
             logger.info("  WARNING: {warning}")
 
         return True
 
 
 # Singleton adapter instance
-_adapter: Optional[ConfigAdapter] = None
+_adapter: ConfigAdapter | None = None
 
 
 def get_config_adapter() -> ConfigAdapter:
@@ -207,7 +203,7 @@ def migrate_env_to_yaml() -> None:
         logger.info("To use environment overrides with new system, rename to:")
         print()
         for env_var, (value, path) in found_vars.items():
-            new_name = "WHEEL_" + path.upper().replace(".", "__")
+            "WHEEL_" + path.upper().replace(".", "__")
             logger.info("  export {new_name}={value}")
         print()
     else:

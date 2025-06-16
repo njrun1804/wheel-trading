@@ -9,7 +9,6 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.unity_wheel.risk.advanced_financial_modeling import AdvancedFinancialModeling
-from src.unity_wheel.risk.borrowing_cost_analyzer import BorrowingCostAnalyzer
 
 
 def demo_monte_carlo():
@@ -128,7 +127,7 @@ def demo_optimal_capital_structure():
 
     print(f"Expected Asset Return: {expected_return:.0%}")
     print(f"Asset Volatility: {volatility:.0%}")
-    print(f"Borrowing Cost: 10% (Schwab margin)")
+    print("Borrowing Cost: 10% (Schwab margin)")
     print()
 
     print("Optimal Structure:")
@@ -165,7 +164,10 @@ def demo_multi_period_optimization():
 
     # Optimize
     result = modeler.multi_period_optimization(
-        periods=periods, initial_capital=initial_capital, max_leverage=1.5, reinvest_profits=True
+        periods=periods,
+        initial_capital=initial_capital,
+        max_leverage=1.5,
+        reinvest_profits=True,
     )
 
     print(f"Initial Capital: ${initial_capital:,}")
@@ -173,7 +175,9 @@ def demo_multi_period_optimization():
     print()
 
     print("Optimal Borrowing Schedule:")
-    for i, (period, borrow) in enumerate(zip(periods, result.optimal_borrowing_schedule)):
+    for i, (period, borrow) in enumerate(
+        zip(periods, result.optimal_borrowing_schedule, strict=False)
+    ):
         print(
             f"  Period {i+1} ({period['days']}d, {period['expected_return']:.0%} return): Borrow ${borrow:,.0f}"
         )
@@ -203,7 +207,9 @@ def demo_correlation_analysis():
 
     # Unity returns (somewhat correlated with rates)
     base_returns = np.random.standard_t(df=5, size=n_days) * 0.03
-    rate_impact = -np.diff(np.concatenate([[rates[0]], rates])) * 50  # Negative correlation
+    rate_impact = (
+        -np.diff(np.concatenate([[rates[0]], rates])) * 50
+    )  # Negative correlation
     unity_returns = base_returns + rate_impact + 0.001
 
     # Other factors
@@ -219,9 +225,7 @@ def demo_correlation_analysis():
 
     print("Correlation Analysis:")
     for metric, value in correlation.items():
-        if "correlation" in metric:
-            print(f"  {metric}: {value:.3f}")
-        elif "beta" in metric:
+        if "correlation" in metric or "beta" in metric:
             print(f"  {metric}: {value:.3f}")
 
 

@@ -7,7 +7,6 @@ No hand-waving - just math.
 import math
 
 import numpy as np
-from scipy import stats
 
 
 def calculate_var_requirements():
@@ -100,7 +99,9 @@ def calculate_kelly_requirements():
     print(f"Days needed (minimum): {days_needed_min} ({days_needed_min/252:.1f} years)")
 
     print(f"\nRobust monthly cycles: {robust_observations}")
-    print(f"Days needed (robust): {days_needed_robust} ({days_needed_robust/252:.1f} years)")
+    print(
+        f"Days needed (robust): {days_needed_robust} ({days_needed_robust/252:.1f} years)"
+    )
 
     # Calculate confidence intervals for win rate
     print("\nWin rate confidence intervals:")

@@ -1,0 +1,5 @@
+[console_scripts]
+bolt = bolt.cli.main:main
+bolt-bench = bolt.cli.benchmark:main
+bolt-monitor = bolt.cli.monitor:main
+bolt-solve = bolt.cli.solve:main

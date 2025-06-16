@@ -69,6 +69,14 @@ if [[ -z "$WHEEL_TRADING_INITIALIZED" ]]; then
     export ANTHROPIC_SMALL_FAST_MODEL="claude-3-haiku-latest"
     export CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1
     
+    # Claude Code Memory Optimizations (Prevents RangeError: Invalid string length)
+    export NODE_OPTIONS="--max-old-space-size=20480 --max-semi-space-size=1024 --max-buffer-size=16777216"
+    export CLAUDE_CODE_MAX_OUTPUT_TOKENS=256000
+    export CLAUDE_CODE_MAX_CONTEXT_TOKENS=400000
+    export CLAUDE_CODE_STREAMING_ENABLED=true
+    export CLAUDE_CODE_CHUNK_SIZE=8192
+    export UV_THREADPOOL_SIZE=12
+    
     # Suppress warnings
     export PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning"
     

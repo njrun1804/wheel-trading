@@ -10,10 +10,10 @@ from .component_wiring import (
 )
 
 __all__ = [
-    'ComponentRegistry',
-    'IntegratedDecisionTracker',
-    'IntegratedRiskAnalyzer',
-    'IntegratedStatsAnalyzer', 
-    'IntegratedWheelStrategy',
-    'get_component_registry',
+    "ComponentRegistry",
+    "IntegratedDecisionTracker",
+    "IntegratedRiskAnalyzer",
+    "IntegratedStatsAnalyzer",
+    "IntegratedWheelStrategy",
+    "get_component_registry",
 ]

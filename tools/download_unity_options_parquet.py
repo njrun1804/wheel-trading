@@ -12,15 +12,13 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 import databento as db
 import duckdb
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -28,7 +26,9 @@ config = get_config()
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 os.environ["DATABENTO_ZSTD_THREADS"] = str(os.cpu_count() or 4)
 
 # Singleton Databento client
-_CLIENT: Optional[db.Historical] = None
+_CLIENT: db.Historical | None = None
 
 
 def get_databento_api_key():
@@ -95,7 +95,7 @@ class ParquetUnityDownloader:
 
         logger.info(f"Output directory: {self.output_dir}")
 
-    def download_single_date(self, date: datetime.date) -> Optional[str]:
+    def download_single_date(self, date: datetime.date) -> str | None:
         """Download Unity options for a single date and save to Parquet."""
         try:
             # Download data
@@ -124,11 +124,16 @@ class ParquetUnityDownloader:
                 return None
 
             # Save to Parquet
-            output_file = self.output_dir / f"unity_options_{date.strftime('%Y%m%d')}.parquet"
+            output_file = (
+                self.output_dir / f"unity_options_{date.strftime('%Y%m%d')}.parquet"
+            )
 
             # Write with compression
             processed_df.to_parquet(
-                output_file, engine="pyarrow", compression="snappy", index=False  # Fast compression
+                output_file,
+                engine="pyarrow",
+                compression="snappy",
+                index=False,  # Fast compression
             )
 
             with self.lock:
@@ -184,12 +189,12 @@ class ParquetUnityDownloader:
 
         return pd.DataFrame(processed_records)
 
-    def convert_price(self, price) -> Optional[float]:
+    def convert_price(self, price) -> float | None:
         """Convert Databento price format."""
         if price is None:
             return None
         try:
-            if isinstance(price, (int, float)):
+            if isinstance(price, int | float):
                 if price > 10000:
                     return float(price) / 10000.0
                 elif price > 1000:
@@ -228,7 +233,8 @@ class ParquetUnityDownloader:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # Submit all tasks
             future_to_date = {
-                executor.submit(self.download_single_date, date): date for date in trading_days
+                executor.submit(self.download_single_date, date): date
+                for date in trading_days
             }
 
             # Process completed tasks
@@ -267,7 +273,7 @@ class ParquetUnityDownloader:
         logger.info(f"Rate: {len(trading_days)/duration:.1f} days/second")
 
         if self.failed_dates:
-            logger.warning(f"\nFailed dates:")
+            logger.warning("\nFailed dates:")
             for date, error in self.failed_dates[:10]:  # Show first 10
                 logger.warning(f"  {date}: {error}")
 
@@ -280,7 +286,7 @@ class ParquetUnityDownloader:
 
         return parquet_files
 
-    def load_to_duckdb(self, parquet_files: List[Path]):
+    def load_to_duckdb(self, parquet_files: list[Path]):
         """Bulk load all Parquet files into DuckDB."""
         logger.info("\n" + "=" * 60)
         logger.info("LOADING PARQUET FILES TO DUCKDB")
@@ -362,7 +368,7 @@ class ParquetUnityDownloader:
             if stats[1] > 0 and stats[5]:
                 daily_volume = stats[5] / stats[1]
                 logger.info(f"\nDaily average volume: {daily_volume:,.0f}")
-                logger.info(f"Expected (CBOE): ~55,000")
+                logger.info("Expected (CBOE): ~55,000")
 
                 if daily_volume > 40000:
                     logger.info("✅ EXCELLENT! Data matches expectations")

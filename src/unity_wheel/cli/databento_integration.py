@@ -1,11 +1,10 @@
 """Real-time Databento integration for Unity options data."""
 from __future__ import annotations
 
-
 import asyncio
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.config import get_settings
 from unity_wheel.api.types import MarketSnapshot, OptionData
@@ -94,11 +93,11 @@ async def create_databento_market_snapshot(
                 if hasattr(candidate["expiration"], "replace"):
                     expiration = candidate["expiration"]
                     if expiration.tzinfo is None:
-                        expiration = expiration.replace(tzinfo=timezone.utc)
+                        expiration = expiration.replace(tzinfo=UTC)
                 else:
                     expiration = datetime.fromisoformat(str(candidate["expiration"]))
                     if expiration.tzinfo is None:
-                        expiration = expiration.replace(tzinfo=timezone.utc)
+                        expiration = expiration.replace(tzinfo=UTC)
 
                 option_chain[strike_key] = OptionData(
                     strike=candidate["strike"],
@@ -117,7 +116,7 @@ async def create_databento_market_snapshot(
 
             # Create market snapshot with timezone-aware timestamp
             market_snapshot = MarketSnapshot(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 ticker=ticker,
                 current_price=current_price,
                 buying_power=portfolio_value,
@@ -176,35 +175,35 @@ async def create_live_market_snapshot(
     risk_free_rate: float = 0.05,
 ) -> tuple[MarketSnapshot, float]:
     """Create market snapshot using Databento Live API for real-time data.
-    
+
     This is used for ad hoc requests where current data is needed.
-    
+
     Args:
         portfolio_value: Total portfolio value
         ticker: Stock ticker (default: "U" for Unity)
         risk_free_rate: Risk-free rate to use for IV calculations
-        
+
     Returns:
         MarketSnapshot with live Unity data and confidence score
-        
+
     Raises:
         ValueError: If unable to fetch live data
     """
     logger.info("Using Databento Live API for real-time data...")
-    
+
     # Initialize live client
     live_client = UnityLiveClient()
-    
+
     try:
         # Get live snapshot
         live_data = await live_client.get_live_snapshot()
-        
+
         if not live_data["stock_price"]:
             raise ValueError("Could not get live Unity stock price")
-            
+
         current_price = live_data["stock_price"]
         logger.info(f"Live Unity price: ${current_price:.2f}")
-        
+
         # Build option chain from live quotes
         option_chain = {}
         for key, quote in live_data["option_quotes"].items():
@@ -212,18 +211,18 @@ async def create_live_market_snapshot(
             parts = key.split("_")
             if len(parts) != 3:
                 continue
-                
+
             strike = float(parts[0])
             expiry_str = parts[1]
             opt_type = parts[2]
-            
+
             # Only include puts for wheel strategy
             if opt_type != "P":
                 continue
-                
+
             # Convert expiry string to date
             expiry_date = datetime.strptime(expiry_str, "%Y%m%d").date()
-            
+
             option_chain[str(strike)] = OptionData(
                 strike=strike,
                 expiration=expiry_date.isoformat(),
@@ -238,15 +237,15 @@ async def create_live_market_snapshot(
                 vega=0.0,
                 implied_volatility=0.0,  # Will be calculated
             )
-            
+
         if not option_chain:
             raise ValueError("No live Unity options found")
-            
+
         logger.info(f"Found {len(option_chain)} live option quotes")
-        
+
         # Create market snapshot
         snapshot = MarketSnapshot(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             ticker=ticker,
             current_price=current_price,
             buying_power=portfolio_value * 0.5,  # Conservative estimate
@@ -256,12 +255,12 @@ async def create_live_market_snapshot(
             implied_volatility=0.65,  # Unity typical
             risk_free_rate=risk_free_rate,
         )
-        
+
         # High confidence for live data
         confidence = 0.95
-        
+
         return snapshot, confidence
-        
+
     except Exception as e:
         logger.error(f"Live data fetch failed: {e}")
         # Fall back to historical data
@@ -279,13 +278,13 @@ def get_market_data_sync(
     use_live: bool = None,
 ) -> tuple[MarketSnapshot, float]:
     """Get market data synchronously, using live data for ad hoc requests.
-    
+
     Args:
         portfolio_value: Total portfolio value
         ticker: Stock ticker
         risk_free_rate: Risk-free rate
         use_live: Force live data (None = auto-detect)
-        
+
     Returns:
         MarketSnapshot and confidence score
     """
@@ -293,7 +292,7 @@ def get_market_data_sync(
     if use_live is None:
         # Check if running from cron/automated
         use_live = not os.environ.get("AUTOMATED_RUN", False)
-        
+
     if use_live:
         logger.info("Ad hoc request detected - using live data")
         # Create new event loop for synchronous execution

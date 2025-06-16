@@ -1,0 +1,78 @@
+DATABASE INTEGRITY ASSESSMENT SUMMARY
+==================================================
+
+Assessment Time: 2025-06-16 09:26:00.011068
+Databases Found: 29
+Databases Accessible: 25
+Total Size: 448.2 MB
+
+CRITICAL ISSUES:
+  ❌ 4 databases are inaccessible
+  ❌ 22 databases are world-readable
+
+RECOMMENDATIONS:
+  💡 Fix database accessibility issues immediately
+  💡 Consider archiving or optimizing 1 large databases (>100MB)
+  💡 Found duplicate databases: ['analytics.db', 'rapid_cache.db', 'wheel_trading_optimized.duckdb', 'wheel_cache.duckdb', 'wheel_trading_master.duckdb']
+  💡 Fix database file permissions for security
+
+DATABASE DETAILS:
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/error_handling_analysis.db (2.0MB, sqlite)
+      Tables: exception_handlers, sqlite_sequence, analysis_summary
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/jarvis2_strategy.db (0.0MB, sqlite)
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/analytics.db (0.0MB, sqlite)
+      Tables: test_table
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_monitoring.db (2.1MB, sqlite)
+      Tables: metrics, sqlite_sequence, health_checks, alerts
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_daemon.db (0.0MB, sqlite)
+      Tables: audit_results, sqlite_sequence, audit_patterns, auditor_events
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_evolution.db (13.9MB, sqlite)
+      Tables: observations, sqlite_sequence, design_decisions, evolution_history, evolution_plans
+      ... and 9 more
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.query_intelligence.db (0.0MB, sqlite)
+      Tables: query_history, sqlite_sequence, contextual_info
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/jarvis2_audit.db (0.0MB, sqlite)
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/meta_reality_learning.db (0.0MB, sqlite)
+      Tables: reality_events, sqlite_sequence, claude_patterns
+  ❌ ERROR /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/embeddings.db (46.5MB, sqlite)
+      Error: file is not a database
+  ❌ ERROR /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/rapid_analytics.db (0.0MB, sqlite)
+      Error: file is not a database
+  ❌ ERROR /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/analytics.db (2.8MB, sqlite)
+      Error: file is not a database
+  ❌ ERROR /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/experience.db (2.5MB, sqlite)
+      Error: file is not a database
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/experience/experiences.db (0.0MB, sqlite)
+      Tables: experiences, sqlite_sequence, experience_stats
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/indexes/fts/code_fts.db (0.0MB, sqlite)
+      Tables: code_search, code_search_data, code_search_idx, code_search_content, code_search_docsize
+      ... and 2 more
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/query_cache/rapid_cache.db (2.1MB, sqlite)
+      Tables: search_cache, cache_performance, sqlite_sequence
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.einstein/file_cache/rapid_cache.db (0.0MB, sqlite)
+      Tables: search_cache, cache_performance, sqlite_sequence
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.mcp_index/filesystem.duckdb (0.3MB, duckdb)
+      Tables: code_index
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/wheel_trading_optimized.duckdb (6.3MB, duckdb)
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/wheel_cache.duckdb (78.8MB, duckdb)
+      Tables: bug_history, code_complexity_cache, code_performance_metrics, greeks_cache, opra_symbology
+      ... and 8 more
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/unified_wheel_trading.duckdb (0.0MB, duckdb)
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/test_wheel_trading.duckdb (1.0MB, duckdb)
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/wheel_trading_master.duckdb (4.3MB, duckdb)
+      Tables: active_options, cc_candidates, csp_candidates, decisions, high_iv_options
+      ... and 6 more
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.jarvis/indexes/structured/code_analytics.duckdb (0.3MB, duckdb)
+      Tables: code_metrics, function_signatures, patterns
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/unified_trading.duckdb (0.3MB, duckdb)
+      Tables: market_data
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/wheel_trading_optimized.duckdb (4.5MB, duckdb)
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/wheel_cache.duckdb (78.8MB, duckdb)
+      Tables: bug_history, code_complexity_cache, code_performance_metrics, greeks_cache, opra_symbology
+      ... and 8 more
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/wheel_trading_master.duckdb (4.3MB, duckdb)
+      Tables: active_options, cc_candidates, csp_candidates, decisions, high_iv_options
+      ... and 6 more
+  ✅ OK /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/data/archive/consolidated_20250614_060231/wheel_cache.duckdb (197.5MB, duckdb)
+      Tables: fred_features, fred_observations, fred_series, greeks_cache, option_chains
+      ... and 8 more

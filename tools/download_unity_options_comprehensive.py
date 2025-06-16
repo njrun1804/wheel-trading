@@ -9,7 +9,6 @@ import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Set
 
 import duckdb
 import pytz
@@ -18,14 +17,16 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -289,7 +290,7 @@ class UnityOptionsComprehensiveDownloader:
             logger.debug(f"Trades failed: {e}")
             return 0
 
-    def get_option_definitions(self, date: datetime.date) -> List[Dict]:
+    def get_option_definitions(self, date: datetime.date) -> list[dict]:
         """Get all Unity option definitions for a date."""
         # Definitions are available at midnight
         def_time = datetime.combine(date, datetime.min.time()).replace(tzinfo=pytz.UTC)
@@ -561,7 +562,7 @@ class UnityOptionsComprehensiveDownloader:
         ).fetchone()
 
         if stats and stats[0] > 0:
-            logger.info(f"\nData Coverage:")
+            logger.info("\nData Coverage:")
             logger.info(f"  Trading days with data: {stats[0]}")
             logger.info(f"  Unique option contracts: {stats[1]:,}")
             logger.info(f"  Total records: {stats[2]:,}")
@@ -573,12 +574,18 @@ class UnityOptionsComprehensiveDownloader:
                 end = datetime.strptime(str(stats[4]), "%Y-%m-%d")
                 total_days = (end - start).days + 1
                 weekdays = sum(
-                    1 for i in range(total_days) if (start + timedelta(days=i)).weekday() < 5
+                    1
+                    for i in range(total_days)
+                    if (start + timedelta(days=i)).weekday() < 5
                 )
                 coverage = (stats[0] / weekdays) * 100 if weekdays > 0 else 0
 
                 logger.info(f"  Coverage: {coverage:.1f}% of weekdays")
-                logger.info(f"  Total volume: {stats[5]:,}" if stats[5] else "  Total volume: N/A")
+                logger.info(
+                    f"  Total volume: {stats[5]:,}"
+                    if stats[5]
+                    else "  Total volume: N/A"
+                )
                 logger.info(f"  Unique expirations: {stats[6]}")
                 logger.info(f"  Unique strikes: {stats[7]}")
 
@@ -598,7 +605,7 @@ class UnityOptionsComprehensiveDownloader:
             ).fetchone()
 
             if daily_avg:
-                logger.info(f"\nDaily Statistics:")
+                logger.info("\nDaily Statistics:")
                 logger.info(f"  Average options per day: {daily_avg[0]:.0f}")
                 logger.info(f"  Min options in a day: {daily_avg[1]}")
                 logger.info(f"  Max options in a day: {daily_avg[2]}")
@@ -636,7 +643,7 @@ class UnityOptionsComprehensiveDownloader:
             ).fetchone()
 
             if quality_check:
-                logger.info(f"\nData Quality:")
+                logger.info("\nData Quality:")
                 logger.info(f"  Records with quotes: {quality_check[2]:,}")
                 logger.info(f"  Records with zero volume: {quality_check[1]:,}")
                 logger.info(f"  Records missing all prices: {quality_check[0]:,}")

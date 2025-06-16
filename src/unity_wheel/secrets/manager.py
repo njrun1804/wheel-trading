@@ -1,7 +1,6 @@
 """Unified secret management for local and Google Cloud environments."""
 from __future__ import annotations
 
-
 import base64
 import getpass
 import json
@@ -10,7 +9,7 @@ import os
 from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -33,7 +32,7 @@ class BaseSecretBackend(ABC):
     """Abstract base class for secret backends."""
 
     @abstractmethod
-    def get_secret(self, secret_id: str) -> Optional[str]:
+    def get_secret(self, secret_id: str) -> str | None:
         """Retrieve a secret by ID."""
 
     @abstractmethod
@@ -52,7 +51,7 @@ class BaseSecretBackend(ABC):
 class LocalSecretBackend(BaseSecretBackend):
     """Local encrypted secret storage."""
 
-    def __init__(self, storage_path: Optional[Path] = None):
+    def __init__(self, storage_path: Path | None = None):
         """Initialize local secret backend.
 
         Args:
@@ -88,7 +87,7 @@ class LocalSecretBackend(BaseSecretBackend):
 
         return Fernet(key)
 
-    def _load_secrets(self) -> Dict[str, str]:
+    def _load_secrets(self) -> dict[str, str]:
         """Load and decrypt secrets from disk."""
         if not self.secrets_file.exists():
             return {}
@@ -103,7 +102,7 @@ class LocalSecretBackend(BaseSecretBackend):
             logger.error(f"Failed to load secrets: {e}")
             raise SecretProviderError(f"Failed to load local secrets: {e}")
 
-    def _save_secrets(self, secrets: Dict[str, str]) -> None:
+    def _save_secrets(self, secrets: dict[str, str]) -> None:
         """Encrypt and save secrets to disk."""
         try:
             json_data = json.dumps(secrets).encode()
@@ -117,7 +116,7 @@ class LocalSecretBackend(BaseSecretBackend):
             logger.error(f"Failed to save secrets: {e}")
             raise SecretProviderError(f"Failed to save local secrets: {e}")
 
-    def get_secret(self, secret_id: str) -> Optional[str]:
+    def get_secret(self, secret_id: str) -> str | None:
         """Retrieve a secret by ID."""
         secrets = self._load_secrets()
         return secrets.get(secret_id)
@@ -143,7 +142,7 @@ class LocalSecretBackend(BaseSecretBackend):
 class GCPSecretBackend(BaseSecretBackend):
     """Google Cloud Secret Manager backend."""
 
-    def __init__(self, project_id: Optional[str] = None):
+    def __init__(self, project_id: str | None = None):
         """Initialize GCP Secret Manager backend.
 
         Args:
@@ -176,7 +175,7 @@ class GCPSecretBackend(BaseSecretBackend):
         """Get parent path for listing secrets."""
         return f"projects/{self.project_id}"
 
-    def get_secret(self, secret_id: str) -> Optional[str]:
+    def get_secret(self, secret_id: str) -> str | None:
         """Retrieve a secret by ID."""
         try:
             response = self.client.access_secret_version(
@@ -231,7 +230,9 @@ class GCPSecretBackend(BaseSecretBackend):
         """List all available secret IDs."""
         try:
             secrets = []
-            for secret in self.client.list_secrets(request={"parent": self._get_parent_path()}):
+            for secret in self.client.list_secrets(
+                request={"parent": self._get_parent_path()}
+            ):
                 # Extract secret ID from full resource name
                 secret_id = secret.name.split("/")[-1]
                 secrets.append(secret_id)
@@ -252,7 +253,7 @@ class EnvironmentSecretBackend(BaseSecretBackend):
         """
         self.prefix = prefix
 
-    def get_secret(self, secret_id: str) -> Optional[str]:
+    def get_secret(self, secret_id: str) -> str | None:
         """Retrieve a secret by ID from environment variables."""
         env_var = f"{self.prefix}{secret_id.upper()}"
         return os.environ.get(env_var)
@@ -292,7 +293,7 @@ class SecretManager:
         },
     }
 
-    def __init__(self, provider: Optional[Union[SecretProvider, str]] = None, **kwargs: Any):
+    def __init__(self, provider: SecretProvider | str | None = None, **kwargs: Any):
         """Initialize secret manager.
 
         Args:
@@ -311,7 +312,9 @@ class SecretManager:
     def _detect_provider(self) -> SecretProvider:
         """Auto-detect the best provider based on environment."""
         # Check if running in GCP
-        if os.environ.get("GCP_PROJECT_ID") or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+        if os.environ.get("GCP_PROJECT_ID") or os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS"
+        ):
             try:
                 # Try to import and use GCP
                 import google.cloud.secretmanager
@@ -325,7 +328,9 @@ class SecretManager:
         # Default to local
         return SecretProvider.LOCAL
 
-    def _create_backend(self, provider: SecretProvider, **kwargs: Any) -> BaseSecretBackend:
+    def _create_backend(
+        self, provider: SecretProvider, **kwargs: Any
+    ) -> BaseSecretBackend:
         """Create the appropriate backend for the provider."""
         if provider == SecretProvider.LOCAL:
             return LocalSecretBackend(**kwargs)
@@ -365,14 +370,16 @@ class SecretManager:
                 try:
                     self.backend.set_secret(secret_id, value)
                 except SecretProviderError:
-                    logger.warning(f"Could not save {secret_id} to {self.provider.value} backend")
+                    logger.warning(
+                        f"Could not save {secret_id} to {self.provider.value} backend"
+                    )
 
         if value is None:
             raise SecretNotFoundError(f"Secret '{secret_id}' not found")
 
         return value
 
-    def _prompt_for_secret(self, secret_id: str) -> Optional[str]:
+    def _prompt_for_secret(self, secret_id: str) -> str | None:
         """Prompt user for a secret value."""
         # Check if this is a known credential
         for service, creds in self.CREDENTIAL_SETS.items():
@@ -390,7 +397,9 @@ class SecretManager:
         else:
             return input(f"Enter value for {secret_id}: ")
 
-    def get_credentials(self, service: str, prompt_if_missing: bool = True) -> Dict[str, str]:
+    def get_credentials(
+        self, service: str, prompt_if_missing: bool = True
+    ) -> dict[str, str]:
         """Get all credentials for a service.
 
         Args:
@@ -426,7 +435,9 @@ class SecretManager:
 
         for cred_type, value in credentials.items():
             if cred_type not in self.CREDENTIAL_SETS[service]:
-                raise SecretConfigError(f"Unknown credential type '{cred_type}' for {service}")
+                raise SecretConfigError(
+                    f"Unknown credential type '{cred_type}' for {service}"
+                )
 
             secret_id = f"{service}_{cred_type}"
             self.backend.set_secret(secret_id, value)
@@ -441,13 +452,14 @@ class SecretManager:
 
             # Check if already configured
             try:
-                existing = self.get_credentials(service, prompt_if_missing=False)
+                self.get_credentials(service, prompt_if_missing=False)
                 print(f"✓ {service} credentials already configured")
                 update = input("Update? (y/N): ").lower().strip() == "y"
                 if not update:
                     continue
             except SecretNotFoundError:
                 import logging
+
                 logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
 
@@ -468,9 +480,9 @@ class SecretManager:
         print("\n✓ All credentials configured successfully!")
         print(f"\nCredentials are stored in: {self.provider.value}")
         if self.provider == SecretProvider.LOCAL:
-            print(f"Location: ~/.wheel_trading/secrets/")
+            print("Location: ~/.wheel_trading/secrets/")
 
-    def list_configured_services(self) -> Dict[str, bool]:
+    def list_configured_services(self) -> dict[str, bool]:
         """List which services have been configured.
 
         Returns:

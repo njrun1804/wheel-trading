@@ -15,33 +15,33 @@ async def main():
     """Run orchestrator with automatic hardware optimization."""
     # Create enhanced session
     session = EnhancedSession(".")
-    
+
     # Interactive mode if no arguments
     if len(sys.argv) < 2:
         print("🚀 Unity Wheel Orchestrator - M4 Pro Optimized")
         print("=" * 50)
         print("\nNo command provided, entering interactive mode...")
         print("(Use './orchestrate <command>' for single execution)")
-        
+
         await session.initialize()
         await session.interactive_mode()
         return
-    
+
     # Single command execution
     command = " ".join(sys.argv[1:])
-    
+
     # Initialize session with optimizations
     await session.initialize()
-    
+
     print(f"\n🎯 Orchestrating: {command}")
     print("-" * 70)
-    
+
     # Execute command
     result = await session.execute(command)
-    
+
     # Display results
     print(f"\n✅ Strategy used: {result.get('strategy', 'unknown')}")
-    
+
     if "phases" in result:
         for phase_name, phase_data in result["phases"].items():
             if isinstance(phase_data, dict) and phase_data:
@@ -53,22 +53,22 @@ async def main():
                         print(f"  • {key}: {len(value)} entries")
                     else:
                         print(f"  • {key}: {value}")
-    
+
     # Show performance metrics
     if "session_metrics" in result:
         metrics = result["session_metrics"]
-        print(f"\n⚡ Performance:")
+        print("\n⚡ Performance:")
         print(f"  • Duration: {metrics['duration_ms']:.1f}ms")
         print(f"  • Memory: +{metrics['memory_delta_mb']:.1f}MB")
         print(f"  • Backend: {metrics['backend']}")
-        
+
     if "execution_metrics" in result:
         metrics = result["execution_metrics"]
-        print(f"\n📊 Detailed Metrics:")
+        print("\n📊 Detailed Metrics:")
         print(f"  • Total: {metrics.get('duration_ms', 0):.1f}ms")
         print(f"  • CPU: {metrics.get('cpu_percent', 0):.1f}%")
         print(f"  • Memory: {metrics.get('memory_mb', 0):.1f}MB")
-    
+
     # Shutdown
     await session.shutdown()
 

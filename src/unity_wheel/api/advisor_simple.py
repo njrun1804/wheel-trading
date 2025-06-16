@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-import logging
-from typing import Dict, Optional
-
 from unity_wheel.execution import UnityFillModel
 from unity_wheel.portfolio import SingleAccountManager, die
 from unity_wheel.risk import RiskLimits
 from unity_wheel.strategy import WheelParameters
-from unity_wheel.utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
-from unity_wheel.utils.data_validator import DataValidator, validate_market_data
+from unity_wheel.utils import get_logger, timed_operation
+from unity_wheel.utils.data_validator import validate_market_data
+
 from .advisor import WheelAdvisor
 from .types import MarketSnapshot, Recommendation
 
@@ -22,8 +20,8 @@ class SimpleWheelAdvisor(WheelAdvisor):
 
     def __init__(
         self,
-        wheel_params: Optional[WheelParameters] = None,
-        risk_limits: Optional[RiskLimits] = None,
+        wheel_params: WheelParameters | None = None,
+        risk_limits: RiskLimits | None = None,
     ):
         """Initialize simple advisor."""
         super().__init__(wheel_params, risk_limits)
@@ -36,7 +34,7 @@ class SimpleWheelAdvisor(WheelAdvisor):
 
     @timed_operation(threshold_ms=200.0)
     def advise_with_fills(
-        self, market_snapshot: MarketSnapshot, account_data: Dict
+        self, market_snapshot: MarketSnapshot, account_data: dict
     ) -> Recommendation:
         """
         Generate recommendation with fill costs and account validation.
@@ -73,7 +71,9 @@ class SimpleWheelAdvisor(WheelAdvisor):
 
         # Validate buying power - dies if insufficient
         if "margin_required" in base_rec["risk"]:
-            self.account_manager.validate_buying_power(base_rec["risk"]["margin_required"], account)
+            self.account_manager.validate_buying_power(
+                base_rec["risk"]["margin_required"], account
+            )
 
         # Validate position limits - dies if exceeded
         if "strike" in base_rec["details"] and "contracts" in base_rec["details"]:
@@ -136,7 +136,9 @@ class SimpleWheelAdvisor(WheelAdvisor):
 
         return base_rec
 
-    def _find_option_key(self, market_snapshot: MarketSnapshot, strike: float) -> Optional[str]:
+    def _find_option_key(
+        self, market_snapshot: MarketSnapshot, strike: float
+    ) -> str | None:
         """Find option key matching the strike price."""
         for key, option in market_snapshot["option_chain"].items():
             if abs(option["strike"] - strike) < 0.01:

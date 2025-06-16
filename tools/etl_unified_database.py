@@ -10,8 +10,8 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def create_etl_pipeline():

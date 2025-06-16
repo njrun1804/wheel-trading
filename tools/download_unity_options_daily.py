@@ -8,9 +8,8 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -24,8 +23,6 @@ except ImportError as e:
     print("Please install: pip install duckdb databento")
     sys.exit(1)
 
-from src.config.loader import get_config
-from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.secrets.integration import get_databento_api_key
 from src.unity_wheel.utils.logging import StructuredLogger
 
@@ -59,8 +56,8 @@ class UnityOptionsDownloader:
         self.client = db.Historical(api_key)
 
         # Date range
-        self.start_date = datetime(2023, 3, 28, tzinfo=timezone.utc)
-        self.end_date = datetime.now(timezone.utc) - timedelta(days=1)  # Yesterday
+        self.start_date = datetime(2023, 3, 28, tzinfo=UTC)
+        self.end_date = datetime.now(UTC) - timedelta(days=1)  # Yesterday
 
         logger.info(
             "downloader_initialized",
@@ -138,7 +135,10 @@ class UnityOptionsDownloader:
 
                 logger.info(
                     "downloading_chunk",
-                    extra={"start": current_start.isoformat(), "end": chunk_end.isoformat()},
+                    extra={
+                        "start": current_start.isoformat(),
+                        "end": chunk_end.isoformat(),
+                    },
                 )
 
                 try:
@@ -155,7 +155,8 @@ class UnityOptionsDownloader:
                     for schema, schema_desc in schemas_to_try:
                         try:
                             logger.info(
-                                f"Trying schema: {schema_desc}", extra={"schema": str(schema)}
+                                f"Trying schema: {schema_desc}",
+                                extra={"schema": str(schema)},
                             )
 
                             # Try with Unity option symbols
@@ -180,7 +181,8 @@ class UnityOptionsDownloader:
 
                         except Exception as e:
                             logger.warning(
-                                f"Schema {schema} failed: {str(e)}", extra={"error": str(e)}
+                                f"Schema {schema} failed: {str(e)}",
+                                extra={"error": str(e)},
                             )
                             continue
 
@@ -214,7 +216,10 @@ class UnityOptionsDownloader:
 
                     logger.info(
                         "chunk_complete",
-                        extra={"records_added": records_added, "total_so_far": total_records},
+                        extra={
+                            "records_added": records_added,
+                            "total_so_far": total_records,
+                        },
                     )
 
                 except Exception as e:
@@ -240,7 +245,7 @@ class UnityOptionsDownloader:
         finally:
             conn.close()
 
-    def _process_ohlcv_data(self, conn: duckdb.DuckDBPyConnection, data: List) -> int:
+    def _process_ohlcv_data(self, conn: duckdb.DuckDBPyConnection, data: list) -> int:
         """Process OHLCV daily bar data."""
         records = []
 
@@ -263,21 +268,35 @@ class UnityOptionsDownloader:
                     {
                         "symbol": underlying,
                         "instrument_id": (
-                            record.instrument_id if hasattr(record, "instrument_id") else 0
+                            record.instrument_id
+                            if hasattr(record, "instrument_id")
+                            else 0
                         ),
                         "strike_price": strike,
                         "expiration": expiration,
                         "option_type": option_type,
                         "date": datetime.fromtimestamp(
-                            record.ts_event / 1e9, tz=timezone.utc
+                            record.ts_event / 1e9, tz=UTC
                         ).date(),
-                        "open": float(record.open) / 1e9 if hasattr(record, "open") else None,
-                        "high": float(record.high) / 1e9 if hasattr(record, "high") else None,
-                        "low": float(record.low) / 1e9 if hasattr(record, "low") else None,
-                        "close": float(record.close) / 1e9 if hasattr(record, "close") else None,
+                        "open": float(record.open) / 1e9
+                        if hasattr(record, "open")
+                        else None,
+                        "high": float(record.high) / 1e9
+                        if hasattr(record, "high")
+                        else None,
+                        "low": float(record.low) / 1e9
+                        if hasattr(record, "low")
+                        else None,
+                        "close": float(record.close) / 1e9
+                        if hasattr(record, "close")
+                        else None,
                         "volume": record.volume if hasattr(record, "volume") else 0,
-                        "trades_count": record.trades if hasattr(record, "trades") else 0,
-                        "vwap": float(record.vwap) / 1e9 if hasattr(record, "vwap") else None,
+                        "trades_count": record.trades
+                        if hasattr(record, "trades")
+                        else 0,
+                        "vwap": float(record.vwap) / 1e9
+                        if hasattr(record, "vwap")
+                        else None,
                         "bid_close": None,  # Would need separate quote data
                         "ask_close": None,
                         "underlying_close": None,  # Would need separate underlying data
@@ -294,7 +313,9 @@ class UnityOptionsDownloader:
 
         return len(records)
 
-    def _process_statistics_data(self, conn: duckdb.DuckDBPyConnection, data: List) -> int:
+    def _process_statistics_data(
+        self, conn: duckdb.DuckDBPyConnection, data: list
+    ) -> int:
         """Process daily statistics data as fallback."""
         records = []
 
@@ -315,13 +336,15 @@ class UnityOptionsDownloader:
                     {
                         "symbol": underlying,
                         "instrument_id": (
-                            record.instrument_id if hasattr(record, "instrument_id") else 0
+                            record.instrument_id
+                            if hasattr(record, "instrument_id")
+                            else 0
                         ),
                         "strike_price": strike,
                         "expiration": expiration,
                         "option_type": option_type,
                         "date": datetime.fromtimestamp(
-                            record.ts_event / 1e9, tz=timezone.utc
+                            record.ts_event / 1e9, tz=UTC
                         ).date(),
                         "open": (
                             float(record.open_price) / 1e9
@@ -334,7 +357,9 @@ class UnityOptionsDownloader:
                             else None
                         ),
                         "low": (
-                            float(record.low_price) / 1e9 if hasattr(record, "low_price") else None
+                            float(record.low_price) / 1e9
+                            if hasattr(record, "low_price")
+                            else None
                         ),
                         "close": (
                             float(record.close_price) / 1e9
@@ -345,10 +370,14 @@ class UnityOptionsDownloader:
                         "trades_count": 0,
                         "vwap": None,
                         "bid_close": (
-                            float(record.bid_close) / 1e9 if hasattr(record, "bid_close") else None
+                            float(record.bid_close) / 1e9
+                            if hasattr(record, "bid_close")
+                            else None
                         ),
                         "ask_close": (
-                            float(record.ask_close) / 1e9 if hasattr(record, "ask_close") else None
+                            float(record.ask_close) / 1e9
+                            if hasattr(record, "ask_close")
+                            else None
                         ),
                         "underlying_close": None,
                     }
@@ -364,7 +393,11 @@ class UnityOptionsDownloader:
         return len(records)
 
     def _aggregate_trades_to_daily(
-        self, conn: duckdb.DuckDBPyConnection, data: List, start_date: datetime, end_date: datetime
+        self,
+        conn: duckdb.DuckDBPyConnection,
+        data: list,
+        start_date: datetime,
+        end_date: datetime,
     ) -> int:
         """Aggregate trade data into daily bars as last resort."""
         # This would be more complex - aggregate trades by day
@@ -372,7 +405,9 @@ class UnityOptionsDownloader:
         logger.warning("Trade aggregation not implemented - skipping")
         return 0
 
-    def _parse_option_symbol(self, symbol: str) -> Optional[Tuple[str, datetime, str, float]]:
+    def _parse_option_symbol(
+        self, symbol: str
+    ) -> tuple[str, datetime, str, float] | None:
         """Parse Unity option symbol format."""
         try:
             # Unity format: "U     240119P00035000"
@@ -397,7 +432,7 @@ class UnityOptionsDownloader:
         except Exception:
             return None
 
-    def _batch_insert(self, conn: duckdb.DuckDBPyConnection, records: List[Dict]):
+    def _batch_insert(self, conn: duckdb.DuckDBPyConnection, records: list[dict]):
         """Batch insert records into the database."""
         if not records:
             return
@@ -430,7 +465,7 @@ class UnityOptionsDownloader:
         print("=" * 60)
 
         # Basic stats
-        print(f"\nDownload Statistics:")
+        print("\nDownload Statistics:")
         print(f"  Total records downloaded: {total_records:,}")
         print(f"  Successful days: {successful_days}")
         print(f"  Failed chunks: {failed_chunks}")
@@ -453,7 +488,7 @@ class UnityOptionsDownloader:
         ).fetchone()
 
         if stats:
-            print(f"\nDatabase Statistics:")
+            print("\nDatabase Statistics:")
             print(f"  Total records in database: {stats[3]:,}")
             print(f"  Unique trading days: {stats[0]:,}")
             print(f"  Unique options: {stats[1]:,}")
@@ -464,10 +499,12 @@ class UnityOptionsDownloader:
                 if stats[6]
                 else "  Average daily volume: N/A"
             )
-            print(f"  Total volume: {stats[7]:,}" if stats[7] else "  Total volume: N/A")
+            print(
+                f"  Total volume: {stats[7]:,}" if stats[7] else "  Total volume: N/A"
+            )
 
         # Sample data
-        print(f"\nSample Records (most recent):")
+        print("\nSample Records (most recent):")
         samples = conn.execute(
             """
             SELECT date, strike_price, option_type, close, volume
@@ -479,7 +516,9 @@ class UnityOptionsDownloader:
         ).fetchall()
 
         if samples:
-            print(f"  {'Date':<12} {'Strike':<8} {'Type':<5} {'Close':<8} {'Volume':<10}")
+            print(
+                f"  {'Date':<12} {'Strike':<8} {'Type':<5} {'Close':<8} {'Volume':<10}"
+            )
             print(f"  {'-'*12} {'-'*8} {'-'*5} {'-'*8} {'-'*10}")
             for date, strike, opt_type, close, volume in samples:
                 print(

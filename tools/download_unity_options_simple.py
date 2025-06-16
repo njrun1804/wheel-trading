@@ -15,8 +15,8 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -91,7 +91,9 @@ def main():
                             if symbol[i].isdigit():
                                 exp_str = symbol[i : i + 6]
                                 if len(exp_str) == 6 and exp_str.isdigit():
-                                    expiration = datetime.strptime("20" + exp_str, "%Y%m%d").date()
+                                    expiration = datetime.strptime(
+                                        "20" + exp_str, "%Y%m%d"
+                                    ).date()
                                 break
 
                         # Extract type (C or P)
@@ -115,7 +117,7 @@ def main():
                 def convert_price(val):
                     if val is None:
                         return None
-                    if isinstance(val, (int, float)) and val > 1000:
+                    if isinstance(val, int | float) and val > 1000:
                         return val / 10000.0
                     return float(val)
 
@@ -158,7 +160,7 @@ def main():
                 (start_date,),
             ).fetchone()
 
-            logger.info(f"Database now contains:")
+            logger.info("Database now contains:")
             logger.info(f"  Records: {result[0]}")
             logger.info(f"  Unique options: {result[1]}")
             logger.info(f"  Date range: {result[2]} to {result[3]}")

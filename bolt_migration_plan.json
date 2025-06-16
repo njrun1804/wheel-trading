@@ -1,0 +1,273 @@
+{
+  "timestamp": "2025-06-16T15:38:48.958677",
+  "migration_plan": {
+    "phase_1_backup": {
+      "description": "Create complete backup of current system",
+      "operations": [
+        "Create backup directory: /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt_migration_backup_20250616_153848",
+        "Backup BOLT directory: /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt -> /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt_migration_backup_20250616_153848/bolt_original",
+        "Backup BOB directory: /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob -> /Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt_migration_backup_20250616_153848/bob_original",
+        "Create rollback script"
+      ]
+    },
+    "phase_2_directory_structure": {
+      "description": "Ensure proper BOB directory structure",
+      "operations": [
+        "Verify /bob/agents/ exists (already present)",
+        "Create /bob/integration/bolt/ for BOLT-specific integration",
+        "Create /bob/hardware/gpu/ for GPU acceleration",
+        "Create /bob/performance/bolt/ for BOLT performance components"
+      ]
+    },
+    "phase_3_core_migration": {
+      "description": "Migrate core BOLT components to BOB structure",
+      "file_mappings": [
+        [
+          "/bolt/core/integration.py",
+          "/bob/integration/bolt/core_integration.py"
+        ],
+        [
+          "/bolt/core/optimized_integration.py",
+          "/bob/integration/bolt/optimized_integration.py"
+        ],
+        [
+          "/bolt/core/ultra_fast_coordination.py",
+          "/bob/core/ultra_fast_coordination.py"
+        ],
+        [
+          "/bolt/gpu_acceleration.py",
+          "/bob/hardware/gpu/bolt_gpu_acceleration.py"
+        ],
+        [
+          "/bolt/gpu_acceleration_optimized.py",
+          "/bob/hardware/gpu/optimized_acceleration.py"
+        ],
+        [
+          "/bolt/gpu_acceleration_final.py",
+          "/bob/hardware/gpu/final_acceleration.py"
+        ],
+        [
+          "/bolt/hardware_accelerated_faiss.py",
+          "/bob/hardware/gpu/faiss_acceleration.py"
+        ],
+        [
+          "/bolt/memory_optimized_bolt.py",
+          "/bob/hardware/memory_optimization.py"
+        ],
+        [
+          "/bolt/unified_memory.py",
+          "/bob/hardware/unified_memory.py"
+        ],
+        [
+          "/bolt/optimized_memory_manager.py",
+          "/bob/hardware/memory_manager.py"
+        ],
+        [
+          "/bolt/performance_benchmark.py",
+          "/bob/performance/bolt/benchmarks.py"
+        ],
+        [
+          "/bolt/m4_pro_integration.py",
+          "/bob/performance/bolt/m4_pro_integration.py"
+        ],
+        [
+          "/bolt/adaptive_concurrency.py",
+          "/bob/performance/bolt/adaptive_concurrency.py"
+        ]
+      ]
+    },
+    "phase_4_merge_operations": {
+      "description": "Merge overlapping components",
+      "operations": [
+        {
+          "type": "merge_hardware",
+          "source": "/bolt/hardware/",
+          "target": "/bob/hardware/",
+          "strategy": "supplement_existing"
+        },
+        {
+          "type": "merge_error_handling",
+          "source": "/bolt/error_handling/",
+          "target": "/bob/integration/error_handling/",
+          "strategy": "enhance_existing"
+        },
+        {
+          "type": "merge_utils",
+          "source": "/bolt/utils/",
+          "target": "/bob/utils/",
+          "strategy": "supplement_with_bolt_prefix"
+        }
+      ]
+    },
+    "phase_5_configuration": {
+      "description": "Update configuration systems",
+      "operations": [
+        "Merge BOLT config into BOB unified config",
+        "Update import paths in all migrated files",
+        "Update CLI integration for bolt-specific commands",
+        "Configure startup sequence integration"
+      ]
+    },
+    "phase_6_validation": {
+      "description": "Comprehensive validation and testing",
+      "tests": [
+        "8-agent orchestration functionality",
+        "1.5 tasks/second throughput validation",
+        "Work-stealing algorithm verification",
+        "M4 Pro hardware optimization validation",
+        "Einstein integration compatibility",
+        "GPU acceleration functionality",
+        "Error handling and recovery systems",
+        "Memory management and optimization"
+      ]
+    },
+    "phase_7_cleanup": {
+      "description": "Clean up after successful migration",
+      "operations": [
+        "Archive original /bolt/ directory",
+        "Update all external references to BOLT",
+        "Update documentation and README files",
+        "Create migration completion report"
+      ]
+    }
+  },
+  "file_mappings": [
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/integration.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/integration.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/optimized_integration.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/optimized_integration.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/ultra_fast_coordination.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/ultra_fast_coordination.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/config.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/config.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/system_info.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/system_info.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/task_subdivision.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/task_subdivision.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/robust_tool_manager.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/robust_tool_manager.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/core/einstein_accelerator.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/integration/bolt/einstein_accelerator.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/gpu_acceleration.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/hardware/gpu/gpu_acceleration.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/gpu_acceleration_optimized.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/hardware/gpu/gpu_acceleration_optimized.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/gpu_acceleration_final.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/hardware/gpu/gpu_acceleration_final.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/hardware_accelerated_faiss.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/hardware/gpu/hardware_accelerated_faiss.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/metal_accelerated_search.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/hardware/gpu/metal_accelerated_search.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/gpu_memory_optimizer.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/hardware/gpu/gpu_memory_optimizer.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/performance_benchmark.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/performance/bolt/performance_benchmark.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/m4_pro_integration.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/performance/bolt/m4_pro_integration.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/adaptive_concurrency.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/performance/bolt/adaptive_concurrency.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/thermal_monitor.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/performance/bolt/thermal_monitor.py"
+    ],
+    [
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt/memory_optimization_integration.py",
+      "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bob/performance/bolt/memory_optimization_integration.py"
+    ]
+  ],
+  "dependency_updates": [
+    {
+      "type": "import_path_updates",
+      "description": "Update all imports from bolt.* to bob.*",
+      "patterns": [
+        [
+          "from bolt.core",
+          "from bob.integration.bolt"
+        ],
+        [
+          "from bolt.agents",
+          "from bob.agents"
+        ],
+        [
+          "from bolt.hardware",
+          "from bob.hardware"
+        ],
+        [
+          "from bolt.error_handling",
+          "from bob.integration.error_handling"
+        ],
+        [
+          "import bolt.",
+          "import bob."
+        ]
+      ]
+    },
+    {
+      "type": "configuration_integration",
+      "description": "Integrate BOLT configurations into BOB config system",
+      "operations": [
+        "Merge bolt/config.yaml.example into bob/config/base.yaml",
+        "Update configuration loader to handle BOLT-specific settings",
+        "Preserve M4 Pro optimization settings"
+      ]
+    },
+    {
+      "type": "cli_integration",
+      "description": "Integrate BOLT CLI commands into BOB CLI",
+      "operations": [
+        "Move bolt_cli.py functionality to bob/cli/",
+        "Update command routing in bob/cli/main.py",
+        "Preserve bolt-specific command options"
+      ]
+    }
+  ],
+  "validation_steps": [
+    "python bob_performance_test.py --validate-throughput",
+    "python test_8_agent_coordination.py --full-validation",
+    "python validate_work_stealing.py --performance-test",
+    "python test_m4_pro_optimization.py --benchmark",
+    "python validate_gpu_acceleration.py --metal-test",
+    "python test_memory_optimization.py --pressure-test",
+    "python test_einstein_bolt_integration.py --comprehensive",
+    "python validate_error_handling.py --recovery-test",
+    "python test_thermal_monitoring.py --stress-test",
+    "python run_bolt_production_validation.py --full-suite",
+    "python validate_migration_success.py --complete-check"
+  ],
+  "backup_location": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/bolt_migration_backup_20250616_153848",
+  "rollback_script_location": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/rollback_bolt_migration.sh"
+}

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Analyze the initialization pattern to find the root cause."""
 import os
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Key observations:
 # 1. Synchronous creation works fine
@@ -14,7 +15,7 @@ print("with async methods on macOS, causing event loop blocking.\n")
 
 print("Evidence:")
 print("1. TransformerEncoder (heavy PyTorch init) → hang")
-print("2. Path() in async context → hang") 
+print("2. Path() in async context → hang")
 print("3. ProcessPoolExecutor → pickle errors")
 print("4. LMDB writemap → segfaults")
 print("5. Timeouts not firing → event loop blocked")

@@ -2,12 +2,12 @@
 """Verify Unity data is properly stored and test risk calculations."""
 
 import os
-from datetime import datetime, timedelta
 
 import duckdb
 import numpy as np
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -44,18 +44,18 @@ def main():
     if summary:
         symbol, days, start, end, ret, vol, min_p, max_p, worst, best = summary
 
-        print(f"\n📊 Unity Price Data Summary:")
+        print("\n📊 Unity Price Data Summary:")
         print(f"   Days stored: {days}")
         print(f"   Date range: {start} to {end}")
         print(f"   Price range: ${min_p:.2f} - ${max_p:.2f}")
-        print(f"\n📈 Return Statistics:")
+        print("\n📈 Return Statistics:")
         print(f"   Annual return: {ret*100:.1f}%")
         print(f"   Annual volatility: {vol*100:.1f}%")
         print(f"   Worst day: {worst*100:.1f}%")
         print(f"   Best day: {best*100:.1f}%")
 
         # Show recent prices
-        print(f"\n📅 Recent 10 Days:")
+        print("\n📅 Recent 10 Days:")
         recent = conn.execute(
             """
             SELECT date, open, high, low, close, volume, returns
@@ -77,7 +77,7 @@ def main():
             )
 
         # Calculate risk metrics
-        print(f"\n💡 Risk Metrics (250-day):")
+        print("\n💡 Risk Metrics (250-day):")
 
         # Get returns for VaR calculation
         returns = conn.execute(
@@ -110,7 +110,7 @@ def main():
             print(f"   Sharpe Ratio: {sharpe:.2f}")
 
         # Check if we have both FRED and price data
-        print(f"\n🔗 Cross-Database Check:")
+        print("\n🔗 Cross-Database Check:")
 
         # Check FRED tables
         fred_check = conn.execute(
@@ -122,7 +122,7 @@ def main():
         ).fetchone()[0]
 
         if fred_check > 0:
-            print(f"   ✅ FRED tables exist")
+            print("   ✅ FRED tables exist")
 
             # Check for VIX data
             vix_count = (
@@ -140,9 +140,9 @@ def main():
             if vix_count > 0:
                 print(f"   ✅ VIX data available ({vix_count} days)")
         else:
-            print(f"   ❌ FRED tables not found")
+            print("   ❌ FRED tables not found")
 
-        print(f"\n✅ Unity data is properly stored and ready for risk calculations!")
+        print("\n✅ Unity data is properly stored and ready for risk calculations!")
 
     else:
         print("❌ No Unity data found in database")

@@ -9,6 +9,7 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -73,7 +74,7 @@ def check_data():
             print("  - Daily high/low/close for each option")
             print("  - Volume (if tracked in the data)")
     except Exception as e:
-        print(f"\nDAILY OPTIONS DATA: No tick data to summarize")
+        print("\nDAILY OPTIONS DATA: No tick data to summarize")
 
     # Show what's available vs what's needed
     print("\n" + "=" * 60)

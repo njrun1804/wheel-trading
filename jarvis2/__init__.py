@@ -16,11 +16,16 @@ Usage:
 
 # Check if we have the new orchestrator structure
 try:
-    from .core.orchestrator import CodeRequest, CodeSolution, Jarvis2Config, Jarvis2Orchestrator
-    
+    from .core.orchestrator import (
+        CodeRequest,
+        CodeSolution,
+        Jarvis2Config,
+        Jarvis2Orchestrator,
+    )
+
     __all__ = [
         "Jarvis2Orchestrator",
-        "CodeRequest", 
+        "CodeRequest",
         "CodeSolution",
         "Jarvis2Config",
         "get_router",
@@ -36,10 +41,18 @@ except ImportError:
 
         # Provide compatibility layer
         Jarvis2Orchestrator = Jarvis2
-        CodeRequest = lambda query, context=None: {"query": query, "context": context or {}}
-        
-        __all__ = ["Jarvis2", "Jarvis2Config", "CodeSolution", "SolutionMetrics", 
-                   "Jarvis2Orchestrator", "CodeRequest"]
+
+        def CodeRequest(query, context=None):
+            return {"query": query, "context": context or {}}
+
+        __all__ = [
+            "Jarvis2",
+            "Jarvis2Config",
+            "CodeSolution",
+            "SolutionMetrics",
+            "Jarvis2Orchestrator",
+            "CodeRequest",
+        ]
     except ImportError:
         raise ImportError("Jarvis2 core modules not found. Please check installation.")
 

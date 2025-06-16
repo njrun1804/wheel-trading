@@ -1,0 +1,112 @@
+# Bolt Sonnet 4 Production Configuration
+# Configuration for 12-agent orchestrator system with M4 Pro optimization
+
+system:
+  name: "Bolt Sonnet 4 Production"
+  version: "1.0.0"
+  environment: "production"
+
+# Agent Pool Configuration
+agent_pool:
+  num_agents: 12
+  enable_work_stealing: true
+  batch_size: 32
+  batch_timeout_ms: 5
+  steal_threshold: 0.2
+  monitor_interval_ms: 50
+  max_steal_attempts: 4
+  proactive_stealing_interval_ms: 20
+
+# Token Optimization Configuration  
+token_optimization:
+  enable_dynamic_tokens: true
+  enable_drift_compensation: true
+  max_context_size: 64000
+  complexity_budgets:
+    simple:
+      min_tokens: 1000
+      target_tokens: 2000
+      max_tokens: 3000
+    moderate:
+      min_tokens: 4000
+      target_tokens: 6000
+      max_tokens: 8000
+    detailed:
+      min_tokens: 10000
+      target_tokens: 15000
+      max_tokens: 20000
+    exhaustive:
+      min_tokens: 25000
+      target_tokens: 40000
+      max_tokens: 50000
+
+# CPU Optimization Configuration (M4 Pro)
+cpu_optimization:
+  enable_cpu_optimization: true
+  enable_core_affinity: true
+  total_cores: 12
+  p_cores: [0, 1, 2, 3, 4, 5, 6, 7]  # Performance cores
+  e_cores: [8, 9, 10, 11]             # Efficiency cores
+  load_threshold: 0.8
+  rebalance_interval_seconds: 1.0
+  process_priority: -5  # Higher priority
+
+# Memory Management
+memory:
+  max_memory_usage_gb: 18.0
+  enable_memory_monitoring: true
+  gc_threshold: 0.85
+  buffer_allocation_size_mb: 16
+
+# Performance Targets
+performance:
+  target_cpu_utilization: 0.80
+  target_tasks_per_second: 150.0
+  max_task_duration_seconds: 30.0
+  initialization_timeout_seconds: 30
+
+# Integration Settings
+integrations:
+  enable_einstein_integration: true
+  enable_mcp_integration: true
+  enable_trading_system_integration: true
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  enable_file_logging: true
+  log_file: "bolt_production.log"
+  max_log_size_mb: 100
+  backup_count: 5
+  enable_performance_logging: true
+
+# Validation Configuration
+validation:
+  success_rate_threshold: 0.90
+  enable_startup_validation: true
+  enable_performance_validation: true
+  enable_integration_validation: true
+  validation_timeout_seconds: 60
+
+# Error Handling
+error_handling:
+  enable_graceful_degradation: true
+  max_retry_attempts: 3
+  retry_delay_seconds: 1.0
+  enable_circuit_breaker: true
+  circuit_breaker_threshold: 5
+  circuit_breaker_timeout_seconds: 30
+
+# Monitoring
+monitoring:
+  enable_system_monitoring: true
+  metrics_collection_interval_seconds: 10
+  enable_performance_metrics: true
+  enable_resource_metrics: true
+  enable_health_checks: true
+
+# Development/Debug Settings (disabled in production)
+debug:
+  enable_debug_logging: false
+  enable_performance_profiling: false
+  enable_memory_profiling: false

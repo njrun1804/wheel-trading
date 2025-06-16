@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-06-15 20:19:55",
+  "performance_targets": {},
+  "hardware_utilization": {},
+  "throughput_metrics": {},
+  "reliability_metrics": {},
+  "real_world_performance": {},
+  "overall_status": "VALIDATION_FAILED",
+  "error": "cannot import name 'UnifiedIndexHub' from 'einstein.unified_index' (/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/einstein/unified_index.py)"
+}

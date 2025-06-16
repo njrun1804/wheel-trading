@@ -25,8 +25,20 @@ This project uses an automated housekeeping script to enforce file placement and
    ```
 4. Commit your changes once all checks pass.
 
-Refer to `HOUSEKEEPING_GUIDE.md` for full details on the import fix pattern and other rules.
+Refer to [HOUSEKEEPING_GUIDE.md](HOUSEKEEPING_GUIDE.md) for full details on the import fix pattern and other rules.
 
 ### Package Structure
 Legacy directories `ml_engine`, `strategy_engine`, and `risk_engine` were removed.
 Use the `src.unity_wheel` package for all imports.
+
+## Related Documentation
+
+- [Development Guide](DEVELOPMENT_GUIDE.md) - Complete development workflow
+- [Housekeeping Guide](HOUSEKEEPING_GUIDE.md) - File organization rules
+- [Architecture](ARCHITECTURE.md) - System architecture
+- [Quick Reference](QUICK_REFERENCE.md) - Common commands
+
+---
+
+**Last Updated**: June 2025  
+**Version**: 2.2

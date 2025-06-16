@@ -8,7 +8,6 @@ IMPORTANT: This file is specifically for AI/Codex consumption.
 """
 from __future__ import annotations
 
-
 # ============================================================================
 # ARCHITECTURE INVARIANTS (Never violate these)
 # ============================================================================

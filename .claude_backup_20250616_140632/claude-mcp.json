@@ -1,0 +1,70 @@
+{
+  "claude.mcp.workspace": {
+    "isolation": true,
+    "runtimeDir": "${workspaceFolder}/.claude/runtime",
+    "autoCleanup": true,
+    "cleanupOnClose": true
+  },
+  
+  "claude.mcp.servers": {
+    "essential": {
+      "autoStart": true,
+      "command": "mcp-up-essential",
+      "environment": {
+        "MCP_ROOT": "${workspaceFolder}"
+      }
+    },
+    "optional": {
+      "autoStart": false,
+      "servers": ["pyrepl", "duckdb", "brave"]
+    }
+  },
+  
+  "claude.mcp.fileWatcher": {
+    "enabled": true,
+    "debounceMs": 500,
+    "exclude": [
+      "**/.git/**",
+      "**/.claude/**",
+      "**/node_modules/**",
+      "**/__pycache__/**",
+      "**/*.pyc",
+      "**/data/cache/**"
+    ],
+    "command": "claude-cli reindex --path ${file}"
+  },
+  
+  "claude.mcp.healthCheck": {
+    "enabled": true,
+    "intervalSeconds": 60,
+    "endpoint": "http://localhost:${port}/healthz",
+    "autoRestart": true,
+    "maxRestarts": 3
+  },
+  
+  "claude.mcp.performance": {
+    "preWarmOnStartup": true,
+    "tokenBudget": {
+      "thinking": 4096,
+      "output": 4096,
+      "total": 100000
+    },
+    "chunkSize": {
+      "min": 500,
+      "max": 5000,
+      "dynamic": true
+    }
+  },
+  
+  "claude.mcp.telemetry": {
+    "enabled": true,
+    "endpoint": "http://localhost:4318",
+    "serviceName": "wheel-trading",
+    "exportIntervalMs": 5000
+  },
+  
+  "files.watcherExclude": {
+    "**/.claude/runtime/**": true,
+    "**/data/cache/**": true
+  }
+}

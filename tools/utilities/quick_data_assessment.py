@@ -9,8 +9,8 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def quick_assessment():
@@ -126,7 +126,9 @@ def quick_assessment():
         try:
             count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
             if count > 0:
-                print(f"  ⚠️  {table}: {count:,} records (REDUNDANT - should be removed)")
+                print(
+                    f"  ⚠️  {table}: {count:,} records (REDUNDANT - should be removed)"
+                )
             else:
                 print(f"  ✅ {table}: Empty (can be removed)")
         except:

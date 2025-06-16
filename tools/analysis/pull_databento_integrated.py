@@ -2,11 +2,9 @@
 """Pull Databento options data using integrated storage (per DATABENTO_STORAGE_PLAN.md)."""
 
 import asyncio
-import json
 import os
 import sys
 from datetime import datetime, timedelta
-from pathlib import Path
 
 # Add src to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,10 +16,9 @@ from src.unity_wheel.databento.integration import DatentoIntegration
 from src.unity_wheel.databento.validation import DataValidator
 from src.unity_wheel.storage import Storage
 from src.unity_wheel.utils import setup_structured_logging
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 async def pull_wheel_data_integrated():
@@ -50,11 +47,11 @@ async def pull_wheel_data_integrated():
     # Initialize validator
     validator = DataValidator()
 
-    print(f"✅ System initialized with:")
-    print(f"   - DuckDB cache: data/wheel_trading_optimized.duckdb")
-    print(f"   - Moneyness filter: ±20% (80% storage reduction)")
-    print(f"   - TTL: 15 minutes for options, 5 minutes for Greeks")
-    print(f"   - Retention: 30 days max")
+    print("✅ System initialized with:")
+    print("   - DuckDB cache: data/wheel_trading_optimized.duckdb")
+    print("   - Moneyness filter: ±20% (80% storage reduction)")
+    print("   - TTL: 15 minutes for options, 5 minutes for Greeks")
+    print("   - Retention: 30 days max")
 
     # Define fetch function for get_or_fetch pattern
     async def fetch_option_chain(symbol: str, expiration: datetime):
@@ -129,7 +126,10 @@ async def pull_wheel_data_integrated():
         start_time = datetime.now()
 
         chain_data = await databento_adapter.get_or_fetch_option_chain(
-            symbol=TICKER, expiration=expiration, fetch_func=fetch_option_chain, max_age_minutes=15
+            symbol=TICKER,
+            expiration=expiration,
+            fetch_func=fetch_option_chain,
+            max_age_minutes=15,
         )
 
         elapsed = (datetime.now() - start_time).total_seconds()
@@ -141,7 +141,7 @@ async def pull_wheel_data_integrated():
             print(f"   ⏱️  Time: {elapsed:.1f}s")
             print(f"   💾 Cached: {chain_data.get('cached', False)}")
         else:
-            print(f"   ❌ No data retrieved")
+            print("   ❌ No data retrieved")
 
         # Second call - should hit cache
         print("\n2️⃣ Second call (cache hit expected)...")
@@ -154,21 +154,26 @@ async def pull_wheel_data_integrated():
         elapsed = (datetime.now() - start_time).total_seconds()
 
         if chain_data2:
-            print(f"   ✅ Retrieved from cache")
+            print("   ✅ Retrieved from cache")
             print(f"   ⏱️  Time: {elapsed:.3f}s (should be <0.1s)")
             print(f"   💾 Cached: {chain_data2.get('cached', False)}")
 
         # Get wheel candidates using integration
-        print(f"\n🎯 Finding wheel candidates...")
+        print("\n🎯 Finding wheel candidates...")
         candidates = await integration.get_wheel_candidates(
-            underlying=TICKER, target_delta = config.trading.target_delta, dte_range=(30, 60), min_premium_pct=1.0
+            underlying=TICKER,
+            target_delta=config.trading.target_delta,
+            dte_range=(30, 60),
+            min_premium_pct=1.0,
         )
 
         print(f"\n📊 Found {len(candidates)} wheel candidates")
 
         if candidates:
             # Store candidates
-            await databento_adapter.store_wheel_candidates(TICKER, 0.30, candidates[:10])  # Top 10
+            await databento_adapter.store_wheel_candidates(
+                TICKER, 0.30, candidates[:10]
+            )  # Top 10
 
             # Display top 3
             print("\n" + "-" * 60)
@@ -192,7 +197,9 @@ async def pull_wheel_data_integrated():
         print(f"   Unique symbols: {stats['unique_symbols']}")
         print(f"   Database size: {stats['db_size_mb']:.1f} MB")
         print(f"   Cache hit rate: {stats['cache_hit_rate']:.1%}")
-        print(f"   Options filtered: {stats['metrics']['options_filtered']:,} (moneyness filter)")
+        print(
+            f"   Options filtered: {stats['metrics']['options_filtered']:,} (moneyness filter)"
+        )
 
         # Test data quality
         if chain_data:

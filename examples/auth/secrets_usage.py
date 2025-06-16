@@ -74,7 +74,9 @@ async def demo_env_injection():
 
     # Check initial state
     print("Before injection:")
-    print(f"  WHEEL_AUTH__CLIENT_ID: {os.environ.get('WHEEL_AUTH__CLIENT_ID', 'Not set')}")
+    print(
+        f"  WHEEL_AUTH__CLIENT_ID: {os.environ.get('WHEEL_AUTH__CLIENT_ID', 'Not set')}"
+    )
     print(f"  DATABENTO_API_KEY: {os.environ.get('DATABENTO_API_KEY', 'Not set')}")
 
     # Use SecretInjector for temporary env vars
@@ -87,8 +89,12 @@ async def demo_env_injection():
         print(f"  WHEEL_AUTH__CLIENT_SECRET: {'*' * 8}")
 
     print("\nAfter context:")
-    print(f"  WHEEL_AUTH__CLIENT_ID: {os.environ.get('WHEEL_AUTH__CLIENT_ID', 'Not set')}")
-    print(f"  WHEEL_AUTH__CLIENT_SECRET: {os.environ.get('WHEEL_AUTH__CLIENT_SECRET', 'Not set')}")
+    print(
+        f"  WHEEL_AUTH__CLIENT_ID: {os.environ.get('WHEEL_AUTH__CLIENT_ID', 'Not set')}"
+    )
+    print(
+        f"  WHEEL_AUTH__CLIENT_SECRET: {os.environ.get('WHEEL_AUTH__CLIENT_SECRET', 'Not set')}"
+    )
 
 
 async def demo_auth_client_integration():
@@ -111,7 +117,9 @@ async def demo_auth_client_integration():
             # Show SecretManager status
             if "secret_manager" in health:
                 sm_status = health["secret_manager"]
-                print(f"\nSecretManager provider: {sm_status.get('provider', 'unknown')}")
+                print(
+                    f"\nSecretManager provider: {sm_status.get('provider', 'unknown')}"
+                )
                 print(f"Schwab configured: {sm_status.get('schwab_configured', False)}")
 
     except Exception as e:
@@ -133,7 +141,7 @@ async def demo_schwab_client_integration():
             client_id = os.environ["WHEEL_AUTH__CLIENT_ID"]
             client_secret = os.environ["WHEEL_AUTH__CLIENT_SECRET"]
 
-            async with SchwabClient(client_id, client_secret) as client:
+            async with SchwabClient(client_id, client_secret):
                 print("✓ SchwabClient initialized successfully")
                 print(f"  Using client_id: {client_id[:8]}...")
 
@@ -147,25 +155,27 @@ async def demo_provider_specific():
 
     # Local provider
     print("Local Provider:")
-    local_manager = SecretManager(provider=SecretProvider.LOCAL)
-    print(f"  Storage location: ~/.wheel_trading/secrets/")
-    print(f"  Encryption: Machine-specific key (UID + hostname)")
+    SecretManager(provider=SecretProvider.LOCAL)
+    print("  Storage location: ~/.wheel_trading/secrets/")
+    print("  Encryption: Machine-specific key (UID + hostname)")
 
     # GCP provider (only if configured)
     if os.environ.get("GCP_PROJECT_ID"):
         print("\nGCP Provider:")
         try:
-            gcp_manager = SecretManager(provider=SecretProvider.GCP)
+            SecretManager(provider=SecretProvider.GCP)
             print(f"  Project ID: {os.environ['GCP_PROJECT_ID']}")
-            print(f"  Secret format: projects/{os.environ['GCP_PROJECT_ID']}/secrets/{{secret_id}}")
+            print(
+                f"  Secret format: projects/{os.environ['GCP_PROJECT_ID']}/secrets/{{secret_id}}"
+            )
         except Exception as e:
             print(f"  ✗ GCP not available: {e}")
 
     # Environment provider (read-only)
     print("\nEnvironment Provider:")
-    env_manager = SecretManager(provider=SecretProvider.ENVIRONMENT)
-    print(f"  Prefix: WHEEL_")
-    print(f"  Read-only: Cannot set or delete secrets")
+    SecretManager(provider=SecretProvider.ENVIRONMENT)
+    print("  Prefix: WHEEL_")
+    print("  Read-only: Cannot set or delete secrets")
 
 
 async def main():

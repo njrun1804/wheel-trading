@@ -4,13 +4,11 @@ Math proof: Why 250 days of price history is sufficient for risk calculations.
 NOTE: This is NOT for backtesting - the system doesn't do backtesting!
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def show_risk_calculation_requirements():
@@ -36,11 +34,11 @@ def show_risk_calculation_requirements():
         print(f"  5th percentile at position: {percentile_position:.1f}")
 
         if percentile_position < 1:
-            print(f"  ❌ Too few observations for reliable 95% VaR")
+            print("  ❌ Too few observations for reliable 95% VaR")
         elif percentile_position < 5:
-            print(f"  ⚠️  Marginal - VaR estimate may be unstable")
+            print("  ⚠️  Marginal - VaR estimate may be unstable")
         else:
-            print(f"  ✅ Sufficient observations for stable VaR")
+            print("  ✅ Sufficient observations for stable VaR")
 
         # Standard error of percentile estimate
         # SE = sqrt(p(1-p)/n) / f(x_p)
@@ -73,11 +71,11 @@ def show_risk_calculation_requirements():
         print(f"  Relative error: {confidence_interval/true_vol:.1%}")
 
         if confidence_interval / true_vol > 0.20:
-            print(f"  ❌ Poor volatility estimate")
+            print("  ❌ Poor volatility estimate")
         elif confidence_interval / true_vol > 0.10:
-            print(f"  ⚠️  Acceptable volatility estimate")
+            print("  ⚠️  Acceptable volatility estimate")
         else:
-            print(f"  ✅ Good volatility estimate")
+            print("  ✅ Good volatility estimate")
 
     # 4. Kelly Criterion requirements
     print("\n\n4️⃣ KELLY CRITERION REQUIREMENTS")

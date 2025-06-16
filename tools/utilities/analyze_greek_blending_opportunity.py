@@ -80,7 +80,9 @@ def simulate_greek_profiles():
 
     print("\nBlended Approach (3 Strikes/Dates):")
     for i, b in enumerate(blend):
-        print(f"  Position {i+1}: ${b['strike']} @ {b['dte']}d ({b['weight']:.0%} weight)")
+        print(
+            f"  Position {i+1}: ${b['strike']} @ {b['dte']}d ({b['weight']:.0%} weight)"
+        )
 
     print("\n  Blended Greeks:")
     print(f"  Delta: {blended_delta:.2f}")
@@ -155,7 +157,9 @@ def simulate_greek_profiles():
         if abs(move) > 0.10:  # Extreme moves
             blended_pnl *= 1.2  # 20% better due to strike diversification
 
-        advantage = (blended_pnl - single_pnl) / abs(single_pnl) * 100 if single_pnl != 0 else 0
+        advantage = (
+            (blended_pnl - single_pnl) / abs(single_pnl) * 100 if single_pnl != 0 else 0
+        )
 
         print(
             f"{scenario['name']:<16} | ${single_pnl:>12,.0f} | ${blended_pnl:>7,.0f} | {advantage:>7.1f}%"

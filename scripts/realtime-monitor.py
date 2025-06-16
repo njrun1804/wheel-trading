@@ -3,10 +3,8 @@
 Real-time monitoring dashboard for wheel trading system
 """
 
-import json
 import os
 import subprocess
-import sys
 import time
 from datetime import datetime
 
@@ -80,7 +78,11 @@ def check_data_freshness():
             mtime = os.path.getmtime(path)
             age_hours = (time.time() - mtime) / 3600
             files.append(
-                {"name": file, "age_hours": age_hours, "size_mb": os.path.getsize(path) / 1e6}
+                {
+                    "name": file,
+                    "age_hours": age_hours,
+                    "size_mb": os.path.getsize(path) / 1e6,
+                }
             )
 
     return sorted(files, key=lambda x: x["age_hours"])

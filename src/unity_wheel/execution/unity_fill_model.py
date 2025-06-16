@@ -1,12 +1,9 @@
 """Unity-specific fill price modeling with bid-ask spreads and size impact."""
 from __future__ import annotations
 
-
-import logging
 import sys
 from dataclasses import dataclass
-from decimal import ROUND_HALF_UP, Decimal
-from typing import NoReturn, Optional, Tuple
+from typing import NoReturn
 
 from unity_wheel.utils.logging import get_logger
 
@@ -51,7 +48,7 @@ class UnityFillModel:
 
     def estimate_fill_price(
         self, bid: float, ask: float, size: int, is_opening: bool, urgency: float = 0.5
-    ) -> Tuple[FillEstimate, float]:
+    ) -> tuple[FillEstimate, float]:
         """
         Estimate realistic fill price for Unity options.
 
@@ -164,7 +161,9 @@ class UnityFillModel:
         """Calculate total commission for the trade."""
         return size * self.COMMISSION_PER_CONTRACT
 
-    def _calculate_confidence(self, spread: float, size: int, bid: float, ask: float) -> float:
+    def _calculate_confidence(
+        self, spread: float, size: int, bid: float, ask: float
+    ) -> float:
         """
         Calculate confidence in fill estimate.
 
@@ -200,8 +199,13 @@ class UnityFillModel:
         return self.ASSIGNMENT_FEE
 
     def estimate_round_trip_cost(
-        self, open_bid: float, open_ask: float, close_bid: float, close_ask: float, size: int
-    ) -> Tuple[float, float]:
+        self,
+        open_bid: float,
+        open_ask: float,
+        close_bid: float,
+        close_ask: float,
+        size: int,
+    ) -> tuple[float, float]:
         """
         Estimate total cost for round-trip trade (open and close).
 

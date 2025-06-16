@@ -1,12 +1,9 @@
 """Calculate exact data requirements for Unity wheel strategy validation."""
 
-from datetime import datetime, timedelta
-
-import pandas as pd
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def calculate_data_requirements():
@@ -28,7 +25,9 @@ def calculate_data_requirements():
     min_trading_days = int(min_years * 252)  # 252 trading days/year
 
     print(f"   Minimum period: {min_years:.1f} years ({min_trading_days} trading days)")
-    print(f"   Why: Need {min_trades_for_significance} trades for statistical significance")
+    print(
+        f"   Why: Need {min_trades_for_significance} trades for statistical significance"
+    )
     print(f"   At {target_dte} DTE, that's ~{trades_per_year:.1f} trades/year")
 
     print("\n   Required fields:")
@@ -92,7 +91,9 @@ def calculate_data_requirements():
     expiries_per_day = 8  # Weekly + monthly
     option_row_size = 10 * 8  # More fields
 
-    options_1yr = days_1yr * strikes_per_expiry * expiries_per_day * option_row_size / 1024 / 1024
+    options_1yr = (
+        days_1yr * strikes_per_expiry * expiries_per_day * option_row_size / 1024 / 1024
+    )
 
     print(f"   Options data (1 year): ~{options_1yr:.1f} MB")
 

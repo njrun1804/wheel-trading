@@ -8,9 +8,9 @@ Now with adaptive limits that adjust to market conditions.
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
 from ..utils import get_logger
 
@@ -52,7 +52,7 @@ class TradingLimits:
     max_warnings: int = field(default=None)
 
     # Time limits
-    blackout_hours: List[int] = field(default=None)
+    blackout_hours: list[int] = field(default=None)
     min_days_between_trades: int = field(default=0)
 
     def __post_init__(self):
@@ -87,7 +87,7 @@ class TradingLimits:
             self.blackout_hours = circuit_breakers.blackout_hours or []
 
     @classmethod
-    def from_config(cls, config: Dict) -> "TradingLimits":
+    def from_config(cls, config: dict) -> "TradingLimits":
         """Create limits from configuration."""
         risk_config = config.get("risk", {})
         circuit_breakers = risk_config.get("circuit_breakers", {})
@@ -107,7 +107,9 @@ class TradingLimits:
             blackout_hours=circuit_breakers.get("blackout_hours"),
         )
 
-    def check_position_size(self, position_value: float, portfolio_value: float) -> bool:
+    def check_position_size(
+        self, position_value: float, portfolio_value: float
+    ) -> bool:
         """Check if position size is within limits."""
         position_pct = position_value / portfolio_value
         return position_pct <= self.max_position_pct
@@ -134,7 +136,9 @@ class TradingLimits:
         """Check if number of contracts is within limits."""
         return contracts <= self.max_contracts
 
-    def check_risk_metrics(self, metrics: "RiskMetrics", portfolio_value: float) -> bool:
+    def check_risk_metrics(
+        self, metrics: "RiskMetrics", portfolio_value: float
+    ) -> bool:
         """Check all risk metrics against limits."""
         # For aggressive strategy, very permissive
         return True  # All risk accepted per user preference
@@ -143,18 +147,18 @@ class TradingLimits:
 class RiskLimitChecker:
     """Checks all risk limits before allowing trades."""
 
-    def __init__(self, limits: Optional[TradingLimits] = None):
+    def __init__(self, limits: TradingLimits | None = None):
         self.limits = limits or TradingLimits()
-        self.trade_history: List[Dict] = []
-        self.daily_pnl: Dict[str, float] = {}
+        self.trade_history: list[dict] = []
+        self.daily_pnl: dict[str, float] = {}
 
     def check_all_limits(
         self,
-        recommendation: Dict,
+        recommendation: dict,
         portfolio_value: float,
-        current_positions: Optional[List] = None,
-        market_data: Optional[Dict] = None,
-    ) -> List[RiskLimit]:
+        current_positions: list | None = None,
+        market_data: dict | None = None,
+    ) -> list[RiskLimit]:
         """Check all risk limits and return any breaches."""
         breaches = []
 
@@ -217,7 +221,8 @@ class RiskLimitChecker:
             # Check for gaps
             if "open" in market_data and "prev_close" in market_data:
                 gap = (
-                    abs(market_data["open"] - market_data["prev_close"]) / market_data["prev_close"]
+                    abs(market_data["open"] - market_data["prev_close"])
+                    / market_data["prev_close"]
                 )
                 if gap > self.limits.max_gap_percent:
                     breaches.append(
@@ -289,7 +294,7 @@ class RiskLimitChecker:
 
         return breaches
 
-    def should_allow_trade(self, breaches: List[RiskLimit]) -> bool:
+    def should_allow_trade(self, breaches: list[RiskLimit]) -> bool:
         """Determine if trade should be allowed given breaches."""
         if not breaches:
             return True
@@ -298,7 +303,8 @@ class RiskLimitChecker:
         critical_breaches = [b for b in breaches if b.severity == "critical"]
         if critical_breaches:
             logger.error(
-                "Critical risk limits breached", breaches=[b.name for b in critical_breaches]
+                "Critical risk limits breached",
+                breaches=[b.name for b in critical_breaches],
             )
             return False
 
@@ -306,7 +312,9 @@ class RiskLimitChecker:
         warning_count = len([b for b in breaches if b.severity == "warning"])
         if warning_count >= 2:
             logger.warning(
-                "Multiple risk warnings", count=warning_count, breaches=[b.name for b in breaches]
+                "Multiple risk warnings",
+                count=warning_count,
+                breaches=[b.name for b in breaches],
             )
             return False
 
@@ -315,7 +323,12 @@ class RiskLimitChecker:
     def record_trade_result(self, trade_id: int, pnl: float, success: bool):
         """Record trade result for limit tracking."""
         self.trade_history.append(
-            {"id": trade_id, "timestamp": datetime.now(), "pnl": pnl, "success": success}
+            {
+                "id": trade_id,
+                "timestamp": datetime.now(),
+                "pnl": pnl,
+                "success": success,
+            }
         )
 
         # Update daily P&L
@@ -340,7 +353,7 @@ class RiskLimitChecker:
 
         return consecutive
 
-    def get_current_restrictions(self) -> Dict[str, any]:
+    def get_current_restrictions(self) -> dict[str, any]:
         """Get current trading restrictions based on limits."""
         restrictions = {
             "can_trade": True,
@@ -355,7 +368,9 @@ class RiskLimitChecker:
             current_hour = datetime.now().hour
             if current_hour in self.limits.blackout_hours:
                 next_allowed = min(
-                    h for h in range(24) if h not in self.limits.blackout_hours and h > current_hour
+                    h
+                    for h in range(24)
+                    if h not in self.limits.blackout_hours and h > current_hour
                 )
                 restrictions["blocked_until"] = datetime.now().replace(
                     hour=next_allowed, minute=0, second=0
@@ -373,7 +388,7 @@ class RiskLimitChecker:
 
         return restrictions
 
-    def generate_risk_report(self) -> List[str]:
+    def generate_risk_report(self) -> list[str]:
         """Generate human-readable risk status report."""
         report = ["=== RISK LIMITS STATUS ===", ""]
 
@@ -385,10 +400,14 @@ class RiskLimitChecker:
             report.append("🚫 Trading blocked")
 
         if restrictions["reduced_size"]:
-            report.append(f"⚠️  Position size reduced to {restrictions['max_position_size']:.1%}")
+            report.append(
+                f"⚠️  Position size reduced to {restrictions['max_position_size']:.1%}"
+            )
 
         if restrictions["blocked_until"]:
-            report.append(f"⏰ Blocked until: {restrictions['blocked_until'].strftime('%H:%M')}")
+            report.append(
+                f"⏰ Blocked until: {restrictions['blocked_until'].strftime('%H:%M')}"
+            )
 
         if restrictions["reasons"]:
             report.append("\nReasons:")

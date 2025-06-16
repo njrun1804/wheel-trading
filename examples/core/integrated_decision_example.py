@@ -88,14 +88,16 @@ def make_integrated_decision():
             need_to_borrow = max(0, position_size - cash)
             if need_to_borrow > 0:
                 print(f"  Borrow: ${need_to_borrow:,} from {result.source_to_use}")
-                print(f"  Cost: ${result.borrowing_cost:.0f} for {wheel_opportunity['dte']} days")
+                print(
+                    f"  Cost: ${result.borrowing_cost:.0f} for {wheel_opportunity['dte']} days"
+                )
             print(f"  Expected Profit: ${result.details['expected_profit']:.0f}")
             print(f"  Net After Borrowing: ${result.net_benefit:.0f}")
-            print(f"  → GO: Take the position")
+            print("  → GO: Take the position")
         else:
             print(f"  Hurdle Rate: {result.hurdle_rate:.1%}")
             print(f"  Your Return: {result.expected_return:.1%}")
-            print(f"  → NO GO: Pay down debt instead")
+            print("  → NO GO: Pay down debt instead")
 
     # Final recommendation
     print("\n" + "=" * 50)

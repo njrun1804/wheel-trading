@@ -1,0 +1,61 @@
+bob:
+  # BOB System Configuration
+  version: "2.0.0"
+  
+  # Agent orchestration settings
+  agents:
+    count: 8
+    work_stealing: true
+    max_concurrent_tasks: 16
+    timeout_seconds: 300
+    
+  # Hardware optimization settings
+  hardware:
+    cpu_cores: 12
+    gpu_backend: "metal"
+    memory_limit_gb: 20
+    auto_detect: true
+    thermal_monitoring: true
+    
+  # Einstein search configuration (migrated)
+  einstein:
+    # Performance settings
+    max_startup_ms: 2000
+    max_search_ms: 100
+    
+    # Hardware detection
+    auto_detect_hardware: true
+    override_cpu_cores: null
+    override_memory_gb: null
+    
+    # FAISS settings
+    faiss:
+      nlist: 100
+      nprobe: 10
+      use_gpu: true
+      batch_size: 1000
+      
+    # MLX settings
+    mlx:
+      max_memory_fraction: 0.8
+      enable_quantization: true
+      precision: "float16"
+      
+  # BOLT integration settings (will be added during BOLT migration)
+  bolt:
+    enabled: true
+    performance_target_tasks_per_second: 1.5
+    gpu_acceleration: true
+    error_recovery: true
+    
+  # System integration
+  integration:
+    wheel_trading: true
+    database: "unified_wheel_trading"
+    monitoring: true
+    
+  # Logging and diagnostics
+  logging:
+    level: "INFO"
+    performance_metrics: true
+    error_tracking: true

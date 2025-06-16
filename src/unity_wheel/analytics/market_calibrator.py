@@ -6,14 +6,13 @@ Adapts settings based on current market regime and historical performance.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 from src.config.loader import get_config
+
 from ..risk.regime_detector import RegimeDetector, RegimeInfo
 from ..utils import get_logger
 
@@ -27,11 +26,11 @@ class OptimalParameters:
     # Strike selection
     put_delta_target: float
     call_delta_target: float
-    delta_range: Tuple[float, float]  # Min/max acceptable
+    delta_range: tuple[float, float]  # Min/max acceptable
 
     # Expiration selection
     dte_target: int
-    dte_range: Tuple[int, int]
+    dte_range: tuple[int, int]
 
     # Position sizing
     kelly_fraction: float
@@ -61,10 +60,13 @@ class MarketCalibrator:
             symbol = config.unity.ticker
         self.symbol = symbol
         self.regime_detector = RegimeDetector()
-        self.historical_performance: Dict = {}
+        self.historical_performance: dict = {}
 
     async def calibrate_from_history(
-        self, returns: np.ndarray, prices: pd.DataFrame, iv_history: Optional[pd.DataFrame] = None
+        self,
+        returns: np.ndarray,
+        prices: pd.DataFrame,
+        iv_history: pd.DataFrame | None = None,
     ) -> OptimalParameters:
         """
         Calibrate optimal parameters from historical data.
@@ -86,7 +88,9 @@ class MarketCalibrator:
         )
 
         # 2. Calculate IV rank if available
-        iv_rank = self._calculate_iv_rank(iv_history) if iv_history is not None else 50.0
+        iv_rank = (
+            self._calculate_iv_rank(iv_history) if iv_history is not None else 50.0
+        )
 
         # 3. Analyze historical performance by regime
         regime_performance = self._analyze_regime_performance(returns, prices)
@@ -114,17 +118,23 @@ class MarketCalibrator:
 
     def _analyze_regime_performance(
         self, returns: np.ndarray, prices: pd.DataFrame
-    ) -> Dict[str, Dict]:
+    ) -> dict[str, dict]:
         """Analyze performance metrics by regime."""
 
         performance = {}
 
-        for regime_id, regime_info in self.regime_detector.regime_info.items():
+        for _regime_id, regime_info in self.regime_detector.regime_info.items():
             # Calculate regime-specific metrics
             regime_metrics = {
-                "avg_move_30d": self._calculate_avg_move(prices, 30, regime_info.volatility),
-                "avg_move_45d": self._calculate_avg_move(prices, 45, regime_info.volatility),
-                "avg_move_60d": self._calculate_avg_move(prices, 60, regime_info.volatility),
+                "avg_move_30d": self._calculate_avg_move(
+                    prices, 30, regime_info.volatility
+                ),
+                "avg_move_45d": self._calculate_avg_move(
+                    prices, 45, regime_info.volatility
+                ),
+                "avg_move_60d": self._calculate_avg_move(
+                    prices, 60, regime_info.volatility
+                ),
                 "breach_prob_20": self._calculate_breach_probability(returns, 0.20, 30),
                 "breach_prob_30": self._calculate_breach_probability(returns, 0.30, 30),
                 "optimal_dte": self._find_optimal_dte(prices, regime_info.volatility),
@@ -135,7 +145,9 @@ class MarketCalibrator:
 
         return performance
 
-    def _calculate_avg_move(self, prices: pd.DataFrame, days: int, volatility: float) -> float:
+    def _calculate_avg_move(
+        self, prices: pd.DataFrame, days: int, volatility: float
+    ) -> float:
         """Calculate average price movement over N days."""
         # Use volatility to estimate expected move
         # Annual vol * sqrt(days/252) = expected move
@@ -171,7 +183,7 @@ class MarketCalibrator:
         return min(0.95, base_win_rate + vol_adjustment)
 
     def _calculate_optimal_parameters(
-        self, current_regime: RegimeInfo, regime_performance: Dict, iv_rank: float
+        self, current_regime: RegimeInfo, regime_performance: dict, iv_rank: float
     ) -> OptimalParameters:
         """Calculate optimal parameters for current conditions."""
 
@@ -237,7 +249,7 @@ class MarketCalibrator:
             regime=current_regime.name,
         )
 
-    def generate_trading_rules(self, params: OptimalParameters) -> List[str]:
+    def generate_trading_rules(self, params: OptimalParameters) -> list[str]:
         """Generate human-readable trading rules."""
 
         rules = [

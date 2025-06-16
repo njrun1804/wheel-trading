@@ -69,12 +69,12 @@ async def demonstrate_schema_mapping():
             "buying_power": 10000.00,  # Would come from account endpoint
         },
     }
-    print(f"INSERT INTO position_snapshots VALUES (")
+    print("INSERT INTO position_snapshots VALUES (")
     print(f"  '{duckdb_positions['account_id']}',")
     print(f"  '{duckdb_positions['timestamp']}',")
     print(f"  '{json.dumps(duckdb_positions['positions'])}',")
     print(f"  '{json.dumps(duckdb_positions['account_data'])}'")
-    print(f");")
+    print(");")
 
     print("\n" + "=" * 50 + "\n")
     print("=== Databento API → DuckDB Mapping ===\n")
@@ -99,8 +99,12 @@ async def demonstrate_schema_mapping():
 
     # Transform the data
     timestamp = datetime.fromtimestamp(DATABENTO_API_RESPONSE["ts_event"] / 1e9)
-    bid_price = float(Decimal(DATABENTO_API_RESPONSE["levels"][0]["bid_px"]) / Decimal("1e9"))
-    ask_price = float(Decimal(DATABENTO_API_RESPONSE["levels"][0]["ask_px"]) / Decimal("1e9"))
+    bid_price = float(
+        Decimal(DATABENTO_API_RESPONSE["levels"][0]["bid_px"]) / Decimal("1e9")
+    )
+    ask_price = float(
+        Decimal(DATABENTO_API_RESPONSE["levels"][0]["ask_px"]) / Decimal("1e9")
+    )
 
     duckdb_chain = {
         "symbol": "U",
@@ -122,13 +126,13 @@ async def demonstrate_schema_mapping():
         },
     }
 
-    print(f"INSERT INTO option_chains VALUES (")
+    print("INSERT INTO option_chains VALUES (")
     print(f"  '{duckdb_chain['symbol']}',")
     print(f"  '{duckdb_chain['expiration']}',")
     print(f"  '{duckdb_chain['timestamp']}',")
     print(f"  {duckdb_chain['spot_price']},")
     print(f"  '{json.dumps(duckdb_chain['data'])}'")
-    print(f");")
+    print(");")
 
     print("\n" + "=" * 50 + "\n")
     print("=== Greeks Calculation → DuckDB ===\n")
@@ -148,7 +152,7 @@ async def demonstrate_schema_mapping():
         "iv": 0.2345,
     }
 
-    print(f"INSERT INTO greeks_cache VALUES (")
+    print("INSERT INTO greeks_cache VALUES (")
     print(f"  '{greeks_data['option_symbol']}',")
     print(f"  '{greeks_data['timestamp']}',")
     print(f"  {greeks_data['spot_price']},")
@@ -159,7 +163,7 @@ async def demonstrate_schema_mapping():
     print(f"  {greeks_data['vega']},")
     print(f"  {greeks_data['rho']},")
     print(f"  {greeks_data['iv']}")
-    print(f");")
+    print(");")
 
     print("\n=== Schema Validation Results ===")
     print("✅ All Schwab position fields preserved in JSON")

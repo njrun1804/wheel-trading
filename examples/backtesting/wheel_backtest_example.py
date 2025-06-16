@@ -29,7 +29,7 @@ DATA REQUIREMENTS FOR UNITY WHEEL STRATEGY VALIDATION:
 """
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -60,7 +60,7 @@ async def run_basic_backtest():
 
     # Run backtest with default parameters
     results = await backtester.backtest_strategy(
-        symbol = config.trading.symbol,
+        symbol=config.trading.symbol,
         start_date=start_date,
         end_date=end_date,
         initial_capital=100000,
@@ -77,11 +77,11 @@ async def run_basic_backtest():
     print(f"\nTotal Trades: {results.total_trades}")
     print(f"Assignments: {results.assignments}")
     print(f"Average Trade P&L: ${results.average_trade_pnl:.2f}")
-    print(f"\nRisk Metrics:")
+    print("\nRisk Metrics:")
     print(f"VaR (95%): {results.var_95:.2%}")
     print(f"CVaR (95%): {results.cvar_95:.2%}")
     print(f"Max Gap Loss: ${results.max_gap_loss:.2f}")
-    print(f"\nUnity-Specific:")
+    print("\nUnity-Specific:")
     print(f"Gap Events: {results.gap_events}")
     print(f"Earnings Avoided: {results.earnings_avoided}")
 
@@ -102,7 +102,7 @@ async def optimize_parameters():
 
     # Run optimization
     optimization_results = await backtester.optimize_parameters(
-        symbol = config.trading.symbol,
+        symbol=config.trading.symbol,
         start_date=start_date,
         end_date=end_date,
         delta_range=(0.20, 0.40),  # Test 20-40 delta
@@ -140,7 +140,7 @@ async def backtest_different_deltas():
         params = WheelParameters(target_delta=delta)
 
         result = await backtester.backtest_strategy(
-            symbol = config.trading.symbol,
+            symbol=config.trading.symbol,
             start_date=start_date,
             end_date=end_date,
             initial_capital=100000,

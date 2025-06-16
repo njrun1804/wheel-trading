@@ -1,0 +1,8 @@
+# Minimal safety net for Claude Code
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=10000']  # 10MB limit

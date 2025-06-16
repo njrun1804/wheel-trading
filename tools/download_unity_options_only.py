@@ -5,28 +5,28 @@ Focused script that skips stock data and goes straight to options.
 """
 
 import logging
-import os
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 import pytz
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,9 @@ class UnityOptionsOnlyDownloader:
         # Connect to DuckDB
         self.conn = duckdb.connect(str(self.db_path))
 
-        logger.info(f"Initialized - will download options from {self.OPTIONS_START_DATE}")
+        logger.info(
+            f"Initialized - will download options from {self.OPTIONS_START_DATE}"
+        )
 
     def download_options_for_date(self, date: datetime.date) -> int:
         """Download Unity options data for a single date."""
@@ -83,8 +85,16 @@ class UnityOptionsOnlyDownloader:
 
                 for _, row in batch.iterrows():
                     # Convert prices from integer representation
-                    bid_px = row.get("bid_px_01", 0) / 10000.0 if "bid_px_01" in row else None
-                    ask_px = row.get("ask_px_01", 0) / 10000.0 if "ask_px_01" in row else None
+                    bid_px = (
+                        row.get("bid_px_01", 0) / 10000.0
+                        if "bid_px_01" in row
+                        else None
+                    )
+                    ask_px = (
+                        row.get("ask_px_01", 0) / 10000.0
+                        if "ask_px_01" in row
+                        else None
+                    )
 
                     self.conn.execute(
                         """
@@ -125,7 +135,9 @@ class UnityOptionsOnlyDownloader:
         end_date = datetime.now().date() - timedelta(days=1)
         current_date = self.OPTIONS_START_DATE
 
-        logger.info(f"Downloading Unity options from {self.OPTIONS_START_DATE} to {end_date}")
+        logger.info(
+            f"Downloading Unity options from {self.OPTIONS_START_DATE} to {end_date}"
+        )
 
         total_records = 0
         days_with_data = 0
@@ -175,12 +187,16 @@ class UnityOptionsOnlyDownloader:
         """
         ).fetchone()
 
-        logger.info(f"\nOPTIONS DATA VERIFICATION:")
+        logger.info("\nOPTIONS DATA VERIFICATION:")
         logger.info(f"  Records: {stats[0]:,}")
         logger.info(f"  Trading days: {stats[1]}")
         logger.info(f"  Unique contracts: {stats[2]:,}")
         logger.info(f"  Date range: {stats[3]} to {stats[4]}")
-        logger.info(f"  Average spread: ${stats[5]:.3f}" if stats[5] else "  Average spread: N/A")
+        logger.info(
+            f"  Average spread: ${stats[5]:.3f}"
+            if stats[5]
+            else "  Average spread: N/A"
+        )
 
         if stats[0] > 0:
             # Show sample symbols
@@ -201,7 +217,9 @@ class UnityOptionsOnlyDownloader:
             logger.info("\n✅ Unity options data successfully downloaded from Databento")
             logger.info("✅ All data is REAL market data - NO SYNTHETIC DATA")
         else:
-            logger.warning("\n⚠️  No options data downloaded - check Databento subscription")
+            logger.warning(
+                "\n⚠️  No options data downloaded - check Databento subscription"
+            )
 
     def cleanup(self):
         """Close database connection."""

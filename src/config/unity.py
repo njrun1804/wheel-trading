@@ -22,7 +22,9 @@ TYPICAL_IV_RANGE: tuple[Decimal, Decimal] = (Decimal("0.40"), Decimal("0.90"))
 AVERAGE_IV: Final[Decimal] = Decimal("0.65")  # Unity tends to have higher vol
 
 # Liquidity constraints
-MIN_BID_ASK_SPREAD: Final[Decimal] = Decimal("0.10")  # Allow $0.10 spread for Unity options
+MIN_BID_ASK_SPREAD: Final[Decimal] = Decimal(
+    "0.10"
+)  # Allow $0.10 spread for Unity options
 MIN_OPEN_INTEREST: Final[int] = 50
 MIN_VOLUME: Final[int] = 10
 

@@ -7,11 +7,10 @@ from datetime import datetime
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def assess_data_quality():
@@ -53,7 +52,9 @@ def assess_data_quality():
     print(f"  Null prices: {stock_stats[6]}")
     print(f"  Zero/null volume: {stock_stats[7]}")
     print(
-        f"  Avg daily range: {stock_stats[8]:.2f}%" if stock_stats[8] else "  Avg daily range: N/A"
+        f"  Avg daily range: {stock_stats[8]:.2f}%"
+        if stock_stats[8]
+        else "  Avg daily range: N/A"
     )
 
     # Check for price anomalies
@@ -77,7 +78,9 @@ def assess_data_quality():
     if anomalies:
         print("\n  ⚠️  Price anomalies detected (>50% daily change):")
         for symbol, date, close, prev_close, pct_change in anomalies:
-            print(f"    {symbol} on {date}: ${prev_close:.2f} → ${close:.2f} ({pct_change:.1f}%)")
+            print(
+                f"    {symbol} on {date}: ${prev_close:.2f} → ${close:.2f} ({pct_change:.1f}%)"
+            )
 
     # Check Unity-specific stock tables
     print("\n  Unity Stock Tables:")
@@ -105,8 +108,8 @@ def assess_data_quality():
             print(f"    Records: {stats[0]:,}")
             print(f"    Days: {stats[1]}")
             print(f"    Date range: {stats[2]} to {stats[3]}")
-        except:
-            print(f"\n  {table}: Empty or not found")
+        except (Exception, duckdb.Error) as e:
+            print(f"\n  {table}: Empty or not found ({e})")
 
     # 2. OPTIONS DATA ASSESSMENT
     print("\n\n2. OPTIONS DATA TABLES")
@@ -181,7 +184,7 @@ def assess_data_quality():
     """
     ).fetchone()
 
-    print(f"fred_series:")
+    print("fred_series:")
     print(f"  Total series: {fred_series[0]}")
     print(f"  Frequencies: {fred_series[1]}")
     print(f"  Earliest data: {fred_series[2]}")
@@ -214,7 +217,7 @@ def assess_data_quality():
     """
     ).fetchone()
 
-    print(f"\nfred_observations:")
+    print("\nfred_observations:")
     print(f"  Total observations: {fred_obs[0]:,}")
     print(f"  Series count: {fred_obs[1]}")
     print(f"  Date range: {fred_obs[2]} to {fred_obs[3]}")
@@ -228,11 +231,11 @@ def assess_data_quality():
             FROM fred_features
         """
         ).fetchone()
-        print(f"\nfred_features:")
+        print("\nfred_features:")
         print(f"  Records: {fred_feat[0]:,}")
         print(f"  Unique dates: {fred_feat[1]}")
-    except:
-        print(f"\nfred_features: Empty or not found")
+    except (Exception, duckdb.Error) as e:
+        print(f"\nfred_features: Empty or not found ({e})")
 
     # 4. OTHER TABLES
     print("\n\n4. OTHER TABLES")
@@ -247,8 +250,8 @@ def assess_data_quality():
         """
         ).fetchone()
         print(f"risk_metrics: {risk[0]} records across {risk[1]} dates")
-    except:
-        print("risk_metrics: Empty or not found")
+    except (Exception, duckdb.Error) as e:
+        print(f"risk_metrics: Empty or not found ({e})")
 
     # Instruments
     try:
@@ -259,8 +262,8 @@ def assess_data_quality():
         """
         ).fetchone()
         print(f"instruments: {inst[0]} records, {inst[1]} unique symbols")
-    except:
-        print("instruments: Empty or not found")
+    except (Exception, duckdb.Error) as e:
+        print(f"instruments: Empty or not found ({e})")
 
     # 5. REDUNDANCY ANALYSIS
     print("\n\n5. REDUNDANCY ANALYSIS & RECOMMENDATIONS")

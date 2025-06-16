@@ -11,12 +11,13 @@ from .options import (
 # GPU-accelerated versions
 try:
     from .options_gpu import (
+        TORCH_AVAILABLE,
         black_scholes,
         black_scholes_numexpr,
         black_scholes_torch,
         calculate_greeks_gpu,
-        TORCH_AVAILABLE,
     )
+
     GPU_AVAILABLE = True
 except ImportError:
     GPU_AVAILABLE = False
@@ -29,6 +30,7 @@ except ImportError:
 # Enhanced versions if available
 try:
     from .options_enhanced import BlackScholesEnhanced, black_scholes_price_enhanced
+
     ENHANCED_AVAILABLE = True
 except ImportError:
     ENHANCED_AVAILABLE = False

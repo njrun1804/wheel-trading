@@ -8,10 +8,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from src.unity_wheel.models.position import Position
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def main():
@@ -172,7 +171,7 @@ $212,001.67    +$1,350.00    +0.64%    $135,589.45    +$35,410.55    +26.12%"""
         # U 07/18/2025 25.00 C: -75 (short 75 calls)
 
         positions = [
-            Position(symbol = config.trading.symbol, quantity=7500),
+            Position(symbol=config.trading.symbol, quantity=7500),
             # Convert option format to OCC: UYYMMDDCPPPPPPPP
             Position(symbol="U250718C00025000", quantity=-75),
         ]

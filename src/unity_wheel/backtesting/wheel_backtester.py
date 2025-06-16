@@ -4,20 +4,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
-from src.config.loader import get_config
-
-from unity_wheel.data_providers.databento.price_history_loader import PriceHistoryLoader
-from unity_wheel.math.options import black_scholes_price_validated
-from unity_wheel.math import CalculationResult
-from unity_wheel.storage import Storage
-from unity_wheel.strategy.wheel import WheelParameters, WheelStrategy
-from unity_wheel.utils import get_logger, timed_operation
-from unity_wheel.utils.position_sizing import DynamicPositionSizer
+from ..config.loader import get_config
+from ..data_providers.databento.price_history_loader import PriceHistoryLoader
+from ..math import CalculationResult
+from ..math.options import black_scholes_price_validated
+from ..storage import Storage
+from ..strategy.wheel import WheelParameters, WheelStrategy
+from ..utils import get_logger, timed_operation
+from ..utils.position_sizing import DynamicPositionSizer
 
 logger = get_logger(__name__)
 
@@ -35,8 +33,8 @@ class BacktestPosition:
     contracts: int
     premium_collected: float
     assigned: bool = False
-    exit_date: Optional[datetime] = None
-    exit_price: Optional[float] = None
+    exit_date: datetime | None = None
+    exit_price: float | None = None
     realized_pnl: float = 0.0
 
 
@@ -64,7 +62,7 @@ class BacktestResults:
     max_gap_loss: float
 
     # Position tracking
-    positions: List[BacktestPosition]
+    positions: list[BacktestPosition]
     equity_curve: pd.Series
     daily_returns: pd.Series
 
@@ -83,7 +81,7 @@ class WheelBacktester:
     def __init__(
         self,
         storage: Storage,
-        price_loader: Optional[PriceHistoryLoader] = None,
+        price_loader: PriceHistoryLoader | None = None,
     ):
         """Initialize backtester."""
         self.storage = storage
@@ -99,8 +97,8 @@ class WheelBacktester:
         start_date: datetime,
         end_date: datetime,
         initial_capital: float = 100000,
-        contracts_per_trade: Optional[int] = None,
-        parameters: Optional[WheelParameters] = None,
+        contracts_per_trade: int | None = None,
+        parameters: WheelParameters | None = None,
     ) -> BacktestResults:
         """
         Run wheel strategy backtest on historical data.
@@ -143,8 +141,8 @@ class WheelBacktester:
 
         # Initialize tracking
         capital = initial_capital
-        positions: List[BacktestPosition] = []
-        active_position: Optional[BacktestPosition] = None
+        positions: list[BacktestPosition] = []
+        active_position: BacktestPosition | None = None
         daily_equity = []
         daily_returns = []
 
@@ -186,7 +184,9 @@ class WheelBacktester:
                 strike = self._find_backtest_strike(current_price, params.target_delta)
 
                 # Calculate realistic premium
-                premium_result = self._calculate_backtest_premium(current_price, strike, params.target_dte)
+                premium_result = self._calculate_backtest_premium(
+                    current_price, strike, params.target_dte
+                )
 
                 if contracts_per_trade is None:
                     contracts = self.position_sizer.contracts_for_trade(
@@ -215,7 +215,9 @@ class WheelBacktester:
             # Track daily equity
             daily_equity.append(capital)
             if len(daily_equity) > 1:
-                daily_returns.append((daily_equity[-1] - daily_equity[-2]) / daily_equity[-2])
+                daily_returns.append(
+                    (daily_equity[-1] - daily_equity[-2]) / daily_equity[-2]
+                )
             else:
                 daily_returns.append(0)
 
@@ -259,7 +261,9 @@ class WheelBacktester:
             losing_trades=len(positions) - winning_trades,
             assignments=assignments,
             average_trade_pnl=(
-                sum(p.realized_pnl for p in positions) / len(positions) if positions else 0
+                sum(p.realized_pnl for p in positions) / len(positions)
+                if positions
+                else 0
             ),
             var_95=var_95,
             cvar_95=cvar_95,
@@ -313,10 +317,10 @@ class WheelBacktester:
         symbol: str,
         start_date: datetime,
         end_date: datetime,
-        delta_range: Tuple[float, float] = (0.20, 0.40),
-        dte_range: Tuple[int, int] = (30, 60),
+        delta_range: tuple[float, float] = (0.20, 0.40),
+        dte_range: tuple[int, int] = (30, 60),
         optimization_metric: str = "sharpe",
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """
         Optimize delta and DTE parameters.
 
@@ -427,7 +431,9 @@ class WheelBacktester:
         if not result:
             return pd.DataFrame()
 
-        df = pd.DataFrame(result, columns=["date", "open", "high", "low", "close", "volume"])
+        df = pd.DataFrame(
+            result, columns=["date", "open", "high", "low", "close", "volume"]
+        )
         df["date"] = pd.to_datetime(df["date"])
         df.set_index("date", inplace=True)
 
@@ -468,7 +474,9 @@ class WheelBacktester:
             if current_price > position.entry_price * 1.02:  # 2% profit
                 position.exit_date = current_date
                 position.exit_price = current_price
-                stock_pnl = (current_price - position.entry_price) * 100 * position.contracts
+                stock_pnl = (
+                    (current_price - position.entry_price) * 100 * position.contracts
+                )
                 position.realized_pnl = position.premium_collected + stock_pnl
                 pnl = stock_pnl  # Premium already counted
 
@@ -603,7 +611,7 @@ class WheelBacktester:
         self,
         returns: pd.Series,
         confidence: float = 0.95,
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """Calculate VaR and CVaR with a confidence score."""
         if len(returns) < 20:
             return 0.0, 0.0, 0.3
@@ -621,7 +629,7 @@ class WheelBacktester:
 
     def _calculate_max_gap_loss(
         self,
-        positions: List[BacktestPosition],
+        positions: list[BacktestPosition],
         price_data: pd.DataFrame,
     ) -> float:
         """Calculate maximum gap loss from positions."""

@@ -1,10 +1,7 @@
 """Parser for broker account data (Schwab/TD Ameritrade format)."""
 from __future__ import annotations
 
-
 import re
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
 
 from unity_wheel.models.position import Position
 from unity_wheel.portfolio.single_account import ManualAccount
@@ -64,7 +61,13 @@ class BrokerDataParser:
             # Parse positions
             if in_positions_section and not any(
                 header in line_lower
-                for header in ["symbol", "description", "customize", "equities", "total"]
+                for header in [
+                    "symbol",
+                    "description",
+                    "customize",
+                    "equities",
+                    "total",
+                ]
             ):
                 position = self._parse_position_row(line, lines, i)
                 if position:
@@ -105,7 +108,9 @@ class BrokerDataParser:
 
         return account
 
-    def _extract_next_dollar_amount(self, lines: List[str], start_idx: int) -> Optional[float]:
+    def _extract_next_dollar_amount(
+        self, lines: list[str], start_idx: int
+    ) -> float | None:
         """Extract dollar amount from current or next few lines."""
         for offset in range(0, min(5, len(lines) - start_idx)):
             line = lines[start_idx + offset]
@@ -114,7 +119,7 @@ class BrokerDataParser:
                 return amount
         return None
 
-    def _extract_dollar_amount(self, text: str) -> Optional[float]:
+    def _extract_dollar_amount(self, text: str) -> float | None:
         """Extract dollar amount from text."""
         # Pattern to match dollar amounts with optional negative sign
         pattern = r"([-]?)\$([0-9,]+\.?[0-9]*)"
@@ -126,11 +131,14 @@ class BrokerDataParser:
                 return sign * float(amount_str)
             except ValueError:
                 import logging
+
                 logging.debug(f"Exception caught: {e}", exc_info=True)
                 pass
         return None
 
-    def _parse_position_row(self, line: str, lines: List[str], line_idx: int) -> Optional[Position]:
+    def _parse_position_row(
+        self, line: str, lines: list[str], line_idx: int
+    ) -> Position | None:
         """Parse a position row from broker data."""
         # Skip empty lines or headers
         if not line or line.lower() in ["equities", "options", "cash & money market"]:
@@ -171,7 +179,7 @@ class BrokerDataParser:
 
         return None
 
-    def _find_quantity_in_lines(self, lines: List[str], start_idx: int) -> Optional[int]:
+    def _find_quantity_in_lines(self, lines: list[str], start_idx: int) -> int | None:
         """Find quantity in current or next few lines."""
         for offset in range(0, min(5, len(lines) - start_idx)):
             line = lines[start_idx + offset]

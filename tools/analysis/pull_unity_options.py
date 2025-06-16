@@ -11,15 +11,14 @@ from datetime import datetime, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.unity_wheel.utils.databento_unity import (
-
-from unity_wheel.config.unified_config import get_config
-config = get_config()
-
     cost_estimate,
     get_equity_bars,
     get_wheel_candidates,
     store_options_in_duckdb,
 )
+from unity_wheel.config.unified_config import get_config
+
+config = get_config()
 
 
 async def main():
@@ -65,7 +64,9 @@ async def main():
             """,
                 [
                     "U",
-                    row["ts_event"].date() if hasattr(row["ts_event"], "date") else row.name.date(),
+                    row["ts_event"].date()
+                    if hasattr(row["ts_event"], "date")
+                    else row.name.date(),
                     float(row.get("open", row["close"])),
                     float(row.get("high", row["close"])),
                     float(row.get("low", row["close"])),
@@ -85,7 +86,9 @@ async def main():
 
     # Get wheel candidates
     candidates = get_wheel_candidates(
-        target_delta = config.trading.target_delta, dte_range=(30, 60), moneyness_range=0.15  # ±15% from ATM
+        target_delta=config.trading.target_delta,
+        dte_range=(30, 60),
+        moneyness_range=0.15,  # ±15% from ATM
     )
 
     if candidates.empty:
@@ -120,7 +123,9 @@ async def main():
     # Show data quality
     print("\n📊 Data Quality Check:")
     print(f"   Options with quotes: {candidates['bid'].notna().sum()}")
-    print(f"   Average bid-ask spread: ${(candidates['ask'] - candidates['bid']).mean():.2f}")
+    print(
+        f"   Average bid-ask spread: ${(candidates['ask'] - candidates['bid']).mean():.2f}"
+    )
     print(f"   Tightest spread: ${(candidates['ask'] - candidates['bid']).min():.2f}")
 
     # Test recommendation

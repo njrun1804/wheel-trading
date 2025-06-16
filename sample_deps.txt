@@ -1,0 +1,40 @@
+Name: absl-py
+Requires: 
+Name: aiofiles
+Requires: 
+Name: aiohappyeyeballs
+Requires: 
+Name: aiohttp
+Requires: aiohappyeyeballs, aiosignal, attrs, frozenlist, multidict, propcache, yarl
+Name: aioitertools
+Requires: 
+Name: aiomultiprocess
+Requires: 
+Name: aiosignal
+Requires: frozenlist
+Name: aiosqlite
+Requires: typing_extensions
+Name: alembic
+Requires: Mako, SQLAlchemy, typing-extensions
+Name: alpaca-py
+Requires: msgpack, pandas, pydantic, requests, sseclient-py, websockets
+Name: annotated-types
+Requires: 
+Name: anthropic
+Requires: anyio, distro, httpx, jiter, pydantic, sniffio, typing-extensions
+Name: anyio
+Requires: idna, sniffio, typing_extensions
+Name: appdirs
+Requires: 
+Name: argcomplete
+Requires: 
+Name: arize-phoenix
+Requires: aioitertools, aiosqlite, alembic, arize-phoenix-client, arize-phoenix-evals, arize-phoenix-otel, authlib, cachetools, email-validator, fastapi, grpc-interceptor, grpcio, httpx, jinja2, numpy, openinference-instrumentation, openinference-semantic-conventions, opentelemetry-exporter-otlp, opentelemetry-proto, opentelemetry-sdk, opentelemetry-semantic-conventions, pandas, protobuf, psutil, pyarrow, pydantic, python-multipart, scikit-learn, scipy, sqlalchemy, sqlean-py, starlette, strawberry-graphql, tqdm, typing-extensions, uvicorn, wrapt
+Name: arize-phoenix-client
+Requires: httpx, typing-extensions
+Name: arize-phoenix-evals
+Requires: pandas, tqdm, typing-extensions
+Name: arize-phoenix-otel
+Requires: openinference-instrumentation, openinference-semantic-conventions, opentelemetry-exporter-otlp, opentelemetry-proto, opentelemetry-sdk, opentelemetry-semantic-conventions, typing-extensions, wrapt
+Name: ast-comments
+Requires: 

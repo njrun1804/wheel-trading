@@ -5,9 +5,7 @@ Load historical price data for risk calculations.
 Only needs 250 days of daily bars - no options history required.
 """
 
-import asyncio
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
 
 import pandas as pd
 from databento_dbn import Schema
@@ -49,7 +47,9 @@ class PriceHistoryLoader:
         try:
             # Calculate date range (add buffer for weekends/holidays)
             end_date = datetime.now() - timedelta(days=1)  # Yesterday
-            start_date = end_date - timedelta(days=int(days * 1.5))  # Extra for non-trading days
+            start_date = end_date - timedelta(
+                days=int(days * 1.5)
+            )  # Extra for non-trading days
 
             # Fetch daily bars from Databento
             bars = await self._fetch_daily_bars(symbol, start_date, end_date)
@@ -80,7 +80,9 @@ class PriceHistoryLoader:
             return False
 
     @with_recovery(max_attempts=3)
-    async def _fetch_daily_bars(self, symbol: str, start: datetime, end: datetime) -> List[Dict]:
+    async def _fetch_daily_bars(
+        self, symbol: str, start: datetime, end: datetime
+    ) -> list[dict]:
         """Fetch daily OHLCV bars from Databento."""
 
         bars = []
@@ -110,7 +112,7 @@ class PriceHistoryLoader:
 
         return sorted(bars, key=lambda x: x["date"])
 
-    async def _store_price_history(self, symbol: str, bars: List[Dict]):
+    async def _store_price_history(self, symbol: str, bars: list[dict]):
         """Store price history in DuckDB."""
 
         # Create table if not exists
@@ -136,7 +138,9 @@ class PriceHistoryLoader:
         for i in range(1, len(bars)):
             prev_close = bars[i - 1]["close"]
             curr_close = bars[i]["close"]
-            bars[i]["returns"] = (curr_close - prev_close) / prev_close if prev_close > 0 else 0
+            bars[i]["returns"] = (
+                (curr_close - prev_close) / prev_close if prev_close > 0 else 0
+            )
 
         bars[0]["returns"] = 0  # First day has no return
 
@@ -183,7 +187,8 @@ class PriceHistoryLoader:
                 cutoff = datetime.now().date() - timedelta(days=self.REQUIRED_DAYS + 30)
                 async with self.storage.cache.connection() as conn:
                     conn.execute(
-                        "DELETE FROM price_history WHERE symbol = ? AND date < ?", [symbol, cutoff]
+                        "DELETE FROM price_history WHERE symbol = ? AND date < ?",
+                        [symbol, cutoff],
                     )
 
                 return True
@@ -194,8 +199,8 @@ class PriceHistoryLoader:
         return False
 
     async def get_returns_for_risk(
-        self, symbol: str, days: Optional[int] = None
-    ) -> Optional[pd.Series]:
+        self, symbol: str, days: int | None = None
+    ) -> pd.Series | None:
         """Get returns series for risk calculations."""
 
         days = days or self.REQUIRED_DAYS
@@ -215,7 +220,7 @@ class PriceHistoryLoader:
         if not result:
             return None
 
-        dates, returns = zip(*result)
+        dates, returns = zip(*result, strict=False)
         return pd.Series(returns, index=pd.to_datetime(dates), name=symbol)
 
     def _get_dataset_for_symbol(self, symbol: str) -> str:
@@ -232,7 +237,7 @@ class PriceHistoryLoader:
         else:
             return "XNAS.BASIC"  # Default to NASDAQ
 
-    async def check_data_availability(self, symbol: str) -> Dict[str, any]:
+    async def check_data_availability(self, symbol: str) -> dict[str, any]:
         """Check how much historical data is available."""
 
         async with self.storage.cache.connection() as conn:

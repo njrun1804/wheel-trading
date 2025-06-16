@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+"""
+BOB Simple - Minimal Unified CLI for Testing
+=============================================
+
+Simple version of the unified BOB CLI for testing and demonstration.
+Shows the consolidation concept without requiring heavy dependencies.
+"""
+
+import argparse
+import sys
+from pathlib import Path
+
+
+def main():
+    """Simple BOB CLI entry point."""
+    parser = argparse.ArgumentParser(
+        description="BOB - Unified CLI for Wheel Trading System (Simple Version)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  ./bob "find WheelStrategy"
+  ./bob solve "optimize database performance"
+  ./bob system status
+  ./bob --interactive
+  ./bob help
+
+This unified interface consolidates:
+- bob_cli.py (natural language interface)
+- bolt_cli.py (8-agent problem solving)
+- bob_unified.py (unified interface attempt)
+- unified_cli.py (intelligent router)
+        """
+    )
+    
+    # Subcommands
+    subparsers = parser.add_subparsers(dest='subcommand', help='Available subcommands')
+    
+    # Solve subcommand (Bolt)
+    solve_parser = subparsers.add_parser('solve', help='Solve problems using 8-agent Bolt system')
+    solve_parser.add_argument('query', help='Problem description')
+    solve_parser.add_argument('--analyze-only', action='store_true', help='Only analyze, do not execute')
+    
+    # Search subcommand (Einstein)
+    search_parser = subparsers.add_parser('search', help='Search using Einstein semantic system')
+    search_parser.add_argument('query', help='Search query')
+    
+    # System subcommand
+    system_parser = subparsers.add_parser('system', help='System operations')
+    system_parser.add_argument('action', choices=['status', 'health', 'metrics'], help='System action')
+    
+    # Main options
+    parser.add_argument('query', nargs='*', help='Natural language query')
+    parser.add_argument('-i', '--interactive', action='store_true', help='Run in interactive mode')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
+    parser.add_argument('--version', action='store_true', help='Show version information')
+    
+    args = parser.parse_args()
+    
+    # Show version
+    if args.version:
+        print("BOB - Unified System v2.0.0")
+        print("Features: Intelligent routing, 8-agent orchestration, Einstein search")
+        print("Components: Einstein, Bolt, BOB, M4 Pro acceleration")
+        print("Status: Consolidated CLI interface active")
+        return 0
+    
+    # Interactive mode
+    if args.interactive:
+        print("🚀 BOB Unified Interactive Mode")
+        print("   Commands: <query>, solve <query>, search <query>, system <action>")
+        print("   Special: help, quit")
+        print("   Note: This is the simple test version")
+        print("")
+        
+        while True:
+            try:
+                user_input = input("bob> ").strip()
+                
+                if user_input.lower() in ["quit", "exit", "q"]:
+                    break
+                    
+                if user_input.lower() in ["help", "?"]:
+                    print("Available commands:")
+                    print("  <query>        - Natural language query (auto-routed)")
+                    print("  solve <query>  - Complex analysis using Bolt")
+                    print("  search <query> - Fast search using Einstein")
+                    print("  system status  - Show system status")
+                    print("  help           - Show this help")
+                    print("  quit           - Exit")
+                    continue
+                    
+                if not user_input:
+                    continue
+                
+                # Simple routing simulation
+                if user_input.startswith("solve "):
+                    query = user_input[6:]
+                    print(f"🔧 BOLT: Would analyze '{query}' using 8-agent system")
+                elif user_input.startswith("search "):
+                    query = user_input[7:]
+                    print(f"🔍 EINSTEIN: Would search for '{query}' using semantic index")
+                elif user_input.startswith("system "):
+                    action = user_input[7:]
+                    print(f"⚙️  SYSTEM: Would show {action}")
+                else:
+                    # Auto-route based on simple heuristics
+                    if any(word in user_input.lower() for word in ["find", "search", "show", "where"]):
+                        print(f"🔍 AUTO-ROUTED TO EINSTEIN: '{user_input}'")
+                    elif any(word in user_input.lower() for word in ["optimize", "fix", "analyze", "debug"]):
+                        print(f"🔧 AUTO-ROUTED TO BOLT: '{user_input}'")
+                    else:
+                        print(f"🤖 AUTO-ROUTED TO BOB: '{user_input}'")
+                        
+            except KeyboardInterrupt:
+                break
+                
+        print("\n👋 Session ended")
+        return 0
+    
+    # Handle subcommands
+    if args.subcommand == 'solve':
+        print(f"🔧 BOLT: Would solve '{args.query}' using 8-agent system")
+        if args.analyze_only:
+            print("   Mode: Analysis only")
+        return 0
+        
+    elif args.subcommand == 'search':
+        print(f"🔍 EINSTEIN: Would search for '{args.query}' using semantic index")
+        return 0
+        
+    elif args.subcommand == 'system':
+        if args.action == 'status':
+            print("⚙️  BOB SYSTEM STATUS")
+            print("   Einstein: ✅ Available (simulated)")
+            print("   Bolt:     ✅ Available (simulated)")
+            print("   BOB:      ✅ Available (simulated)")
+            print("   Routing:  ✅ Operational")
+        elif args.action == 'health':
+            print("🏥 BOB SYSTEM HEALTH")
+            print("   All systems: Operational")
+            print("   Performance: Optimal")
+            print("   Memory:      Normal")
+        elif args.action == 'metrics':
+            print("📊 BOB SYSTEM METRICS")
+            print("   Queries processed: 0")
+            print("   Success rate: 100%")
+            print("   Average response: <100ms")
+        return 0
+        
+    elif args.query:
+        # Natural language query
+        query = " ".join(args.query)
+        
+        # Special handling for help
+        if query.lower().startswith("help"):
+            parser.print_help()
+            return 0
+        
+        # Simple auto-routing simulation
+        if any(word in query.lower() for word in ["find", "search", "show", "where"]):
+            print(f"🔍 AUTO-ROUTED TO EINSTEIN: '{query}'")
+            print("   Would perform semantic search and return results")
+        elif any(word in query.lower() for word in ["optimize", "fix", "analyze", "debug"]):
+            print(f"🔧 AUTO-ROUTED TO BOLT: '{query}'")
+            print("   Would use 8-agent system for complex analysis")
+        else:
+            print(f"🤖 AUTO-ROUTED TO BOB: '{query}'")
+            print("   Would process natural language command")
+            
+        return 0
+    else:
+        # No command provided
+        parser.print_help()
+        return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

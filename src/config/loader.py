@@ -10,12 +10,12 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any
 
 import yaml
 from pydantic import ValidationError
 
-from .schema import WheelConfig, load_config, validate_config_health
+from .schema import WheelConfig, validate_config_health
 
 logger = logging.getLogger(__name__)
 
@@ -26,16 +26,19 @@ class ConfigurationLoader:
     change tracking, and self-tuning capabilities.
     """
 
-    def __init__(self, config_path: Union[str, Path] = os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml")):
+    def __init__(
+        self,
+        config_path: str | Path = os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml"),
+    ):
         self.config_path = Path(config_path)
-        self.config: Optional[WheelConfig] = None
-        self.raw_config: Dict[str, Any] = {}
-        self.overrides: Dict[str, Any] = {}
-        self.parameter_usage: Dict[str, int] = {}
-        self.parameter_impact: Dict[str, float] = {}
-        self.parameter_execution_times: Dict[str, List[float]] = {}
-        self.config_history: List[Dict[str, Any]] = []
-        self.health_report: Dict[str, Any] = {}
+        self.config: WheelConfig | None = None
+        self.raw_config: dict[str, Any] = {}
+        self.overrides: dict[str, Any] = {}
+        self.parameter_usage: dict[str, int] = {}
+        self.parameter_impact: dict[str, float] = {}
+        self.parameter_execution_times: dict[str, list[float]] = {}
+        self.config_history: list[dict[str, Any]] = []
+        self.health_report: dict[str, Any] = {}
 
         # Load configuration on init
         self.load()
@@ -63,12 +66,12 @@ class ConfigurationLoader:
 
         return self.config
 
-    def _load_yaml(self) -> Dict[str, Any]:
+    def _load_yaml(self) -> dict[str, Any]:
         """Load raw configuration from YAML file."""
         if not self.config_path.exists():
             raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
 
-        with open(self.config_path, "r") as f:
+        with open(self.config_path) as f:
             config = yaml.safe_load(f)
 
         # Ensure metadata exists
@@ -79,7 +82,7 @@ class ConfigurationLoader:
 
         return config
 
-    def _apply_env_overrides(self, config: Dict[str, Any]) -> Dict[str, Any]:
+    def _apply_env_overrides(self, config: dict[str, Any]) -> dict[str, Any]:
         """
         Apply environment variable overrides.
 
@@ -101,7 +104,7 @@ class ConfigurationLoader:
 
             # Navigate to the correct nested dict location
             current = config
-            for i, part in enumerate(key_parts[:-1]):
+            for _i, part in enumerate(key_parts[:-1]):
                 if part not in current:
                     current[part] = {}
                 current = current[part]
@@ -140,6 +143,7 @@ class ConfigurationLoader:
             return float(value)
         except ValueError as e:
             import logging
+
             logging.debug(f"Exception caught: {e}", exc_info=True)
             pass
 
@@ -160,7 +164,9 @@ class ConfigurationLoader:
         }
         self.config_history.append(change_record)
 
-    def track_parameter_usage(self, param_path: str, execution_time: float = 0.0) -> None:
+    def track_parameter_usage(
+        self, param_path: str, execution_time: float = 0.0
+    ) -> None:
         """Track when a configuration parameter is used with performance metrics."""
         if not self.config.metadata.tracking.track_usage:
             return
@@ -183,7 +189,7 @@ class ConfigurationLoader:
         current = self.parameter_impact.get(param_path, 0.0)
         self.parameter_impact[param_path] = alpha * impact_score + (1 - alpha) * current
 
-    def get_unused_parameters(self) -> Set[str]:
+    def get_unused_parameters(self) -> set[str]:
         """Get parameters that have never been accessed."""
         if not self.config.metadata.tracking.warn_unused:
             return set()
@@ -192,7 +198,7 @@ class ConfigurationLoader:
         used_params = set(self.parameter_usage.keys())
         return all_params - used_params
 
-    def _get_all_parameter_paths(self, obj: Any = None, prefix: str = "") -> Set[str]:
+    def _get_all_parameter_paths(self, obj: Any = None, prefix: str = "") -> set[str]:
         """Recursively get all parameter paths in config."""
         if obj is None:
             obj = self.config.model_dump()
@@ -202,21 +208,21 @@ class ConfigurationLoader:
         if isinstance(obj, dict):
             for key, value in obj.items():
                 new_prefix = f"{prefix}.{key}" if prefix else key
-                if isinstance(value, (dict, list)):
+                if isinstance(value, dict | list):
                     paths.update(self._get_all_parameter_paths(value, new_prefix))
                 else:
                     paths.add(new_prefix)
         elif isinstance(obj, list):
             for i, item in enumerate(obj):
                 new_prefix = f"{prefix}[{i}]"
-                if isinstance(item, (dict, list)):
+                if isinstance(item, dict | list):
                     paths.update(self._get_all_parameter_paths(item, new_prefix))
                 else:
                     paths.add(new_prefix)
 
         return paths
 
-    def suggest_parameter_adjustments(self) -> List[Dict[str, Any]]:
+    def suggest_parameter_adjustments(self) -> list[dict[str, Any]]:
         """Suggest parameter adjustments based on usage and impact."""
         if not self.config.metadata.tracking.suggest_tuning:
             return []
@@ -229,7 +235,7 @@ class ConfigurationLoader:
 
             if usage > 10 and abs(impact) > 0.1:
                 current_value = self._get_param_value(param)
-                if isinstance(current_value, (int, float)):
+                if isinstance(current_value, int | float):
                     # Suggest small adjustment based on impact direction
                     adjustment = 0.1 if impact > 0 else -0.1
                     suggested_value = current_value * (1 + adjustment)
@@ -323,8 +329,10 @@ class ConfigurationLoader:
                     "-" * 30,
                 ]
             )
-            for path, info in self.overrides.items():
-                report_lines.append(f"  {info['env_var']}: {info['original']} → {info['override']}")
+            for _path, info in self.overrides.items():
+                report_lines.append(
+                    f"  {info['env_var']}: {info['original']} → {info['override']}"
+                )
             report_lines.append("")
 
         # Validation results
@@ -376,9 +384,9 @@ class ConfigurationLoader:
                     "-" * 30,
                 ]
             )
-            sorted_usage = sorted(self.parameter_usage.items(), key=lambda x: x[1], reverse=True)[
-                :10
-            ]
+            sorted_usage = sorted(
+                self.parameter_usage.items(), key=lambda x: x[1], reverse=True
+            )[:10]
             for param, count in sorted_usage:
                 report_lines.append(f"  {param}: {count} uses")
             report_lines.append("")
@@ -408,7 +416,9 @@ class ConfigurationLoader:
                 ]
             )
             for sug in suggestions[:5]:
-                report_lines.append(f"  {sug['parameter']}: {sug['current']} → {sug['suggested']}")
+                report_lines.append(
+                    f"  {sug['parameter']}: {sug['current']} → {sug['suggested']}"
+                )
                 report_lines.append(f"    Reason: {sug['reason']}")
             report_lines.append("")
 
@@ -447,7 +457,7 @@ class ConfigurationLoader:
 
         return "\n".join(report_lines)
 
-    def export_config(self, path: Union[str, Path], format: str = "yaml") -> None:
+    def export_config(self, path: str | Path, format: str = "yaml") -> None:
         """Export current configuration with overrides applied."""
         path = Path(path)
         config_dict = self.config.model_dump()
@@ -482,10 +492,12 @@ class ConfigurationLoader:
 
 
 # Singleton instance
-_config_loader: Optional[ConfigurationLoader] = None
+_config_loader: ConfigurationLoader | None = None
 
 
-def get_config_loader(config_path: Union[str, Path] = os.getenv("WHEEL_CONFIG_PATH", "config_unified.yaml")) -> ConfigurationLoader:
+def get_config_loader(
+    config_path: str | Path = os.getenv("WHEEL_CONFIG_PATH", "config_unified.yaml")
+) -> ConfigurationLoader:
     """Get or create configuration loader singleton."""
     global _config_loader
     if _config_loader is None:

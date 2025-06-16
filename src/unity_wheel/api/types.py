@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Literal, TypedDict
-from typing_extensions import NotRequired
+from typing import Any, Literal, NotRequired, TypedDict
 
 # Type aliases
 Action = Literal["HOLD", "ADJUST", "ROLL", "CLOSE"]
@@ -21,7 +20,7 @@ class RiskMetrics(TypedDict):
     var_95: float
     cvar_95: float
     margin_required: float
-    borrowing_analysis: NotRequired[Dict[str, Any]]
+    borrowing_analysis: NotRequired[dict[str, Any]]
 
 
 class Recommendation(TypedDict):
@@ -31,8 +30,8 @@ class Recommendation(TypedDict):
     rationale: str
     confidence: float
     risk: RiskMetrics
-    details: Dict[str, Any]
-    risk_report: Dict[str, Any]
+    details: dict[str, Any]
+    risk_report: dict[str, Any]
 
 
 class PositionData(TypedDict):
@@ -55,8 +54,8 @@ class MarketSnapshot(TypedDict):
     current_price: float
     buying_power: float
     margin_used: float
-    positions: List[PositionData]
-    option_chain: Dict[str, OptionData]
+    positions: list[PositionData]
+    option_chain: dict[str, OptionData]
     implied_volatility: float
     risk_free_rate: float
 

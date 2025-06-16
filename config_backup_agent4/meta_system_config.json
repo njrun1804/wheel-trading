@@ -1,0 +1,8 @@
+{
+    "startup_time": "2025-06-15T14:02:18Z",
+    "claude_code_env": "1",
+    "thinking_budget": "50000",
+    "parallelism": "8",
+    "auto_improvement": true,
+    "learning_enabled": true
+}

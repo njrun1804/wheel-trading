@@ -5,27 +5,27 @@ Based on official Databento documentation.
 """
 
 import logging
-import os
 import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 import pytz
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
 
 
@@ -122,7 +122,9 @@ class UnityOptionsDatabentoDownloader:
                 unity_options = df[df["raw_symbol"].str.startswith("U ")]
 
                 if not unity_options.empty:
-                    logger.info(f"  Found {len(unity_options)} Unity option definitions")
+                    logger.info(
+                        f"  Found {len(unity_options)} Unity option definitions"
+                    )
 
                     # Store definitions
                     for _, row in unity_options.iterrows():
@@ -359,7 +361,7 @@ class UnityOptionsDatabentoDownloader:
         """
         ).fetchone()
 
-        logger.info(f"\nOption Definitions:")
+        logger.info("\nOption Definitions:")
         logger.info(f"  Total contracts: {defs[0]:,}")
         logger.info(f"  Unique expirations: {defs[1]}")
         logger.info(f"  Unique strikes: {defs[2]}")
@@ -376,11 +378,17 @@ class UnityOptionsDatabentoDownloader:
         """
         ).fetchone()
 
-        logger.info(f"\nOptions Trades:")
+        logger.info("\nOptions Trades:")
         logger.info(f"  Total trades: {trades[0]:,}")
         logger.info(f"  Trading days: {trades[1]}")
-        logger.info(f"  Average price: ${trades[2]:.2f}" if trades[2] else "  Average price: N/A")
-        logger.info(f"  Total volume: {trades[3]:,}" if trades[3] else "  Total volume: N/A")
+        logger.info(
+            f"  Average price: ${trades[2]:.2f}"
+            if trades[2]
+            else "  Average price: N/A"
+        )
+        logger.info(
+            f"  Total volume: {trades[3]:,}" if trades[3] else "  Total volume: N/A"
+        )
 
         # Sample options
         logger.info("\nSample Unity Options:")

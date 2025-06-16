@@ -6,15 +6,18 @@ import json
 import logging
 import sys
 import time
+from collections.abc import Callable, MutableMapping
 from contextvars import ContextVar
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, MutableMapping, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 # Context variables for request tracking
-request_id: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
-execution_context: ContextVar[Dict[str, Any]] = ContextVar("execution_context", default={})
+request_id: ContextVar[str | None] = ContextVar("request_id", default=None)
+execution_context: ContextVar[dict[str, Any]] = ContextVar(
+    "execution_context", default={}
+)
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -22,52 +25,92 @@ F = TypeVar("F", bound=Callable[..., Any])
 class StructuredLogger(logging.LoggerAdapter[logging.Logger]):
     """Logger adapter that adds structured context to all log messages."""
 
-    def __init__(self, logger: logging.Logger, extra: Optional[Dict[str, Any]] = None):
+    def __init__(self, logger: logging.Logger, extra: dict[str, Any] | None = None):
         super().__init__(logger, extra or {})
 
     def process(
         self, msg: Any, kwargs: MutableMapping[str, Any]
     ) -> tuple[Any, MutableMapping[str, Any]]:
         """Process log message to add structured context."""
-        # Get execution context
-        ctx = execution_context.get()
-        req_id = request_id.get()
+        try:
+            # Get execution context
+            ctx = execution_context.get()
+            req_id = request_id.get()
 
-        # Build structured log entry
-        log_entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "level": kwargs.get("levelname", "INFO"),
-            "message": msg,
-            "module": self.logger.name,
-        }
+            # Build structured log entry
+            log_entry = {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "level": kwargs.get("levelname", "INFO"),
+                "message": msg,
+                "module": self.logger.name,
+            }
 
-        # Add request ID if available
-        if req_id:
-            log_entry["request_id"] = req_id
+            # Add request ID if available
+            if req_id:
+                log_entry["request_id"] = req_id
 
-        # Add execution context
-        if ctx:
-            log_entry["context"] = ctx
+            # Add execution context
+            if ctx:
+                log_entry["context"] = ctx
 
-        # Add any extra fields from kwargs
-        if "extra" in kwargs:
-            log_entry.update(kwargs["extra"])
+            # Add any extra fields from kwargs, avoiding conflicts with LogRecord built-ins
+            if "extra" in kwargs:
+                extra_data = kwargs["extra"]
+                # Avoid conflicts with built-in LogRecord fields
+                safe_extra = {
+                    k: v
+                    for k, v in extra_data.items()
+                    if k
+                    not in (
+                        "name",
+                        "levelname",
+                        "levelno",
+                        "pathname",
+                        "filename",
+                        "module",
+                        "lineno",
+                        "funcName",
+                        "created",
+                        "msecs",
+                        "relativeCreated",
+                        "thread",
+                        "threadName",
+                        "processName",
+                        "process",
+                        "msg",
+                        "args",
+                        "exc_info",
+                        "exc_text",
+                        "stack_info",
+                    )
+                }
+                log_entry.update(safe_extra)
 
-        # Format as JSON for machine parsing
-        formatted_msg = json.dumps(log_entry, default=str)
+                # Create clean kwargs without conflicting extra
+                clean_kwargs = kwargs.copy()
+                clean_kwargs.pop("extra", None)
+                kwargs = clean_kwargs
 
-        return formatted_msg, kwargs
+            # Format as JSON for machine parsing
+            formatted_msg = json.dumps(log_entry, default=str)
+
+            return formatted_msg, kwargs
+        except Exception as e:
+            # Fallback to simple logging if structured logging fails
+            return f"Structured logging error: {e} - Original message: {msg}", kwargs
 
 
 class PerformanceLogger:
     """Context manager for logging performance metrics."""
 
-    def __init__(self, operation: str, logger: StructuredLogger, threshold_ms: float = 200):
+    def __init__(
+        self, operation: str, logger: StructuredLogger, threshold_ms: float = 200
+    ):
         self.operation = operation
         self.logger = logger
         self.threshold_ms = threshold_ms
-        self.start_time: Optional[float] = None
-        self.metadata: Dict[str, Any] = {}
+        self.start_time: float | None = None
+        self.metadata: dict[str, Any] = {}
 
     def __enter__(self) -> PerformanceLogger:
         self.start_time = time.time()
@@ -108,10 +151,14 @@ class PerformanceLogger:
                 extra=extra_data,
             )
         else:
-            self.logger.info(f"Completed {self.operation} in {duration_ms:.0f}ms", extra=extra_data)
+            self.logger.info(
+                f"Completed {self.operation} in {duration_ms:.0f}ms", extra=extra_data
+            )
 
 
-def timed_operation(threshold_ms: float = 200, include_args: bool = False) -> Callable[[F], F]:
+def timed_operation(
+    threshold_ms: float = 200, include_args: bool = False
+) -> Callable[[F], F]:
     """Decorator to automatically log operation timing."""
 
     def decorator(func: F) -> F:
@@ -123,13 +170,15 @@ def timed_operation(threshold_ms: float = 200, include_args: bool = False) -> Ca
             with PerformanceLogger(operation, logger, threshold_ms) as perf:
                 if include_args:
                     # Log first few args (avoid logging sensitive data)
-                    safe_args = str(args[:3]) if len(args) <= 3 else f"{str(args[:3])}..."
+                    safe_args = (
+                        str(args[:3]) if len(args) <= 3 else f"{str(args[:3])}..."
+                    )
                     perf.add_metadata(args=safe_args)
 
                 result = func(*args, **kwargs)
 
                 # Add result metadata if it's simple
-                if isinstance(result, (int, float, str, bool)):
+                if isinstance(result, int | float | str | bool):
                     perf.add_metadata(result=result)
                 elif isinstance(result, dict) and "confidence" in result:
                     perf.add_metadata(confidence=result["confidence"])
@@ -147,19 +196,19 @@ class DecisionLogger:
     def __init__(self, structured_logger: StructuredLogger):
         self.logger = structured_logger.logger  # Get the underlying logger
         self.structured_logger = structured_logger
-        self.decision_history: List[Dict[str, Any]] = []
+        self.decision_history: list[dict[str, Any]] = []
 
     def log_decision(
         self,
         action: str,
         rationale: str,
         confidence: float,
-        risk_metrics: Optional[Dict[str, float]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        risk_metrics: dict[str, float] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Log a trading decision with full context."""
         decision = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "action": action,
             "rationale": rationale,
             "confidence": confidence,
@@ -182,7 +231,7 @@ class DecisionLogger:
         check: str,
         reason: str,
         severity: str = "WARNING",
-        recovery_action: Optional[str] = None,
+        recovery_action: str | None = None,
     ) -> None:
         """Log validation failures with recovery suggestions."""
         self.logger.warning(
@@ -201,7 +250,7 @@ class DecisionLogger:
 
 def setup_structured_logging(
     log_level: str = "INFO",
-    log_file: Optional[Path] = None,
+    log_file: Path | None = None,
     include_stdout: bool = True,
 ) -> None:
     """Set up structured logging for the application."""
@@ -219,7 +268,7 @@ def setup_structured_logging(
             # Fallback for regular loggers
             return json.dumps(
                 {
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                     "level": record.levelname,
                     "module": record.name,
                     "message": record.getMessage(),

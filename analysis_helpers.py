@@ -1,13 +1,13 @@
 """Helper functions for mathematical analysis and validation."""
 
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 
-def validate_option_params(delta: float, iv: float, dte: int) -> Dict[str, Any]:
+def validate_option_params(delta: float, iv: float, dte: int) -> dict[str, Any]:
     """Validate option parameters are within reasonable bounds."""
     issues = []
 
@@ -21,7 +21,9 @@ def validate_option_params(delta: float, iv: float, dte: int) -> Dict[str, Any]:
     return {"valid": len(issues) == 0, "issues": issues}
 
 
-def calculate_kelly_criterion(win_prob: float, win_amt: float, loss_amt: float) -> float:
+def calculate_kelly_criterion(
+    win_prob: float, win_amt: float, loss_amt: float
+) -> float:
     """Calculate optimal position size using Kelly Criterion."""
     if loss_amt == 0:
         return 0
@@ -34,7 +36,7 @@ def calculate_kelly_criterion(win_prob: float, win_amt: float, loss_amt: float) 
     return max(0, min(kelly, 0.25))  # Cap at 25% for safety
 
 
-def analyze_returns_distribution(returns: pd.Series) -> Dict[str, float]:
+def analyze_returns_distribution(returns: pd.Series) -> dict[str, float]:
     """Analyze return distribution for risk metrics."""
     return {
         "mean": returns.mean(),

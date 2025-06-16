@@ -6,8 +6,8 @@ Identifies when current market deviates from historical norms.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from datetime import datetime
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
@@ -15,8 +15,8 @@ from scipy import stats
 from sklearn.ensemble import IsolationForest
 
 from src.config.loader import get_config
-from ..utils import get_logger, timed_operation, with_recovery
-from ..utils.recovery import RecoveryStrategy
+
+from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
 
@@ -36,7 +36,7 @@ class MarketAnomaly:
 
     anomaly_type: AnomalyType
     timestamp: datetime
-    metrics: Dict[str, float]
+    metrics: dict[str, float]
     z_score: float
     percentile: float
     historical_frequency: float  # How often this occurs
@@ -74,7 +74,10 @@ class AnomalyDetector:
                 "Reduce position size significantly",
             ),
             "volume_spike": AnomalyType(
-                "volume_spike", 0.7, "Volume 5x above average", "Check for news, consider avoiding"
+                "volume_spike",
+                0.7,
+                "Volume 5x above average",
+                "Check for news, consider avoiding",
             ),
             "price_gap": AnomalyType(
                 "price_gap",
@@ -111,10 +114,10 @@ class AnomalyDetector:
     @timed_operation(threshold_ms=100)
     def detect_anomalies(
         self,
-        current_data: Dict[str, float],
+        current_data: dict[str, float],
         historical_data: pd.DataFrame,
-        option_data: Optional[Dict] = None,
-    ) -> List[MarketAnomaly]:
+        option_data: dict | None = None,
+    ) -> list[MarketAnomaly]:
         """
         Detect all types of anomalies in current market data.
 
@@ -137,12 +140,16 @@ class AnomalyDetector:
         anomalies.extend(vol_anomalies)
 
         # 3. Correlation anomalies
-        corr_anomalies = self._detect_correlation_anomalies(current_data, historical_data)
+        corr_anomalies = self._detect_correlation_anomalies(
+            current_data, historical_data
+        )
         anomalies.extend(corr_anomalies)
 
         # 4. Options anomalies (if data available)
         if option_data:
-            option_anomalies = self._detect_option_anomalies(option_data, historical_data)
+            option_anomalies = self._detect_option_anomalies(
+                option_data, historical_data
+            )
             anomalies.extend(option_anomalies)
 
         # 5. Multi-factor anomalies using ML
@@ -165,8 +172,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_price_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect price-related anomalies."""
         anomalies = []
 
@@ -176,7 +183,9 @@ class AnomalyDetector:
 
             if gap > 0.10:  # 10% gap
                 historical_gaps = self._calculate_historical_gaps(historical)
-                z_score = (gap - historical_gaps.mean()) / (historical_gaps.std() + 1e-6)
+                z_score = (gap - historical_gaps.mean()) / (
+                    historical_gaps.std() + 1e-6
+                )
                 percentile = stats.percentileofscore(historical_gaps, gap)
 
                 anomaly = MarketAnomaly(
@@ -199,14 +208,23 @@ class AnomalyDetector:
             volume_ratio = current["volume"] / (avg_volume + 1e-6)
 
             if volume_ratio > 5.0:  # 5x average
-                volume_ratios = historical["volume"] / historical["volume"].rolling(20).mean()
-                z_score = (volume_ratio - volume_ratios.mean()) / (volume_ratios.std() + 1e-6)
-                percentile = stats.percentileofscore(volume_ratios.dropna(), volume_ratio)
+                volume_ratios = (
+                    historical["volume"] / historical["volume"].rolling(20).mean()
+                )
+                z_score = (volume_ratio - volume_ratios.mean()) / (
+                    volume_ratios.std() + 1e-6
+                )
+                percentile = stats.percentileofscore(
+                    volume_ratios.dropna(), volume_ratio
+                )
 
                 anomaly = MarketAnomaly(
                     anomaly_type=self.ANOMALY_TYPES["volume_spike"],
                     timestamp=datetime.now(),
-                    metrics={"volume_ratio": volume_ratio, "actual_volume": current["volume"]},
+                    metrics={
+                        "volume_ratio": volume_ratio,
+                        "actual_volume": current["volume"],
+                    },
                     z_score=z_score,
                     percentile=percentile,
                     historical_frequency=(volume_ratios > 5.0).mean(),
@@ -217,8 +235,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_volatility_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect volatility-related anomalies."""
         anomalies = []
 
@@ -228,18 +246,24 @@ class AnomalyDetector:
             current_vol = current["realized_vol"]
 
             # Z-score
-            z_score = (current_vol - historical_vols.mean()) / (historical_vols.std() + 1e-6)
+            z_score = (current_vol - historical_vols.mean()) / (
+                historical_vols.std() + 1e-6
+            )
             percentile = stats.percentileofscore(historical_vols.dropna(), current_vol)
 
             if abs(z_score) > 3.0:  # 3 standard deviations
                 anomaly = MarketAnomaly(
                     anomaly_type=self.ANOMALY_TYPES["extreme_volatility"],
                     timestamp=datetime.now(),
-                    metrics={"volatility": current_vol, "historical_mean": historical_vols.mean()},
+                    metrics={
+                        "volatility": current_vol,
+                        "historical_mean": historical_vols.mean(),
+                    },
                     z_score=z_score,
                     percentile=percentile,
                     historical_frequency=(
-                        abs(historical_vols - historical_vols.mean()) > 3 * historical_vols.std()
+                        abs(historical_vols - historical_vols.mean())
+                        > 3 * historical_vols.std()
                     ).mean(),
                     confidence=0.95,
                 )
@@ -248,8 +272,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_correlation_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect correlation breaks with market/sector."""
         anomalies = []
 
@@ -263,7 +287,10 @@ class AnomalyDetector:
                 anomaly = MarketAnomaly(
                     anomaly_type=self.ANOMALY_TYPES["correlation_break"],
                     timestamp=datetime.now(),
-                    metrics={"correlation": current_corr, "typical": typical_correlation},
+                    metrics={
+                        "correlation": current_corr,
+                        "typical": typical_correlation,
+                    },
                     z_score=(current_corr - typical_correlation) / 0.15,
                     percentile=20 if current_corr < typical_correlation else 80,
                     historical_frequency=0.10,  # 10% of time
@@ -274,8 +301,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_option_anomalies(
-        self, option_data: Dict, historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, option_data: dict, historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Detect anomalies in options data."""
         anomalies = []
 
@@ -334,8 +361,8 @@ class AnomalyDetector:
         return anomalies
 
     def _detect_ml_anomalies(
-        self, current: Dict[str, float], historical: pd.DataFrame
-    ) -> List[MarketAnomaly]:
+        self, current: dict[str, float], historical: pd.DataFrame
+    ) -> list[MarketAnomaly]:
         """Use ML to detect multi-factor anomalies."""
         anomalies = []
 
@@ -367,7 +394,7 @@ class AnomalyDetector:
 
         return anomalies
 
-    def _prepare_ml_features(self, current: Dict[str, float]) -> Optional[np.ndarray]:
+    def _prepare_ml_features(self, current: dict[str, float]) -> np.ndarray | None:
         """Prepare feature vector for ML anomaly detection."""
         feature_names = [
             "returns",
@@ -418,7 +445,9 @@ class AnomalyDetector:
 
     def _calculate_historical_gaps(self, historical: pd.DataFrame) -> pd.Series:
         """Calculate historical gap sizes."""
-        gaps = abs(historical["open"] - historical["close"].shift(1)) / historical["close"].shift(1)
+        gaps = abs(historical["open"] - historical["close"].shift(1)) / historical[
+            "close"
+        ].shift(1)
         return gaps.dropna()
 
     def _calculate_rsi(self, prices: pd.Series, period: int = 14) -> float:
@@ -432,7 +461,7 @@ class AnomalyDetector:
 
         return rsi.iloc[-1] if len(rsi) > 0 else 50.0
 
-    def generate_anomaly_report(self, anomalies: List[MarketAnomaly]) -> List[str]:
+    def generate_anomaly_report(self, anomalies: list[MarketAnomaly]) -> list[str]:
         """Generate human-readable anomaly report."""
         report = ["=== MARKET ANOMALY REPORT ===", ""]
 
@@ -451,7 +480,9 @@ class AnomalyDetector:
             report.append(f"   Description: {anomaly.anomaly_type.description}")
             report.append(f"   Z-Score: {anomaly.z_score:.1f}")
             report.append(f"   Percentile: {anomaly.percentile:.0f}%")
-            report.append(f"   Historical frequency: {anomaly.historical_frequency:.1%}")
+            report.append(
+                f"   Historical frequency: {anomaly.historical_frequency:.1%}"
+            )
             report.append(f"   ACTION: {anomaly.anomaly_type.recommended_action}")
             report.append("")
 

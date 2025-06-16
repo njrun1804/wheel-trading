@@ -5,14 +5,13 @@ from __future__ import annotations
 import json
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Deque, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from unity_wheel.utils.logging import get_logger
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from unity_wheel.risk.analytics import RiskMetrics
@@ -29,21 +28,21 @@ class DecisionMetrics:
     action: str
     confidence: float
     expected_return: float
-    actual_return: Optional[float] = None
+    actual_return: float | None = None
     risk_taken: float = 0.0
     execution_time_ms: float = 0.0
-    features_used: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    features_used: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
-    def return_error(self) -> Optional[float]:
+    def return_error(self) -> float | None:
         """Calculate prediction error if actual return available."""
         if self.actual_return is None:
             return None
         return abs(self.actual_return - self.expected_return)
 
     @property
-    def confidence_calibration(self) -> Optional[float]:
+    def confidence_calibration(self) -> float | None:
         """
         Measure how well calibrated confidence was.
         Perfect calibration: high confidence = low error.
@@ -52,7 +51,9 @@ class DecisionMetrics:
             return None
 
         # Normalize error to [0, 1] range
-        normalized_error = min(self.return_error / abs(self.expected_return + 1e-6), 1.0)
+        normalized_error = min(
+            self.return_error / abs(self.expected_return + 1e-6), 1.0
+        )
 
         # Calibration score: 1.0 is perfect
         # High confidence (0.9) with low error (0.1) = good (0.8)
@@ -77,7 +78,7 @@ class PerformanceMetrics:
     confidence_calibration_score: float = 0.0
     decisions_per_hour: float = 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "total_decisions": self.total_decisions,
@@ -102,27 +103,27 @@ class MetricsCollector:
     def __init__(
         self,
         window_size: int = 1000,
-        persistence_path: Optional[Path] = None,
+        persistence_path: Path | None = None,
     ):
         self.window_size = window_size
         self.persistence_path = persistence_path
 
         # Recent decisions window
-        self.recent_decisions: Deque[DecisionMetrics] = deque(maxlen=window_size)
+        self.recent_decisions: deque[DecisionMetrics] = deque(maxlen=window_size)
 
         # Historical aggregates
-        self.hourly_metrics: Dict[str, PerformanceMetrics] = {}
-        self.daily_metrics: Dict[str, PerformanceMetrics] = {}
+        self.hourly_metrics: dict[str, PerformanceMetrics] = {}
+        self.daily_metrics: dict[str, PerformanceMetrics] = {}
 
         # Feature importance tracking
-        self.feature_importance: Dict[str, float] = defaultdict(float)
-        self.feature_usage: Dict[str, int] = defaultdict(int)
+        self.feature_importance: dict[str, float] = defaultdict(float)
+        self.feature_usage: dict[str, int] = defaultdict(int)
 
         # Action-specific metrics
-        self.action_metrics: Dict[str, List[float]] = defaultdict(list)
+        self.action_metrics: dict[str, list[float]] = defaultdict(list)
 
         # Function timing metrics
-        self.function_timings: Dict[str, List[float]] = defaultdict(list)
+        self.function_timings: dict[str, list[float]] = defaultdict(list)
 
         # Cache statistics
         self.cache_hits: int = 0
@@ -130,7 +131,7 @@ class MetricsCollector:
         self.cache_evictions: int = 0
 
         # Risk metrics history
-        self.risk_history: Dict[str, List[float]] = defaultdict(list)
+        self.risk_history: dict[str, list[float]] = defaultdict(list)
 
         # Load historical data if available
         if persistence_path and persistence_path.exists():
@@ -144,13 +145,13 @@ class MetricsCollector:
         expected_return: float,
         risk_taken: float = 0.0,
         execution_time_ms: float = 0.0,
-        features_used: Optional[List[str]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        features_used: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Record a new decision."""
         decision = DecisionMetrics(
             decision_id=decision_id,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             action=action,
             confidence=confidence,
             expected_return=expected_return,
@@ -201,7 +202,7 @@ class MetricsCollector:
                 self.action_metrics[decision.action].append(actual_return)
 
                 logger.info(
-                    f"Updated decision outcome",
+                    "Updated decision outcome",
                     extra={
                         "decision_id": decision_id,
                         "expected": decision.expected_return,
@@ -227,13 +228,13 @@ class MetricsCollector:
         """Increment cache eviction counter."""
         self.cache_evictions += 1
 
-    def record_risk_metrics(self, metrics: "RiskMetrics") -> None:
+    def record_risk_metrics(self, metrics: RiskMetrics) -> None:
         """Store risk metrics for distribution analysis."""
         for name, value in metrics.to_dict().items():
-            if isinstance(value, (int, float)):
+            if isinstance(value, int | float):
                 self.risk_history[name].append(float(value))
 
-    def get_function_stats(self) -> Dict[str, Dict[str, float]]:
+    def get_function_stats(self) -> dict[str, dict[str, float]]:
         """Get aggregated timing statistics for recorded functions."""
         stats = {}
         for op, times in self.function_timings.items():
@@ -245,7 +246,7 @@ class MetricsCollector:
             }
         return stats
 
-    def get_cache_summary(self) -> Dict[str, float]:
+    def get_cache_summary(self) -> dict[str, float]:
         """Return cache statistics."""
         total = self.cache_hits + self.cache_misses
         hit_rate = self.cache_hits / total if total else 0.0
@@ -256,7 +257,7 @@ class MetricsCollector:
             "hit_rate": hit_rate,
         }
 
-    def get_risk_distribution(self) -> Dict[str, Dict[str, float]]:
+    def get_risk_distribution(self) -> dict[str, dict[str, float]]:
         """Return distribution stats for recorded risk metrics."""
         summary = {}
         for name, values in self.risk_history.items():
@@ -267,11 +268,11 @@ class MetricsCollector:
             }
         return summary
 
-    def get_performance_summary(self, hours: Optional[int] = None) -> PerformanceMetrics:
+    def get_performance_summary(self, hours: int | None = None) -> PerformanceMetrics:
         """Get performance summary for recent period."""
         # Filter decisions by time if specified
         if hours:
-            cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+            cutoff = datetime.now(UTC) - timedelta(hours=hours)
             decisions = [d for d in self.recent_decisions if d.timestamp >= cutoff]
         else:
             decisions = list(self.recent_decisions)
@@ -310,7 +311,9 @@ class MetricsCollector:
 
         # Time metrics
         if len(decisions) >= 2:
-            time_span = (decisions[-1].timestamp - decisions[0].timestamp).total_seconds() / 3600
+            time_span = (
+                decisions[-1].timestamp - decisions[0].timestamp
+            ).total_seconds() / 3600
             decisions_per_hour = total / time_span if time_span > 0 else 0.0
         else:
             decisions_per_hour = 0.0
@@ -325,7 +328,13 @@ class MetricsCollector:
             sharpe_ratio=sharpe,
             win_rate=successful / len(with_outcomes) if with_outcomes else 0.0,
             average_return_error=(
-                np.mean([d.return_error for d in with_outcomes if d.return_error is not None])
+                np.mean(
+                    [
+                        d.return_error
+                        for d in with_outcomes
+                        if d.return_error is not None
+                    ]
+                )
                 if with_outcomes
                 else 0.0
             ),
@@ -333,7 +342,7 @@ class MetricsCollector:
             decisions_per_hour=decisions_per_hour,
         )
 
-    def get_feature_importance(self, top_n: int = 10) -> List[Tuple[str, float]]:
+    def get_feature_importance(self, top_n: int = 10) -> list[tuple[str, float]]:
         """Get most important features."""
         # Normalize by usage count
         normalized_importance = {
@@ -342,11 +351,13 @@ class MetricsCollector:
         }
 
         # Sort by importance
-        sorted_features = sorted(normalized_importance.items(), key=lambda x: x[1], reverse=True)
+        sorted_features = sorted(
+            normalized_importance.items(), key=lambda x: x[1], reverse=True
+        )
 
         return sorted_features[:top_n]
 
-    def get_action_analysis(self) -> Dict[str, Dict[str, float]]:
+    def get_action_analysis(self) -> dict[str, dict[str, float]]:
         """Analyze performance by action type."""
         analysis = {}
 
@@ -364,7 +375,7 @@ class MetricsCollector:
 
         return analysis
 
-    def identify_patterns(self) -> List[Dict[str, Any]]:
+    def identify_patterns(self) -> list[dict[str, Any]]:
         """Identify patterns in decision making."""
         patterns = []
 
@@ -378,7 +389,9 @@ class MetricsCollector:
         for confidence, outcomes in decisions_by_confidence.items():
             if len(outcomes) >= 10:  # Minimum sample size
                 success_rate = sum(outcomes) / len(outcomes)
-                expected_rate = confidence  # Ideally, confidence should match success rate
+                expected_rate = (
+                    confidence  # Ideally, confidence should match success rate
+                )
 
                 if abs(success_rate - expected_rate) > 0.2:
                     patterns.append(
@@ -407,7 +420,11 @@ class MetricsCollector:
             if len(returns) >= 5:
                 avg_return = np.mean(returns)
                 overall_avg = np.mean(
-                    [r for returns_list in decisions_by_hour.values() for r in returns_list]
+                    [
+                        r
+                        for returns_list in decisions_by_hour.values()
+                        for r in returns_list
+                    ]
                 )
 
                 if abs(avg_return - overall_avg) > 0.02:  # 2% difference
@@ -577,7 +594,7 @@ class MetricsCollector:
             return
 
         try:
-            with open(self.persistence_path, "r") as f:
+            with open(self.persistence_path) as f:
                 data = json.load(f)
 
             # Restore recent decisions
@@ -597,7 +614,9 @@ class MetricsCollector:
                 self.recent_decisions.append(decision)
 
             # Restore aggregates
-            self.feature_importance = defaultdict(float, data.get("feature_importance", {}))
+            self.feature_importance = defaultdict(
+                float, data.get("feature_importance", {})
+            )
             self.feature_usage = defaultdict(int, data.get("feature_usage", {}))
             self.action_metrics = defaultdict(list, data.get("action_metrics", {}))
 

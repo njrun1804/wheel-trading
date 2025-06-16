@@ -27,14 +27,18 @@ def run_script(script_name, description):
     print("=" * 60)
 
     try:
-        result = subprocess.run([sys.executable, str(script_path)], capture_output=False, text=True)
+        result = subprocess.run(
+            [sys.executable, str(script_path)], capture_output=False, text=True
+        )
 
         print("=" * 60)
         if result.returncode == 0:
             print(f"✅ {description} completed successfully")
             return True
         else:
-            print(f"⚠️  {description} completed with warnings (code: {result.returncode})")
+            print(
+                f"⚠️  {description} completed with warnings (code: {result.returncode})"
+            )
             return False
 
     except Exception as e:
@@ -63,7 +67,9 @@ Examples:
         action="store_true",
         help="Run comprehensive validation with detailed report",
     )
-    group.add_argument("--greeks", action="store_true", help="Investigate Greek calculation issues")
+    group.add_argument(
+        "--greeks", action="store_true", help="Investigate Greek calculation issues"
+    )
 
     args = parser.parse_args()
 
@@ -76,12 +82,16 @@ Examples:
         success = run_script("daily_health_check.py", "Daily Health Check")
 
     elif args.comprehensive:
-        success = run_script("validate_database_comprehensive.py", "Comprehensive Validation")
+        success = run_script(
+            "validate_database_comprehensive.py", "Comprehensive Validation"
+        )
         print("\n📊 Detailed report saved to: database_validation_report.json")
         print("📋 Summary available in: database_health_summary.md")
 
     elif args.greeks:
-        success = run_script("investigate_greek_issues.py", "Greek Calculation Investigation")
+        success = run_script(
+            "investigate_greek_issues.py", "Greek Calculation Investigation"
+        )
 
     print("=" * 60)
 

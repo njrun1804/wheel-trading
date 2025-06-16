@@ -58,8 +58,12 @@ def verify_data_structure():
     """
     ).fetchall()
 
-    print("\n  Date       | Price  | Open   | High   | Low    | Close  | Volume    | Vol 20d")
-    print("  -----------|--------|--------|--------|--------|--------|-----------|--------")
+    print(
+        "\n  Date       | Price  | Open   | High   | Low    | Close  | Volume    | Vol 20d"
+    )
+    print(
+        "  -----------|--------|--------|--------|--------|--------|-----------|--------"
+    )
     for row in sample:
         date, price, ret, vol20, var95, open_p, high, low, close, volume = row
         print(
@@ -113,7 +117,9 @@ def verify_data_structure():
     print("\n  Date       | Spot   | Strike | Premium | Volume | Expiry")
     print("  -----------|--------|--------|---------|--------|----------")
     for exp, strike, date, prem, vol, spot in opt_sample:
-        print(f"  {date} | ${spot:>6.2f} | ${strike:>6.2f} | ${prem:>7.2f} | {vol:>6} | {exp}")
+        print(
+            f"  {date} | ${spot:>6.2f} | ${strike:>6.2f} | ${prem:>7.2f} | {vol:>6} | {exp}"
+        )
 
     # 6. Data quality summary
     print("\n6. Data Quality Summary:")

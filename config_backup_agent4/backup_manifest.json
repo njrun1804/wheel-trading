@@ -1,0 +1,17 @@
+{
+  "backup_time": "2025-06-15T20:16:47.513478",
+  "active_configs": [
+    ".envrc",
+    "config/database.yaml",
+    "meta_system_config.json",
+    "mcp-servers.json",
+    "logging_config.json",
+    ".env.example",
+    "examples/core/my_positions_example.yaml",
+    ".pre-commit-config.yaml",
+    "config.yaml",
+    ".env",
+    "examples/core/conservative_config.yaml"
+  ],
+  "purpose": "Agent 4 config cleanup backup"
+}

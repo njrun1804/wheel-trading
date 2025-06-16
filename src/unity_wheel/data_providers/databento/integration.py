@@ -7,12 +7,10 @@ Bridges:
 """
 from __future__ import annotations
 
-
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +20,7 @@ from unity_wheel.models.position import Position
 from unity_wheel.utils.logging import StructuredLogger
 
 from .client import DatabentoClient
-from .types import InstrumentDefinition, OptionChain, OptionQuote
+from .types import InstrumentDefinition, OptionQuote
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
@@ -33,7 +31,7 @@ class DatabentoIntegration:
     def __init__(
         self,
         client: DatabentoClient,
-        storage_adapter: Optional["DatabentoStorageAdapter"] = None,
+        storage_adapter: DatabentoStorageAdapter | None = None,
         risk_free_rate: float = None,
     ):
         """Initialize integration.
@@ -55,15 +53,15 @@ class DatabentoIntegration:
             self.risk_free_rate = risk_free_rate
 
         # Cache for instrument definitions
-        self._definition_cache: Dict[int, InstrumentDefinition] = {}
+        self._definition_cache: dict[int, InstrumentDefinition] = {}
 
     async def get_wheel_candidates(
         self,
         underlying: str = None,
         target_delta: float = None,
-        dte_range: Tuple[int, int] = None,
+        dte_range: tuple[int, int] = None,
         min_premium_pct: float = None,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """Find suitable options for wheel strategy.
 
         Args:
@@ -82,9 +80,14 @@ class DatabentoIntegration:
         if target_delta is None:
             target_delta = config.strategy.delta_target
         if dte_range is None:
-            dte_range = (config.strategy.min_days_to_expiry, config.strategy.days_to_expiry_target)
+            dte_range = (
+                config.strategy.min_days_to_expiry,
+                config.strategy.days_to_expiry_target,
+            )
         if min_premium_pct is None:
-            min_premium_pct = config.strategy.min_premium_yield * 100  # Convert to percentage
+            min_premium_pct = (
+                config.strategy.min_premium_yield * 100
+            )  # Convert to percentage
 
         logger.info(
             "finding_wheel_candidates",
@@ -110,7 +113,7 @@ class DatabentoIntegration:
         expirations = self._get_monthly_expirations(min_expiry, max_expiry)
 
         # Use most recent trading day for market data
-        today = datetime.now(timezone.utc)
+        today = datetime.now(UTC)
 
         # Find last trading day (skip weekends)
         if today.weekday() >= 5:  # Saturday or Sunday
@@ -120,16 +123,20 @@ class DatabentoIntegration:
             # Use previous day for weekdays
             last_trading_day = today - timedelta(days=1)
 
-        market_timestamp = last_trading_day.replace(hour=0, minute=0, second=0, microsecond=0)
+        market_timestamp = last_trading_day.replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
 
         semaphore = asyncio.Semaphore(3)
 
-        async def analyze_expiry(expiry: datetime) -> List[Dict]:
-            local_candidates: List[Dict] = []
+        async def analyze_expiry(expiry: datetime) -> list[dict]:
+            local_candidates: list[dict] = []
             async with semaphore:
                 try:
                     chain = await self.client.get_option_chain(
-                        underlying=underlying, expiration=expiry, timestamp=market_timestamp
+                        underlying=underlying,
+                        expiration=expiry,
+                        timestamp=market_timestamp,
                     )
 
                     definitions = await self.client._get_definitions(underlying, expiry)
@@ -198,7 +205,7 @@ class DatabentoIntegration:
         definition: InstrumentDefinition,
         spot_price: float,
         option_type: str,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Calculate comprehensive option metrics."""
         strike = float(definition.strike_price)
         dte_years = definition.days_to_expiry / 365.0
@@ -264,7 +271,9 @@ class DatabentoIntegration:
             "breakeven": breakeven,
         }
 
-    def _get_monthly_expirations(self, start_date: datetime, end_date: datetime) -> List[datetime]:
+    def _get_monthly_expirations(
+        self, start_date: datetime, end_date: datetime
+    ) -> list[datetime]:
         """Get monthly option expirations (3rd Friday) in date range."""
         expirations = []
 
@@ -276,7 +285,7 @@ class DatabentoIntegration:
 
         # Ensure timezone info
         if current.tzinfo is None:
-            current = current.replace(tzinfo=timezone.utc)
+            current = current.replace(tzinfo=UTC)
 
         while current.date() <= end_date:
             # Find first Friday
@@ -289,13 +298,17 @@ class DatabentoIntegration:
 
             # Handle both date and datetime comparisons
             third_friday_date = third_friday.date()
-            start_compare = start_date.date() if isinstance(start_date, datetime) else start_date
-            end_compare = end_date.date() if isinstance(end_date, datetime) else end_date
+            start_compare = (
+                start_date.date() if isinstance(start_date, datetime) else start_date
+            )
+            end_compare = (
+                end_date.date() if isinstance(end_date, datetime) else end_date
+            )
 
             if start_compare <= third_friday_date <= end_compare:
                 # Ensure expiration has timezone info
                 if third_friday.tzinfo is None:
-                    third_friday = third_friday.replace(tzinfo=timezone.utc)
+                    third_friday = third_friday.replace(tzinfo=UTC)
                 expirations.append(third_friday)
 
             # Next month
@@ -306,7 +319,7 @@ class DatabentoIntegration:
 
         return expirations
 
-    async def convert_to_position(self, candidate: Dict, quantity: int = 1) -> Position:
+    async def convert_to_position(self, candidate: dict, quantity: int = 1) -> Position:
         """Convert wheel candidate to Position model.
 
         Args:
@@ -336,7 +349,11 @@ class DatabentoIntegration:
         return position
 
     async def get_historical_data_for_backtest(
-        self, underlying: str, start_date: datetime, end_date: datetime, frequency: str = "daily"
+        self,
+        underlying: str,
+        start_date: datetime,
+        end_date: datetime,
+        frequency: str = "daily",
     ) -> pd.DataFrame:
         """Get historical data formatted for backtesting.
 
@@ -368,7 +385,9 @@ class DatabentoIntegration:
 
         return df
 
-    async def analyze_positions_on_demand(self, positions: List[Position]) -> Dict[str, Any]:
+    async def analyze_positions_on_demand(
+        self, positions: list[Position]
+    ) -> dict[str, Any]:
         """Analyze current positions with latest market data (pull-when-asked).
 
         Args:
@@ -387,7 +406,9 @@ class DatabentoIntegration:
 
                 # Fetch current market data
                 chain = await self.client.get_option_chain(
-                    underlying=underlying, expiration=pos.expiration, timestamp=None  # Latest data
+                    underlying=underlying,
+                    expiration=pos.expiration,
+                    timestamp=None,  # Latest data
                 )
 
                 # Find specific option in chain

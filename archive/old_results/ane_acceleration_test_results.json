@@ -1,0 +1,155 @@
+{
+  "overall_passed": true,
+  "passed_count": 4,
+  "total_count": 5,
+  "test_results": {
+    "ane_availability": {
+      "passed": true,
+      "details": {
+        "device_info": {
+          "default_device": "Device(gpu, 0)",
+          "metal_available": true,
+          "gpu_memory": 46.87794494628906
+        },
+        "gpu_available": true,
+        "ane_simulated": true,
+        "tests_passed": true
+      }
+    },
+    "embedding_performance": {
+      "passed": true,
+      "details": {
+        "batch_1": {
+          "batch_size": 1,
+          "elapsed_ms": 0.5738735198974609,
+          "ms_per_sample": 0.5738735198974609,
+          "tokens_per_second": 223045.66348151225,
+          "passed": true
+        },
+        "batch_4": {
+          "batch_size": 4,
+          "elapsed_ms": 0.48089027404785156,
+          "ms_per_sample": 0.12022256851196289,
+          "tokens_per_second": 1064691.9424888447,
+          "passed": true
+        },
+        "batch_8": {
+          "batch_size": 8,
+          "elapsed_ms": 0.5867481231689453,
+          "ms_per_sample": 0.07334351539611816,
+          "tokens_per_second": 1745212.229175132,
+          "passed": true
+        },
+        "batch_16": {
+          "batch_size": 16,
+          "elapsed_ms": 0.9839534759521484,
+          "ms_per_sample": 0.06149709224700928,
+          "tokens_per_second": 2081399.2226799128,
+          "passed": true
+        },
+        "batch_32": {
+          "batch_size": 32,
+          "elapsed_ms": 1.110076904296875,
+          "ms_per_sample": 0.034689903259277344,
+          "tokens_per_second": 3689834.446735395,
+          "passed": true
+        },
+        "batch_64": {
+          "batch_size": 64,
+          "elapsed_ms": 1.680135726928711,
+          "ms_per_sample": 0.02625212073326111,
+          "tokens_per_second": 4875796.561373634,
+          "passed": true
+        }
+      },
+      "fastest_time_ms": 0.02625212073326111
+    },
+    "batch_processing": {
+      "passed": true,
+      "details": {
+        "b1_n32": {
+          "batch_size": 1,
+          "num_batches": 32,
+          "total_samples": 32,
+          "elapsed_ms": 12.959957122802734,
+          "ms_per_sample": 0.40499866008758545,
+          "throughput": 2469.143971448545,
+          "passed": true
+        },
+        "b8_n4": {
+          "batch_size": 8,
+          "num_batches": 4,
+          "total_samples": 32,
+          "elapsed_ms": 1.851797103881836,
+          "ms_per_sample": 0.05786865949630737,
+          "throughput": 17280.5108793614,
+          "passed": true
+        },
+        "b32_n1": {
+          "batch_size": 32,
+          "num_batches": 1,
+          "total_samples": 32,
+          "elapsed_ms": 0.8561611175537109,
+          "ms_per_sample": 0.026755034923553467,
+          "throughput": 37376.14257866889,
+          "passed": true
+        }
+      },
+      "best_throughput": 37376.14257866889
+    },
+    "fallback_mechanisms": {
+      "passed": true,
+      "details": {
+        "normal_time_ms": 0.5338191986083984,
+        "fallback_time_ms": 0.49304962158203125,
+        "results_consistent": true,
+        "fallback_overhead": 0.923626619026351,
+        "passed": true
+      }
+    },
+    "concurrent_processing": {
+      "passed": false,
+      "details": {
+        "num_concurrent": 4,
+        "total_time_ms": 3.013134002685547,
+        "avg_task_time_ms": 0.4368424415588379,
+        "concurrent_efficiency": 0.14497942712454503,
+        "individual_results": [
+          {
+            "batch_id": 0,
+            "elapsed_ms": 0.5829334259033203,
+            "shape": [
+              8,
+              384
+            ]
+          },
+          {
+            "batch_id": 1,
+            "elapsed_ms": 0.37217140197753906,
+            "shape": [
+              8,
+              384
+            ]
+          },
+          {
+            "batch_id": 2,
+            "elapsed_ms": 0.3991127014160156,
+            "shape": [
+              8,
+              384
+            ]
+          },
+          {
+            "batch_id": 3,
+            "elapsed_ms": 0.39315223693847656,
+            "shape": [
+              8,
+              384
+            ]
+          }
+        ],
+        "passed": false
+      }
+    }
+  }
+}

@@ -2,34 +2,34 @@
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from typing import List, NamedTuple, Optional, Tuple
+from datetime import UTC, datetime, timedelta
+from typing import NamedTuple
 
 import numpy as np
 
-from src.config.loader import get_config
+from ..config.loader import get_config
 
-# META INTEGRATION: Enable observation and evolution (SHARED SINGLETON)
-def get_meta():
-    """Get shared MetaPrime instance to prevent multiple spawns."""
-    # META COMPLETELY DISABLED FOR EINSTEIN TESTING
-    class MockMeta:
-        def observe(self, *args, **kwargs):
-            pass
-        def __getattr__(self, name):
-            return lambda *args, **kwargs: None
-    return MockMeta()
+
+# PERMANENT META MOCK: Wheel strategy operates independently
+class _WheelMetaMock:
+    """Permanent meta mock for wheel strategy independence."""
     
-    # from ..meta import get_shared_meta
-    # meta = get_shared_meta()
-    # # Record wheel strategy usage
-    # meta.observe("wheel_strategy_meta_access", {"timestamp": datetime.now().isoformat()})
-    return meta
+    def observe(self, *args, **kwargs):
+        """No-op observation for wheel strategy metrics."""
+        pass
+    
+    def __getattr__(self, name):
+        """Return no-op function for any meta method."""
+        return lambda *args, **kwargs: None
+
+
+def get_meta():
+    """Get wheel strategy-specific meta mock instance."""
+    return _WheelMetaMock()
+
 
 from ..math import (
-    CalculationResult,
     black_scholes_price_validated,
     calculate_all_greeks,
     probability_itm_validated,
@@ -37,7 +37,13 @@ from ..math import (
 from ..models import Position, PositionType
 from ..risk import RiskAnalyzer
 from ..storage.cache.general_cache import cached
-from ..utils import RecoveryStrategy, StructuredLogger, get_logger, timed_operation, with_recovery
+from ..utils import (
+    RecoveryStrategy,
+    StructuredLogger,
+    get_logger,
+    timed_operation,
+    with_recovery,
+)
 from ..utils.position_sizing import DynamicPositionSizer
 
 logger = get_logger(__name__)
@@ -82,11 +88,15 @@ class WheelParameters:
         if self.roll_dte_threshold is None:
             self.roll_dte_threshold = config.strategy.roll_triggers.dte_threshold
         if self.roll_delta_threshold is None:
-            self.roll_delta_threshold = config.strategy.roll_triggers.delta_breach_threshold
+            self.roll_delta_threshold = (
+                config.strategy.roll_triggers.delta_breach_threshold
+            )
 
         # Validate parameters
         if not 0 < self.target_delta < 1:
-            raise ValueError(f"Target delta must be between 0 and 1, got {self.target_delta}")
+            raise ValueError(
+                f"Target delta must be between 0 and 1, got {self.target_delta}"
+            )
         if self.target_dte < 1:
             raise ValueError(f"Target DTE must be positive, got {self.target_dte}")
         if not 0 < self.max_position_size <= 1:
@@ -100,8 +110,8 @@ class WheelStrategy:
 
     def __init__(
         self,
-        parameters: Optional[WheelParameters] = None,
-        risk_analyzer: Optional[RiskAnalyzer] = None,
+        parameters: WheelParameters | None = None,
+        risk_analyzer: RiskAnalyzer | None = None,
     ):
         """Initialize wheel strategy."""
         self.params = parameters or WheelParameters()
@@ -122,12 +132,12 @@ class WheelStrategy:
     def find_optimal_put_strike(
         self,
         current_price: float,
-        available_strikes: List[float],
+        available_strikes: list[float],
         volatility: float,
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
         portfolio_value: float = 100000.0,
-    ) -> Optional[StrikeRecommendation]:
+    ) -> StrikeRecommendation | None:
         """
         Find optimal put strike with validation and confidence scoring.
 
@@ -166,12 +176,12 @@ class WheelStrategy:
     def find_optimal_put_strike_vectorized(
         self,
         current_price: float,
-        available_strikes: List[float],
+        available_strikes: list[float],
         volatility: float,
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
-        target_delta: Optional[float] = None,
-    ) -> Optional[StrikeRecommendation]:
+        target_delta: float | None = None,
+    ) -> StrikeRecommendation | None:
         """
         Vectorized version of find_optimal_put_strike for better performance.
         Processes all strikes at once using numpy arrays.
@@ -309,12 +319,12 @@ class WheelStrategy:
         self,
         current_price: float,
         cost_basis: float,
-        available_strikes: List[float],
+        available_strikes: list[float],
         volatility: float,
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
-        target_delta: Optional[float] = None,
-    ) -> Optional[StrikeRecommendation]:
+        target_delta: float | None = None,
+    ) -> StrikeRecommendation | None:
         """Vectorized version of find_optimal_call_strike."""
 
         if not available_strikes:
@@ -331,7 +341,9 @@ class WheelStrategy:
         config = get_config()
         max_moneyness = config.strategy.strike_range.max_moneyness
 
-        valid_mask = (strikes >= cost_basis) & (strikes <= current_price * max_moneyness)
+        valid_mask = (strikes >= cost_basis) & (
+            strikes <= current_price * max_moneyness
+        )
         strikes = strikes[valid_mask]
 
         if len(strikes) == 0:
@@ -403,7 +415,9 @@ class WheelStrategy:
             ]
         )
 
-        reason = f"Delta {best_delta:.2f} with {best_safety_margin:.1%} above cost basis"
+        reason = (
+            f"Delta {best_delta:.2f} with {best_safety_margin:.1%} above cost basis"
+        )
 
         logger.info(
             "Optimal call strike selected (vectorized)",
@@ -434,11 +448,11 @@ class WheelStrategy:
         self,
         current_price: float,
         cost_basis: float,
-        available_strikes: List[float],
+        available_strikes: list[float],
         volatility: float,
         days_to_expiry: int,
         risk_free_rate: float = 0.05,
-    ) -> Optional[StrikeRecommendation]:
+    ) -> StrikeRecommendation | None:
         """Find optimal call strike with vectorized implementation."""
 
         return self.find_optimal_call_strike_vectorized(
@@ -458,7 +472,7 @@ class WheelStrategy:
         strike_price: float,
         portfolio_value: float,
         current_margin_used: float = 0.0,
-    ) -> Tuple[int, float]:
+    ) -> tuple[int, float]:
         """
         Calculate position size with Kelly criterion and risk limits.
 
@@ -494,7 +508,7 @@ class WheelStrategy:
         current_price: float,
         days_to_expiry: int,
         current_greeks: dict[str, float],
-    ) -> Tuple[bool, str]:
+    ) -> tuple[bool, str]:
         """
         Determine if position should be rolled with reason.
 
@@ -527,7 +541,9 @@ class WheelStrategy:
 
         # Check moneyness
         config = get_config()
-        profit_threshold = config.strategy.roll_triggers.profit_threshold_2  # 95% threshold
+        profit_threshold = (
+            config.strategy.roll_triggers.profit_threshold_2
+        )  # 95% threshold
 
         if position.strike:
             if position.position_type == PositionType.PUT:
@@ -577,7 +593,7 @@ class WheelStrategy:
             return {"error": "Invalid position data"}
 
         # Calculate time to expiry
-        days_to_expiry = (position.expiration - datetime.now(timezone.utc).date()).days
+        days_to_expiry = (position.expiration - datetime.now(UTC).date()).days
         time_to_expiry = max(0, days_to_expiry / 365.0)
 
         # Calculate current Greeks
@@ -621,4 +637,6 @@ class WheelStrategy:
         )
 
         return metrics
+
+
 # Test comment to trigger meta observation

@@ -1,22 +1,57 @@
 {
   "cpu": {
-    "max_workers": 8,
+    "max_workers": 12,
+    "p_core_workers": 8,
+    "e_core_workers": 4,
     "batch_size": 2048,
-    "chunk_size": 65536
+    "chunk_size": 65536,
+    "enable_affinity": true
   },
   "memory": {
     "cache_size_mb": 4915,
     "buffer_size_mb": 7372,
-    "max_allocation_gb": 19
+    "max_allocation_gb": 19,
+    "lock_free_allocation": true,
+    "numa_aware": true,
+    "thread_local_pools": true
   },
   "gpu": {
     "preferred_backend": "mlx",
-    "batch_size": 4096,
-    "use_unified_memory": true
+    "batch_size": 1024,
+    "use_unified_memory": true,
+    "metal_cores": 20
   },
   "io": {
     "concurrent_reads": 24,
     "prefetch_size_mb": 64,
-    "use_mmap": true
+    "use_mmap": true,
+    "async_io": true
+  },
+  "parallel_processing": {
+    "target_speedup": 4.0,
+    "enable_numa": true,
+    "dynamic_load_balancing": true,
+    "adaptive_batch_sizing": true,
+    "contention_reduction": true,
+    "performance_monitoring": true,
+    "task_priority_scheduling": true
+  },
+  "analysis": {
+    "max_functions_per_file": 100,
+    "max_complexity_score": 50,
+    "performance_threshold": 1000,
+    "memory_threshold": 104857600,
+    "enable_ast_caching": true,
+    "parallel_processing": true,
+    "parallel_file_analysis": true,
+    "concurrent_parsing": true
+  },
+  "optimization_targets": {
+    "cpu_intensive_speedup": 4.0,
+    "memory_intensive_speedup": 2.5,
+    "io_bound_speedup": 10.0,
+    "mixed_workload_speedup": 4.0,
+    "cache_hit_rate": 0.85,
+    "memory_efficiency": 0.90
   }
 }

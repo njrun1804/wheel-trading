@@ -1,11 +1,9 @@
 """Data models for wheel strategy recommendations with full type safety."""
 from __future__ import annotations
 
-
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +27,7 @@ class AccountState:
     cash: float
     margin_available: float
     margin_used: float
-    external_loans: Dict[str, float] = field(default_factory=dict)
+    external_loans: dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate account state consistency."""
@@ -99,8 +97,8 @@ class Recommendation:
     expected_return: float
     risk_adjusted_return: float  # CAGR - 0.20 × |CVaR₉₅|
     position_size: float  # ½-Kelly sizing
-    reasoning: List[str]
-    metadata: Dict[str, float] = field(default_factory=dict)
+    reasoning: list[str]
+    metadata: dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate recommendation consistency."""

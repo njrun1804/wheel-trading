@@ -11,7 +11,7 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.config.loader import get_config, get_config_loader
+from src.config.loader import get_config_loader
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
     # Load configuration
     print("1. Loading configuration...")
     try:
-        loader = get_config_loader(os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml"))
+        loader = get_config_loader(os.getenv("WHEEL_CONFIG_PATH", "config.yaml"))
         config = loader.config
         print("✓ Configuration loaded successfully")
     except Exception as e:
@@ -40,7 +40,7 @@ def main():
     os.environ["WHEEL_STRATEGY__DELTA_TARGET"] = "0.25"
 
     # Reload to apply override
-    loader = get_config_loader(os.getenv("WHEEL_CONFIG_PATH", "config/unified.yaml"))
+    loader = get_config_loader(os.getenv("WHEEL_CONFIG_PATH", "config.yaml"))
     config = loader.config
     print(f"   New delta_target: {config.strategy.delta_target}")
     print(f"   Overrides applied: {len(loader.overrides)}")
@@ -71,11 +71,11 @@ def main():
     # Display some configuration values
     print("4. Current Configuration Values:")
     print(f"   Trading Mode: {config.trading.mode}")
-    print(f"   Risk Profile:")
+    print("   Risk Profile:")
     print(f"     - Max Position Size: {config.risk.max_position_size:.1%}")
     print(f"     - Kelly Fraction: {config.risk.kelly_fraction:.1%}")
     print(f"     - Max Drawdown: {config.risk.max_drawdown_percent:.1%}")
-    print(f"   Strategy:")
+    print("   Strategy:")
     print(f"     - Delta Target: {config.strategy.delta_target}")
     print(f"     - DTE Target: {config.strategy.days_to_expiry_target}")
     print(f"   ML Status: {'Enabled' if config.ml.enabled else 'Disabled'}")

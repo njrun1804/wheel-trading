@@ -21,7 +21,9 @@ print(f"Date range: {df.ts_event.min()} to {df.ts_event.max()}")
 print("\n=== VOLUME ANALYSIS (Liquidity Proxy) ===")
 volume_stats = df.groupby("symbol")["volume"].agg(["mean", "median", "max", "sum"])
 liquid_options = volume_stats[volume_stats["sum"] > 1000].index
-print(f"Options with >1000 total volume: {len(liquid_options):,} / {len(volume_stats):,}")
+print(
+    f"Options with >1000 total volume: {len(liquid_options):,} / {len(volume_stats):,}"
+)
 
 # Find most liquid strikes for current expirations
 print("\n=== MOST LIQUID STRIKES (by volume) ===")
@@ -64,7 +66,9 @@ for strike in target_strikes:
         if len(matches) > 0:
             total_vol = matches["volume"].sum()
             avg_spread = matches["hl_spread_pct"].mean()
-            print(f"  ${strike} @ {expiry}: Volume={total_vol:,}, H-L Spread={avg_spread:.1f}%")
+            print(
+                f"  ${strike} @ {expiry}: Volume={total_vol:,}, H-L Spread={avg_spread:.1f}%"
+            )
 
 # Analyze current portfolio from my_positions.yaml
 print("\n=== CURRENT POSITION ANALYSIS ===")

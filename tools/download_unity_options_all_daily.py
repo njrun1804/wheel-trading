@@ -9,7 +9,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import databento as db
 import duckdb
 import pandas as pd
 
@@ -17,14 +16,16 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", stream=sys.stdout
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
@@ -87,8 +88,8 @@ class UnityOptionsAllDailyDownloader:
         logger.info("=" * 60)
         logger.info("DOWNLOADING ALL UNITY OPTIONS - TRUE DAILY COVERAGE")
         logger.info("=" * 60)
-        logger.info(f"Dataset: OPRA.PILLAR")
-        logger.info(f"Symbol: U.OPT (using parent symbol)")
+        logger.info("Dataset: OPRA.PILLAR")
+        logger.info("Symbol: U.OPT (using parent symbol)")
         logger.info(f"Date range: {START} to {END}")
         logger.info("=" * 60)
 
@@ -105,7 +106,9 @@ class UnityOptionsAllDailyDownloader:
 
             try:
                 # Check if schema is available
-                available_schemas = self.client.client.metadata.list_schemas("OPRA.PILLAR")
+                available_schemas = self.client.client.metadata.list_schemas(
+                    "OPRA.PILLAR"
+                )
                 if schema not in available_schemas:
                     logger.warning(f"Schema {schema} not available, skipping...")
                     continue
@@ -193,9 +196,9 @@ class UnityOptionsAllDailyDownloader:
                     logger.info(f"Getting snapshot for {current_date}...")
 
                     # Use a very narrow time window at market close
-                    market_close = datetime.combine(current_date, datetime.min.time()).replace(
-                        hour=16, minute=0, second=0
-                    )
+                    market_close = datetime.combine(
+                        current_date, datetime.min.time()
+                    ).replace(hour=16, minute=0, second=0)
 
                     data = self.client.client.timeseries.get_range(
                         dataset="OPRA.PILLAR",
@@ -282,7 +285,9 @@ class UnityOptionsAllDailyDownloader:
                                 "high": self.convert_price(row.get("high_price")),
                                 "low": self.convert_price(row.get("low_price")),
                                 "close": self.convert_price(row.get("close_price")),
-                                "settlement": self.convert_price(row.get("settlement_price")),
+                                "settlement": self.convert_price(
+                                    row.get("settlement_price")
+                                ),
                                 "volume": row.get("volume", 0),
                                 "open_interest": row.get("open_interest", 0),
                                 "bid_close": self.convert_price(row.get("bid_close")),
@@ -363,7 +368,7 @@ class UnityOptionsAllDailyDownloader:
         if price is None:
             return None
         # Handle both integer fixed-point and float formats
-        if isinstance(price, (int, float)):
+        if isinstance(price, int | float):
             if price > 10000:
                 return float(price) / 10000.0
             elif price > 1000:
@@ -432,7 +437,9 @@ class UnityOptionsAllDailyDownloader:
                         elif coverage > 20:
                             logger.info("  ✅ Good coverage")
                         else:
-                            logger.info("  ⚠️  Limited coverage - Unity may have sparse trading")
+                            logger.info(
+                                "  ⚠️  Limited coverage - Unity may have sparse trading"
+                            )
 
             except Exception as e:
                 logger.debug(f"Error checking {table}: {e}")

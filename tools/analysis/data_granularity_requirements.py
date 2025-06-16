@@ -6,11 +6,9 @@ Daily? Minute? Tick? Let's find out.
 
 import math
 
-import numpy as np
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def analyze_wheel_strategy_needs():
@@ -57,27 +55,27 @@ def compare_data_requirements():
     bytes_per_record = 50
 
     print(f"\nFor {days} days of Unity data:")
-    print(f"\nDAILY BARS:")
+    print("\nDAILY BARS:")
     print(f"  Data points: {daily_points:,}")
     print(f"  Storage: {daily_points * bytes_per_record / 1024:.1f} KB")
-    print(f"  API calls: 3-4 (daily bar batches)")
+    print("  API calls: 3-4 (daily bar batches)")
 
-    print(f"\n15-MINUTE BARS:")
+    print("\n15-MINUTE BARS:")
     minute_15_points = days * hours_per_day * 4
     print(f"  Data points: {minute_15_points:,}")
     print(f"  Storage: {minute_15_points * bytes_per_record / 1024 / 1024:.1f} MB")
-    print(f"  API calls: ~100 (limited batch size)")
+    print("  API calls: ~100 (limited batch size)")
 
-    print(f"\nMINUTE BARS:")
+    print("\nMINUTE BARS:")
     print(f"  Data points: {minute_points:,}")
     print(f"  Storage: {minute_points * bytes_per_record / 1024 / 1024:.1f} MB")
-    print(f"  API calls: ~500+")
+    print("  API calls: ~500+")
 
-    print(f"\nTICK DATA:")
+    print("\nTICK DATA:")
     print(f"  Data points: {tick_points:,}")
     print(f"  Storage: {tick_points * bytes_per_record / 1024 / 1024 / 1024:.1f} GB")
-    print(f"  API calls: Thousands")
-    print(f"  Cost: $$$$ (tick data is expensive!)")
+    print("  API calls: Thousands")
+    print("  Cost: $$$$ (tick data is expensive!)")
 
 
 def calculate_risk_metrics_accuracy():
@@ -122,7 +120,7 @@ def show_actual_vol_calculations():
     intraday_multiplier = 1.3  # Typical for volatile stocks
     annual_vol_intraday = annual_vol_daily * intraday_multiplier
 
-    print(f"\nUnity volatility estimates:")
+    print("\nUnity volatility estimates:")
     print(f"From daily closes: {annual_vol_daily:.0%} annual")
     print(f"From intraday data: {annual_vol_intraday:.0%} annual")
 
@@ -130,13 +128,19 @@ def show_actual_vol_calculations():
     portfolio = config.trading.portfolio_value_000
     target_risk = 0.02  # 2% daily risk
 
-    position_size_daily = (target_risk * portfolio) / (annual_vol_daily / math.sqrt(252))
-    position_size_intraday = (target_risk * portfolio) / (annual_vol_intraday / math.sqrt(252))
+    position_size_daily = (target_risk * portfolio) / (
+        annual_vol_daily / math.sqrt(252)
+    )
+    position_size_intraday = (target_risk * portfolio) / (
+        annual_vol_intraday / math.sqrt(252)
+    )
 
-    print(f"\nPosition sizing impact:")
+    print("\nPosition sizing impact:")
     print(f"Using daily vol: ${position_size_daily:,.0f}")
     print(f"Using intraday vol: ${position_size_intraday:,.0f}")
-    print(f"Difference: ${position_size_daily - position_size_intraday:,.0f} smaller position")
+    print(
+        f"Difference: ${position_size_daily - position_size_intraday:,.0f} smaller position"
+    )
 
     print("\n⚠️ Using intraday data would make us too conservative!")
 

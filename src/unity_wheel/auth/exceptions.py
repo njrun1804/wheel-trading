@@ -2,14 +2,15 @@
 Authentication exceptions with self-recovery hints.
 """
 
-from typing import Optional
-
 
 class AuthError(Exception):
     """Base authentication exception."""
 
     def __init__(
-        self, message: str, recovery_action: Optional[str] = None, is_recoverable: bool = True
+        self,
+        message: str,
+        recovery_action: str | None = None,
+        is_recoverable: bool = True,
     ):
         super().__init__(message)
         self.recovery_action = recovery_action
@@ -21,16 +22,24 @@ class TokenExpiredError(AuthError):
 
     def __init__(self, message: str = "Access token expired"):
         super().__init__(
-            message, recovery_action="Refreshing token automatically", is_recoverable=True
+            message,
+            recovery_action="Refreshing token automatically",
+            is_recoverable=True,
         )
 
 
 class RateLimitError(AuthError):
     """API rate limit exceeded."""
 
-    def __init__(self, retry_after: Optional[int] = None, message: str = "Rate limit exceeded"):
+    def __init__(
+        self, retry_after: int | None = None, message: str = "Rate limit exceeded"
+    ):
         self.retry_after = retry_after
-        recovery = f"Retry after {retry_after}s" if retry_after else "Applying exponential backoff"
+        recovery = (
+            f"Retry after {retry_after}s"
+            if retry_after
+            else "Applying exponential backoff"
+        )
         super().__init__(message, recovery_action=recovery, is_recoverable=True)
 
 

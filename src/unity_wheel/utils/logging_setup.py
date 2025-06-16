@@ -1,6 +1,6 @@
 """Example of how to use project logging."""
-import logging.config
 import json
+import logging.config
 from pathlib import Path
 
 # Load logging configuration

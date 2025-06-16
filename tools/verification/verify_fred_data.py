@@ -3,9 +3,8 @@
 
 import asyncio
 from datetime import date as Date
-from datetime import timedelta
 
-from src.unity_wheel.data import FREDDataManager, WheelStrategyFREDSeries
+from src.unity_wheel.data import FREDDataManager
 from src.unity_wheel.storage.storage import Storage
 
 

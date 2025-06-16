@@ -12,9 +12,7 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
-from typing import Dict, List, Optional, Set, Tuple
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
@@ -26,14 +24,14 @@ from src.unity_wheel.data_providers.databento.client import DatabentoClient
 from src.unity_wheel.data_providers.databento.databento_storage_adapter import (
     DatabentoStorageAdapter,
 )
-from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
+from src.unity_wheel.storage.duckdb_cache import CacheConfig
 from src.unity_wheel.storage.storage import Storage, StorageConfig
 from src.unity_wheel.utils.logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
 
 
-def get_monthly_expirations(start_date: datetime, end_date: datetime) -> List[datetime]:
+def get_monthly_expirations(start_date: datetime, end_date: datetime) -> list[datetime]:
     """Get all 3rd Friday monthly expirations between start and end dates.
 
     Args:
@@ -55,7 +53,9 @@ def get_monthly_expirations(start_date: datetime, end_date: datetime) -> List[da
         third_friday = first_friday + timedelta(days=14)
 
         if start_date <= third_friday <= end_date:
-            expirations.append(third_friday.replace(hour=16, minute=0, second=0, microsecond=0))
+            expirations.append(
+                third_friday.replace(hour=16, minute=0, second=0, microsecond=0)
+            )
 
         # Move to next month
         if current.month == 12:
@@ -67,8 +67,8 @@ def get_monthly_expirations(start_date: datetime, end_date: datetime) -> List[da
 
 
 def get_strikes_for_price(
-    spot_price: float, moneyness_range: Tuple[float, float] = (0.70, 1.30)
-) -> List[float]:
+    spot_price: float, moneyness_range: tuple[float, float] = (0.70, 1.30)
+) -> list[float]:
     """Calculate strikes needed for a given spot price.
 
     Args:
@@ -111,7 +111,10 @@ async def collect_stock_data(
     Returns:
         DataFrame with OHLCV data
     """
-    logger.info("collecting_stock_data", extra={"start": start_date.date(), "end": end_date.date()})
+    logger.info(
+        "collecting_stock_data",
+        extra={"start": start_date.date(), "end": end_date.date()},
+    )
 
     try:
         # Use the historical client directly
@@ -131,7 +134,9 @@ async def collect_stock_data(
             # Divide prices by 1e9 for dollar price
             data.append(
                 {
-                    "date": datetime.fromtimestamp(record.ts_event / 1e9, tz=timezone.utc).date(),
+                    "date": datetime.fromtimestamp(
+                        record.ts_event / 1e9, tz=UTC
+                    ).date(),
                     "open": float(record.open) / 1e9,
                     "high": float(record.high) / 1e9,
                     "low": float(record.low) / 1e9,
@@ -146,7 +151,11 @@ async def collect_stock_data(
 
         logger.info(
             "stock_data_collected",
-            extra={"days": len(df), "min_price": df["low"].min(), "max_price": df["high"].max()},
+            extra={
+                "days": len(df),
+                "min_price": df["low"].min(),
+                "max_price": df["high"].max(),
+            },
         )
 
         # Store in database
@@ -201,12 +210,22 @@ async def store_stock_data(adapter: DatabentoStorageAdapter, df: pd.DataFrame) -
                     (symbol, date, open, high, low, close, volume, created_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
                 """,
-                    ["U", date, row["open"], row["high"], row["low"], row["close"], row["volume"]],
+                    [
+                        "U",
+                        date,
+                        row["open"],
+                        row["high"],
+                        row["low"],
+                        row["close"],
+                        row["volume"],
+                    ],
                 )
                 new_records += 1
 
         conn.commit()
-        logger.info(f"Added {new_records} new days to existing {count if existing else 0} days")
+        logger.info(
+            f"Added {new_records} new days to existing {count if existing else 0} days"
+        )
 
 
 async def collect_options_for_date(
@@ -214,8 +233,8 @@ async def collect_options_for_date(
     adapter: DatabentoStorageAdapter,
     trade_date: datetime,
     spot_price: float,
-    expirations: List[datetime],
-    stats: Dict,
+    expirations: list[datetime],
+    stats: dict,
 ) -> None:
     """Collect options data for a specific date.
 
@@ -257,12 +276,13 @@ async def collect_options_for_date(
     # Check if we should skip options collection
     skip_options = os.getenv("DATABENTO_SKIP_VALIDATION", "false").lower() == "true"
     if skip_options and options_collected == 0:  # Log once
-        logger.info("Skipping all options collection due to DATABENTO_SKIP_VALIDATION=true")
+        logger.info(
+            "Skipping all options collection due to DATABENTO_SKIP_VALIDATION=true"
+        )
         return
 
     for expiration in valid_expirations:
         try:
-
             # Get option chain
             chain = await client.get_option_chain(
                 underlying="U",
@@ -291,19 +311,31 @@ async def collect_options_for_date(
         except Exception as e:
             logger.error(
                 "option_collection_error",
-                extra={"date": trade_date.date(), "expiration": expiration.date(), "error": str(e)},
+                extra={
+                    "date": trade_date.date(),
+                    "expiration": expiration.date(),
+                    "error": str(e),
+                },
             )
-            stats["errors"].append(f"{trade_date.date()} - {expiration.date()}: {str(e)}")
+            stats["errors"].append(
+                f"{trade_date.date()} - {expiration.date()}: {str(e)}"
+            )
 
     if options_collected > 0:
         stats["successful_days"] += 1
         logger.info(
             "daily_options_collected",
-            extra={"date": trade_date.date(), "options": options_collected, "spot": spot_price},
+            extra={
+                "date": trade_date.date(),
+                "options": options_collected,
+                "spot": spot_price,
+            },
         )
 
 
-def filter_chain_by_strikes(chain, definitions, target_strikes: List[float]) -> Optional[Dict]:
+def filter_chain_by_strikes(
+    chain, definitions, target_strikes: list[float]
+) -> dict | None:
     """Filter option chain to only include target strikes.
 
     Args:
@@ -326,7 +358,9 @@ def filter_chain_by_strikes(chain, definitions, target_strikes: List[float]) -> 
     for put in chain.puts:
         if put.instrument_id in strike_map:
             strike = strike_map[put.instrument_id]
-            if strike in target_strikes or any(abs(strike - ts) < 0.01 for ts in target_strikes):
+            if strike in target_strikes or any(
+                abs(strike - ts) < 0.01 for ts in target_strikes
+            ):
                 filtered_puts.append(put)
                 # Find corresponding definition
                 for defn in definitions:
@@ -350,7 +384,7 @@ async def collect_all_options_data(
     stock_data: pd.DataFrame,
     start_date: datetime,
     end_date: datetime,
-) -> Dict:
+) -> dict:
     """Collect all options data based on dynamic stock prices.
 
     Args:
@@ -406,7 +440,7 @@ async def collect_all_options_data(
 
             # Create task for this date
             trade_date = datetime.combine(date, datetime.min.time()).replace(
-                hour=16, tzinfo=timezone.utc  # Market close
+                hour=16, tzinfo=UTC  # Market close
             )
 
             tasks.append(
@@ -438,7 +472,7 @@ async def collect_all_options_data(
     return stats
 
 
-async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
+async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> dict:
     """Validate that we have complete data coverage.
 
     Args:
@@ -530,7 +564,10 @@ async def validate_data_completeness(adapter: DatabentoStorageAdapter) -> Dict:
 async def main():
     """Main entry point for comprehensive data collection."""
     # Import SecretInjector to handle API key
-    from src.unity_wheel.secrets.integration import SecretInjector, get_databento_api_key
+    from src.unity_wheel.secrets.integration import (
+        SecretInjector,
+        get_databento_api_key,
+    )
 
     # Check if API key exists in secrets
     try:
@@ -576,10 +613,12 @@ async def main():
         try:
             # Step 1: Collect stock data
             print("\n📊 Step 1: Collecting Unity stock data...")
-            stock_start = datetime(2022, 1, 1, tzinfo=timezone.utc)
-            stock_end = datetime(2025, 6, 10, tzinfo=timezone.utc)  # TODAY
+            stock_start = datetime(2022, 1, 1, tzinfo=UTC)
+            stock_end = datetime(2025, 6, 10, tzinfo=UTC)  # TODAY
 
-            stock_data = await collect_stock_data(client, adapter, stock_start, stock_end)
+            stock_data = await collect_stock_data(
+                client, adapter, stock_start, stock_end
+            )
 
             print(f"✅ Collected {len(stock_data)} days of new stock data")
 
@@ -597,7 +636,8 @@ async def main():
 
                 # Convert to DataFrame for options collection
                 stock_data = pd.DataFrame(
-                    full_data, columns=["date", "open", "high", "low", "close", "volume"]
+                    full_data,
+                    columns=["date", "open", "high", "low", "close", "volume"],
                 )
                 stock_data.set_index("date", inplace=True)
 
@@ -612,14 +652,14 @@ async def main():
             print("   Using dynamic strikes based on daily prices")
             print("   Filtering to 21-49 DTE monthly expirations")
 
-            options_start = datetime(2023, 1, 1, tzinfo=timezone.utc)
-            options_end = datetime(2025, 6, 10, tzinfo=timezone.utc)
+            options_start = datetime(2023, 1, 1, tzinfo=UTC)
+            options_end = datetime(2025, 6, 10, tzinfo=UTC)
 
             stats = await collect_all_options_data(
                 client, adapter, stock_data, options_start, options_end
             )
 
-            print(f"\n✅ Options Collection Complete!")
+            print("\n✅ Options Collection Complete!")
             print(f"   Days processed: {stats['total_days']}")
             print(f"   Successful days: {stats['successful_days']}")
             print(f"   Options collected: {stats['options_collected']:,}")
@@ -641,26 +681,28 @@ async def main():
 
             print("\n📊 Data Coverage Summary")
             print("=" * 50)
-            print(f"Stock Data:")
+            print("Stock Data:")
             print(f"  Period: {stock_cov[0]} to {stock_cov[1]}")
             print(f"  Trading days: {stock_cov[2]}")
             print(f"  Years covered: {stock_cov[3]}")
             print(f"  Missing days: {validation['missing_days']}")
 
-            print(f"\nOptions Data:")
+            print("\nOptions Data:")
             print(f"  Period: {options_cov[0]} to {options_cov[1]}")
             print(f"  Days with data: {options_cov[2]}")
             print(f"  Unique expirations: {options_cov[3]}")
             print(f"  Total options: {options_cov[4]:,}")
             print(f"  Average spread: ${options_cov[5]:.3f}")
 
-            print(f"\nStrike Coverage by Price Range:")
+            print("\nStrike Coverage by Price Range:")
             for price_range, strikes, min_s, max_s in validation["strike_coverage"]:
-                print(f"  {price_range}: {strikes} strikes (${min_s:.2f} - ${max_s:.2f})")
+                print(
+                    f"  {price_range}: {strikes} strikes (${min_s:.2f} - ${max_s:.2f})"
+                )
 
             # Get storage statistics
             storage_stats = await adapter.get_storage_stats()
-            print(f"\n💾 Storage Statistics:")
+            print("\n💾 Storage Statistics:")
             print(f"  Database size: {storage_stats['db_size_mb']:.1f} MB")
             print(f"  Cache efficiency: {storage_stats['cache_hit_rate']:.1%}")
 

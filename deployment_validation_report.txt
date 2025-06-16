@@ -1,0 +1,73 @@
+================================================================================
+DEPLOYMENT VALIDATION REPORT
+================================================================================
+
+SUMMARY: 1/4 validation sections passed
+
+BUFFER STRIDE FIXES
+----------------------------------------
+tests_run: 4
+tests_passed: 4
+success_rate: 1.0
+detailed_results:
+  100x768: {'success': True, 'load_time_ms': 7.342100143432617, 'search_results': 10, 'buffer_aligned': True}
+  500x1536: {'success': True, 'load_time_ms': 0.5786418914794922, 'search_results': 10, 'buffer_aligned': True}
+  1000x384: {'success': True, 'load_time_ms': 0.3960132598876953, 'search_results': 10, 'buffer_aligned': True}
+  50x777: {'success': True, 'load_time_ms': 0.22912025451660156, 'search_results': 10, 'buffer_aligned': True}
+
+ANE ACCELERATION
+----------------------------------------
+hardware_detection:
+  ane_detected: True
+  ane_cores: 16
+  platform_type: apple_silicon
+configuration:
+  ane_enabled: True
+  batch_size: 256
+  cache_size_mb: 512
+  warmup_enabled: True
+  fallback_enabled: True
+neural_engine:
+  initialized: True
+  device_name: Apple Neural Engine (M4 Pro)
+  ane_available: True
+  cores: 16
+  preferred_batch_size: 256
+embedding_test:
+  success: True
+  processing_time_ms: 11.789798736572266
+  tokens_processed: 1536
+  device_used: Apple Neural Engine (M4 Pro)
+  cache_hit: False
+einstein_integration:
+  success: True
+  processing_time_ms: 30006.58392906189
+  texts_processed: 3
+  ane_calls: 0
+  fallback_calls: 1
+  ane_usage_percent: 0.0
+
+SYSTEM INTEGRATION
+----------------------------------------
+imports:
+  success: True
+  components: ['GPUAccelerator', 'MetalAcceleratedSearch', 'NeuralEngineTurbo', 'EinsteinANEPipeline', 'EinsteinConfig']
+configuration:
+  success: True
+  checks: {'ane_config_available': True, 'hardware_detection_updated': True, 'ane_enabled_when_available': True}
+fallback_mechanisms:
+  success: True
+  gpu_fallback_ready: True
+  metal_fallback_ready: True
+
+PERFORMANCE TESTS
+----------------------------------------
+gpu_acceleration:
+  success: True
+  gpu_utilization: 100.0
+  intelligent_routing_rate: 27.77777777777778
+  speedup: 0.2441921146091664
+  overhead_avoided_ms: 14.5
+ane_acceleration:
+  success: False
+  error: Embedding task task_1750080570361 timed out after 30.0s

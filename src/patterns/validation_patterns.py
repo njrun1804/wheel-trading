@@ -5,16 +5,15 @@ the codebase. Codex should follow these patterns for consistency.
 """
 from __future__ import annotations
 
-
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, TypeVar, Union
+from typing import TypeVar
 
 import numpy as np
 from pydantic import BaseModel, Field, validator
 
 from ..utils.logging import get_logger
-from ..utils.validate import die, validate_positive, validate_range
+from ..utils.validate import die, validate_positive
 
 logger = get_logger(__name__)
 
@@ -36,7 +35,7 @@ class MarketDataModel(BaseModel):
     ticker: str = Field(..., min_length=1, max_length=10)
     price: float = Field(..., gt=0, description="Current market price")
     volume: int = Field(0, ge=0, description="Trading volume")
-    volatility: Optional[float] = Field(None, ge=0, le=5.0)
+    volatility: float | None = Field(None, ge=0, le=5.0)
     timestamp: datetime = Field(default_factory=datetime.now)
 
     @validator("ticker")
@@ -53,7 +52,8 @@ class MarketDataModel(BaseModel):
             price = values.get("price", 0)
             if price < 10 and v > 2.0:
                 logger.warning(
-                    "High volatility for low-priced stock", extra={"price": price, "volatility": v}
+                    "High volatility for low-priced stock",
+                    extra={"price": price, "volatility": v},
                 )
         return v
 
@@ -74,7 +74,7 @@ def validate_trade_inputs(
     portfolio_value: float,
     position_size: float,
     max_position_pct: float = 0.20,
-) -> Optional[str]:
+) -> str | None:
     """
     Validate inputs with early returns for clarity.
 
@@ -85,10 +85,10 @@ def validate_trade_inputs(
     4. Log validation failures
     """
     # Basic type checks
-    if not isinstance(portfolio_value, (int, float)):
+    if not isinstance(portfolio_value, int | float):
         return "Portfolio value must be numeric"
 
-    if not isinstance(position_size, (int, float)):
+    if not isinstance(position_size, int | float):
         return "Position size must be numeric"
 
     # Value constraints
@@ -126,11 +126,16 @@ def validate_option_data(option_data: dict) -> dict:
     option_type = die(option_data.get("type"), "Option type required")
 
     # Validate numeric fields
-    strike = die(validate_positive(float(strike)), f"Strike must be positive, got {strike}")
+    strike = die(
+        validate_positive(float(strike)), f"Strike must be positive, got {strike}"
+    )
 
     # Validate option type
     option_type = option_type.lower()
-    die(option_type in ["call", "put"], f"Option type must be 'call' or 'put', got {option_type}")
+    die(
+        option_type in ["call", "put"],
+        f"Option type must be 'call' or 'put', got {option_type}",
+    )
 
     # Optional fields with defaults and validation
     bid = float(option_data.get("bid", 0))
@@ -138,7 +143,9 @@ def validate_option_data(option_data: dict) -> dict:
 
     # Validate bid/ask spread
     if bid > 0 and ask > 0 and bid > ask:
-        logger.warning("Inverted bid/ask spread", extra={"bid": bid, "ask": ask, "strike": strike})
+        logger.warning(
+            "Inverted bid/ask spread", extra={"bid": bid, "ask": ask, "strike": strike}
+        )
         # Swap them
         bid, ask = ask, bid
 
@@ -154,9 +161,9 @@ def validate_option_data(option_data: dict) -> dict:
 
 # PATTERN 4: Array validation for numerical computations
 def validate_price_series(
-    prices: Union[List[float], np.ndarray],
+    prices: list[float] | np.ndarray,
     min_length: int = 20,
-    max_length: Optional[int] = None,
+    max_length: int | None = None,
 ) -> np.ndarray:
     """
     Validate arrays for numerical computation.
@@ -172,7 +179,9 @@ def validate_price_series(
 
     # Check dimensions
     if prices.ndim != 1:
-        raise ValueError(f"Expected 1D array, got {prices.ndim}D with shape {prices.shape}")
+        raise ValueError(
+            f"Expected 1D array, got {prices.ndim}D with shape {prices.shape}"
+        )
 
     # Check length
     if len(prices) < min_length:
@@ -279,7 +288,7 @@ def validate_portfolio_state(portfolio: dict) -> dict:
 
 # PATTERN 6: Time-based validation
 def validate_option_expiry(
-    expiry: Union[str, datetime],
+    expiry: str | datetime,
     min_dte: int = 0,
     max_dte: int = 365,
 ) -> datetime:
@@ -292,7 +301,7 @@ def validate_option_expiry(
     3. Consider trading calendar
     4. Return standardized datetime
     """
-    from ..utils.trading_calendar import get_next_expiry_friday, is_trading_day
+    from ..utils.trading_calendar import is_trading_day
 
     # Parse expiry date
     if isinstance(expiry, str):
@@ -350,7 +359,8 @@ def validate_option_chain(chain_data: dict) -> dict:
     """
     # Basic validation
     underlying_price = die(
-        validate_positive(chain_data.get("underlying_price")), "Underlying price required"
+        validate_positive(chain_data.get("underlying_price")),
+        "Underlying price required",
     )
 
     calls = chain_data.get("calls", [])
@@ -388,7 +398,9 @@ def validate_option_chain(chain_data: dict) -> dict:
         )
 
     # Validate put-call parity at ATM
-    atm_strike = min(call_strikes + put_strikes, key=lambda x: abs(x - underlying_price))
+    atm_strike = min(
+        call_strikes + put_strikes, key=lambda x: abs(x - underlying_price)
+    )
 
     atm_call = next((c for c in calls if c["strike"] == atm_strike), None)
     atm_put = next((p for p in puts if p["strike"] == atm_strike), None)

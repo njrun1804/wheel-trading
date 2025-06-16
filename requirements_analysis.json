@@ -1,0 +1,7444 @@
+{
+  "summary": {
+    "total_files": 9,
+    "total_unique_packages": 243,
+    "total_declarations": 365
+  },
+  "files": {
+    "requirements.txt": {
+      "path": "requirements.txt",
+      "category": "core",
+      "dependencies": [
+        {
+          "name": "numpy",
+          "version_spec": ">=1.26.4,<2.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas",
+          "version_spec": ">=2.2.3",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "scipy",
+          "version_spec": ">=1.14.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "scikit-learn",
+          "version_spec": ">=1.5.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "databento",
+          "version_spec": ">=0.37.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "databento-dbn",
+          "version_spec": ">=0.37.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "yfinance",
+          "version_spec": ">=0.2.37",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "fredapi",
+          "version_spec": ">=0.5.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "duckdb",
+          "version_spec": ">=0.10.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pyarrow",
+          "version_spec": ">=14.0.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "polars",
+          "version_spec": ">=0.20.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "bottleneck",
+          "version_spec": ">=1.3.7",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numexpr",
+          "version_spec": ">=2.8.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiohttp",
+          "version_spec": ">=3.10.11",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "httpx",
+          "version_spec": ">=0.27.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "nest-asyncio",
+          "version_spec": ">=1.6.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "tenacity",
+          "version_spec": ">=8.2.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "torch",
+          "version_spec": ">=2.4.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\" and platform_machine == \"arm64\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mlx",
+          "version_spec": ">=0.0.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\" and platform_machine == \"arm64\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "hnswlib",
+          "version_spec": ">=0.8.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "usearch",
+          "version_spec": ">=2.9.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "opentelemetry-api",
+          "version_spec": ">=1.22.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "opentelemetry-sdk",
+          "version_spec": ">=1.22.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "opentelemetry-exporter-otlp",
+          "version_spec": ">=1.22.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "logfire",
+          "version_spec": ">=3.18.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas_market_calendars",
+          "version_spec": ">=4.0.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "exchange_calendars",
+          "version_spec": ">=4.2.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "quantlib",
+          "version_spec": ">=1.33",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic",
+          "version_spec": ">=2.7.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic-settings",
+          "version_spec": ">=2.6.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dotenv",
+          "version_spec": ">=1.0.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pyyaml",
+          "version_spec": ">=6.0.2",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "click",
+          "version_spec": ">=8.1.7",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "rich",
+          "version_spec": ">=13.7.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "typer",
+          "version_spec": ">=0.9.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "cryptography",
+          "version_spec": ">=45.0.4",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dateutil",
+          "version_spec": ">=2.9.0.post0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytz",
+          "version_spec": ">=2024.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "tzdata",
+          "version_spec": ">=2025.2",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "joblib",
+          "version_spec": ">=1.5.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "attrs",
+          "version_spec": ">=25.3.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "cffi",
+          "version_spec": ">=1.17.1",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\" and platform_python_implementation != \"PyPy\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "typing-extensions",
+          "version_spec": ">=4.14.0",
+          "conditions": [
+            "python_version >= \"3.12\" and python_version < \"4.0\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 43
+    },
+    "requirements_claude_integration.txt": {
+      "path": "requirements_claude_integration.txt",
+      "category": "claude_integration",
+      "dependencies": [
+        {
+          "name": "anthropic",
+          "version_spec": ">=0.40.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numpy",
+          "version_spec": ">=1.24.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "asyncio-mqtt",
+          "version_spec": ">=0.13.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mlx",
+          "version_spec": ">=0.15.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiofiles",
+          "version_spec": ">=23.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic",
+          "version_spec": ">=2.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 6
+    },
+    "requirements_bolt.txt": {
+      "path": "requirements_bolt.txt",
+      "category": "bolt_system",
+      "dependencies": [
+        {
+          "name": "click",
+          "version_spec": ">=8.0.0,<9.0.0",
+          "conditions": [],
+          "comment": "CLI framework",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "psutil",
+          "version_spec": ">=5.8.0,<6.0.0",
+          "conditions": [],
+          "comment": "System monitoring",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "rich",
+          "version_spec": ">=10.0.0,<14.0.0",
+          "conditions": [],
+          "comment": "Terminal output formatting",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic",
+          "version_spec": ">=2.0.0,<3.0.0",
+          "conditions": [],
+          "comment": "Data validation",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "tenacity",
+          "version_spec": ">=8.0.0,<9.0.0",
+          "conditions": [],
+          "comment": "Retry mechanisms",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "httpx",
+          "version_spec": ">=0.24.0,<1.0.0",
+          "conditions": [],
+          "comment": "HTTP client",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numpy",
+          "version_spec": ">=1.21.0,<2.0.0",
+          "conditions": [],
+          "comment": "Numerical operations",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas",
+          "version_spec": ">=1.3.0,<3.0.0",
+          "conditions": [],
+          "comment": "Data manipulation",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "scipy",
+          "version_spec": ">=1.7.0,<2.0.0",
+          "conditions": [],
+          "comment": "Scientific computing",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiofiles",
+          "version_spec": ">=0.7.0,<1.0.0",
+          "conditions": [],
+          "comment": "Async file operations",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "asyncio-mqtt",
+          "version_spec": ">=0.13.0,<1.0.0",
+          "conditions": [],
+          "comment": "MQTT async support (optional)",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "orjson",
+          "version_spec": ">=3.8.0,<4.0.0",
+          "conditions": [],
+          "comment": "Fast JSON serialization",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "lmdb",
+          "version_spec": ">=1.4.0,<2.0.0",
+          "conditions": [],
+          "comment": "Fast key-value storage",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "uvloop",
+          "version_spec": ">=0.17.0,<1.0.0",
+          "conditions": [
+            "sys_platform != \"win32\""
+          ],
+          "comment": "Better async loop",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mlx",
+          "version_spec": ">=0.0.1",
+          "conditions": [
+            "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mlx-lm",
+          "version_spec": ">=0.0.1",
+          "conditions": [
+            "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "torch",
+          "version_spec": ">=2.0.0",
+          "conditions": [
+            "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+          ],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pynvml",
+          "version_spec": ">=11.4.0,<12.0.0",
+          "conditions": [],
+          "comment": "NVIDIA GPU monitoring (optional)",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest",
+          "version_spec": ">=7.0.0,<8.0.0",
+          "conditions": [],
+          "comment": "Testing framework",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-asyncio",
+          "version_spec": ">=0.21.0,<1.0.0",
+          "conditions": [],
+          "comment": "Async testing support",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "black",
+          "version_spec": ">=22.0.0,<24.0.0",
+          "conditions": [],
+          "comment": "Code formatting (dev)",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mypy",
+          "version_spec": ">=1.0.0,<2.0.0",
+          "conditions": [],
+          "comment": "Type checking (dev)",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "cryptography",
+          "version_spec": ">=3.4.0,<42.0.0",
+          "conditions": [],
+          "comment": "Cryptographic operations",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dateutil",
+          "version_spec": ">=2.8.0,<3.0.0",
+          "conditions": [],
+          "comment": "Date parsing utilities",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytz",
+          "version_spec": ">=2022.1",
+          "conditions": [],
+          "comment": "Timezone handling",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "py-spy",
+          "version_spec": ">=0.3.0,<1.0.0",
+          "conditions": [],
+          "comment": "Performance profiling (optional)",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "memory-profiler",
+          "version_spec": ">=0.60.0,<1.0.0",
+          "conditions": [],
+          "comment": "Memory profiling (optional)",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 27
+    },
+    "requirements-dev.txt": {
+      "path": "requirements-dev.txt",
+      "category": "development",
+      "dependencies": [
+        {
+          "name": "pytest",
+          "version_spec": ">=8.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-cov",
+          "version_spec": ">=4.1.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-asyncio",
+          "version_spec": ">=0.23.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-mock",
+          "version_spec": ">=3.12.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "ruff",
+          "version_spec": ">=0.2.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "black",
+          "version_spec": ">=24.2.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "isort",
+          "version_spec": ">=5.13.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "ipython",
+          "version_spec": ">=8.20.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pre-commit",
+          "version_spec": ">=3.6.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [
+        "requirements.txt"
+      ],
+      "total_dependencies": 9
+    },
+    "requirements-ci.txt": {
+      "path": "requirements-ci.txt",
+      "category": "ci_cd",
+      "dependencies": [
+        {
+          "name": "aiohappyeyeballs",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiohttp",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiosignal",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "annotated-types",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "attrs",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "cffi",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "click",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "colorama",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "cryptography",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "duckdb",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "frozenlist",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "idna",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "joblib",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "markdown-it-py",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mdurl",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "multidict",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numpy",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "propcache",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pycparser",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic-core",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic-settings",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pygments",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dateutil",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dotenv",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytz",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pyyaml",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "requests",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "rich",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "scikit-learn",
+          "version_spec": ">=1.5.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "scipy",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "six",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "tenacity",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "threadpoolctl",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "tqdm",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "typing-extensions",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "tzdata",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "urllib3",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "yarl",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "databento",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "fredapi",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "yfinance",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "alpaca-py",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "matplotlib",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "seaborn",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "plotly",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mlflow",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "exchange-calendars",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas-market-calendars",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pyarrow",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "polars",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numba",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numexpr",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "asyncio",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "asyncpg",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiofiles",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "psutil",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "memory_profiler",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-cov",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-asyncio",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-mock",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "ruff",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "hypothesis",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "black",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "isort",
+          "version_spec": "",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 67
+    },
+    "bob/requirements.txt": {
+      "path": "bob/requirements.txt",
+      "category": "bob_system",
+      "dependencies": [
+        {
+          "name": "aiofiles",
+          "version_spec": ">=23.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "asyncio",
+          "version_spec": ">=3.4.3",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "click",
+          "version_spec": ">=8.1.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "fastapi",
+          "version_spec": ">=0.100.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "httpx",
+          "version_spec": ">=0.24.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic",
+          "version_spec": ">=2.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dotenv",
+          "version_spec": ">=1.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "rich",
+          "version_spec": ">=13.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "structlog",
+          "version_spec": ">=23.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "uvicorn",
+          "version_spec": ">=0.23.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "psutil",
+          "version_spec": ">=5.9.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pyyaml",
+          "version_spec": ">=6.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "duckdb",
+          "version_spec": ">=0.9.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numpy",
+          "version_spec": ">=1.24.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas",
+          "version_spec": ">=2.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest",
+          "version_spec": ">=7.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-asyncio",
+          "version_spec": ">=0.21.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "prometheus-client",
+          "version_spec": ">=0.17.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "opentelemetry-api",
+          "version_spec": ">=1.20.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "opentelemetry-sdk",
+          "version_spec": ">=1.20.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "black",
+          "version_spec": ">=23.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "flake8",
+          "version_spec": ">=6.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "mypy",
+          "version_spec": ">=1.5.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pre-commit",
+          "version_spec": ">=3.4.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 24
+    },
+    "mcp-servers/statsource/requirements.txt": {
+      "path": "mcp-servers/statsource/requirements.txt",
+      "category": "mcp_server",
+      "dependencies": [
+        {
+          "name": "mcp",
+          "version_spec": ">=0.2.0,<1.0.0",
+          "conditions": [],
+          "comment": "Official Model Context Protocol Python SDK with FastMCP",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "requests",
+          "version_spec": ">=2.31.0,<3.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pydantic",
+          "version_spec": ">=2.4.2,<3.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-dotenv",
+          "version_spec": ">=1.0.0,<2.0.0",
+          "conditions": [],
+          "comment": "For reading .env files (optional)",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "python-json-logger",
+          "version_spec": ">=2.0.7,<3.0.0",
+          "conditions": [],
+          "comment": "For structured logging (optional)",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 5
+    },
+    "tests/production/requirements-production-tests.txt": {
+      "path": "tests/production/requirements-production-tests.txt",
+      "category": "testing",
+      "dependencies": [
+        {
+          "name": "pytest",
+          "version_spec": ">=7.4.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-asyncio",
+          "version_spec": ">=0.21.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-timeout",
+          "version_spec": ">=2.1.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-cov",
+          "version_spec": ">=4.1.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pytest-xdist",
+          "version_spec": ">=3.3.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "psutil",
+          "version_spec": ">=5.9.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "memory-profiler",
+          "version_spec": ">=0.61.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "py-spy",
+          "version_spec": ">=0.3.14",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "rich",
+          "version_spec": ">=13.5.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "click",
+          "version_spec": ">=8.1.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "pandas",
+          "version_spec": ">=2.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "numpy",
+          "version_spec": ">=1.24.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "aiofiles",
+          "version_spec": ">=23.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "httpx",
+          "version_spec": ">=0.24.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "Faker",
+          "version_spec": ">=19.0.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "factory-boy",
+          "version_spec": ">=3.3.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "junitparser",
+          "version_spec": ">=3.1.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        },
+        {
+          "name": "coverage",
+          "version_spec": ">=7.3.0",
+          "conditions": [],
+          "comment": "",
+          "is_editable": false,
+          "is_git": false
+        }
+      ],
+      "includes": [],
+      "total_dependencies": 18
+    }
+  },
+  "packages": {
+    "numpy": {
+      "total_occurrences": 6,
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd",
+        "claude_integration"
+      ],
+      "versions": [
+        ">=1.26.4,<2.0",
+        ">=1.21.0,<2.0.0",
+        ">=1.24.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pandas": {
+      "total_occurrences": 5,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2.0.0",
+        ">=1.3.0,<3.0.0",
+        ">=2.2.3"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "scipy": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=1.14.0",
+        ">=1.7.0,<2.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "scikit-learn": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=1.5.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "databento": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=0.37.0",
+        "==0.57.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "databento-dbn": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=0.37.0",
+        "==0.36.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "yfinance": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=0.2.37"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "fredapi": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=0.5.1",
+        "==0.5.2"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "duckdb": {
+      "total_occurrences": 4,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=0.9.0",
+        ">=0.10.0",
+        "==1.3.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pyarrow": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=14.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "polars": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=0.20.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "bottleneck": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=1.3.7"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "numexpr": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2.8.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "aiohttp": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==3.12.12",
+        ">=3.10.11"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "httpx": {
+      "total_occurrences": 5,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=0.24.0",
+        "==0.28.1",
+        ">=0.24.0,<1.0.0",
+        ">=0.27.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "nest-asyncio": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=1.6.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "tenacity": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=8.2.0",
+        ">=8.0.0,<9.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "torch": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system"
+      ],
+      "versions": [
+        ">=2.4.0",
+        ">=2.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\" and platform_machine == \"arm64\""
+        ],
+        [
+          "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mlx": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "claude_integration"
+      ],
+      "versions": [
+        ">=0.0.1",
+        ">=0.15.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\" and platform_machine == \"arm64\""
+        ],
+        [
+          "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "hnswlib": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=0.8.0",
+        "==0.8.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "usearch": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=2.9.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "opentelemetry-api": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "core"
+      ],
+      "versions": [
+        ">=1.22.0",
+        ">=1.20.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "opentelemetry-sdk": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "core"
+      ],
+      "versions": [
+        ">=1.22.0",
+        ">=1.20.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "opentelemetry-exporter-otlp": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=1.22.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "logfire": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=3.18.0",
+        "==3.18.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pandas_market_calendars": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=4.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "exchange_calendars": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=4.2.0",
+        "==4.10.1"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "quantlib": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=1.33"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pydantic": {
+      "total_occurrences": 6,
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "bob_system",
+        "mcp_server",
+        "ci_cd",
+        "claude_integration"
+      ],
+      "versions": [
+        ">=2.4.2,<3.0.0",
+        ">=2.0.0",
+        ">=2.0.0,<3.0.0",
+        ">=2.7.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pydantic-settings": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2.6.1"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "python-dotenv": {
+      "total_occurrences": 4,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ],
+      "categories": [
+        "mcp_server",
+        "bob_system",
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=1.0.1",
+        ">=1.0.0,<2.0.0",
+        ">=1.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pyyaml": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=6.0",
+        ">=6.0.2"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "click": {
+      "total_occurrences": 6,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=8.1.7",
+        ">=8.1.0",
+        ">=8.0.0,<9.0.0",
+        "==8.2.1"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "rich": {
+      "total_occurrences": 5,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=13.0.0",
+        ">=10.0.0,<14.0.0",
+        ">=13.7.1",
+        ">=13.5.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "typer": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements.txt"
+      ],
+      "categories": [
+        "core"
+      ],
+      "versions": [
+        ">=0.9.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cryptography": {
+      "total_occurrences": 4,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "core",
+        "bolt_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=3.4.0,<42.0.0",
+        "==45.0.4",
+        ">=45.0.4"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "python-dateutil": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2.9.0.post0",
+        ">=2.8.0,<3.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytz": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "bolt_system",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2022.1",
+        ">=2024.1"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "tzdata": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2025.2"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "joblib": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==1.5.1",
+        ">=1.5.1"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "attrs": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=25.3.0",
+        "==25.3.0"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cffi": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=1.17.1",
+        "==1.17.1"
+      ],
+      "has_conflict": true,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\" and platform_python_implementation != \"PyPy\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "typing-extensions": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "core",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=4.14.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "python_version >= \"3.12\" and python_version < \"4.0\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "anthropic": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements_claude_integration.txt"
+      ],
+      "categories": [
+        "claude_integration"
+      ],
+      "versions": [
+        ">=0.40.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "asyncio-mqtt": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "claude_integration"
+      ],
+      "versions": [
+        ">=0.13.0",
+        ">=0.13.0,<1.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "aiofiles": {
+      "total_occurrences": 6,
+      "files": [
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd",
+        "updated_frozen",
+        "claude_integration"
+      ],
+      "versions": [
+        ">=23.0.0",
+        ">=0.7.0,<1.0.0",
+        "==24.1.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "psutil": {
+      "total_occurrences": 4,
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "bolt_system",
+        "ci_cd",
+        "testing"
+      ],
+      "versions": [
+        ">=5.8.0,<6.0.0",
+        ">=5.9.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "orjson": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "bolt_system"
+      ],
+      "versions": [
+        ">=3.8.0,<4.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "lmdb": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "bolt_system"
+      ],
+      "versions": [
+        ">=1.4.0,<2.0.0",
+        "==1.6.2"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "uvloop": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "bolt_system"
+      ],
+      "versions": [
+        ">=0.17.0,<1.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "sys_platform != \"win32\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mlx-lm": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "bolt_system"
+      ],
+      "versions": [
+        ">=0.0.1"
+      ],
+      "has_conflict": false,
+      "conditions": [
+        [
+          "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+        ]
+      ],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pynvml": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements_bolt.txt"
+      ],
+      "categories": [
+        "bolt_system"
+      ],
+      "versions": [
+        ">=11.4.0,<12.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytest": {
+      "total_occurrences": 5,
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd",
+        "development"
+      ],
+      "versions": [
+        ">=7.0.0,<8.0.0",
+        ">=8.0.0",
+        ">=7.4.0",
+        ">=7.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytest-asyncio": {
+      "total_occurrences": 5,
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "testing",
+        "bob_system",
+        "ci_cd",
+        "development"
+      ],
+      "versions": [
+        ">=0.21.0,<1.0.0",
+        ">=0.21.0",
+        ">=0.23.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "black": {
+      "total_occurrences": 5,
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-dev.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "bob_system",
+        "ci_cd",
+        "development",
+        "updated_frozen"
+      ],
+      "versions": [
+        "==25.1.0",
+        ">=23.0.0",
+        ">=22.0.0,<24.0.0",
+        ">=24.2.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mypy": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements_bolt.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "bolt_system"
+      ],
+      "versions": [
+        ">=1.5.0",
+        ">=1.0.0,<2.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "py-spy": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements_bolt.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "testing"
+      ],
+      "versions": [
+        ">=0.3.14",
+        ">=0.3.0,<1.0.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "memory-profiler": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements_bolt.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "bolt_system",
+        "testing"
+      ],
+      "versions": [
+        ">=0.60.0,<1.0.0",
+        ">=0.61.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytest-cov": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "development",
+        "ci_cd",
+        "testing"
+      ],
+      "versions": [
+        ">=4.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytest-mock": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "development",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=3.12.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "ruff": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "development",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=0.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "isort": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-dev.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "development",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=5.13.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "ipython": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-dev.txt"
+      ],
+      "categories": [
+        "development"
+      ],
+      "versions": [
+        ">=8.20.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pre-commit": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-dev.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "development",
+        "bob_system"
+      ],
+      "versions": [
+        ">=3.4.0",
+        ">=3.6.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "absl-py": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.3.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "aiohappyeyeballs": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==2.6.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "aioitertools": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.12.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "aiosignal": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==1.3.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "aiosqlite": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.21.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "alembic": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.16.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "alpaca-py": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==0.40.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "annotated-types": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==0.7.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "anyio": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.9.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "appdirs": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.4.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "argcomplete": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.6.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "arize-phoenix": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==10.11.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "arize-phoenix-client": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.10.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "arize-phoenix-evals": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.20.8"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "arize-phoenix-otel": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.10.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "ast-comments": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.2.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "asttokens": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "astunparse": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.6.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "asyncio": {
+      "total_occurrences": 3,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=3.4.3",
+        "==3.4.3"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "asyncpg": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==0.30.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Authlib": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.6.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "backoff": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.2.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "backports.tarfile": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "beautifulsoup4": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.13.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "blinker": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.9.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "boolean.py": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==5.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "boto3-stubs": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.38.35"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "botocore-stubs": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.38.30"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Bottleneck": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.5.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "build": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.2.2.post1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "CacheControl": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.14.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cachetools": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==5.5.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Cerberus": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.3.7"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "certifi": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2025.4.26"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cfgv": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.4.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "charset-normalizer": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.4.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "clarabel": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.11.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cleo": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cloudpickle": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.1.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "colorama": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==0.4.6"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "colorlog": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==6.9.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "contourpy": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.3.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "coverage": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "testing"
+      ],
+      "versions": [
+        "==7.8.2",
+        ">=7.3.0"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "crashtest": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.4.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "curl_cffi": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.11.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cvxpy": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.6.6"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cycler": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.12.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "cyclonedx-python-lib": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==9.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "dash": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.0.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "databricks-sdk": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.56.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "db-dtypes": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.4.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "defusedxml": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.7.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "distlib": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.9"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "distro": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.9.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "dnspython": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.7.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "docker": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==7.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "docstring_parser": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.16"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "dulwich": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.22.8"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "einops": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.8.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "email_validator": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "executing": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "faiss-cpu": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.11.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "fastapi": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=0.100.0",
+        "==0.115.12"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "fastjsonschema": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.21.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "filelock": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.18.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "findpython": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.6.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Flask": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.0.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "flatbuffers": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==25.2.10"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "fonttools": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.58.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "frozendict": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.4.6"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "frozenlist": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==1.6.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "fsspec": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2025.5.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "gast": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.6.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "gitdb": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.0.12"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "GitPython": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.1.44"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-api-core": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.25.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-auth": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.40.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-auth-oauthlib": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.2.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-cloud-bigquery": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.34.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-cloud-core": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.4.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-cloud-pubsub": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.29.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-cloud-secret-manager": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.24.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-crc32c": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.7.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-pasta": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "google-resumable-media": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.7.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "googleapis-common-protos": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.70.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "graphene": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.4.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "graphql-core": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.2.6"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "graphql-relay": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "greenlet": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.2.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "grpc-google-iam-v1": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.14.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "grpc-interceptor": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.15.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "grpcio": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.72.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "grpcio-status": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.72.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "gunicorn": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==23.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "h11": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.16.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "h5py": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.14.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "hf-xet": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.1.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "hmmlearn": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "httpcore": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.0.9"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "httpie": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.2.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "httpx-sse": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.4.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "huggingface-hub": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.33.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "hypothesis": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==6.135.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "icecream": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.1.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "identify": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.6.12"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "idna": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==3.10"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "importlib_metadata": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==8.7.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "iniconfig": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "installer": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.7.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "itsdangerous": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jaraco.classes": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.4.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jaraco.context": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==6.0.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jaraco.functools": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jax": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.6.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jax-metal": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.1.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jaxlib": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.6.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jedi": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.19.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Jinja2": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.1.6"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jiter": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.10.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jsonpatch": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.33"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jsonpointer": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jsonschema": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.24.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "jsonschema-specifications": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==2025.4.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "kaleido": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.2.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "keras": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.10.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "keyring": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==25.6.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "kiwisolver": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.4.8"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "korean-lunar-calendar": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "langchain": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.25"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "langchain-core": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.65"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "langchain-mcp-adapters": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.1.7"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "langchain-openai": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.22"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "langchain-text-splitters": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.8"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "langsmith": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.3.45"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Levenshtein": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.27.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "libclang": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==18.1.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "libcst": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.8.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "license-expression": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==30.4.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "line_profiler": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==4.2.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "litellm": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.72.4"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "llvmlite": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.44.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Mako": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==1.3.10"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mando": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==0.7.1"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Markdown": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.8"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "markdown-it-py": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==3.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "MarkupSafe": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "==3.0.2"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "matplotlib": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "updated_frozen",
+        "ci_cd"
+      ],
+      "versions": [
+        "==3.10.3"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mcp": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-updated.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ],
+      "categories": [
+        "mcp_server",
+        "updated_frozen"
+      ],
+      "versions": [
+        ">=0.2.0,<1.0.0",
+        "==1.9.4"
+      ],
+      "has_conflict": true,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mcp-py-repl@5154a17c10f8813def4f6c5fc36b693b57ff518d": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-updated.txt"
+      ],
+      "categories": [
+        "updated_frozen"
+      ],
+      "versions": [
+        "git+https://github.com/evalstate/mcp-py-repl.git@5154a17c10f8813def4f6c5fc36b693b57ff518d"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": true,
+      "is_editable": true
+    },
+    "mdurl": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "multidict": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "propcache": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pycparser": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pydantic-core": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pygments": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "requests": {
+      "total_occurrences": 2,
+      "files": [
+        "requirements-ci.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ],
+      "categories": [
+        "mcp_server",
+        "ci_cd"
+      ],
+      "versions": [
+        ">=2.31.0,<3.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "six": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "threadpoolctl": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "tqdm": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "urllib3": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "yarl": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "seaborn": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "plotly": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "mlflow": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "exchange-calendars": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pandas-market-calendars": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "numba": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "memory_profiler": {
+      "total_occurrences": 1,
+      "files": [
+        "requirements-ci.txt"
+      ],
+      "categories": [
+        "ci_cd"
+      ],
+      "versions": [],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "structlog": {
+      "total_occurrences": 1,
+      "files": [
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system"
+      ],
+      "versions": [
+        ">=23.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "uvicorn": {
+      "total_occurrences": 1,
+      "files": [
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system"
+      ],
+      "versions": [
+        ">=0.23.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "prometheus-client": {
+      "total_occurrences": 1,
+      "files": [
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system"
+      ],
+      "versions": [
+        ">=0.17.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "flake8": {
+      "total_occurrences": 1,
+      "files": [
+        "bob/requirements.txt"
+      ],
+      "categories": [
+        "bob_system"
+      ],
+      "versions": [
+        ">=6.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "python-json-logger": {
+      "total_occurrences": 1,
+      "files": [
+        "mcp-servers/statsource/requirements.txt"
+      ],
+      "categories": [
+        "mcp_server"
+      ],
+      "versions": [
+        ">=2.0.7,<3.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytest-timeout": {
+      "total_occurrences": 1,
+      "files": [
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "versions": [
+        ">=2.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "pytest-xdist": {
+      "total_occurrences": 1,
+      "files": [
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "versions": [
+        ">=3.3.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "Faker": {
+      "total_occurrences": 1,
+      "files": [
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "versions": [
+        ">=19.0.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "factory-boy": {
+      "total_occurrences": 1,
+      "files": [
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "versions": [
+        ">=3.3.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    },
+    "junitparser": {
+      "total_occurrences": 1,
+      "files": [
+        "tests/production/requirements-production-tests.txt"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "versions": [
+        ">=3.1.0"
+      ],
+      "has_conflict": false,
+      "conditions": [],
+      "is_git": false,
+      "is_editable": false
+    }
+  },
+  "categories": {
+    "core": [
+      "requirements.txt"
+    ],
+    "development": [
+      "requirements-dev.txt"
+    ],
+    "testing": [
+      "tests/production/requirements-production-tests.txt"
+    ],
+    "ci_cd": [
+      "requirements-ci.txt"
+    ],
+    "claude_integration": [
+      "requirements_claude_integration.txt"
+    ],
+    "bolt_system": [
+      "requirements_bolt.txt"
+    ],
+    "bob_system": [
+      "bob/requirements.txt"
+    ],
+    "mcp_server": [
+      "mcp-servers/statsource/requirements.txt"
+    ],
+    "updated_frozen": [
+      "requirements-updated.txt"
+    ],
+    "other": []
+  },
+  "version_patterns": {
+    "exact_pin": [
+      "absl-py",
+      "aiofiles",
+      "aiohappyeyeballs",
+      "aiohttp",
+      "aioitertools",
+      "aiosignal",
+      "aiosqlite",
+      "alembic",
+      "alpaca-py",
+      "annotated-types",
+      "anyio",
+      "appdirs",
+      "argcomplete",
+      "arize-phoenix",
+      "arize-phoenix-client",
+      "arize-phoenix-evals",
+      "arize-phoenix-otel",
+      "ast-comments",
+      "asttokens",
+      "astunparse",
+      "asyncio",
+      "asyncpg",
+      "attrs",
+      "Authlib",
+      "backoff",
+      "backports.tarfile",
+      "beautifulsoup4",
+      "black",
+      "blinker",
+      "boolean.py",
+      "boto3-stubs",
+      "botocore-stubs",
+      "Bottleneck",
+      "build",
+      "CacheControl",
+      "cachetools",
+      "Cerberus",
+      "certifi",
+      "cffi",
+      "cfgv",
+      "charset-normalizer",
+      "clarabel",
+      "cleo",
+      "click",
+      "cloudpickle",
+      "colorama",
+      "colorlog",
+      "contourpy",
+      "coverage",
+      "crashtest",
+      "cryptography",
+      "curl_cffi",
+      "cvxpy",
+      "cycler",
+      "cyclonedx-python-lib",
+      "dash",
+      "databento",
+      "databento-dbn",
+      "databricks-sdk",
+      "db-dtypes",
+      "defusedxml",
+      "distlib",
+      "distro",
+      "dnspython",
+      "docker",
+      "docstring_parser",
+      "duckdb",
+      "dulwich",
+      "einops",
+      "email_validator",
+      "exchange_calendars",
+      "executing",
+      "faiss-cpu",
+      "fastapi",
+      "fastjsonschema",
+      "filelock",
+      "findpython",
+      "Flask",
+      "flatbuffers",
+      "fonttools",
+      "fredapi",
+      "frozendict",
+      "frozenlist",
+      "fsspec",
+      "gast",
+      "gitdb",
+      "GitPython",
+      "google-api-core",
+      "google-auth",
+      "google-auth-oauthlib",
+      "google-cloud-bigquery",
+      "google-cloud-core",
+      "google-cloud-pubsub",
+      "google-cloud-secret-manager",
+      "google-crc32c",
+      "google-pasta",
+      "google-resumable-media",
+      "googleapis-common-protos",
+      "graphene",
+      "graphql-core",
+      "graphql-relay",
+      "greenlet",
+      "grpc-google-iam-v1",
+      "grpc-interceptor",
+      "grpcio",
+      "grpcio-status",
+      "gunicorn",
+      "h11",
+      "h5py",
+      "hf-xet",
+      "hmmlearn",
+      "hnswlib",
+      "httpcore",
+      "httpie",
+      "httpx",
+      "httpx-sse",
+      "huggingface-hub",
+      "hypothesis",
+      "icecream",
+      "identify",
+      "idna",
+      "importlib_metadata",
+      "iniconfig",
+      "installer",
+      "itsdangerous",
+      "jaraco.classes",
+      "jaraco.context",
+      "jaraco.functools",
+      "jax",
+      "jax-metal",
+      "jaxlib",
+      "jedi",
+      "Jinja2",
+      "jiter",
+      "joblib",
+      "jsonpatch",
+      "jsonpointer",
+      "jsonschema",
+      "jsonschema-specifications",
+      "kaleido",
+      "keras",
+      "keyring",
+      "kiwisolver",
+      "korean-lunar-calendar",
+      "langchain",
+      "langchain-core",
+      "langchain-mcp-adapters",
+      "langchain-openai",
+      "langchain-text-splitters",
+      "langsmith",
+      "Levenshtein",
+      "libclang",
+      "libcst",
+      "license-expression",
+      "line_profiler",
+      "litellm",
+      "llvmlite",
+      "lmdb",
+      "logfire",
+      "Mako",
+      "mando",
+      "Markdown",
+      "markdown-it-py",
+      "MarkupSafe",
+      "matplotlib",
+      "mcp"
+    ],
+    "minimum_version": [
+      "pandas",
+      "scipy",
+      "scikit-learn",
+      "databento",
+      "databento-dbn",
+      "yfinance",
+      "fredapi",
+      "duckdb",
+      "pyarrow",
+      "polars",
+      "bottleneck",
+      "numexpr",
+      "aiohttp",
+      "httpx",
+      "nest-asyncio",
+      "tenacity",
+      "torch",
+      "mlx",
+      "hnswlib",
+      "usearch",
+      "opentelemetry-api",
+      "opentelemetry-sdk",
+      "opentelemetry-exporter-otlp",
+      "logfire",
+      "pandas_market_calendars",
+      "exchange_calendars",
+      "quantlib",
+      "pydantic",
+      "pydantic-settings",
+      "python-dotenv",
+      "pyyaml",
+      "click",
+      "rich",
+      "typer",
+      "cryptography",
+      "python-dateutil",
+      "pytz",
+      "tzdata",
+      "joblib",
+      "attrs",
+      "cffi",
+      "typing-extensions",
+      "anthropic",
+      "numpy",
+      "asyncio-mqtt",
+      "aiofiles",
+      "mlx-lm",
+      "pytest",
+      "pytest-cov",
+      "pytest-asyncio",
+      "pytest-mock",
+      "ruff",
+      "black",
+      "isort",
+      "ipython",
+      "pre-commit",
+      "asyncio",
+      "fastapi",
+      "structlog",
+      "uvicorn",
+      "psutil",
+      "prometheus-client",
+      "flake8",
+      "mypy",
+      "pytest-timeout",
+      "pytest-xdist",
+      "memory-profiler",
+      "py-spy",
+      "Faker",
+      "factory-boy",
+      "junitparser",
+      "coverage"
+    ],
+    "range_constraint": [
+      "numpy",
+      "click",
+      "psutil",
+      "rich",
+      "pydantic",
+      "tenacity",
+      "httpx",
+      "pandas",
+      "scipy",
+      "aiofiles",
+      "asyncio-mqtt",
+      "orjson",
+      "lmdb",
+      "uvloop",
+      "pynvml",
+      "pytest",
+      "pytest-asyncio",
+      "black",
+      "mypy",
+      "cryptography",
+      "python-dateutil",
+      "py-spy",
+      "memory-profiler",
+      "mcp",
+      "requests",
+      "python-dotenv",
+      "python-json-logger"
+    ],
+    "compatible_release": [],
+    "no_version": [
+      "aiohappyeyeballs",
+      "aiohttp",
+      "aiosignal",
+      "annotated-types",
+      "attrs",
+      "cffi",
+      "click",
+      "colorama",
+      "cryptography",
+      "duckdb",
+      "frozenlist",
+      "idna",
+      "joblib",
+      "markdown-it-py",
+      "mdurl",
+      "multidict",
+      "numpy",
+      "pandas",
+      "propcache",
+      "pycparser",
+      "pydantic",
+      "pydantic-core",
+      "pydantic-settings",
+      "pygments",
+      "python-dateutil",
+      "python-dotenv",
+      "pytz",
+      "pyyaml",
+      "requests",
+      "rich",
+      "scipy",
+      "six",
+      "tenacity",
+      "threadpoolctl",
+      "tqdm",
+      "typing-extensions",
+      "tzdata",
+      "urllib3",
+      "yarl",
+      "databento",
+      "fredapi",
+      "yfinance",
+      "alpaca-py",
+      "matplotlib",
+      "seaborn",
+      "plotly",
+      "mlflow",
+      "exchange-calendars",
+      "pandas-market-calendars",
+      "pyarrow",
+      "polars",
+      "numba",
+      "numexpr",
+      "asyncio",
+      "asyncpg",
+      "aiofiles",
+      "psutil",
+      "memory_profiler",
+      "pytest",
+      "pytest-cov",
+      "pytest-asyncio",
+      "pytest-mock",
+      "ruff",
+      "hypothesis",
+      "black",
+      "isort"
+    ]
+  },
+  "platform_dependencies": [
+    {
+      "package": "numpy",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pandas",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "scipy",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "scikit-learn",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "databento",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "databento-dbn",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "yfinance",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "fredapi",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "duckdb",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pyarrow",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "polars",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "bottleneck",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "numexpr",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "aiohttp",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "httpx",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "nest-asyncio",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "tenacity",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "torch",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\" and platform_machine == \"arm64\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "mlx",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\" and platform_machine == \"arm64\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "hnswlib",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "usearch",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "opentelemetry-api",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "opentelemetry-sdk",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "opentelemetry-exporter-otlp",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "logfire",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pandas_market_calendars",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "exchange_calendars",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "quantlib",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\" and sys_platform == \"darwin\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pydantic",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pydantic-settings",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "python-dotenv",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pyyaml",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "click",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "rich",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "typer",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "cryptography",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "python-dateutil",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "pytz",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "tzdata",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "joblib",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "attrs",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "cffi",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\" and platform_python_implementation != \"PyPy\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "typing-extensions",
+      "conditions": [
+        "python_version >= \"3.12\" and python_version < \"4.0\""
+      ],
+      "file": "requirements.txt"
+    },
+    {
+      "package": "uvloop",
+      "conditions": [
+        "sys_platform != \"win32\""
+      ],
+      "file": "requirements_bolt.txt"
+    },
+    {
+      "package": "mlx",
+      "conditions": [
+        "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+      ],
+      "file": "requirements_bolt.txt"
+    },
+    {
+      "package": "mlx-lm",
+      "conditions": [
+        "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+      ],
+      "file": "requirements_bolt.txt"
+    },
+    {
+      "package": "torch",
+      "conditions": [
+        "sys_platform == \"darwin\" and platform_machine == \"arm64\""
+      ],
+      "file": "requirements_bolt.txt"
+    }
+  ],
+  "git_dependencies": [],
+  "conflicts": [
+    {
+      "package": "numpy",
+      "versions": [
+        ">=1.26.4,<2.0",
+        ">=1.21.0,<2.0.0",
+        ">=1.24.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pandas",
+      "versions": [
+        ">=2.0.0",
+        ">=1.3.0,<3.0.0",
+        ">=2.2.3"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "scipy",
+      "versions": [
+        ">=1.14.0",
+        ">=1.7.0,<2.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "databento",
+      "versions": [
+        ">=0.37.0",
+        "==0.57.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "databento-dbn",
+      "versions": [
+        ">=0.37.0",
+        "==0.36.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ]
+    },
+    {
+      "package": "fredapi",
+      "versions": [
+        ">=0.5.1",
+        "==0.5.2"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "duckdb",
+      "versions": [
+        ">=0.9.0",
+        ">=0.10.0",
+        "==1.3.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "aiohttp",
+      "versions": [
+        "==3.12.12",
+        ">=3.10.11"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "httpx",
+      "versions": [
+        ">=0.24.0",
+        "==0.28.1",
+        ">=0.24.0,<1.0.0",
+        ">=0.27.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "tenacity",
+      "versions": [
+        ">=8.2.0",
+        ">=8.0.0,<9.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "torch",
+      "versions": [
+        ">=2.4.0",
+        ">=2.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "mlx",
+      "versions": [
+        ">=0.0.1",
+        ">=0.15.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "hnswlib",
+      "versions": [
+        ">=0.8.0",
+        "==0.8.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ]
+    },
+    {
+      "package": "opentelemetry-api",
+      "versions": [
+        ">=1.22.0",
+        ">=1.20.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "opentelemetry-sdk",
+      "versions": [
+        ">=1.22.0",
+        ">=1.20.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "logfire",
+      "versions": [
+        ">=3.18.0",
+        "==3.18.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ]
+    },
+    {
+      "package": "exchange_calendars",
+      "versions": [
+        ">=4.2.0",
+        "==4.10.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt"
+      ]
+    },
+    {
+      "package": "pydantic",
+      "versions": [
+        ">=2.4.2,<3.0.0",
+        ">=2.0.0",
+        ">=2.0.0,<3.0.0",
+        ">=2.7.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ]
+    },
+    {
+      "package": "python-dotenv",
+      "versions": [
+        ">=1.0.1",
+        ">=1.0.0,<2.0.0",
+        ">=1.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ]
+    },
+    {
+      "package": "pyyaml",
+      "versions": [
+        ">=6.0",
+        ">=6.0.2"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "click",
+      "versions": [
+        ">=8.1.7",
+        ">=8.1.0",
+        ">=8.0.0,<9.0.0",
+        "==8.2.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "rich",
+      "versions": [
+        ">=13.0.0",
+        ">=10.0.0,<14.0.0",
+        ">=13.7.1",
+        ">=13.5.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "cryptography",
+      "versions": [
+        ">=3.4.0,<42.0.0",
+        "==45.0.4",
+        ">=45.0.4"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "python-dateutil",
+      "versions": [
+        ">=2.9.0.post0",
+        ">=2.8.0,<3.0.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "pytz",
+      "versions": [
+        ">=2022.1",
+        ">=2024.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements_bolt.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "joblib",
+      "versions": [
+        "==1.5.1",
+        ">=1.5.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "attrs",
+      "versions": [
+        ">=25.3.0",
+        "==25.3.0"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "cffi",
+      "versions": [
+        ">=1.17.1",
+        "==1.17.1"
+      ],
+      "files": [
+        "requirements.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt"
+      ]
+    },
+    {
+      "package": "asyncio-mqtt",
+      "versions": [
+        ">=0.13.0",
+        ">=0.13.0,<1.0.0"
+      ],
+      "files": [
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt"
+      ]
+    },
+    {
+      "package": "aiofiles",
+      "versions": [
+        ">=23.0.0",
+        ">=0.7.0,<1.0.0",
+        "==24.1.0"
+      ],
+      "files": [
+        "requirements_claude_integration.txt",
+        "requirements_bolt.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "psutil",
+      "versions": [
+        ">=5.8.0,<6.0.0",
+        ">=5.9.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "lmdb",
+      "versions": [
+        ">=1.4.0,<2.0.0",
+        "==1.6.2"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-updated.txt"
+      ]
+    },
+    {
+      "package": "pytest",
+      "versions": [
+        ">=7.0.0,<8.0.0",
+        ">=8.0.0",
+        ">=7.4.0",
+        ">=7.0.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pytest-asyncio",
+      "versions": [
+        ">=0.21.0,<1.0.0",
+        ">=0.21.0",
+        ">=0.23.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-dev.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "black",
+      "versions": [
+        "==25.1.0",
+        ">=23.0.0",
+        ">=22.0.0,<24.0.0",
+        ">=24.2.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "requirements-dev.txt",
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "mypy",
+      "versions": [
+        ">=1.5.0",
+        ">=1.0.0,<2.0.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "py-spy",
+      "versions": [
+        ">=0.3.14",
+        ">=0.3.0,<1.0.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "memory-profiler",
+      "versions": [
+        ">=0.60.0,<1.0.0",
+        ">=0.61.0"
+      ],
+      "files": [
+        "requirements_bolt.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "pre-commit",
+      "versions": [
+        ">=3.4.0",
+        ">=3.6.0"
+      ],
+      "files": [
+        "requirements-dev.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "asyncio",
+      "versions": [
+        ">=3.4.3",
+        "==3.4.3"
+      ],
+      "files": [
+        "requirements-updated.txt",
+        "requirements-ci.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "coverage",
+      "versions": [
+        "==7.8.2",
+        ">=7.3.0"
+      ],
+      "files": [
+        "requirements-updated.txt",
+        "tests/production/requirements-production-tests.txt"
+      ]
+    },
+    {
+      "package": "fastapi",
+      "versions": [
+        ">=0.100.0",
+        "==0.115.12"
+      ],
+      "files": [
+        "requirements-updated.txt",
+        "bob/requirements.txt"
+      ]
+    },
+    {
+      "package": "mcp",
+      "versions": [
+        ">=0.2.0,<1.0.0",
+        "==1.9.4"
+      ],
+      "files": [
+        "requirements-updated.txt",
+        "mcp-servers/statsource/requirements.txt"
+      ]
+    }
+  ],
+  "most_common_packages": [
+    [
+      "numpy",
+      6
+    ],
+    [
+      "pydantic",
+      6
+    ],
+    [
+      "click",
+      6
+    ],
+    [
+      "aiofiles",
+      6
+    ],
+    [
+      "pandas",
+      5
+    ],
+    [
+      "httpx",
+      5
+    ],
+    [
+      "rich",
+      5
+    ],
+    [
+      "pytest",
+      5
+    ],
+    [
+      "pytest-asyncio",
+      5
+    ],
+    [
+      "black",
+      5
+    ],
+    [
+      "duckdb",
+      4
+    ],
+    [
+      "python-dotenv",
+      4
+    ],
+    [
+      "cryptography",
+      4
+    ],
+    [
+      "psutil",
+      4
+    ],
+    [
+      "scipy",
+      3
+    ],
+    [
+      "databento",
+      3
+    ],
+    [
+      "fredapi",
+      3
+    ],
+    [
+      "aiohttp",
+      3
+    ],
+    [
+      "tenacity",
+      3
+    ],
+    [
+      "mlx",
+      3
+    ]
+  ]
+}

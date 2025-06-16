@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -46,39 +45,36 @@ class Greeks:
     ValueError: Delta must be between -1 and 1, got 1.5
     """
 
-    delta: Optional[float] = None
-    gamma: Optional[float] = None
-    theta: Optional[float] = None
-    vega: Optional[float] = None
-    rho: Optional[float] = None
+    delta: float | None = None
+    gamma: float | None = None
+    theta: float | None = None
+    vega: float | None = None
+    rho: float | None = None
 
     def __post_init__(self) -> None:
         """Validate Greek values are within expected ranges."""
         # Delta validation: -1 <= delta <= 1
-        if self.delta is not None:
-            if not -1 <= self.delta <= 1:
-                raise ValueError(f"Delta must be between -1 and 1, got {self.delta}")
+        if self.delta is not None and not -1 <= self.delta <= 1:
+            raise ValueError(f"Delta must be between -1 and 1, got {self.delta}")
 
         # Gamma validation: gamma >= 0
-        if self.gamma is not None:
-            if self.gamma < 0:
-                raise ValueError(f"Gamma must be non-negative, got {self.gamma}")
+        if self.gamma is not None and self.gamma < 0:
+            raise ValueError(f"Gamma must be non-negative, got {self.gamma}")
 
         # Theta validation: typically negative but can be positive in rare cases
         # No strict validation, just warning for unusual values
-        if self.theta is not None:
-            if self.theta > 0:
-                logger.warning("Positive theta detected (unusual)", extra={"theta": self.theta})
+        if self.theta is not None and self.theta > 0:
+            logger.warning(
+                "Positive theta detected (unusual)", extra={"theta": self.theta}
+            )
 
         # Vega validation: vega >= 0
-        if self.vega is not None:
-            if self.vega < 0:
-                raise ValueError(f"Vega must be non-negative, got {self.vega}")
+        if self.vega is not None and self.vega < 0:
+            raise ValueError(f"Vega must be non-negative, got {self.vega}")
 
         # Rho validation: no strict bounds but warn on extreme values
-        if self.rho is not None:
-            if abs(self.rho) > 1000:  # Arbitrary large value
-                logger.warning("Extreme rho value detected", extra={"rho": self.rho})
+        if self.rho is not None and abs(self.rho) > 1000:  # Arbitrary large value
+            logger.warning("Extreme rho value detected", extra={"rho": self.rho})
 
         logger.debug(
             "Greeks created",
@@ -95,11 +91,12 @@ class Greeks:
     def has_all_greeks(self) -> bool:
         """Check if all Greeks are populated."""
         return all(
-            greek is not None for greek in [self.delta, self.gamma, self.theta, self.vega, self.rho]
+            greek is not None
+            for greek in [self.delta, self.gamma, self.theta, self.vega, self.rho]
         )
 
     @property
-    def speed(self) -> Optional[float]:
+    def speed(self) -> float | None:
         """
         Calculate speed (rate of change of gamma).
 
@@ -110,7 +107,7 @@ class Greeks:
         # Cannot be calculated from static Greeks alone
         return None
 
-    def to_dict(self) -> dict[str, Optional[float]]:
+    def to_dict(self) -> dict[str, float | None]:
         """Convert to dictionary for serialization."""
         return {
             "delta": self.delta,
@@ -121,7 +118,7 @@ class Greeks:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Optional[float]]) -> Greeks:
+    def from_dict(cls, data: dict[str, float | None]) -> Greeks:
         """Create Greeks from dictionary."""
         return cls(
             delta=data.get("delta"),

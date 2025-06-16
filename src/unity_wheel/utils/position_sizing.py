@@ -8,14 +8,12 @@ This module provides intelligent position sizing based on:
 """
 from __future__ import annotations
 
-
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
 
-from src.config.loader import get_config
+from ..config.loader import get_config
+from ..risk.unity_margin import UnityMarginCalculator
 
-from unity_wheel.risk.unity_margin import UnityMarginCalculator
 from .logging import StructuredLogger
 
 logger = StructuredLogger(logging.getLogger(__name__))
@@ -83,7 +81,7 @@ class DynamicPositionSizer:
         confidence: float = 1.0,
         existing_exposure: float = 0.0,
         account_type: str = "margin",
-        current_price: Optional[float] = None,
+        current_price: float | None = None,
     ) -> PositionSizeResult:
         """Calculate optimal position size with risk constraints.
 
@@ -159,7 +157,9 @@ class DynamicPositionSizer:
         warnings = []
 
         # 1. Kelly-based position size
-        kelly_position_value = portfolio_value * kelly_fraction * volatility_factor * confidence
+        kelly_position_value = (
+            portfolio_value * kelly_fraction * volatility_factor * confidence
+        )
 
         # 2. Calculate notional value per contract
         notional_per_contract = strike_price * 100  # 100 shares per contract
@@ -209,7 +209,9 @@ class DynamicPositionSizer:
         # 6. Apply minimum contract requirement
         if contracts < self.min_contracts:
             contracts = 0
-            warnings.append(f"Position too small: {contracts} < {self.min_contracts} minimum")
+            warnings.append(
+                f"Position too small: {contracts} < {self.min_contracts} minimum"
+            )
 
         # 7. Add warnings for binding constraints
         sizing_method = "kelly"
@@ -227,7 +229,9 @@ class DynamicPositionSizer:
             sizing_method = "notional_limit"
 
         if contracts == self.max_contracts_absolute and contracts < kelly_contracts:
-            warnings.append(f"Limited by absolute max: {self.max_contracts_absolute} contracts")
+            warnings.append(
+                f"Limited by absolute max: {self.max_contracts_absolute} contracts"
+            )
             sizing_method = "absolute_limit"
 
         # 8. Final calculations
@@ -289,7 +293,7 @@ class DynamicPositionSizer:
         self,
         portfolio_value: float,
         min_trade_value: float = 5000,
-    ) -> Tuple[int, str]:
+    ) -> tuple[int, str]:
         """
         Special handling for small accounts.
 
@@ -341,7 +345,7 @@ class DynamicPositionSizer:
         self,
         portfolio_value: float,
         buying_power: float,
-        recommendation: Dict,
+        recommendation: dict,
         account_type: str = "margin",
     ) -> PositionSizeResult:
         """
@@ -402,7 +406,7 @@ def calculate_dynamic_contracts(
     option_premium: float,
     kelly_fraction: float = 0.25,
     account_type: str = "margin",
-    current_price: Optional[float] = None,
+    current_price: float | None = None,
     **kwargs,
 ) -> int:
     """

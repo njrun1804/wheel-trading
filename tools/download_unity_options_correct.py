@@ -5,27 +5,27 @@ Based on the technical guide - Unity options are in OPRA.PILLAR dataset.
 """
 
 import logging
-import os
 import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 import pytz
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
 
 
@@ -134,8 +134,16 @@ class UnityOptionsCorrectDownloader:
                         option_type = "CALL" if opt_type == "C" else "PUT"
 
                         # Convert prices
-                        bid = row.get("bid_px_01", 0) / 10000.0 if "bid_px_01" in row else None
-                        ask = row.get("ask_px_01", 0) / 10000.0 if "ask_px_01" in row else None
+                        bid = (
+                            row.get("bid_px_01", 0) / 10000.0
+                            if "bid_px_01" in row
+                            else None
+                        )
+                        ask = (
+                            row.get("ask_px_01", 0) / 10000.0
+                            if "ask_px_01" in row
+                            else None
+                        )
 
                         # Store in database
                         self.conn.execute(
@@ -204,7 +212,9 @@ class UnityOptionsCorrectDownloader:
 
                 # Pause every 10 days
                 if days_with_data % 10 == 0 and days_with_data > 0:
-                    logger.info(f"Progress: {days_with_data} days, {total_records:,} records")
+                    logger.info(
+                        f"Progress: {days_with_data} days, {total_records:,} records"
+                    )
                     time.sleep(1)
 
             current_date += timedelta(days=1)

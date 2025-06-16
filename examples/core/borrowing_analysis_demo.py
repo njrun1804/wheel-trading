@@ -6,7 +6,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.unity_wheel.risk.borrowing_cost_analyzer import BorrowingCostAnalyzer, BorrowingSource
+from src.unity_wheel.risk.borrowing_cost_analyzer import BorrowingCostAnalyzer
 
 
 def demo_borrowing_analysis():
@@ -47,7 +47,7 @@ def demo_borrowing_analysis():
 
         print(f"\n{source_name.replace('_', ' ').title()}:")
         print(f"  Pure Hurdle Rate: {hurdle:.1%}")
-        print(f"  Note: Tax-free environment, no safety factors")
+        print("  Note: Tax-free environment, no safety factors")
 
     # Example Unity wheel scenarios
     print("\n" + "=" * 60)
@@ -101,14 +101,16 @@ def demo_borrowing_analysis():
             available_cash=0,
         )
 
-        print(f"\n  With $0 cash available:")
+        print("\n  With $0 cash available:")
         print(f"    Decision: {result_no_cash.action.upper()}")
         print(f"    Reasoning: {result_no_cash.reasoning}")
 
         if result_no_cash.action == "invest":
             print(f"    Borrow From: {result_no_cash.source_to_use}")
             print(f"    Borrowing Cost: ${result_no_cash.borrowing_cost:.0f}")
-            print(f"    Expected Profit: ${result_no_cash.details['expected_profit']:.0f}")
+            print(
+                f"    Expected Profit: ${result_no_cash.details['expected_profit']:.0f}"
+            )
             print(f"    Net Benefit: ${result_no_cash.net_benefit:.0f}")
 
         # Analyze with some cash
@@ -124,7 +126,9 @@ def demo_borrowing_analysis():
         print(f"\n  With ${cash_available:,.0f} cash available:")
         print(f"    Decision: {result_with_cash.action.upper()}")
         if result_with_cash.action == "invest" and result_with_cash.source_to_use:
-            print(f"    Need to Borrow: ${result_with_cash.details['need_to_borrow']:,.0f}")
+            print(
+                f"    Need to Borrow: ${result_with_cash.details['need_to_borrow']:,.0f}"
+            )
             print(f"    Borrowing Cost: ${result_with_cash.borrowing_cost:.0f}")
             print(f"    Net Benefit: ${result_with_cash.net_benefit:.0f}")
 

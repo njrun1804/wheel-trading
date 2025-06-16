@@ -7,129 +7,86 @@ if wezterm.config_builder then
   config = wezterm.config_builder()
 end
 
--- Appearance
+-- Appearance - Optimized for Claude Code CLI intensive work
 config.color_scheme = 'Dracula'
-config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
-config.font_size = 13.0
+config.font = wezterm.font('JetBrains Mono', { 
+  weight = 'Medium',
+  stretch = 'Normal',
+  style = 'Normal'
+})
+-- Font size set below for Claude Code CLI
+config.cell_width = 1.0   -- Standard character width
 
--- GPU Acceleration for M4 Pro
+-- Typography enhancements for M4 Pro display
+config.font_antialias = 'Subpixel'  -- Better text rendering on Retina displays
+config.font_hinting = 'Full'        -- Improved character sharpness
+
+-- GPU Acceleration for M4 Pro - Optimized for high system load
 config.webgpu_preferred_adapter = 'Metal'
-config.webgpu_power_preference = 'high-performance'
+config.webgpu_power_preference = 'default'  -- Reduced from 'high-performance'
 config.front_end = 'WebGpu'
-config.max_fps = 120
-config.animation_fps = 60
+-- FPS settings moved to Claude CLI section below
 config.enable_wayland = false
-config.enable_kitty_graphics = true
+config.enable_kitty_graphics = false       -- Disabled to reduce GPU load
 
--- Window settings
+-- Window settings - Optimized for Claude Code CLI work
 config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.95
-config.macos_window_background_blur = 10
+config.window_background_opacity = 1.0     -- Solid background for better text contrast
+config.macos_window_background_blur = 0    -- Disabled blur effects for performance
+config.window_padding = {                  -- Comfortable padding for long CLI sessions
+  left = 8,
+  right = 8,
+  top = 8,
+  bottom = 8,
+}
 
--- Tab bar
+-- Display optimization for M4 Pro MacBook
+config.dpi = nil                           -- Auto-detect DPI for proper scaling
+config.freetype_load_target = 'Normal'     -- Balanced rendering
+config.freetype_render_target = 'Normal'   -- Consistent with load target
+
+-- Cursor and editing optimizations for CLI work
+config.default_cursor_style = 'SteadyBlock'  -- Clear cursor visibility
+config.cursor_blink_rate = 800              -- Comfortable blink rate
+config.cursor_thickness = '2px'             -- Slightly thicker for visibility
+
+-- Scrollback settings moved to Claude CLI section below
+config.alternate_screen_scroll_enabled = true  -- Better screen handling
+
+-- Simplified configuration without custom memory management
+
+-- Tab bar - Minimalist for focus
 config.hide_tab_bar_if_only_one_tab = true
 config.tab_bar_at_bottom = true
 config.show_new_tab_button_in_tab_bar = false
 config.use_fancy_tab_bar = false
 
--- Environment variables (defaults, can be overridden by shell)
-config.set_environment_variables = {
-  -- These are DEFAULTS - shell can override
-  WHEEL_TRADING_ROOT = wezterm.home_dir .. '/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading',
-  WEZTERM_SHELL_INTEGRATION = '1',
-  TERM_PROGRAM = 'WezTerm',
-}
+-- Environment variables moved to Claude CLI section below
 
--- Key bindings for split management
+-- Claude Code CLI optimized key bindings
+local act = wezterm.action
 config.keys = {
-  -- Split panes
-  { key = 'd', mods = 'CMD', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = 'd', mods = 'CMD|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  -- Silence CMD-m to avoid conflicts with Claude's /m and /mcp commands
+  {key='m', mods='CMD', action=act.DisableDefaultAssignment},
   
-  -- Navigate panes
-  { key = 'LeftArrow', mods = 'CMD|ALT', action = wezterm.action.ActivatePaneDirection 'Left' },
-  { key = 'RightArrow', mods = 'CMD|ALT', action = wezterm.action.ActivatePaneDirection 'Right' },
-  { key = 'UpArrow', mods = 'CMD|ALT', action = wezterm.action.ActivatePaneDirection 'Up' },
-  { key = 'DownArrow', mods = 'CMD|ALT', action = wezterm.action.ActivatePaneDirection 'Down' },
+  -- Removed split pane binding to prevent automatic splits
   
-  -- Resize panes
-  { key = 'LeftArrow', mods = 'CMD|SHIFT', action = wezterm.action.AdjustPaneSize { 'Left', 5 } },
-  { key = 'RightArrow', mods = 'CMD|SHIFT', action = wezterm.action.AdjustPaneSize { 'Right', 5 } },
+  -- Clear scrollback for fresh Claude runs
+  {key='K', mods='CTRL|SHIFT', action=act.ClearScrollback('ScrollbackAndViewport')},
   
-  -- Quick launch configurations
-  { key = 'l', mods = 'CMD|SHIFT', action = wezterm.action.SpawnCommandInNewTab {
-    label = 'Logs',
-    args = { 'bash', '-c', 'scripts/wheel-logs.sh' },
-  }},
-  { key = 't', mods = 'CMD|SHIFT', action = wezterm.action.SpawnCommandInNewTab {
-    label = 'Tests',
-    args = { 'bash', '-c', 'scripts/wheel-logs.sh test' },
-  }},
-  { key = 'j', mods = 'CMD|SHIFT', action = wezterm.action.SpawnCommandInNewTab {
-    label = 'Jarvis2',
-    args = { 'bash', '-c', 'python -m jarvis2' },
-  }},
-  { key = 's', mods = 'CMD|SHIFT', action = wezterm.action.SpawnCommandInNewTab {
-    label = 'Startup',
-    args = { 'bash', '-c', './startup_unified.sh' },
-  }},
-  { key = 'c', mods = 'CMD|SHIFT', action = wezterm.action.SpawnCommandInNewTab {
-    label = 'Claude (Auto-Accept)',
-    args = { 'claude', '--dangerously-skip-permissions' },
-  }},
+  -- Quick "yes" for Claude permission prompts
+  {key='Y', mods='CMD', action=act.SendString("yes\n")},
 }
 
--- Status bar showing environment info
-wezterm.on('update-status', function(window, pane)
-  local cwd = pane:get_current_working_dir()
-  if cwd then
-    cwd = cwd.path
-  end
-  
-  -- Get user vars from shell integration
-  local user_vars = pane:get_user_vars()
-  local wheel_active = user_vars.wheel_active == "true"
-  
-  -- Build status based on current state
-  local status_items = {}
-  
-  if wheel_active then
-    table.insert(status_items, { Text = '🚀 Wheel Trading' })
-  end
-  
-  if cwd then
-    -- Show shortened path
-    local short_cwd = cwd:gsub(wezterm.home_dir, "~")
-    if #short_cwd > 40 then
-      short_cwd = "..." .. short_cwd:sub(-37)
-    end
-    table.insert(status_items, { Text = ' | ' .. short_cwd })
-  end
-  
-  window:set_left_status(wezterm.format(status_items))
-end)
+-- Disable custom status bar
+-- wezterm.on('update-status', function(window, pane)
+-- end)
 
--- Launch menu for quick access to Claude with different modes
-config.launch_menu = {
-  {
-    label = 'Claude (Auto-Accept)',
-    args = { 'claude', '--dangerously-skip-permissions' },
-  },
-  {
-    label = 'Claude (Safe Mode)', 
-    args = { 'claude' },
-  },
-  {
-    label = 'Trading System',
-    args = { 'python', 'run.py' },
-    cwd = wezterm.home_dir .. '/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading',
-  },
-  {
-    label = 'Jarvis2',
-    args = { 'python', '-m', 'jarvis2' },
-    cwd = wezterm.home_dir .. '/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading',
-  },
-}
+-- Launch menu disabled to prevent automatic splits
+-- config.launch_menu = {
+--   { label = "Claude Code", args = {"claude"} },
+--   { label = "Project Shell", args = {"zsh"} },
+-- }
 
 -- Disable auto-startup behavior to prevent doom scrolling
 -- Comment out the gui-startup handler completely
@@ -138,5 +95,29 @@ wezterm.on('gui-startup', function(cmd)
   -- Disabled to prevent automatic command execution and scrolling
 end)
 --]]
+
+-- Claude Code CLI optimizations
+config.exit_behavior = 'Close'
+config.scrollback_lines = 20000  -- Extended for Claude's long outputs
+config.enable_scroll_bar = true   -- Visual navigation for long responses
+
+-- Silence terminal bells during Claude streaming
+config.audible_bell = "Disabled"
+
+-- Performance for Claude's heavy text output
+config.max_fps = 60
+config.animation_fps = 30
+
+-- Better for reading Claude's formatted output
+config.line_height = 1.2
+config.font_size = 13.0
+
+-- Environment variables for Claude Code CLI
+config.set_environment_variables = {
+  TERM_PROGRAM = 'WezTerm',
+  CLAUDE_CODE_TERMINAL = '1',
+  CLAUDE_MODEL = 'sonnet',  -- Default model
+  NODE_OPTIONS = '--max-old-space-size=20480 --max-semi-space-size=1024',  -- Memory for large outputs
+}
 
 return config

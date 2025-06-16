@@ -7,7 +7,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.unity_wheel.risk.borrowing_cost_analyzer import (
-    BorrowingCostAnalyzer,
     analyze_borrowing_decision,
 )
 
@@ -76,7 +75,9 @@ def quick_borrowing_check():
         if result.action == "invest":
             print(f"  → Borrow ${result.invest_amount:,.0f} (profit beats cost)")
         else:
-            print(f"  → Pay debt instead ({adj_return:.0%} < {result.hurdle_rate:.0%} hurdle)")
+            print(
+                f"  → Pay debt instead ({adj_return:.0%} < {result.hurdle_rate:.0%} hurdle)"
+            )
         print()
 
     # Bottom line

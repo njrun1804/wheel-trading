@@ -1,0 +1,5653 @@
+{
+  "timestamp": 1750056754.933646,
+  "database_discovery": {
+    "duckdb_files": [
+      ".mcp_index/filesystem.duckdb",
+      "data/wheel_trading_optimized.duckdb",
+      "data/unified_wheel_trading.duckdb",
+      "data/test_wheel_trading.duckdb",
+      "data/wheel_trading_master.duckdb",
+      ".jarvis/indexes/structured/code_analytics.duckdb",
+      "data/archive/unified_trading.duckdb",
+      "data/archive/wheel_trading_optimized.duckdb",
+      "data/archive/wheel_cache.duckdb",
+      "data/archive/wheel_trading_master.duckdb",
+      "data/archive/consolidated_20250614_060231/wheel_cache.duckdb"
+    ],
+    "sqlite_files": [
+      "error_handling_analysis.db",
+      "jarvis2_strategy.db",
+      "analytics.db",
+      "meta_monitoring.db",
+      "meta_daemon.db",
+      "meta_evolution.db",
+      "jarvis2_audit.db",
+      "meta_reality_learning.db",
+      ".einstein/embeddings.db",
+      ".einstein/rapid_analytics.db",
+      ".einstein/analytics.db",
+      ".jarvis/experience.db",
+      ".jarvis/experience/experiences.db",
+      ".jarvis/indexes/fts/code_fts.db",
+      "backups/database_consolidation/meta_daemon_continuous.db",
+      "backups/database_consolidation/jarvis2_reaudit.db",
+      "backups/database_consolidation/jarvis2_strategy.db",
+      "backups/database_consolidation/meta_monitoring.db",
+      "backups/database_consolidation/meta_evolution.db",
+      "backups/database_consolidation/jarvis2_audit.db",
+      "backups/database_consolidation/meta_reality_learning.db",
+      ".einstein/query_cache/rapid_cache.db",
+      ".einstein/file_cache/rapid_cache.db"
+    ],
+    "total_size_mb": 376.02,
+    "file_details": {
+      ".mcp_index/filesystem.duckdb": {
+        "path": ".mcp_index/filesystem.duckdb",
+        "size_mb": 0.26,
+        "modified": 1749995488.1402094,
+        "type": "duckdb"
+      },
+      "data/wheel_trading_optimized.duckdb": {
+        "path": "data/wheel_trading_optimized.duckdb",
+        "size_mb": 6.26,
+        "modified": 1749901007.7011068,
+        "type": "duckdb"
+      },
+      "data/unified_wheel_trading.duckdb": {
+        "path": "data/unified_wheel_trading.duckdb",
+        "size_mb": 0.01,
+        "modified": 1750010051.0339901,
+        "type": "duckdb"
+      },
+      "data/test_wheel_trading.duckdb": {
+        "path": "data/test_wheel_trading.duckdb",
+        "size_mb": 1.01,
+        "modified": 1749897756.9846902,
+        "type": "duckdb"
+      },
+      "data/wheel_trading_master.duckdb": {
+        "path": "data/wheel_trading_master.duckdb",
+        "size_mb": 0.01,
+        "modified": 1750026607.5474663,
+        "type": "duckdb"
+      },
+      ".jarvis/indexes/structured/code_analytics.duckdb": {
+        "path": ".jarvis/indexes/structured/code_analytics.duckdb",
+        "size_mb": 0.26,
+        "modified": 1749865173.0238807,
+        "type": "duckdb"
+      },
+      "data/archive/unified_trading.duckdb": {
+        "path": "data/archive/unified_trading.duckdb",
+        "size_mb": 0.26,
+        "modified": 1749646450.0,
+        "type": "duckdb"
+      },
+      "data/archive/wheel_trading_optimized.duckdb": {
+        "path": "data/archive/wheel_trading_optimized.duckdb",
+        "size_mb": 4.51,
+        "modified": 1749857202.3484304,
+        "type": "duckdb"
+      },
+      "data/archive/wheel_cache.duckdb": {
+        "path": "data/archive/wheel_cache.duckdb",
+        "size_mb": 78.76,
+        "modified": 1749814405.4545333,
+        "type": "duckdb"
+      },
+      "data/archive/wheel_trading_master.duckdb": {
+        "path": "data/archive/wheel_trading_master.duckdb",
+        "size_mb": 4.26,
+        "modified": 1749774875.9595613,
+        "type": "duckdb"
+      },
+      "data/archive/consolidated_20250614_060231/wheel_cache.duckdb": {
+        "path": "data/archive/consolidated_20250614_060231/wheel_cache.duckdb",
+        "size_mb": 197.51,
+        "modified": 1749870209.395863,
+        "type": "duckdb"
+      },
+      "error_handling_analysis.db": {
+        "path": "error_handling_analysis.db",
+        "size_mb": 2.04,
+        "modified": 1750030326.976998,
+        "type": "sqlite"
+      },
+      "jarvis2_strategy.db": {
+        "path": "jarvis2_strategy.db",
+        "size_mb": 0.0,
+        "modified": 1750030326.9778237,
+        "type": "sqlite"
+      },
+      "analytics.db": {
+        "path": "analytics.db",
+        "size_mb": 0.01,
+        "modified": 1750030326.978403,
+        "type": "sqlite"
+      },
+      "meta_monitoring.db": {
+        "path": "meta_monitoring.db",
+        "size_mb": 2.05,
+        "modified": 1750032084.821284,
+        "type": "sqlite"
+      },
+      "meta_daemon.db": {
+        "path": "meta_daemon.db",
+        "size_mb": 0.02,
+        "modified": 1750030326.9799762,
+        "type": "sqlite"
+      },
+      "meta_evolution.db": {
+        "path": "meta_evolution.db",
+        "size_mb": 13.87,
+        "modified": 1750029807.2608216,
+        "type": "sqlite"
+      },
+      "jarvis2_audit.db": {
+        "path": "jarvis2_audit.db",
+        "size_mb": 0.0,
+        "modified": 1750030326.9828846,
+        "type": "sqlite"
+      },
+      "meta_reality_learning.db": {
+        "path": "meta_reality_learning.db",
+        "size_mb": 0.02,
+        "modified": 1749959797.2576518,
+        "type": "sqlite"
+      },
+      ".einstein/embeddings.db": {
+        "path": ".einstein/embeddings.db",
+        "size_mb": 46.51,
+        "modified": 1750027155.5312576,
+        "type": "sqlite"
+      },
+      ".einstein/rapid_analytics.db": {
+        "path": ".einstein/rapid_analytics.db",
+        "size_mb": 0.01,
+        "modified": 1750030914.7143557,
+        "type": "sqlite"
+      },
+      ".einstein/analytics.db": {
+        "path": ".einstein/analytics.db",
+        "size_mb": 3.51,
+        "modified": 1750030964.8141751,
+        "type": "sqlite"
+      },
+      ".jarvis/experience.db": {
+        "path": ".jarvis/experience.db",
+        "size_mb": 2.51,
+        "modified": 1749899039.8194175,
+        "type": "sqlite"
+      },
+      ".jarvis/experience/experiences.db": {
+        "path": ".jarvis/experience/experiences.db",
+        "size_mb": 0.04,
+        "modified": 1750030326.9890027,
+        "type": "sqlite"
+      },
+      ".jarvis/indexes/fts/code_fts.db": {
+        "path": ".jarvis/indexes/fts/code_fts.db",
+        "size_mb": 0.03,
+        "modified": 1749865173.0247798,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/meta_daemon_continuous.db": {
+        "path": "backups/database_consolidation/meta_daemon_continuous.db",
+        "size_mb": 0.02,
+        "modified": 1750030326.9932027,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/jarvis2_reaudit.db": {
+        "path": "backups/database_consolidation/jarvis2_reaudit.db",
+        "size_mb": 0.02,
+        "modified": 1750030326.994089,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/jarvis2_strategy.db": {
+        "path": "backups/database_consolidation/jarvis2_strategy.db",
+        "size_mb": 0.02,
+        "modified": 1750030326.9949424,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/meta_monitoring.db": {
+        "path": "backups/database_consolidation/meta_monitoring.db",
+        "size_mb": 0.23,
+        "modified": 1749959797.2566419,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/meta_evolution.db": {
+        "path": "backups/database_consolidation/meta_evolution.db",
+        "size_mb": 9.75,
+        "modified": 1749959797.2557175,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/jarvis2_audit.db": {
+        "path": "backups/database_consolidation/jarvis2_audit.db",
+        "size_mb": 0.03,
+        "modified": 1750030326.9994023,
+        "type": "sqlite"
+      },
+      "backups/database_consolidation/meta_reality_learning.db": {
+        "path": "backups/database_consolidation/meta_reality_learning.db",
+        "size_mb": 0.02,
+        "modified": 1749959797.2576518,
+        "type": "sqlite"
+      },
+      ".einstein/query_cache/rapid_cache.db": {
+        "path": ".einstein/query_cache/rapid_cache.db",
+        "size_mb": 2.14,
+        "modified": 1750031080.6588502,
+        "type": "sqlite"
+      },
+      ".einstein/file_cache/rapid_cache.db": {
+        "path": ".einstein/file_cache/rapid_cache.db",
+        "size_mb": 0.04,
+        "modified": 1750030914.6894488,
+        "type": "sqlite"
+      }
+    }
+  },
+  "schema_validation": {
+    "schema_consistency": {
+      ".mcp_index/filesystem.duckdb": {
+        "tables": [
+          {
+            "name": "code_index",
+            "columns": 11,
+            "records": 0,
+            "schema": [
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "content",
+                "VARCHAR"
+              ],
+              [
+                "file_hash",
+                "VARCHAR"
+              ],
+              [
+                "size_bytes",
+                "INTEGER"
+              ],
+              [
+                "last_modified",
+                "TIMESTAMP"
+              ],
+              [
+                "extension",
+                "VARCHAR"
+              ],
+              [
+                "directory",
+                "VARCHAR"
+              ],
+              [
+                "function_count",
+                "INTEGER"
+              ],
+              [
+                "class_count",
+                "INTEGER"
+              ],
+              [
+                "import_count",
+                "INTEGER"
+              ],
+              [
+                "complexity_score",
+                "INTEGER"
+              ]
+            ]
+          }
+        ],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/wheel_trading_optimized.duckdb": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/unified_wheel_trading.duckdb": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/test_wheel_trading.duckdb": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/wheel_trading_master.duckdb": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      ".jarvis/indexes/structured/code_analytics.duckdb": {
+        "tables": [
+          {
+            "name": "code_metrics",
+            "columns": 11,
+            "records": 0,
+            "schema": [
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "language",
+                "VARCHAR"
+              ],
+              [
+                "total_lines",
+                "INTEGER"
+              ],
+              [
+                "code_lines",
+                "INTEGER"
+              ],
+              [
+                "comment_lines",
+                "INTEGER"
+              ],
+              [
+                "complexity",
+                "INTEGER"
+              ],
+              [
+                "num_functions",
+                "INTEGER"
+              ],
+              [
+                "num_classes",
+                "INTEGER"
+              ],
+              [
+                "avg_function_length",
+                "DOUBLE"
+              ],
+              [
+                "max_nesting_depth",
+                "INTEGER"
+              ],
+              [
+                "technical_debt_score",
+                "DOUBLE"
+              ]
+            ]
+          },
+          {
+            "name": "function_signatures",
+            "columns": 9,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "function_name",
+                "VARCHAR"
+              ],
+              [
+                "line_number",
+                "INTEGER"
+              ],
+              [
+                "parameters",
+                "VARCHAR"
+              ],
+              [
+                "return_type",
+                "VARCHAR"
+              ],
+              [
+                "decorators",
+                "VARCHAR"
+              ],
+              [
+                "complexity",
+                "INTEGER"
+              ],
+              [
+                "is_async",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "patterns",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "pattern_id",
+                "VARCHAR"
+              ],
+              [
+                "pattern_type",
+                "VARCHAR"
+              ],
+              [
+                "description",
+                "VARCHAR"
+              ],
+              [
+                "occurrences",
+                "INTEGER"
+              ],
+              [
+                "files",
+                "VARCHAR"
+              ]
+            ]
+          }
+        ],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/archive/unified_trading.duckdb": {
+        "tables": [
+          {
+            "name": "market_data",
+            "columns": 9,
+            "records": 0,
+            "schema": [
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "open",
+                "DOUBLE"
+              ],
+              [
+                "high",
+                "DOUBLE"
+              ],
+              [
+                "low",
+                "DOUBLE"
+              ],
+              [
+                "close",
+                "DOUBLE"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ],
+              [
+                "returns",
+                "DOUBLE"
+              ],
+              [
+                "data_type",
+                "VARCHAR"
+              ]
+            ]
+          }
+        ],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/archive/wheel_trading_optimized.duckdb": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      "data/archive/wheel_cache.duckdb": {
+        "tables": [
+          {
+            "name": "bug_history",
+            "columns": 4,
+            "records": 0,
+            "schema": [
+              [
+                "error_type",
+                "VARCHAR"
+              ],
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "fix_applied",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "code_complexity_cache",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "complexity_score",
+                "INTEGER"
+              ],
+              [
+                "lines_of_code",
+                "INTEGER"
+              ],
+              [
+                "dependencies",
+                "JSON"
+              ],
+              [
+                "last_analyzed",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "code_performance_metrics",
+            "columns": 4,
+            "records": 0,
+            "schema": [
+              [
+                "function_name",
+                "VARCHAR"
+              ],
+              [
+                "execution_time_ms",
+                "DOUBLE"
+              ],
+              [
+                "memory_usage_mb",
+                "DOUBLE"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "greeks_cache",
+            "columns": 11,
+            "records": 0,
+            "schema": [
+              [
+                "option_symbol",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "spot_price",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "risk_free_rate",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "delta",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "gamma",
+                "DECIMAL(8,6)"
+              ],
+              [
+                "theta",
+                "DECIMAL(8,4)"
+              ],
+              [
+                "vega",
+                "DECIMAL(8,4)"
+              ],
+              [
+                "rho",
+                "DECIMAL(8,4)"
+              ],
+              [
+                "iv",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "opra_symbology",
+            "columns": 3,
+            "records": 759994,
+            "schema": [
+              [
+                "raw_symbol",
+                "VARCHAR"
+              ],
+              [
+                "instrument_id",
+                "BIGINT"
+              ],
+              [
+                "date",
+                "DATE"
+              ]
+            ]
+          },
+          {
+            "name": "optimization_experiments",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "experiment_id",
+                "VARCHAR"
+              ],
+              [
+                "approach",
+                "VARCHAR"
+              ],
+              [
+                "parameters",
+                "JSON"
+              ],
+              [
+                "performance_metrics",
+                "JSON"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "option_chains",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "spot_price",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "data",
+                "JSON"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "options_data",
+            "columns": 13,
+            "records": 0,
+            "schema": [
+              [
+                "ts_event",
+                "TIMESTAMP"
+              ],
+              [
+                "instrument_id",
+                "BIGINT"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "strike",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "open",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "high",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "low",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ],
+              [
+                "data_source",
+                "VARCHAR"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "position_snapshots",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "account_id",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "positions",
+                "JSON"
+              ],
+              [
+                "account_data",
+                "JSON"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "predictions_cache",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "prediction_id",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "input_features",
+                "JSON"
+              ],
+              [
+                "predictions",
+                "JSON"
+              ],
+              [
+                "model_version",
+                "VARCHAR"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "slice_cache",
+            "columns": 11,
+            "records": 0,
+            "schema": [
+              [
+                "hash",
+                "VARCHAR"
+              ],
+              [
+                "content",
+                "VARCHAR"
+              ],
+              [
+                "embedding",
+                "VARCHAR"
+              ],
+              [
+                "model_name",
+                "VARCHAR"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ],
+              [
+                "last_accessed",
+                "TIMESTAMP"
+              ],
+              [
+                "access_count",
+                "INTEGER"
+              ],
+              [
+                "token_count",
+                "INTEGER"
+              ],
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "start_line",
+                "INTEGER"
+              ],
+              [
+                "end_line",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "unity_options_ohlcv",
+            "columns": 7,
+            "records": 178724,
+            "schema": [
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "ts_event",
+                "DATE"
+              ],
+              [
+                "open",
+                "DOUBLE"
+              ],
+              [
+                "high",
+                "DOUBLE"
+              ],
+              [
+                "low",
+                "DOUBLE"
+              ],
+              [
+                "close",
+                "DOUBLE"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ]
+            ]
+          },
+          {
+            "name": "unity_options_ohlcv_intraday_backup",
+            "columns": 7,
+            "records": 1040215,
+            "schema": [
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "ts_event",
+                "DATE"
+              ],
+              [
+                "open",
+                "DOUBLE"
+              ],
+              [
+                "high",
+                "DOUBLE"
+              ],
+              [
+                "low",
+                "DOUBLE"
+              ],
+              [
+                "close",
+                "DOUBLE"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 1978933,
+        "has_data": true
+      },
+      "data/archive/wheel_trading_master.duckdb": {
+        "tables": [
+          {
+            "name": "active_options",
+            "columns": 14,
+            "records": 36,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "FLOAT"
+              ],
+              [
+                "ask",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "implied_volatility",
+                "FLOAT"
+              ],
+              [
+                "delta",
+                "FLOAT"
+              ],
+              [
+                "gamma",
+                "FLOAT"
+              ],
+              [
+                "theta",
+                "FLOAT"
+              ],
+              [
+                "vega",
+                "FLOAT"
+              ]
+            ]
+          },
+          {
+            "name": "cc_candidates",
+            "columns": 14,
+            "records": 0,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "FLOAT"
+              ],
+              [
+                "ask",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "implied_volatility",
+                "FLOAT"
+              ],
+              [
+                "delta",
+                "FLOAT"
+              ],
+              [
+                "gamma",
+                "FLOAT"
+              ],
+              [
+                "theta",
+                "FLOAT"
+              ],
+              [
+                "vega",
+                "FLOAT"
+              ]
+            ]
+          },
+          {
+            "name": "csp_candidates",
+            "columns": 14,
+            "records": 0,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "FLOAT"
+              ],
+              [
+                "ask",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "implied_volatility",
+                "FLOAT"
+              ],
+              [
+                "delta",
+                "FLOAT"
+              ],
+              [
+                "gamma",
+                "FLOAT"
+              ],
+              [
+                "theta",
+                "FLOAT"
+              ],
+              [
+                "vega",
+                "FLOAT"
+              ]
+            ]
+          },
+          {
+            "name": "decisions",
+            "columns": 9,
+            "records": 0,
+            "schema": [
+              [
+                "decision_id",
+                "VARCHAR"
+              ],
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "action",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "contracts",
+                "INTEGER"
+              ],
+              [
+                "expected_value",
+                "FLOAT"
+              ],
+              [
+                "confidence",
+                "FLOAT"
+              ]
+            ]
+          },
+          {
+            "name": "high_iv_options",
+            "columns": 14,
+            "records": 0,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "FLOAT"
+              ],
+              [
+                "ask",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "implied_volatility",
+                "FLOAT"
+              ],
+              [
+                "delta",
+                "FLOAT"
+              ],
+              [
+                "gamma",
+                "FLOAT"
+              ],
+              [
+                "theta",
+                "FLOAT"
+              ],
+              [
+                "vega",
+                "FLOAT"
+              ]
+            ]
+          },
+          {
+            "name": "market_data",
+            "columns": 7,
+            "records": 30,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "open",
+                "FLOAT"
+              ],
+              [
+                "high",
+                "FLOAT"
+              ],
+              [
+                "low",
+                "FLOAT"
+              ],
+              [
+                "close",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ]
+            ]
+          },
+          {
+            "name": "option_statistics",
+            "columns": 9,
+            "records": 5,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "total_options",
+                "BIGINT"
+              ],
+              [
+                "avg_iv",
+                "DOUBLE"
+              ],
+              [
+                "max_iv",
+                "FLOAT"
+              ],
+              [
+                "min_iv",
+                "FLOAT"
+              ],
+              [
+                "avg_put_bid",
+                "DOUBLE"
+              ],
+              [
+                "avg_call_bid",
+                "DOUBLE"
+              ],
+              [
+                "unique_expirations",
+                "BIGINT"
+              ],
+              [
+                "unique_strikes",
+                "BIGINT"
+              ]
+            ]
+          },
+          {
+            "name": "options_data",
+            "columns": 14,
+            "records": 45,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "FLOAT"
+              ],
+              [
+                "ask",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "implied_volatility",
+                "FLOAT"
+              ],
+              [
+                "delta",
+                "FLOAT"
+              ],
+              [
+                "gamma",
+                "FLOAT"
+              ],
+              [
+                "theta",
+                "FLOAT"
+              ],
+              [
+                "vega",
+                "FLOAT"
+              ]
+            ]
+          },
+          {
+            "name": "recent_market",
+            "columns": 7,
+            "records": 26,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "open",
+                "FLOAT"
+              ],
+              [
+                "high",
+                "FLOAT"
+              ],
+              [
+                "low",
+                "FLOAT"
+              ],
+              [
+                "close",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ]
+            ]
+          },
+          {
+            "name": "slice_cache",
+            "columns": 11,
+            "records": 0,
+            "schema": [
+              [
+                "hash",
+                "VARCHAR"
+              ],
+              [
+                "content",
+                "VARCHAR"
+              ],
+              [
+                "embedding",
+                "VARCHAR"
+              ],
+              [
+                "model_name",
+                "VARCHAR"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ],
+              [
+                "last_accessed",
+                "TIMESTAMP"
+              ],
+              [
+                "access_count",
+                "INTEGER"
+              ],
+              [
+                "token_count",
+                "INTEGER"
+              ],
+              [
+                "file_path",
+                "VARCHAR"
+              ],
+              [
+                "start_line",
+                "INTEGER"
+              ],
+              [
+                "end_line",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "todays_opportunities",
+            "columns": 16,
+            "records": 4,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "strike",
+                "FLOAT"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "FLOAT"
+              ],
+              [
+                "ask",
+                "FLOAT"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "implied_volatility",
+                "FLOAT"
+              ],
+              [
+                "delta",
+                "FLOAT"
+              ],
+              [
+                "gamma",
+                "FLOAT"
+              ],
+              [
+                "theta",
+                "FLOAT"
+              ],
+              [
+                "vega",
+                "FLOAT"
+              ],
+              [
+                "stock_price",
+                "FLOAT"
+              ],
+              [
+                "strike_distance_pct",
+                "FLOAT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 146,
+        "has_data": true
+      },
+      "data/archive/consolidated_20250614_060231/wheel_cache.duckdb": {
+        "tables": [
+          {
+            "name": "fred_features",
+            "columns": 7,
+            "records": 26401,
+            "schema": [
+              [
+                "series_id",
+                "VARCHAR"
+              ],
+              [
+                "feature_name",
+                "VARCHAR"
+              ],
+              [
+                "calculation_date",
+                "DATE"
+              ],
+              [
+                "value",
+                "DECIMAL(18,6)"
+              ],
+              [
+                "confidence",
+                "DECIMAL(4,3)"
+              ],
+              [
+                "parameters",
+                "JSON"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "fred_observations",
+            "columns": 6,
+            "records": 8706,
+            "schema": [
+              [
+                "series_id",
+                "VARCHAR"
+              ],
+              [
+                "observation_date",
+                "DATE"
+              ],
+              [
+                "value",
+                "DECIMAL(18,6)"
+              ],
+              [
+                "is_revised",
+                "BOOLEAN"
+              ],
+              [
+                "revision_date",
+                "TIMESTAMP"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "fred_series",
+            "columns": 12,
+            "records": 9,
+            "schema": [
+              [
+                "series_id",
+                "VARCHAR"
+              ],
+              [
+                "title",
+                "VARCHAR"
+              ],
+              [
+                "observation_start",
+                "DATE"
+              ],
+              [
+                "observation_end",
+                "DATE"
+              ],
+              [
+                "frequency",
+                "VARCHAR"
+              ],
+              [
+                "units",
+                "VARCHAR"
+              ],
+              [
+                "seasonal_adjustment",
+                "VARCHAR"
+              ],
+              [
+                "last_updated",
+                "TIMESTAMP"
+              ],
+              [
+                "popularity",
+                "INTEGER"
+              ],
+              [
+                "notes",
+                "VARCHAR"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ],
+              [
+                "updated_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "greeks_cache",
+            "columns": 11,
+            "records": 0,
+            "schema": [
+              [
+                "option_symbol",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "spot_price",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "risk_free_rate",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "delta",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "gamma",
+                "DECIMAL(8,6)"
+              ],
+              [
+                "theta",
+                "DECIMAL(8,4)"
+              ],
+              [
+                "vega",
+                "DECIMAL(8,4)"
+              ],
+              [
+                "rho",
+                "DECIMAL(8,4)"
+              ],
+              [
+                "iv",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "option_chains",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "spot_price",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "data",
+                "JSON"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "position_snapshots",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "account_id",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "positions",
+                "JSON"
+              ],
+              [
+                "account_data",
+                "JSON"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "predictions_cache",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "prediction_id",
+                "VARCHAR"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ],
+              [
+                "input_features",
+                "JSON"
+              ],
+              [
+                "predictions",
+                "JSON"
+              ],
+              [
+                "model_version",
+                "VARCHAR"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "price_history",
+            "columns": 9,
+            "records": 861,
+            "schema": [
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "open",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "high",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "low",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "close",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ],
+              [
+                "returns",
+                "DECIMAL(8,6)"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "unity_options_all_daily",
+            "columns": 22,
+            "records": 0,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "strike",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "open",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "high",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "low",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "settlement",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ],
+              [
+                "open_interest",
+                "BIGINT"
+              ],
+              [
+                "bid_close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "ask_close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "bid_size",
+                "INTEGER"
+              ],
+              [
+                "ask_size",
+                "INTEGER"
+              ],
+              [
+                "underlying_close",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "iv",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "delta",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "gamma",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "theta",
+                "DECIMAL(6,4)"
+              ],
+              [
+                "vega",
+                "DECIMAL(6,4)"
+              ]
+            ]
+          },
+          {
+            "name": "unity_options_comprehensive",
+            "columns": 14,
+            "records": 2490,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "strike",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "open",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "high",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "low",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ],
+              [
+                "trades_count",
+                "INTEGER"
+              ],
+              [
+                "vwap",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "underlying_price",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "unity_options_daily",
+            "columns": 12,
+            "records": 14564,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "strike",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "bid",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "ask",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "last",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "volume",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "INTEGER"
+              ],
+              [
+                "bid_size",
+                "INTEGER"
+              ],
+              [
+                "ask_size",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "unity_options_highperf",
+            "columns": 19,
+            "records": 2244,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "symbol",
+                "VARCHAR"
+              ],
+              [
+                "expiration",
+                "DATE"
+              ],
+              [
+                "strike",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "option_type",
+                "VARCHAR"
+              ],
+              [
+                "open",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "high",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "low",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ],
+              [
+                "trades_count",
+                "INTEGER"
+              ],
+              [
+                "vwap",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "bid",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "ask",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "bid_size",
+                "INTEGER"
+              ],
+              [
+                "ask_size",
+                "INTEGER"
+              ],
+              [
+                "open_interest",
+                "BIGINT"
+              ],
+              [
+                "underlying_price",
+                "DECIMAL(10,2)"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "unity_stock_1min",
+            "columns": 7,
+            "records": 72441,
+            "schema": [
+              [
+                "date",
+                "DATE"
+              ],
+              [
+                "ts_event",
+                "TIMESTAMP"
+              ],
+              [
+                "open",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "high",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "low",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "close",
+                "DECIMAL(10,4)"
+              ],
+              [
+                "volume",
+                "BIGINT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 127716,
+        "has_data": true
+      },
+      "error_handling_analysis.db": {
+        "tables": [
+          {
+            "name": "exception_handlers",
+            "columns": 11,
+            "records": 4221,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "line_number",
+                "INTEGER"
+              ],
+              [
+                "handler_type",
+                "TEXT"
+              ],
+              [
+                "exception_types",
+                "TEXT"
+              ],
+              [
+                "has_logging",
+                "BOOLEAN"
+              ],
+              [
+                "has_context",
+                "BOOLEAN"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "recommendation",
+                "TEXT"
+              ],
+              [
+                "code_snippet",
+                "TEXT"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          },
+          {
+            "name": "analysis_summary",
+            "columns": 9,
+            "records": 2,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "total_handlers",
+                "INTEGER"
+              ],
+              [
+                "bare_except_count",
+                "INTEGER"
+              ],
+              [
+                "generic_exception_count",
+                "INTEGER"
+              ],
+              [
+                "specific_exception_count",
+                "INTEGER"
+              ],
+              [
+                "handlers_with_logging",
+                "INTEGER"
+              ],
+              [
+                "handlers_with_context",
+                "INTEGER"
+              ],
+              [
+                "quality_score",
+                "REAL"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ]
+            ]
+          }
+        ],
+        "total_records": 4223,
+        "has_data": true
+      },
+      "jarvis2_strategy.db": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      "analytics.db": {
+        "tables": [
+          {
+            "name": "test_table",
+            "columns": 2,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "data",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 1,
+        "has_data": true
+      },
+      "meta_monitoring.db": {
+        "tables": [
+          {
+            "name": "metrics",
+            "columns": 6,
+            "records": 15288,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "metric_name",
+                "TEXT"
+              ],
+              [
+                "value",
+                "REAL"
+              ],
+              [
+                "tags_json",
+                "TEXT"
+              ],
+              [
+                "component",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "health_checks",
+            "columns": 6,
+            "records": 6061,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "component",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "message",
+                "TEXT"
+              ],
+              [
+                "metrics_json",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "alerts",
+            "columns": 7,
+            "records": 2,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "alert_type",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "message",
+                "TEXT"
+              ],
+              [
+                "component",
+                "TEXT"
+              ],
+              [
+                "resolved",
+                "BOOLEAN"
+              ]
+            ]
+          }
+        ],
+        "total_records": 21351,
+        "has_data": true
+      },
+      "meta_daemon.db": {
+        "tables": [
+          {
+            "name": "audit_results",
+            "columns": 9,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "step_name",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "findings_json",
+                "TEXT"
+              ],
+              [
+                "concerns_json",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "audit_generation",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "audit_patterns",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_regex",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "claude_verified",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "auditor_events",
+            "columns": 5,
+            "records": 6,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "context",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 6,
+        "has_data": true
+      },
+      "meta_evolution.db": {
+        "tables": [
+          {
+            "name": "observations",
+            "columns": 6,
+            "records": 122172,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "file_hash",
+                "TEXT"
+              ],
+              [
+                "context",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "design_decisions",
+            "columns": 6,
+            "records": 1739,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "decision",
+                "TEXT"
+              ],
+              [
+                "rationale",
+                "TEXT"
+              ],
+              [
+                "alternatives_considered",
+                "TEXT"
+              ],
+              [
+                "predicted_outcome",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "evolution_history",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "change_type",
+                "TEXT"
+              ],
+              [
+                "before_hash",
+                "TEXT"
+              ],
+              [
+                "after_hash",
+                "TEXT"
+              ],
+              [
+                "change_description",
+                "TEXT"
+              ],
+              [
+                "trigger_pattern",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "evolution_plans",
+            "columns": 13,
+            "records": 146,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "plan_id",
+                "TEXT"
+              ],
+              [
+                "target_component",
+                "TEXT"
+              ],
+              [
+                "evolution_type",
+                "TEXT"
+              ],
+              [
+                "rationale",
+                "TEXT"
+              ],
+              [
+                "implementation",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "expected_benefit",
+                "TEXT"
+              ],
+              [
+                "risk_assessment",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "execution_timestamp",
+                "REAL"
+              ],
+              [
+                "outcome",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "coordination_events",
+            "columns": 7,
+            "records": 741,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "source_component",
+                "TEXT"
+              ],
+              [
+                "target_component",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "impact_assessment",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "capability_evolution",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "capability_name",
+                "TEXT"
+              ],
+              [
+                "evolution_generation",
+                "INTEGER"
+              ],
+              [
+                "implementation_code",
+                "TEXT"
+              ],
+              [
+                "performance_metrics",
+                "TEXT"
+              ],
+              [
+                "success_indicators",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "code_generations",
+            "columns": 13,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "task_id",
+                "TEXT"
+              ],
+              [
+                "target_file",
+                "TEXT"
+              ],
+              [
+                "generation_type",
+                "TEXT"
+              ],
+              [
+                "purpose",
+                "TEXT"
+              ],
+              [
+                "generated_code",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "safety_level",
+                "TEXT"
+              ],
+              [
+                "backup_created",
+                "BOOLEAN"
+              ],
+              [
+                "applied",
+                "BOOLEAN"
+              ],
+              [
+                "outcome",
+                "TEXT"
+              ],
+              [
+                "performance_impact",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "generation_patterns",
+            "columns": 8,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_type",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "usage_count",
+                "INTEGER"
+              ],
+              [
+                "code_template",
+                "TEXT"
+              ],
+              [
+                "example_usage",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "audit_results",
+            "columns": 9,
+            "records": 624,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "step_name",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "findings_json",
+                "TEXT"
+              ],
+              [
+                "concerns_json",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "audit_generation",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "audit_patterns",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_regex",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "claude_verified",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "code_modifications",
+            "columns": 13,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "modification_id",
+                "TEXT"
+              ],
+              [
+                "target_file",
+                "TEXT"
+              ],
+              [
+                "backup_file",
+                "TEXT"
+              ],
+              [
+                "change_type",
+                "TEXT"
+              ],
+              [
+                "original_hash",
+                "TEXT"
+              ],
+              [
+                "modified_hash",
+                "TEXT"
+              ],
+              [
+                "validation_passed",
+                "BOOLEAN"
+              ],
+              [
+                "applied",
+                "BOOLEAN"
+              ],
+              [
+                "rollback_available",
+                "BOOLEAN"
+              ],
+              [
+                "outcome",
+                "TEXT"
+              ],
+              [
+                "error_message",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "safety_events",
+            "columns": 7,
+            "records": 4,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "safety_check",
+                "TEXT"
+              ],
+              [
+                "passed",
+                "BOOLEAN"
+              ],
+              [
+                "details",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "test_integration",
+            "columns": 2,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "data",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 125428,
+        "has_data": true
+      },
+      "jarvis2_audit.db": {
+        "tables": [],
+        "total_records": 0,
+        "has_data": false
+      },
+      "meta_reality_learning.db": {
+        "tables": [
+          {
+            "name": "reality_events",
+            "columns": 7,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "target_path",
+                "TEXT"
+              ],
+              [
+                "details_json",
+                "TEXT"
+              ],
+              [
+                "claude_context",
+                "TEXT"
+              ],
+              [
+                "learned_pattern",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "claude_patterns",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_type",
+                "TEXT"
+              ],
+              [
+                "pattern_data",
+                "TEXT"
+              ],
+              [
+                "frequency",
+                "INTEGER"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ]
+            ]
+          }
+        ],
+        "total_records": 1,
+        "has_data": true
+      },
+      ".jarvis/experience/experiences.db": {
+        "tables": [
+          {
+            "name": "experiences",
+            "columns": 11,
+            "records": 12,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "query",
+                "TEXT"
+              ],
+              [
+                "context_json",
+                "TEXT"
+              ],
+              [
+                "solution_json",
+                "TEXT"
+              ],
+              [
+                "metrics_json",
+                "TEXT"
+              ],
+              [
+                "reward",
+                "REAL"
+              ],
+              [
+                "was_selected",
+                "BOOLEAN"
+              ],
+              [
+                "user_feedback",
+                "REAL"
+              ],
+              [
+                "execution_success",
+                "BOOLEAN"
+              ],
+              [
+                "priority",
+                "REAL"
+              ]
+            ]
+          },
+          {
+            "name": "experience_stats",
+            "columns": 8,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "hour_bucket",
+                "INTEGER"
+              ],
+              [
+                "total_count",
+                "INTEGER"
+              ],
+              [
+                "success_count",
+                "INTEGER"
+              ],
+              [
+                "avg_reward",
+                "REAL"
+              ],
+              [
+                "avg_confidence",
+                "REAL"
+              ],
+              [
+                "avg_generation_time",
+                "REAL"
+              ]
+            ]
+          }
+        ],
+        "total_records": 12,
+        "has_data": true
+      },
+      ".jarvis/indexes/fts/code_fts.db": {
+        "tables": [
+          {
+            "name": "code_search",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "file_path",
+                ""
+              ],
+              [
+                "content",
+                ""
+              ],
+              [
+                "language",
+                ""
+              ],
+              [
+                "symbols",
+                ""
+              ],
+              [
+                "imports",
+                ""
+              ]
+            ]
+          },
+          {
+            "name": "code_search_data",
+            "columns": 2,
+            "records": 2,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "block",
+                "BLOB"
+              ]
+            ]
+          },
+          {
+            "name": "code_search_idx",
+            "columns": 3,
+            "records": 0,
+            "schema": [
+              [
+                "segid",
+                ""
+              ],
+              [
+                "term",
+                ""
+              ],
+              [
+                "pgno",
+                ""
+              ]
+            ]
+          },
+          {
+            "name": "code_search_content",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "c0",
+                ""
+              ],
+              [
+                "c1",
+                ""
+              ],
+              [
+                "c2",
+                ""
+              ],
+              [
+                "c3",
+                ""
+              ],
+              [
+                "c4",
+                ""
+              ]
+            ]
+          },
+          {
+            "name": "code_search_docsize",
+            "columns": 2,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "sz",
+                "BLOB"
+              ]
+            ]
+          },
+          {
+            "name": "code_search_config",
+            "columns": 2,
+            "records": 1,
+            "schema": [
+              [
+                "k",
+                ""
+              ],
+              [
+                "v",
+                ""
+              ]
+            ]
+          },
+          {
+            "name": "file_metadata",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "file_hash",
+                "TEXT"
+              ],
+              [
+                "last_modified",
+                "REAL"
+              ],
+              [
+                "lines",
+                "INTEGER"
+              ],
+              [
+                "complexity_score",
+                "REAL"
+              ],
+              [
+                "ast_hash",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 3,
+        "has_data": true
+      },
+      "backups/database_consolidation/meta_daemon_continuous.db": {
+        "tables": [
+          {
+            "name": "audit_results",
+            "columns": 9,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "step_name",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "findings_json",
+                "TEXT"
+              ],
+              [
+                "concerns_json",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "audit_generation",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "audit_patterns",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_regex",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "claude_verified",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "auditor_events",
+            "columns": 5,
+            "records": 6,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "context",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 6,
+        "has_data": true
+      },
+      "backups/database_consolidation/jarvis2_reaudit.db": {
+        "tables": [
+          {
+            "name": "audit_results",
+            "columns": 9,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "step_name",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "findings_json",
+                "TEXT"
+              ],
+              [
+                "concerns_json",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "audit_generation",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "audit_patterns",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_regex",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "claude_verified",
+                "BOOLEAN"
+              ]
+            ]
+          }
+        ],
+        "total_records": 0,
+        "has_data": false
+      },
+      "backups/database_consolidation/jarvis2_strategy.db": {
+        "tables": [
+          {
+            "name": "strategic_decisions",
+            "columns": 11,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "decision_id",
+                "TEXT"
+              ],
+              [
+                "context",
+                "TEXT"
+              ],
+              [
+                "options_explored",
+                "INTEGER"
+              ],
+              [
+                "chosen_option",
+                "TEXT"
+              ],
+              [
+                "rationale",
+                "TEXT"
+              ],
+              [
+                "estimated_tokens",
+                "INTEGER"
+              ],
+              [
+                "actual_tokens",
+                "INTEGER"
+              ],
+              [
+                "user_feedback",
+                "REAL"
+              ],
+              [
+                "success_outcome",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "user_preferences",
+            "columns": 6,
+            "records": 4,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "preference_type",
+                "TEXT"
+              ],
+              [
+                "preference_value",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "evidence_count",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "exploration_results",
+            "columns": 8,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "option_id",
+                "TEXT"
+              ],
+              [
+                "dimensions_json",
+                "TEXT"
+              ],
+              [
+                "outcome_quality",
+                "REAL"
+              ],
+              [
+                "token_efficiency",
+                "REAL"
+              ],
+              [
+                "user_satisfaction",
+                "REAL"
+              ],
+              [
+                "learned_patterns",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 5,
+        "has_data": true
+      },
+      "backups/database_consolidation/meta_monitoring.db": {
+        "tables": [
+          {
+            "name": "metrics",
+            "columns": 6,
+            "records": 1638,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "metric_name",
+                "TEXT"
+              ],
+              [
+                "value",
+                "REAL"
+              ],
+              [
+                "tags_json",
+                "TEXT"
+              ],
+              [
+                "component",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "health_checks",
+            "columns": 6,
+            "records": 592,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "component",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "message",
+                "TEXT"
+              ],
+              [
+                "metrics_json",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "alerts",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "alert_type",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "message",
+                "TEXT"
+              ],
+              [
+                "component",
+                "TEXT"
+              ],
+              [
+                "resolved",
+                "BOOLEAN"
+              ]
+            ]
+          }
+        ],
+        "total_records": 2230,
+        "has_data": true
+      },
+      "backups/database_consolidation/meta_evolution.db": {
+        "tables": [
+          {
+            "name": "observations",
+            "columns": 6,
+            "records": 103834,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "file_hash",
+                "TEXT"
+              ],
+              [
+                "context",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "design_decisions",
+            "columns": 6,
+            "records": 131,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "decision",
+                "TEXT"
+              ],
+              [
+                "rationale",
+                "TEXT"
+              ],
+              [
+                "alternatives_considered",
+                "TEXT"
+              ],
+              [
+                "predicted_outcome",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "evolution_history",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "change_type",
+                "TEXT"
+              ],
+              [
+                "before_hash",
+                "TEXT"
+              ],
+              [
+                "after_hash",
+                "TEXT"
+              ],
+              [
+                "change_description",
+                "TEXT"
+              ],
+              [
+                "trigger_pattern",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "evolution_plans",
+            "columns": 13,
+            "records": 146,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "plan_id",
+                "TEXT"
+              ],
+              [
+                "target_component",
+                "TEXT"
+              ],
+              [
+                "evolution_type",
+                "TEXT"
+              ],
+              [
+                "rationale",
+                "TEXT"
+              ],
+              [
+                "implementation",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "expected_benefit",
+                "TEXT"
+              ],
+              [
+                "risk_assessment",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "execution_timestamp",
+                "REAL"
+              ],
+              [
+                "outcome",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "coordination_events",
+            "columns": 7,
+            "records": 223,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "source_component",
+                "TEXT"
+              ],
+              [
+                "target_component",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "impact_assessment",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "capability_evolution",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "capability_name",
+                "TEXT"
+              ],
+              [
+                "evolution_generation",
+                "INTEGER"
+              ],
+              [
+                "implementation_code",
+                "TEXT"
+              ],
+              [
+                "performance_metrics",
+                "TEXT"
+              ],
+              [
+                "success_indicators",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "code_generations",
+            "columns": 13,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "task_id",
+                "TEXT"
+              ],
+              [
+                "target_file",
+                "TEXT"
+              ],
+              [
+                "generation_type",
+                "TEXT"
+              ],
+              [
+                "purpose",
+                "TEXT"
+              ],
+              [
+                "generated_code",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "safety_level",
+                "TEXT"
+              ],
+              [
+                "backup_created",
+                "BOOLEAN"
+              ],
+              [
+                "applied",
+                "BOOLEAN"
+              ],
+              [
+                "outcome",
+                "TEXT"
+              ],
+              [
+                "performance_impact",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "generation_patterns",
+            "columns": 8,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_type",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "usage_count",
+                "INTEGER"
+              ],
+              [
+                "code_template",
+                "TEXT"
+              ],
+              [
+                "example_usage",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "audit_results",
+            "columns": 9,
+            "records": 624,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "step_name",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "findings_json",
+                "TEXT"
+              ],
+              [
+                "concerns_json",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "audit_generation",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "audit_patterns",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_regex",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "claude_verified",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "code_modifications",
+            "columns": 13,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "modification_id",
+                "TEXT"
+              ],
+              [
+                "target_file",
+                "TEXT"
+              ],
+              [
+                "backup_file",
+                "TEXT"
+              ],
+              [
+                "change_type",
+                "TEXT"
+              ],
+              [
+                "original_hash",
+                "TEXT"
+              ],
+              [
+                "modified_hash",
+                "TEXT"
+              ],
+              [
+                "validation_passed",
+                "BOOLEAN"
+              ],
+              [
+                "applied",
+                "BOOLEAN"
+              ],
+              [
+                "rollback_available",
+                "BOOLEAN"
+              ],
+              [
+                "outcome",
+                "TEXT"
+              ],
+              [
+                "error_message",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "safety_events",
+            "columns": 7,
+            "records": 4,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "safety_check",
+                "TEXT"
+              ],
+              [
+                "passed",
+                "BOOLEAN"
+              ],
+              [
+                "details",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 104963,
+        "has_data": true
+      },
+      "backups/database_consolidation/jarvis2_audit.db": {
+        "tables": [
+          {
+            "name": "audit_results",
+            "columns": 9,
+            "records": 36,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "file_path",
+                "TEXT"
+              ],
+              [
+                "step_name",
+                "TEXT"
+              ],
+              [
+                "status",
+                "TEXT"
+              ],
+              [
+                "findings_json",
+                "TEXT"
+              ],
+              [
+                "concerns_json",
+                "TEXT"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ],
+              [
+                "audit_generation",
+                "INTEGER"
+              ]
+            ]
+          },
+          {
+            "name": "audit_patterns",
+            "columns": 7,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_name",
+                "TEXT"
+              ],
+              [
+                "pattern_regex",
+                "TEXT"
+              ],
+              [
+                "severity",
+                "TEXT"
+              ],
+              [
+                "success_rate",
+                "REAL"
+              ],
+              [
+                "claude_verified",
+                "BOOLEAN"
+              ]
+            ]
+          },
+          {
+            "name": "observations",
+            "columns": 5,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "details",
+                "TEXT"
+              ],
+              [
+                "context",
+                "TEXT"
+              ]
+            ]
+          }
+        ],
+        "total_records": 37,
+        "has_data": true
+      },
+      "backups/database_consolidation/meta_reality_learning.db": {
+        "tables": [
+          {
+            "name": "reality_events",
+            "columns": 7,
+            "records": 1,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "event_type",
+                "TEXT"
+              ],
+              [
+                "target_path",
+                "TEXT"
+              ],
+              [
+                "details_json",
+                "TEXT"
+              ],
+              [
+                "claude_context",
+                "TEXT"
+              ],
+              [
+                "learned_pattern",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "claude_patterns",
+            "columns": 6,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "timestamp",
+                "REAL"
+              ],
+              [
+                "pattern_type",
+                "TEXT"
+              ],
+              [
+                "pattern_data",
+                "TEXT"
+              ],
+              [
+                "frequency",
+                "INTEGER"
+              ],
+              [
+                "confidence",
+                "REAL"
+              ]
+            ]
+          }
+        ],
+        "total_records": 1,
+        "has_data": true
+      },
+      ".einstein/query_cache/rapid_cache.db": {
+        "tables": [
+          {
+            "name": "search_cache",
+            "columns": 8,
+            "records": 5,
+            "schema": [
+              [
+                "query_hash",
+                "TEXT"
+              ],
+              [
+                "query",
+                "TEXT"
+              ],
+              [
+                "results",
+                "BLOB"
+              ],
+              [
+                "access_count",
+                "INTEGER"
+              ],
+              [
+                "last_access",
+                "TIMESTAMP"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ],
+              [
+                "result_size",
+                "INTEGER"
+              ],
+              [
+                "query_type",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "cache_performance",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "query_hash",
+                "TEXT"
+              ],
+              [
+                "execution_time_ms",
+                "REAL"
+              ],
+              [
+                "cache_hit",
+                "BOOLEAN"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ]
+            ]
+          }
+        ],
+        "total_records": 5,
+        "has_data": true
+      },
+      ".einstein/file_cache/rapid_cache.db": {
+        "tables": [
+          {
+            "name": "search_cache",
+            "columns": 8,
+            "records": 0,
+            "schema": [
+              [
+                "query_hash",
+                "TEXT"
+              ],
+              [
+                "query",
+                "TEXT"
+              ],
+              [
+                "results",
+                "BLOB"
+              ],
+              [
+                "access_count",
+                "INTEGER"
+              ],
+              [
+                "last_access",
+                "TIMESTAMP"
+              ],
+              [
+                "created_at",
+                "TIMESTAMP"
+              ],
+              [
+                "result_size",
+                "INTEGER"
+              ],
+              [
+                "query_type",
+                "TEXT"
+              ]
+            ]
+          },
+          {
+            "name": "cache_performance",
+            "columns": 5,
+            "records": 0,
+            "schema": [
+              [
+                "id",
+                "INTEGER"
+              ],
+              [
+                "query_hash",
+                "TEXT"
+              ],
+              [
+                "execution_time_ms",
+                "REAL"
+              ],
+              [
+                "cache_hit",
+                "BOOLEAN"
+              ],
+              [
+                "timestamp",
+                "TIMESTAMP"
+              ]
+            ]
+          }
+        ],
+        "total_records": 0,
+        "has_data": false
+      }
+    },
+    "table_analysis": {},
+    "index_analysis": {},
+    "issues": [
+      "Error connecting to .einstein/embeddings.db: file is not a database",
+      "Error connecting to .einstein/rapid_analytics.db: file is not a database",
+      "Error connecting to .einstein/analytics.db: file is not a database",
+      "Error connecting to .jarvis/experience.db: file is not a database"
+    ]
+  },
+  "connection_pooling": {
+    "bolt_fixes_available": false,
+    "connection_manager_available": true,
+    "concurrent_access_tests": {},
+    "performance_tests": {
+      "pool_stats": {
+        "db_path": "/Users/mikeedwards/Library/Mobile Documents/com~apple~CloudDocs/pMike/Wheel/wheel-trading/.mcp_index/filesystem.duckdb",
+        "db_type": "duckdb",
+        "pool_size": 4,
+        "total_connections": 0,
+        "available_connections": 0,
+        "initialized": true
+      },
+      "query_performance": {},
+      "concurrent_performance": {},
+      "error": ""
+    },
+    "recommendations": []
+  },
+  "query_performance": {
+    "database_benchmarks": {
+      ".mcp_index/filesystem.duckdb": {
+        "basic_query_ms": 0.25,
+        "table_performance": {
+          "code_index": {
+            "count_query_ms": 0.21,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "duckdb"
+      },
+      "data/wheel_trading_optimized.duckdb": {
+        "basic_query_ms": 0.2,
+        "table_performance": {},
+        "database_type": "duckdb"
+      },
+      "data/unified_wheel_trading.duckdb": {
+        "basic_query_ms": 0.13,
+        "table_performance": {},
+        "database_type": "duckdb"
+      },
+      "data/test_wheel_trading.duckdb": {
+        "basic_query_ms": 0.11,
+        "table_performance": {},
+        "database_type": "duckdb"
+      },
+      "data/wheel_trading_master.duckdb": {
+        "basic_query_ms": 0.1,
+        "table_performance": {},
+        "database_type": "duckdb"
+      },
+      ".jarvis/indexes/structured/code_analytics.duckdb": {
+        "basic_query_ms": 0.14,
+        "table_performance": {
+          "code_metrics": {
+            "count_query_ms": 0.13,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "function_signatures": {
+            "count_query_ms": 0.12,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "patterns": {
+            "count_query_ms": 0.1,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "duckdb"
+      },
+      "data/archive/unified_trading.duckdb": {
+        "basic_query_ms": 0.1,
+        "table_performance": {
+          "market_data": {
+            "count_query_ms": 0.22,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "duckdb"
+      },
+      "data/archive/wheel_trading_optimized.duckdb": {
+        "basic_query_ms": 0.13,
+        "table_performance": {},
+        "database_type": "duckdb"
+      },
+      "data/archive/wheel_cache.duckdb": {
+        "basic_query_ms": 0.15,
+        "table_performance": {
+          "bug_history": {
+            "count_query_ms": 0.15,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_complexity_cache": {
+            "count_query_ms": 0.13,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_performance_metrics": {
+            "count_query_ms": 0.1,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "greeks_cache": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "opra_symbology": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0.33,
+            "record_count": 759994
+          },
+          "optimization_experiments": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "option_chains": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "options_data": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "position_snapshots": {
+            "count_query_ms": 0.1,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "predictions_cache": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "slice_cache": {
+            "count_query_ms": 0.07,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "unity_options_ohlcv": {
+            "count_query_ms": 0.1,
+            "sample_query_ms": 0.42,
+            "record_count": 178724
+          },
+          "unity_options_ohlcv_intraday_backup": {
+            "count_query_ms": 0.07,
+            "sample_query_ms": 0.38,
+            "record_count": 1040215
+          }
+        },
+        "database_type": "duckdb"
+      },
+      "data/archive/wheel_trading_master.duckdb": {
+        "basic_query_ms": 0.11,
+        "table_performance": {
+          "active_options": {
+            "count_query_ms": 0.51,
+            "sample_query_ms": 0.84,
+            "record_count": 36
+          },
+          "cc_candidates": {
+            "count_query_ms": 0.2,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "csp_candidates": {
+            "count_query_ms": 0.2,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "decisions": {
+            "count_query_ms": 0.08,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "high_iv_options": {
+            "count_query_ms": 0.22,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "market_data": {
+            "count_query_ms": 0.08,
+            "sample_query_ms": 0.14,
+            "record_count": 30
+          },
+          "option_statistics": {
+            "count_query_ms": 0.06,
+            "sample_query_ms": 0.15,
+            "record_count": 5
+          },
+          "options_data": {
+            "count_query_ms": 0.06,
+            "sample_query_ms": 0.2,
+            "record_count": 45
+          },
+          "recent_market": {
+            "count_query_ms": 0.49,
+            "sample_query_ms": 0.42,
+            "record_count": 26
+          },
+          "slice_cache": {
+            "count_query_ms": 0.07,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "todays_opportunities": {
+            "count_query_ms": 0.51,
+            "sample_query_ms": 1.18,
+            "record_count": 4
+          }
+        },
+        "database_type": "duckdb"
+      },
+      "data/archive/consolidated_20250614_060231/wheel_cache.duckdb": {
+        "basic_query_ms": 0.08,
+        "table_performance": {
+          "fred_features": {
+            "count_query_ms": 0.12,
+            "sample_query_ms": 0.28,
+            "record_count": 26401
+          },
+          "fred_observations": {
+            "count_query_ms": 0.11,
+            "sample_query_ms": 0.25,
+            "record_count": 8706
+          },
+          "fred_series": {
+            "count_query_ms": 0.08,
+            "sample_query_ms": 0.26,
+            "record_count": 9
+          },
+          "greeks_cache": {
+            "count_query_ms": 0.07,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "option_chains": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "position_snapshots": {
+            "count_query_ms": 0.07,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "predictions_cache": {
+            "count_query_ms": 0.11,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "price_history": {
+            "count_query_ms": 0.08,
+            "sample_query_ms": 0.22,
+            "record_count": 861
+          },
+          "unity_options_all_daily": {
+            "count_query_ms": 0.1,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "unity_options_comprehensive": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0.24,
+            "record_count": 2490
+          },
+          "unity_options_daily": {
+            "count_query_ms": 0.09,
+            "sample_query_ms": 0.35,
+            "record_count": 14564
+          },
+          "unity_options_highperf": {
+            "count_query_ms": 0.08,
+            "sample_query_ms": 0.24,
+            "record_count": 2244
+          },
+          "unity_stock_1min": {
+            "count_query_ms": 0.05,
+            "sample_query_ms": 0.35,
+            "record_count": 72441
+          }
+        },
+        "database_type": "duckdb"
+      },
+      "error_handling_analysis.db": {
+        "basic_query_ms": 0.05,
+        "table_performance": {
+          "exception_handlers": {
+            "count_query_ms": 1.22,
+            "sample_query_ms": 0.04,
+            "record_count": 4221
+          },
+          "analysis_summary": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 2
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "jarvis2_strategy.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {},
+        "database_type": "sqlite"
+      },
+      "analytics.db": {
+        "basic_query_ms": 0.01,
+        "table_performance": {
+          "test_table": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "meta_monitoring.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "metrics": {
+            "count_query_ms": 3.48,
+            "sample_query_ms": 0.02,
+            "record_count": 15288
+          },
+          "health_checks": {
+            "count_query_ms": 0.21,
+            "sample_query_ms": 0.01,
+            "record_count": 6061
+          },
+          "alerts": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 2
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "meta_daemon.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "audit_results": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "audit_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "auditor_events": {
+            "count_query_ms": 0.12,
+            "sample_query_ms": 0.01,
+            "record_count": 6
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "meta_evolution.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "observations": {
+            "count_query_ms": 2.48,
+            "sample_query_ms": 0.03,
+            "record_count": 122172
+          },
+          "design_decisions": {
+            "count_query_ms": 0.04,
+            "sample_query_ms": 0.01,
+            "record_count": 1739
+          },
+          "evolution_history": {
+            "count_query_ms": 0.13,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "evolution_plans": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.03,
+            "record_count": 146
+          },
+          "coordination_events": {
+            "count_query_ms": 0.03,
+            "sample_query_ms": 0.01,
+            "record_count": 741
+          },
+          "capability_evolution": {
+            "count_query_ms": 0.13,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_generations": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "generation_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "audit_results": {
+            "count_query_ms": 0.03,
+            "sample_query_ms": 0.02,
+            "record_count": 624
+          },
+          "audit_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_modifications": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          },
+          "safety_events": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 4
+          },
+          "test_integration": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "jarvis2_audit.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {},
+        "database_type": "sqlite"
+      },
+      "meta_reality_learning.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "reality_events": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          },
+          "claude_patterns": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      ".einstein/embeddings.db": {
+        "error": "file is not a database"
+      },
+      ".einstein/rapid_analytics.db": {
+        "error": "file is not a database"
+      },
+      ".einstein/analytics.db": {
+        "error": "database is locked"
+      },
+      ".jarvis/experience.db": {
+        "error": "file is not a database"
+      },
+      ".jarvis/experience/experiences.db": {
+        "basic_query_ms": 0.01,
+        "table_performance": {
+          "experiences": {
+            "count_query_ms": 0.6,
+            "sample_query_ms": 0.07,
+            "record_count": 12
+          },
+          "experience_stats": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      ".jarvis/indexes/fts/code_fts.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "code_search": {
+            "count_query_ms": 0.26,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_search_data": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 2
+          },
+          "code_search_idx": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_search_content": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_search_docsize": {
+            "count_query_ms": 0.03,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_search_config": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          },
+          "file_metadata": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/meta_daemon_continuous.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "audit_results": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "audit_patterns": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "auditor_events": {
+            "count_query_ms": 1.83,
+            "sample_query_ms": 0.01,
+            "record_count": 6
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/jarvis2_reaudit.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "audit_results": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "audit_patterns": {
+            "count_query_ms": 0.0,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/jarvis2_strategy.db": {
+        "basic_query_ms": 0.01,
+        "table_performance": {
+          "strategic_decisions": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          },
+          "user_preferences": {
+            "count_query_ms": 0.92,
+            "sample_query_ms": 0.02,
+            "record_count": 4
+          },
+          "exploration_results": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/meta_monitoring.db": {
+        "basic_query_ms": 0.01,
+        "table_performance": {
+          "metrics": {
+            "count_query_ms": 6.14,
+            "sample_query_ms": 0.03,
+            "record_count": 1638
+          },
+          "health_checks": {
+            "count_query_ms": 0.03,
+            "sample_query_ms": 0.01,
+            "record_count": 592
+          },
+          "alerts": {
+            "count_query_ms": 0.02,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/meta_evolution.db": {
+        "basic_query_ms": 0.01,
+        "table_performance": {
+          "observations": {
+            "count_query_ms": 9.88,
+            "sample_query_ms": 0.05,
+            "record_count": 103834
+          },
+          "design_decisions": {
+            "count_query_ms": 0.02,
+            "sample_query_ms": 0.01,
+            "record_count": 131
+          },
+          "evolution_history": {
+            "count_query_ms": 0.04,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "evolution_plans": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.06,
+            "record_count": 146
+          },
+          "coordination_events": {
+            "count_query_ms": 0.08,
+            "sample_query_ms": 0.03,
+            "record_count": 223
+          },
+          "capability_evolution": {
+            "count_query_ms": 0.03,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_generations": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "generation_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "audit_results": {
+            "count_query_ms": 0.18,
+            "sample_query_ms": 0.03,
+            "record_count": 624
+          },
+          "audit_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "code_modifications": {
+            "count_query_ms": 0.03,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          },
+          "safety_events": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 4
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/jarvis2_audit.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "audit_results": {
+            "count_query_ms": 0.15,
+            "sample_query_ms": 0.02,
+            "record_count": 36
+          },
+          "audit_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "observations": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          }
+        },
+        "database_type": "sqlite"
+      },
+      "backups/database_consolidation/meta_reality_learning.db": {
+        "basic_query_ms": 0.01,
+        "table_performance": {
+          "reality_events": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0.01,
+            "record_count": 1
+          },
+          "claude_patterns": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      ".einstein/query_cache/rapid_cache.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "search_cache": {
+            "count_query_ms": 0.13,
+            "sample_query_ms": 2.96,
+            "record_count": 5
+          },
+          "cache_performance": {
+            "count_query_ms": 0.01,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      },
+      ".einstein/file_cache/rapid_cache.db": {
+        "basic_query_ms": 0.0,
+        "table_performance": {
+          "search_cache": {
+            "count_query_ms": 0.15,
+            "sample_query_ms": 0,
+            "record_count": 0
+          },
+          "cache_performance": {
+            "count_query_ms": 0.17,
+            "sample_query_ms": 0,
+            "record_count": 0
+          }
+        },
+        "database_type": "sqlite"
+      }
+    },
+    "optimization_opportunities": [
+      "Fix connectivity issues with .einstein/embeddings.db",
+      "Fix connectivity issues with .einstein/rapid_analytics.db",
+      "Fix connectivity issues with .einstein/analytics.db",
+      "Fix connectivity issues with .jarvis/experience.db"
+    ],
+    "performance_metrics": {}
+  },
+  "data_consistency": {
+    "integrity_checks": {},
+    "referential_integrity": {},
+    "data_quality_issues": []
+  },
+  "backup_validation": {
+    "backup_locations": [
+      {
+        "path": "backups",
+        "file_count": 15,
+        "total_size_mb": 10.078399658203125
+      },
+      {
+        "path": "data/archive",
+        "file_count": 2,
+        "total_size_mb": 0.000274658203125
+      }
+    ],
+    "backup_schedules": {},
+    "restoration_tests": {},
+    "recommendations": []
+  },
+  "security_assessment": {
+    "access_controls": {
+      ".mcp_index/filesystem.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/wheel_trading_optimized.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/unified_wheel_trading.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/test_wheel_trading.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/wheel_trading_master.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".jarvis/indexes/structured/code_analytics.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/archive/unified_trading.duckdb": {
+        "permissions": "600",
+        "readable_by_others": false,
+        "writable_by_others": false
+      },
+      "data/archive/wheel_trading_optimized.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/archive/wheel_cache.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/archive/wheel_trading_master.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "data/archive/consolidated_20250614_060231/wheel_cache.duckdb": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "error_handling_analysis.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "jarvis2_strategy.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "analytics.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "meta_monitoring.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "meta_daemon.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "meta_evolution.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "jarvis2_audit.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "meta_reality_learning.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".einstein/embeddings.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".einstein/rapid_analytics.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".einstein/analytics.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".jarvis/experience.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".jarvis/experience/experiences.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".jarvis/indexes/fts/code_fts.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/meta_daemon_continuous.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/jarvis2_reaudit.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/jarvis2_strategy.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/meta_monitoring.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/meta_evolution.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/jarvis2_audit.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      "backups/database_consolidation/meta_reality_learning.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".einstein/query_cache/rapid_cache.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      },
+      ".einstein/file_cache/rapid_cache.db": {
+        "permissions": "644",
+        "readable_by_others": true,
+        "writable_by_others": false
+      }
+    },
+    "encryption_status": {},
+    "security_issues": [
+      ".mcp_index/filesystem.duckdb is readable by others",
+      "data/wheel_trading_optimized.duckdb is readable by others",
+      "data/unified_wheel_trading.duckdb is readable by others",
+      "data/test_wheel_trading.duckdb is readable by others",
+      "data/wheel_trading_master.duckdb is readable by others",
+      ".jarvis/indexes/structured/code_analytics.duckdb is readable by others",
+      "data/archive/wheel_trading_optimized.duckdb is readable by others",
+      "data/archive/wheel_cache.duckdb is readable by others",
+      "data/archive/wheel_trading_master.duckdb is readable by others",
+      "data/archive/consolidated_20250614_060231/wheel_cache.duckdb is readable by others",
+      "error_handling_analysis.db is readable by others",
+      "jarvis2_strategy.db is readable by others",
+      "analytics.db is readable by others",
+      "meta_monitoring.db is readable by others",
+      "meta_daemon.db is readable by others",
+      "meta_evolution.db is readable by others",
+      "jarvis2_audit.db is readable by others",
+      "meta_reality_learning.db is readable by others",
+      ".einstein/embeddings.db is readable by others",
+      ".einstein/rapid_analytics.db is readable by others",
+      ".einstein/analytics.db is readable by others",
+      ".jarvis/experience.db is readable by others",
+      ".jarvis/experience/experiences.db is readable by others",
+      ".jarvis/indexes/fts/code_fts.db is readable by others",
+      "backups/database_consolidation/meta_daemon_continuous.db is readable by others",
+      "backups/database_consolidation/jarvis2_reaudit.db is readable by others",
+      "backups/database_consolidation/jarvis2_strategy.db is readable by others",
+      "backups/database_consolidation/meta_monitoring.db is readable by others",
+      "backups/database_consolidation/meta_evolution.db is readable by others",
+      "backups/database_consolidation/jarvis2_audit.db is readable by others",
+      "backups/database_consolidation/meta_reality_learning.db is readable by others",
+      ".einstein/query_cache/rapid_cache.db is readable by others",
+      ".einstein/file_cache/rapid_cache.db is readable by others"
+    ],
+    "recommendations": [
+      "Fix file permission issues",
+      "Consider database encryption for sensitive data",
+      "Implement access logging and monitoring"
+    ]
+  },
+  "recommendations": [
+    "Fix 4 schema issues",
+    "Install bolt database fixes for improved concurrency",
+    "Fix connectivity issues with .einstein/embeddings.db",
+    "Fix connectivity issues with .einstein/rapid_analytics.db",
+    "Fix connectivity issues with .einstein/analytics.db",
+    "Fix connectivity issues with .jarvis/experience.db",
+    "Fix file permission issues",
+    "Consider database encryption for sensitive data",
+    "Implement access logging and monitoring"
+  ],
+  "assessment_summary": {
+    "total_time_seconds": 35.53,
+    "databases_analyzed": 34,
+    "total_recommendations": 9,
+    "critical_issues": 6,
+    "status": "completed"
+  }
+}

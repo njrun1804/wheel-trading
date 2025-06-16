@@ -72,7 +72,9 @@ def pull_unity_options_liquidity():
 
         # Pivot to get OI and volume as columns
         df_pivot = df_stats.pivot_table(
-            index=["ts_ref", "instrument_id", "symbol"], columns="metric", values="quantity"
+            index=["ts_ref", "instrument_id", "symbol"],
+            columns="metric",
+            values="quantity",
         ).reset_index()
 
         # Filter for Unity options only

@@ -1,19 +1,30 @@
 # Include base requirements
 -r requirements.txt
 
-# Testing
-pytest>=8.0.0
-pytest-cov>=4.1.0
-pytest-asyncio>=0.23.0
-pytest-mock>=3.12.0
+# === TESTING FRAMEWORK ===
+pytest>=8.0.0,<9.0
+pytest-cov>=4.1.0,<7.0
+pytest-asyncio>=0.23.0,<2.0
+pytest-mock>=3.12.0,<4.0
+hypothesis>=6.100.0,<7.0
 
-# Code quality (single tool)
-ruff>=0.2.0
-black>=24.2.0
-isort>=5.13.0
+# === CODE QUALITY ===
+# ruff handles formatting, linting, import sorting (replaces black, isort, pyflakes, basic pylint)
+ruff>=0.6.0,<1.0
+mypy>=1.8.0,<2.0
 
-# Development tools
-ipython>=8.20.0
+# === DEVELOPMENT TOOLS ===
+ipython>=8.20.0,<9.0
+ptpython>=3.0.0,<4.0
 
-# Pre-commit
-pre-commit>=3.6.0
+# === PERFORMANCE PROFILING ===
+memory-profiler>=0.61.0,<1.0
+py-spy>=0.3.0,<1.0
+line-profiler>=4.0.0,<5.0
+
+# === PRE-COMMIT & HOOKS ===
+pre-commit>=3.6.0,<4.0
+
+# === DOCUMENTATION (optional) ===
+mkdocs>=1.5.0,<2.0
+mkdocs-material>=9.0.0,<10.0

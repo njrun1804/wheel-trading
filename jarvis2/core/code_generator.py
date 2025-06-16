@@ -3,7 +3,7 @@ import ast
 import logging
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from jinja2 import Template
 
@@ -16,80 +16,84 @@ logger = logging.getLogger(__name__)
 @dataclass
 class GenerationRequest:
     """Request for code generation."""
+
     query: str
-    context: Dict[str, Any]
-    existing_code: Optional[str] = None
-    constraints: Dict[str, Any] = None
+    context: dict[str, Any]
+    existing_code: str | None = None
+    constraints: dict[str, Any] = None
 
 
 class PatternMatcher:
     """Match queries to code patterns."""
-    
+
     def __init__(self):
         self.patterns = {
-            'function': [
-                (r'(create|write|implement|add)\s+.*\s*(function|method|func)', 'function'),
-                (r'function\s+(to|that|for)\s+', 'function'),
-                (r'def\s+', 'function'),
+            "function": [
+                (
+                    r"(create|write|implement|add)\s+.*\s*(function|method|func)",
+                    "function",
+                ),
+                (r"function\s+(to|that|for)\s+", "function"),
+                (r"def\s+", "function"),
             ],
-            'class': [
-                (r'(create|write|implement|add)\s+.*\s*(class|object)', 'class'),
-                (r'class\s+(to|that|for)\s+', 'class'),
-                (r'(manager|handler|service|controller)\s+for', 'class'),
+            "class": [
+                (r"(create|write|implement|add)\s+.*\s*(class|object)", "class"),
+                (r"class\s+(to|that|for)\s+", "class"),
+                (r"(manager|handler|service|controller)\s+for", "class"),
             ],
-            'optimize': [
-                (r'(optimize|improve|speed up|make faster)', 'optimize'),
-                (r'(performance|efficient|faster)', 'optimize'),
+            "optimize": [
+                (r"(optimize|improve|speed up|make faster)", "optimize"),
+                (r"(performance|efficient|faster)", "optimize"),
             ],
-            'refactor': [
-                (r'(refactor|clean up|reorganize)', 'refactor'),
-                (r'(simplify|extract|split)', 'refactor'),
+            "refactor": [
+                (r"(refactor|clean up|reorganize)", "refactor"),
+                (r"(simplify|extract|split)", "refactor"),
             ],
-            'test': [
-                (r'(test|unit test|pytest)\s+', 'test'),
-                (r'(test case|test function)\s+for', 'test'),
+            "test": [
+                (r"(test|unit test|pytest)\s+", "test"),
+                (r"(test case|test function)\s+for", "test"),
             ],
-            'api': [
-                (r'(api|endpoint|route|rest)\s+', 'api'),
-                (r'(get|post|put|delete)\s+endpoint', 'api'),
+            "api": [
+                (r"(api|endpoint|route|rest)\s+", "api"),
+                (r"(get|post|put|delete)\s+endpoint", "api"),
             ],
-            'algorithm': [
-                (r'(algorithm|sort|search|find)', 'algorithm'),
-                (r'(binary search|quick sort|merge sort)', 'algorithm'),
-                (r'(fibonacci|factorial|prime)', 'algorithm'),
-            ]
+            "algorithm": [
+                (r"(algorithm|sort|search|find)", "algorithm"),
+                (r"(binary search|quick sort|merge sort)", "algorithm"),
+                (r"(fibonacci|factorial|prime)", "algorithm"),
+            ],
         }
-    
-    def match_pattern(self, query: str) -> Tuple[str, str]:
+
+    def match_pattern(self, query: str) -> tuple[str, str]:
         """Match query to a pattern type and extract key info."""
         query_lower = query.lower()
-        
+
         for pattern_type, patterns in self.patterns.items():
             for pattern, _ in patterns:
                 if re.search(pattern, query_lower):
                     # Extract the main subject
                     subject = self._extract_subject(query_lower, pattern)
                     return pattern_type, subject
-        
-        return 'general', query
-    
+
+        return "general", query
+
     def _extract_subject(self, query: str, pattern: str) -> str:
         """Extract the main subject from the query."""
         # Remove the pattern match to get subject
         match = re.search(pattern, query)
         if match:
-            subject = query.replace(match.group(), '').strip()
+            subject = query.replace(match.group(), "").strip()
             # Clean up common words
-            for word in ['a', 'an', 'the', 'to', 'that', 'for']:
-                subject = re.sub(f'^{word}\\s+', '', subject)
-                subject = re.sub(f'\\s+{word}$', '', subject)
+            for word in ["a", "an", "the", "to", "that", "for"]:
+                subject = re.sub(f"^{word}\\s+", "", subject)
+                subject = re.sub(f"\\s+{word}$", "", subject)
             return subject
         return query
 
 
 class CodeGenerator:
     """Generate real code based on patterns and context."""
-    
+
     def __init__(self):
         self.analyzer = CodeAnalyzer()
         self.transformer = CodeTransformer()
@@ -97,61 +101,63 @@ class CodeGenerator:
         self.matcher = PatternMatcher()
         self.ast_generator = ASTCodeGenerator()
         self.templates = self._load_templates()  # Keep for fallback
-    
+
     def generate(self, request: GenerationRequest) -> str:
         """Generate code based on request."""
         # Analyze existing code if provided
         context = {}
         if request.existing_code:
             context = self.analyzer.analyze(request.existing_code)
-        
+
         # Match pattern
         pattern_type, subject = self.matcher.match_pattern(request.query)
-        
+
         # Generate based on pattern
-        if pattern_type == 'function':
+        if pattern_type == "function":
             code = self._generate_function(subject, context, request)
-        elif pattern_type == 'class':
+        elif pattern_type == "class":
             code = self._generate_class(subject, context, request)
-        elif pattern_type == 'optimize':
+        elif pattern_type == "optimize":
             code = self._optimize_code(subject, context, request)
-        elif pattern_type == 'test':
+        elif pattern_type == "test":
             code = self._generate_test(subject, context, request)
-        elif pattern_type == 'api':
+        elif pattern_type == "api":
             code = self._generate_api(subject, context, request)
-        elif pattern_type == 'algorithm':
+        elif pattern_type == "algorithm":
             code = self._generate_algorithm(subject, context, request)
         else:
             code = self._generate_general(subject, context, request)
-        
+
         # Validate and format
         code = self.validator.format_code(code)
-        
+
         # Add to existing code if needed
-        if request.existing_code and pattern_type in ['function', 'class']:
+        if request.existing_code and pattern_type in ["function", "class"]:
             code = self._merge_code(request.existing_code, code)
-        
+
         return code
-    
-    def _generate_function(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _generate_function(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Generate a function based on subject using AST."""
         # Parse function requirements
         func_name = self._generate_function_name(subject)
         args = self._infer_arguments(subject)
         return_type = self._infer_return_type(subject)
-        
+
         # Generate body based on subject
-        if 'calculate' in subject or 'compute' in subject:
+        if "calculate" in subject or "compute" in subject:
             body_code = self._generate_calculation_body(subject, args)
-        elif 'validate' in subject or 'check' in subject:
+        elif "validate" in subject or "check" in subject:
             body_code = self._generate_validation_body(subject, args)
-        elif 'convert' in subject or 'transform' in subject:
+        elif "convert" in subject or "transform" in subject:
             body_code = self._generate_conversion_body(subject, args)
-        elif 'fetch' in subject or 'get' in subject:
+        elif "fetch" in subject or "get" in subject:
             body_code = self._generate_fetch_body(subject, args)
         else:
             body_code = self._generate_generic_body(subject, args)
-        
+
         # Create AST-based function spec
         func_spec = FunctionSpec(
             name=func_name,
@@ -159,10 +165,10 @@ class CodeGenerator:
             return_type=return_type,
             docstring=f"{subject.capitalize()}.",
             body_nodes=self.ast_generator.create_function_body(body_code),
-            is_async='async' in subject.lower() or 'await' in body_code,
-            type_hints=self._infer_type_hints(subject, args, return_type)
+            is_async="async" in subject.lower() or "await" in body_code,
+            type_hints=self._infer_type_hints(subject, args, return_type),
         )
-        
+
         # Generate using AST
         try:
             code = self.ast_generator.generate_function(func_spec)
@@ -170,21 +176,23 @@ class CodeGenerator:
         except Exception as e:
             # Fallback to template
             logger.warning(f"AST generation failed: {e}, using template")
-            template = self.templates['function']
+            template = self.templates["function"]
             return template.render(
                 name=func_name,
                 args=args,
                 return_type=return_type,
                 docstring=f"{subject.capitalize()}.",
-                body=body_code
+                body=body_code,
             )
-    
-    def _generate_class(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _generate_class(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Generate a class based on subject using AST."""
         class_name = self._generate_class_name(subject)
         method_specs = []
         attributes = {}
-        
+
         # Generate __init__ method
         init_args = self._infer_init_args(subject)
         init_body = self._generate_init_body(subject, init_args)
@@ -193,41 +201,41 @@ class CodeGenerator:
             args=["self"] + init_args,
             return_type=None,
             docstring=f"Initialize {class_name}.",
-            body_nodes=self.ast_generator.create_function_body(init_body)
+            body_nodes=self.ast_generator.create_function_body(init_body),
         )
         method_specs.append(init_spec)
-        
+
         # Generate other methods based on pattern
         methods = self._infer_methods(subject)
         for method in methods:
-            if method['name'] != '__init__':
+            if method["name"] != "__init__":
                 method_spec = FunctionSpec(
-                    name=method['name'],
-                    args=method['args'],
-                    return_type=self._infer_method_return_type(method['name']),
+                    name=method["name"],
+                    args=method["args"],
+                    return_type=self._infer_method_return_type(method["name"]),
                     docstring=f"{method['name'].replace('_', ' ').capitalize()}.",
-                    body_nodes=self.ast_generator.create_function_body(method['body'])
+                    body_nodes=self.ast_generator.create_function_body(method["body"]),
                 )
                 method_specs.append(method_spec)
-        
+
         # Infer attributes
         attr_list = self._infer_attributes(subject)
         for attr in attr_list:
-            if ':' in attr:
-                name, type_hint = attr.split(':', 1)
+            if ":" in attr:
+                name, type_hint = attr.split(":", 1)
                 attributes[name.strip()] = type_hint.strip()
             else:
                 attributes[attr] = None
-        
+
         # Create class spec
         class_spec = ClassSpec(
             name=class_name,
             bases=self._infer_base_classes(subject),
             docstring=f"{subject.capitalize()} implementation.",
             attributes=attributes,
-            methods=method_specs
+            methods=method_specs,
         )
-        
+
         # Generate using AST
         try:
             code = self.ast_generator.generate_class(class_spec)
@@ -235,212 +243,229 @@ class CodeGenerator:
         except Exception as e:
             # Fallback to template
             logger.warning(f"AST class generation failed: {e}, using template")
-            template = self.templates['class']
+            template = self.templates["class"]
             return template.render(
                 name=class_name,
                 docstring=f"{subject.capitalize()} implementation.",
                 attributes=attr_list,
-                methods=methods
+                methods=methods,
             )
-    
-    def _generate_algorithm(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _generate_algorithm(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Generate algorithm implementation."""
         algorithms = {
-            'binary search': self._binary_search_template,
-            'quick sort': self._quick_sort_template,
-            'merge sort': self._merge_sort_template,
-            'fibonacci': self._fibonacci_template,
-            'factorial': self._factorial_template,
-            'prime': self._prime_template,
+            "binary search": self._binary_search_template,
+            "quick sort": self._quick_sort_template,
+            "merge sort": self._merge_sort_template,
+            "fibonacci": self._fibonacci_template,
+            "factorial": self._factorial_template,
+            "prime": self._prime_template,
         }
-        
+
         for algo_name, template_func in algorithms.items():
             if algo_name in subject.lower():
                 return template_func()
-        
+
         # Generic algorithm
         return self._generate_function(subject, context, request)
-    
-    def _generate_test(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _generate_test(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Generate test cases."""
         # Extract function/class to test
         target = self._extract_test_target(subject)
-        
-        template = self.templates['test']
+
+        template = self.templates["test"]
         code = template.render(
-            target_name=target,
-            test_cases=self._generate_test_cases(target)
+            target_name=target, test_cases=self._generate_test_cases(target)
         )
-        
+
         return code
-    
-    def _generate_api(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _generate_api(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Generate API endpoint."""
-        method = 'GET'
-        for m in ['GET', 'POST', 'PUT', 'DELETE']:
+        method = "GET"
+        for m in ["GET", "POST", "PUT", "DELETE"]:
             if m.lower() in subject.lower():
                 method = m
                 break
-        
+
         endpoint = self._extract_endpoint_name(subject)
-        
-        template = self.templates['api']
+
+        template = self.templates["api"]
         code = template.render(
             method=method,
             endpoint=endpoint,
-            handler_name=f"{method.lower()}_{endpoint.replace('/', '_')}"
+            handler_name=f"{method.lower()}_{endpoint.replace('/', '_')}",
         )
-        
+
         return code
-    
-    def _optimize_code(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _optimize_code(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Optimize existing code."""
         if not request.existing_code:
             return "# No code provided to optimize"
-        
+
         # Analyze code
         analysis = self.analyzer.analyze(request.existing_code)
-        
+
         # Apply optimizations
         optimized = request.existing_code
-        
+
         # Add type hints
         if not analysis.type_hints:
             optimized = self.transformer.add_type_hints(optimized)
-        
+
         # Optimize imports
         optimized = self.transformer.optimize_imports(optimized)
-        
+
         # Add docstrings if missing
         for func in analysis.functions:
-            if not func['docstring']:
+            if not func["docstring"]:
                 # Add docstring using transformer
                 pass
-        
+
         return optimized
-    
-    def _generate_general(self, subject: str, context: Any, request: GenerationRequest) -> str:
+
+    def _generate_general(
+        self, subject: str, context: Any, request: GenerationRequest
+    ) -> str:
         """Generate general code when no pattern matches."""
         # Try to generate a function
         return self._generate_function(subject, context, request)
-    
+
     def _merge_code(self, existing: str, new: str) -> str:
         """Merge new code with existing code."""
         # Parse both
         existing_tree = ast.parse(existing)
         new_tree = ast.parse(new)
-        
+
         # Extract new items
         new_items = []
         for node in new_tree.body:
-            if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.Import, ast.ImportFrom)):
+            if isinstance(
+                node, ast.FunctionDef | ast.ClassDef | ast.Import | ast.ImportFrom
+            ):
                 new_items.append(node)
-        
+
         # Add to existing
         merged_tree = ast.Module(body=existing_tree.body + new_items, type_ignores=[])
-        
+
         # Convert back to code
-        if hasattr(ast, 'unparse'):
+        if hasattr(ast, "unparse"):
             code = ast.unparse(merged_tree)
         else:
             # Fallback: just concatenate
-            code = existing + '\n\n' + new
-        
+            code = existing + "\n\n" + new
+
         return self.validator.format_code(code)
-    
+
     def _generate_function_name(self, subject: str) -> str:
         """Generate appropriate function name."""
         # Remove common words
         words = subject.lower().split()
-        words = [w for w in words if w not in ['a', 'an', 'the', 'to', 'that', 'for']]
-        
+        words = [w for w in words if w not in ["a", "an", "the", "to", "that", "for"]]
+
         # Convert to snake_case
-        return '_'.join(words[:3])  # Limit to 3 words
-    
+        return "_".join(words[:3])  # Limit to 3 words
+
     def _generate_class_name(self, subject: str) -> str:
         """Generate appropriate class name."""
         words = subject.lower().split()
-        words = [w for w in words if w not in ['a', 'an', 'the', 'to', 'that', 'for']]
-        
+        words = [w for w in words if w not in ["a", "an", "the", "to", "that", "for"]]
+
         # Convert to PascalCase
-        return ''.join(w.capitalize() for w in words[:3])
-    
-    def _infer_arguments(self, subject: str) -> List[str]:
+        return "".join(w.capitalize() for w in words[:3])
+
+    def _infer_arguments(self, subject: str) -> list[str]:
         """Infer function arguments from subject."""
         args = []
-        
+
         # Look for common patterns
-        if 'two' in subject or 'pair' in subject:
-            args = ['a', 'b']
-        elif 'list' in subject or 'array' in subject:
-            args = ['items']
-        elif 'string' in subject or 'text' in subject:
-            args = ['text']
-        elif 'number' in subject:
-            args = ['n']
+        if "two" in subject or "pair" in subject:
+            args = ["a", "b"]
+        elif "list" in subject or "array" in subject:
+            args = ["items"]
+        elif "string" in subject or "text" in subject:
+            args = ["text"]
+        elif "number" in subject:
+            args = ["n"]
         else:
-            args = ['value']
-        
+            args = ["value"]
+
         return args
-    
-    def _infer_return_type(self, subject: str) -> Optional[str]:
+
+    def _infer_return_type(self, subject: str) -> str | None:
         """Infer return type from subject."""
-        if 'calculate' in subject or 'sum' in subject or 'count' in subject:
-            return 'float'
-        elif 'check' in subject or 'validate' in subject or 'is' in subject:
-            return 'bool'
-        elif 'list' in subject or 'array' in subject:
-            return 'List[Any]'
-        elif 'string' in subject or 'text' in subject:
-            return 'str'
+        if "calculate" in subject or "sum" in subject or "count" in subject:
+            return "float"
+        elif "check" in subject or "validate" in subject or "is" in subject:
+            return "bool"
+        elif "list" in subject or "array" in subject:
+            return "List[Any]"
+        elif "string" in subject or "text" in subject:
+            return "str"
         return None
-    
-    def _infer_methods(self, subject: str) -> List[Dict[str, str]]:
+
+    def _infer_methods(self, subject: str) -> list[dict[str, str]]:
         """Infer class methods from subject."""
-        methods = [
-            {'name': '__init__', 'args': ['self'], 'body': 'pass'}
-        ]
-        
+        methods = [{"name": "__init__", "args": ["self"], "body": "pass"}]
+
         # Add methods based on common patterns
-        if 'manager' in subject.lower():
-            methods.extend([
-                {'name': 'add', 'args': ['self', 'item'], 'body': 'pass'},
-                {'name': 'remove', 'args': ['self', 'item'], 'body': 'pass'},
-                {'name': 'get', 'args': ['self', 'key'], 'body': 'return None'},
-            ])
-        elif 'handler' in subject.lower():
-            methods.append({'name': 'handle', 'args': ['self', 'request'], 'body': 'pass'})
-        
+        if "manager" in subject.lower():
+            methods.extend(
+                [
+                    {"name": "add", "args": ["self", "item"], "body": "pass"},
+                    {"name": "remove", "args": ["self", "item"], "body": "pass"},
+                    {"name": "get", "args": ["self", "key"], "body": "return None"},
+                ]
+            )
+        elif "handler" in subject.lower():
+            methods.append(
+                {"name": "handle", "args": ["self", "request"], "body": "pass"}
+            )
+
         return methods
-    
-    def _infer_attributes(self, subject: str) -> List[str]:
+
+    def _infer_attributes(self, subject: str) -> list[str]:
         """Infer class attributes from subject."""
         attrs = []
-        
-        if 'list' in subject or 'collection' in subject:
-            attrs.append('items: List[Any] = []')
-        if 'manager' in subject:
-            attrs.append('data: Dict[str, Any] = {}')
-        
+
+        if "list" in subject or "collection" in subject:
+            attrs.append("items: List[Any] = []")
+        if "manager" in subject:
+            attrs.append("data: Dict[str, Any] = {}")
+
         return attrs
-    
-    def _generate_calculation_body(self, subject: str, args: List[str]) -> str:
+
+    def _generate_calculation_body(self, subject: str, args: list[str]) -> str:
         """Generate calculation function body."""
-        if 'sum' in subject:
-            return f"return sum({args[0]})" if 'items' in args else f"return {' + '.join(args)}"
-        elif 'average' in subject or 'mean' in subject:
+        if "sum" in subject:
+            return (
+                f"return sum({args[0]})"
+                if "items" in args
+                else f"return {' + '.join(args)}"
+            )
+        elif "average" in subject or "mean" in subject:
             return f"return sum({args[0]}) / len({args[0]})"
-        elif 'multiply' in subject or 'product' in subject:
+        elif "multiply" in subject or "product" in subject:
             return f"return {' * '.join(args)}"
-        elif 'divide' in subject:
+        elif "divide" in subject:
             if len(args) >= 2:
                 return f"if {args[1]} == 0:\n        raise ValueError('Division by zero')\n    return {args[0]} / {args[1]}"
             return f"return {args[0]} / divisor"
-        elif 'percentage' in subject:
+        elif "percentage" in subject:
             if len(args) >= 2:
                 return f"return ({args[0]} / {args[1]}) * 100"
             return f"return ({args[0]} / total) * 100"
-        elif 'factorial' in subject:
+        elif "factorial" in subject:
             return f"""if {args[0]} < 0:
         raise ValueError('Factorial not defined for negative numbers')
     if {args[0]} <= 1:
@@ -449,16 +474,24 @@ class CodeGenerator:
     for i in range(2, {args[0]} + 1):
         result *= i
     return result"""
-        elif 'power' in subject or 'exponent' in subject:
+        elif "power" in subject or "exponent" in subject:
             if len(args) >= 2:
                 return f"return {args[0]} ** {args[1]}"
             return f"return {args[0]} ** 2"
-        elif 'sqrt' in subject or 'square root' in subject:
+        elif "sqrt" in subject or "square root" in subject:
             return f"import math\n    return math.sqrt({args[0]})"
-        elif 'max' in subject or 'maximum' in subject:
-            return f"return max({args[0]})" if len(args) == 1 else f"return max({', '.join(args)})"
-        elif 'min' in subject or 'minimum' in subject:
-            return f"return min({args[0]})" if len(args) == 1 else f"return min({', '.join(args)})"
+        elif "max" in subject or "maximum" in subject:
+            return (
+                f"return max({args[0]})"
+                if len(args) == 1
+                else f"return max({', '.join(args)})"
+            )
+        elif "min" in subject or "minimum" in subject:
+            return (
+                f"return min({args[0]})"
+                if len(args) == 1
+                else f"return min({', '.join(args)})"
+            )
         else:
             # Generic calculation with error handling
             return f"""try:
@@ -467,38 +500,38 @@ class CodeGenerator:
         return result
     except Exception as e:
         raise ValueError(f'Calculation error: {{e}}')"""
-    
-    def _generate_validation_body(self, subject: str, args: List[str]) -> str:
+
+    def _generate_validation_body(self, subject: str, args: list[str]) -> str:
         """Generate validation function body."""
-        arg = args[0] if args else 'value'
-        
-        if 'email' in subject:
+        arg = args[0] if args else "value"
+
+        if "email" in subject:
             return f'return "@" in {arg} and "." in {arg}'
-        elif 'positive' in subject:
-            return f'return {arg} > 0'
-        elif 'empty' in subject:
-            return f'return len({arg}) == 0'
+        elif "positive" in subject:
+            return f"return {arg} > 0"
+        elif "empty" in subject:
+            return f"return len({arg}) == 0"
         else:
-            return f'return {arg} is not None'
-    
-    def _generate_conversion_body(self, subject: str, args: List[str]) -> str:
+            return f"return {arg} is not None"
+
+    def _generate_conversion_body(self, subject: str, args: list[str]) -> str:
         """Generate conversion function body."""
-        arg = args[0] if args else 'value'
-        
-        if 'string' in subject:
-            return f'return str({arg})'
-        elif 'int' in subject:
-            return f'return int({arg})'
-        elif 'list' in subject:
-            return f'return list({arg})'
+        arg = args[0] if args else "value"
+
+        if "string" in subject:
+            return f"return str({arg})"
+        elif "int" in subject:
+            return f"return int({arg})"
+        elif "list" in subject:
+            return f"return list({arg})"
         else:
-            return f'return {arg}'
-    
-    def _generate_fetch_body(self, subject: str, args: List[str]) -> str:
+            return f"return {arg}"
+
+    def _generate_fetch_body(self, subject: str, args: list[str]) -> str:
         """Generate fetch/get function body."""
-        arg = args[0] if args else 'key'
-        
-        if 'database' in subject or 'db' in subject:
+        arg = args[0] if args else "key"
+
+        if "database" in subject or "db" in subject:
             return f"""# Database fetch implementation
     try:
         # Example database query
@@ -512,7 +545,7 @@ class CodeGenerator:
     except Exception as e:
         logger.error(f"Database fetch error: {{e}}")
         return None"""
-        elif 'api' in subject or 'http' in subject or 'url' in subject:
+        elif "api" in subject or "http" in subject or "url" in subject:
             return f"""# API fetch implementation
     import requests
     try:
@@ -522,7 +555,7 @@ class CodeGenerator:
     except requests.RequestException as e:
         logger.error(f"API fetch error: {{e}}")
         return None"""
-        elif 'file' in subject:
+        elif "file" in subject:
             return f"""# File fetch implementation
     try:
         with open({arg}, 'r') as f:
@@ -534,7 +567,7 @@ class CodeGenerator:
     except Exception as e:
         logger.error(f"File read error: {{e}}")
         return None"""
-        elif 'cache' in subject:
+        elif "cache" in subject:
             return f"""# Cache fetch implementation
     cache_key = {arg}
     cached_value = cache.get(cache_key)
@@ -548,7 +581,7 @@ class CodeGenerator:
         cache.set(cache_key, value)
     
     return value"""
-        elif 'config' in subject or 'setting' in subject:
+        elif "config" in subject or "setting" in subject:
             return f"""# Configuration fetch implementation
     import os
     
@@ -583,13 +616,13 @@ class CodeGenerator:
             continue
     
     return None  # All sources failed"""
-    
-    def _generate_generic_body(self, subject: str, args: List[str]) -> str:
+
+    def _generate_generic_body(self, subject: str, args: list[str]) -> str:
         """Generate generic function body based on subject analysis."""
         # Analyze subject for hints about functionality
         subject_lower = subject.lower()
-        
-        if 'process' in subject_lower:
+
+        if "process" in subject_lower:
             return f"""# Process the input data
     if not {args[0] if args else 'data'}:
         return None
@@ -606,8 +639,8 @@ class CodeGenerator:
         result = process_item(result)
     
     return result"""
-        
-        elif 'parse' in subject_lower:
+
+        elif "parse" in subject_lower:
             return f"""# Parse the input
     import re
     
@@ -622,8 +655,8 @@ class CodeGenerator:
     
     # Return parsed data
     return matches if matches else None"""
-        
-        elif 'filter' in subject_lower:
+
+        elif "filter" in subject_lower:
             return f"""# Filter the input based on criteria
     if not {args[0] if args else 'items'}:
         return []
@@ -637,8 +670,8 @@ class CodeGenerator:
     filtered = [item for item in {args[0] if args else 'items'} if meets_criteria(item)]
     
     return filtered"""
-        
-        elif 'transform' in subject_lower or 'convert' in subject_lower:
+
+        elif "transform" in subject_lower or "convert" in subject_lower:
             return f"""# Transform the input data
     if {args[0] if args else 'data'} is None:
         return None
@@ -655,8 +688,8 @@ class CodeGenerator:
         transformed = sorted(set(transformed))
     
     return transformed"""
-        
-        elif 'analyze' in subject_lower:
+
+        elif "analyze" in subject_lower:
             return f"""# Analyze the input data
     if not {args[0] if args else 'data'}:
         return {{'error': 'No data to analyze'}}
@@ -675,8 +708,8 @@ class CodeGenerator:
         analysis['nested'] = any(isinstance(v, (dict, list)) for v in {args[0] if args else 'data'}.values())
     
     return analysis"""
-        
-        elif 'generate' in subject_lower or 'create' in subject_lower:
+
+        elif "generate" in subject_lower or "create" in subject_lower:
             return f"""# Generate output based on input
     import uuid
     from datetime import datetime
@@ -699,7 +732,7 @@ class CodeGenerator:
         result['content'] = "Generated with default parameters"
     
     return result"""
-        
+
         else:
             # Truly generic implementation with error handling
             return f"""# Generic implementation
@@ -723,143 +756,154 @@ class CodeGenerator:
     except Exception as e:
         logger.error(f"Processing error: {{e}}")
         raise"""
-    
-    def _infer_type_hints(self, subject: str, args: List[str], return_type: Optional[str]) -> Dict[str, str]:
+
+    def _infer_type_hints(
+        self, subject: str, args: list[str], return_type: str | None
+    ) -> dict[str, str]:
         """Infer type hints for function arguments."""
         hints = {}
         subject_lower = subject.lower()
-        
+
         # Infer from argument names and subject
         for arg in args:
-            if arg in ['n', 'num', 'number', 'count']:
-                hints[arg] = 'int'
-            elif arg in ['text', 'string', 'name', 'message']:
-                hints[arg] = 'str'
-            elif arg in ['items', 'values', 'elements']:
-                hints[arg] = 'List[Any]'
-            elif arg in ['data', 'config']:
-                hints[arg] = 'Dict[str, Any]'
-            elif 'float' in subject_lower or 'decimal' in subject_lower:
-                hints[arg] = 'float'
-            elif 'bool' in subject_lower or arg in ['flag', 'enabled']:
-                hints[arg] = 'bool'
+            if arg in ["n", "num", "number", "count"]:
+                hints[arg] = "int"
+            elif arg in ["text", "string", "name", "message"]:
+                hints[arg] = "str"
+            elif arg in ["items", "values", "elements"]:
+                hints[arg] = "List[Any]"
+            elif arg in ["data", "config"]:
+                hints[arg] = "Dict[str, Any]"
+            elif "float" in subject_lower or "decimal" in subject_lower:
+                hints[arg] = "float"
+            elif "bool" in subject_lower or arg in ["flag", "enabled"]:
+                hints[arg] = "bool"
             else:
-                hints[arg] = 'Any'
-        
+                hints[arg] = "Any"
+
         return hints
-    
-    def _infer_init_args(self, subject: str) -> List[str]:
+
+    def _infer_init_args(self, subject: str) -> list[str]:
         """Infer __init__ arguments from subject."""
-        if 'manager' in subject.lower():
-            return ['name', 'capacity']
-        elif 'handler' in subject.lower():
-            return ['config']
-        elif 'service' in subject.lower():
-            return ['endpoint', 'timeout']
-        elif 'controller' in subject.lower():
-            return ['model', 'view']
+        if "manager" in subject.lower():
+            return ["name", "capacity"]
+        elif "handler" in subject.lower():
+            return ["config"]
+        elif "service" in subject.lower():
+            return ["endpoint", "timeout"]
+        elif "controller" in subject.lower():
+            return ["model", "view"]
         else:
-            return ['config']
-    
-    def _generate_init_body(self, subject: str, args: List[str]) -> str:
+            return ["config"]
+
+    def _generate_init_body(self, subject: str, args: list[str]) -> str:
         """Generate __init__ method body."""
         lines = []
-        
+
         # Assign all arguments
         for arg in args:
             lines.append(f"self.{arg} = {arg}")
-        
+
         # Add common attributes based on pattern
-        if 'manager' in subject.lower():
+        if "manager" in subject.lower():
             lines.append("self.items = []")
             lines.append("self._lock = threading.Lock()")
-        elif 'handler' in subject.lower():
+        elif "handler" in subject.lower():
             lines.append("self.handlers = {}")
             lines.append("self.middleware = []")
-        elif 'service' in subject.lower():
+        elif "service" in subject.lower():
             lines.append("self.session = None")
             lines.append("self.retries = 3")
-        elif 'collection' in subject.lower() or 'list' in subject.lower():
+        elif "collection" in subject.lower() or "list" in subject.lower():
             lines.append("self.items = []")
-        
-        return '\n'.join(lines) if lines else "pass"
-    
-    def _infer_base_classes(self, subject: str) -> List[str]:
+
+        return "\n".join(lines) if lines else "pass"
+
+    def _infer_base_classes(self, subject: str) -> list[str]:
         """Infer base classes from subject."""
         bases = []
-        
-        if 'abstract' in subject.lower():
-            bases.append('abc.ABC')
-        elif 'exception' in subject.lower() or 'error' in subject.lower():
-            bases.append('Exception')
-        elif 'thread' in subject.lower():
-            bases.append('threading.Thread')
-        
+
+        if "abstract" in subject.lower():
+            bases.append("abc.ABC")
+        elif "exception" in subject.lower() or "error" in subject.lower():
+            bases.append("Exception")
+        elif "thread" in subject.lower():
+            bases.append("threading.Thread")
+
         return bases
-    
-    def _infer_method_return_type(self, method_name: str) -> Optional[str]:
+
+    def _infer_method_return_type(self, method_name: str) -> str | None:
         """Infer return type from method name."""
-        if method_name.startswith('is_') or method_name.startswith('has_'):
-            return 'bool'
-        elif method_name.startswith('get_'):
-            return 'Any'
-        elif method_name.startswith('count_') or method_name == 'size':
-            return 'int'
-        elif method_name in ['__str__', '__repr__']:
-            return 'str'
+        if method_name.startswith("is_") or method_name.startswith("has_"):
+            return "bool"
+        elif method_name.startswith("get_"):
+            return "Any"
+        elif method_name.startswith("count_") or method_name == "size":
+            return "int"
+        elif method_name in ["__str__", "__repr__"]:
+            return "str"
         return None
-    
+
     def _extract_test_target(self, subject: str) -> str:
         """Extract what to test from subject."""
         # Look for function/class names
         words = subject.split()
         for word in words:
-            if word.startswith('test_'):
+            if word.startswith("test_"):
                 continue
-            if '_' in word or word[0].isupper():
+            if "_" in word or word[0].isupper():
                 return word
-        return 'function'
-    
-    def _generate_test_cases(self, target: str) -> List[Dict[str, str]]:
+        return "function"
+
+    def _generate_test_cases(self, target: str) -> list[dict[str, str]]:
         """Generate comprehensive test cases for target."""
         test_cases = []
-        
+
         # Basic functionality test
-        test_cases.append({
-            'name': 'test_basic_functionality',
-            'assertion': f"""# Test basic functionality
+        test_cases.append(
+            {
+                "name": "test_basic_functionality",
+                "assertion": f"""# Test basic functionality
     result = {target}(sample_input)
     assert result is not None
-    assert isinstance(result, expected_type)"""
-        })
-        
+    assert isinstance(result, expected_type)""",
+            }
+        )
+
         # Edge cases
-        test_cases.append({
-            'name': 'test_empty_input',
-            'assertion': f"""# Test with empty input
+        test_cases.append(
+            {
+                "name": "test_empty_input",
+                "assertion": f"""# Test with empty input
     result = {target}()
-    assert result is None or result == [] or result == {{}}"""
-        })
-        
-        test_cases.append({
-            'name': 'test_none_input',
-            'assertion': f"""# Test with None input
+    assert result is None or result == [] or result == {{}}""",
+            }
+        )
+
+        test_cases.append(
+            {
+                "name": "test_none_input",
+                "assertion": f"""# Test with None input
     result = {target}(None)
-    assert result is None or isinstance(result, expected_type)"""
-        })
-        
+    assert result is None or isinstance(result, expected_type)""",
+            }
+        )
+
         # Error handling
-        test_cases.append({
-            'name': 'test_invalid_input',
-            'assertion': f"""# Test error handling
+        test_cases.append(
+            {
+                "name": "test_invalid_input",
+                "assertion": f"""# Test error handling
     with pytest.raises((ValueError, TypeError, Exception)):
-        {target}(invalid_input)"""
-        })
-        
+        {target}(invalid_input)""",
+            }
+        )
+
         # Type checking
-        test_cases.append({
-            'name': 'test_type_validation',
-            'assertion': f"""# Test type validation
+        test_cases.append(
+            {
+                "name": "test_type_validation",
+                "assertion": f"""# Test type validation
     # Test with different types
     for test_input in [123, "string", [1,2,3], {{"key": "value"}}]:
         try:
@@ -868,13 +912,15 @@ class CodeGenerator:
             assert result is not None or True
         except (TypeError, ValueError):
             # Expected for incompatible types
-            pass"""
-        })
-        
+            pass""",
+            }
+        )
+
         # Performance test
-        test_cases.append({
-            'name': 'test_performance',
-            'assertion': f"""# Test performance
+        test_cases.append(
+            {
+                "name": "test_performance",
+                "assertion": f"""# Test performance
     import time
     start_time = time.time()
     
@@ -883,34 +929,37 @@ class CodeGenerator:
         result = {target}(sample_input)
     
     elapsed = time.time() - start_time
-    assert elapsed < 1.0  # Should complete in under 1 second"""
-        })
-        
+    assert elapsed < 1.0  # Should complete in under 1 second""",
+            }
+        )
+
         return test_cases
-    
+
     def _extract_endpoint_name(self, subject: str) -> str:
         """Extract API endpoint from subject."""
         # Look for resource names
         words = subject.lower().split()
-        resources = ['users', 'items', 'products', 'orders', 'data']
-        
+        resources = ["users", "items", "products", "orders", "data"]
+
         for word in words:
             if word in resources:
                 return f"/{word}"
-            if word.endswith('s'):  # Plural
+            if word.endswith("s"):  # Plural
                 return f"/{word}"
-        
+
         return "/resource"
-    
-    def _load_templates(self) -> Dict[str, Template]:
+
+    def _load_templates(self) -> dict[str, Template]:
         """Load code generation templates."""
         templates = {
-            'function': Template('''def {{ name }}({{ args|join(', ') }}){% if return_type %} -> {{ return_type }}{% endif %}:
+            "function": Template(
+                '''def {{ name }}({{ args|join(', ') }}){% if return_type %} -> {{ return_type }}{% endif %}:
     """{{ docstring }}"""
     {{ body }}
-'''),
-            
-            'class': Template('''class {{ name }}:
+'''
+            ),
+            "class": Template(
+                '''class {{ name }}:
     """{{ docstring }}"""
     
     {% for attr in attributes %}
@@ -921,9 +970,10 @@ class CodeGenerator:
     def {{ method.name }}({{ method.args|join(', ') }}):
         {{ method.body }}
     {% endfor %}
-'''),
-            
-            'test': Template('''import pytest
+'''
+            ),
+            "test": Template(
+                '''import pytest
 
 
 def test_{{ target_name }}():
@@ -932,9 +982,10 @@ def test_{{ target_name }}():
     # {{ case.name }}
     {{ case.assertion }}
     {% endfor %}
-'''),
-            
-            'api': Template('''from flask import Flask, request, jsonify
+'''
+            ),
+            "api": Template(
+                '''from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
@@ -945,11 +996,12 @@ def {{ handler_name }}():
     if request.method == '{{ method }}':
         # TODO: Implement handler logic
         return jsonify({'status': 'success'})
-'''),
+'''
+            ),
         }
-        
+
         return templates
-    
+
     # Algorithm templates
     def _binary_search_template(self) -> str:
         return '''def binary_search(arr: List[int], target: int) -> int:

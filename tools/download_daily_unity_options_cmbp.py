@@ -16,8 +16,8 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -179,7 +179,7 @@ class UnityDailyOptionsDownloader:
         logger.info("=" * 70)
         logger.info("DOWNLOADING DAILY UNITY OPTIONS DATA")
         logger.info("=" * 70)
-        logger.info(f"Using CMBP-1 schema for end-of-day snapshots")
+        logger.info("Using CMBP-1 schema for end-of-day snapshots")
         logger.info(f"Date range: {start_date} to {end_date}")
         logger.info("=" * 70)
 
@@ -255,9 +255,13 @@ class UnityDailyOptionsDownloader:
 
         if stats[1] > 400:  # Should have ~500+ trading days
             logger.info("\n✅ SUCCESS: Got daily Unity options data!")
-            logger.info("✅ This is proper daily coverage for wheel strategy backtesting")
+            logger.info(
+                "✅ This is proper daily coverage for wheel strategy backtesting"
+            )
         else:
-            logger.info(f"\n⚠️  Only {stats[1]} trading days - still missing daily data")
+            logger.info(
+                f"\n⚠️  Only {stats[1]} trading days - still missing daily data"
+            )
 
     def cleanup(self):
         """Close database connection."""

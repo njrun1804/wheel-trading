@@ -6,9 +6,7 @@ This script collects both stock prices and options data.
 import asyncio
 import os
 import sys
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
-from typing import Any, Dict, List
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
@@ -28,13 +26,13 @@ logger = StructuredLogger(logging.getLogger(__name__))
 # Constants
 config = get_config()
 TICKER = config.unity.ticker
-STOCK_START = datetime(2022, 1, 1, tzinfo=timezone.utc)
-STOCK_END = datetime(2025, 6, 10, tzinfo=timezone.utc)
-OPTIONS_START = datetime(2023, 1, 1, tzinfo=timezone.utc)
-OPTIONS_END = datetime(2025, 6, 10, tzinfo=timezone.utc)
+STOCK_START = datetime(2022, 1, 1, tzinfo=UTC)
+STOCK_END = datetime(2025, 6, 10, tzinfo=UTC)
+OPTIONS_START = datetime(2023, 1, 1, tzinfo=UTC)
+OPTIONS_END = datetime(2025, 6, 10, tzinfo=UTC)
 
 
-def get_monthly_expirations(start_date: datetime, end_date: datetime) -> List[datetime]:
+def get_monthly_expirations(start_date: datetime, end_date: datetime) -> list[datetime]:
     """Get all 3rd Friday monthly expirations between start and end dates."""
     expirations = []
     current = start_date.replace(day=1)
@@ -114,7 +112,9 @@ async def main():
                     df["date"] = pd.to_datetime(df["date"])
                     df.set_index("date", inplace=True)
 
-                print(f"   Price range: ${df['low'].min():.2f} - ${df['high'].max():.2f}")
+                print(
+                    f"   Price range: ${df['low'].min():.2f} - ${df['high'].max():.2f}"
+                )
                 print(f"   Average volume: {df['volume'].mean():,.0f}")
 
                 # Save to CSV for verification
@@ -175,9 +175,13 @@ async def main():
 
                     # Here we would fetch actual options data
                     # For now, just count what we would collect
-                    options_collected += len(strikes) * len(valid_expirations) * 2  # PUT and CALL
+                    options_collected += (
+                        len(strikes) * len(valid_expirations) * 2
+                    )  # PUT and CALL
 
-            print(f"\n✅ Would collect approximately {options_collected:,} option quotes")
+            print(
+                f"\n✅ Would collect approximately {options_collected:,} option quotes"
+            )
 
             # Save summary
             summary = {

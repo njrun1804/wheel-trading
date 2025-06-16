@@ -15,10 +15,9 @@ import pytz
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def test_daily_options_schemas():
@@ -67,7 +66,9 @@ def test_daily_options_schemas():
                 )
             else:
                 # Use UTC midnight for bar data
-                start = datetime.combine(test_date, datetime.min.time()).replace(tzinfo=pytz.UTC)
+                start = datetime.combine(test_date, datetime.min.time()).replace(
+                    tzinfo=pytz.UTC
+                )
                 end = start + timedelta(days=1)
 
             try:
@@ -120,13 +121,13 @@ def test_daily_options_schemas():
             )
 
             if total_days >= 4:  # Good coverage
-                print(f"  ✅ This schema provides good daily coverage!")
+                print("  ✅ This schema provides good daily coverage!")
 
                 # Test a longer date range with this schema
                 print(f"\n  🔍 Testing {schema} with longer date range...")
                 test_longer_range(client, schema)
         else:
-            print(f"  ❌ No data available with this schema")
+            print("  ❌ No data available with this schema")
 
     conn.close()
 
@@ -146,10 +147,12 @@ def test_longer_range(client, schema):
             hour=16, minute=0, tzinfo=pytz.timezone("US/Eastern")
         )
     else:
-        start = datetime.combine(start_date, datetime.min.time()).replace(tzinfo=pytz.UTC)
-        end = datetime.combine(end_date + timedelta(days=1), datetime.min.time()).replace(
+        start = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=pytz.UTC
         )
+        end = datetime.combine(
+            end_date + timedelta(days=1), datetime.min.time()
+        ).replace(tzinfo=pytz.UTC)
 
     try:
         data = client.client.timeseries.get_range(
@@ -179,10 +182,10 @@ def test_longer_range(client, schema):
             print(f"    💹 Avg records per day: {len(df)/trading_days:.0f}")
 
             if trading_days >= 8:  # Should have ~10 trading days in 2 weeks
-                print(f"    ✅ EXCELLENT! This schema gives us daily options data!")
+                print("    ✅ EXCELLENT! This schema gives us daily options data!")
                 return True
         else:
-            print(f"    ❌ No data in longer range")
+            print("    ❌ No data in longer range")
 
     except Exception as e:
         print(f"    ❌ Error in longer range: {str(e)[:50]}")

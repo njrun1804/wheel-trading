@@ -6,14 +6,15 @@ import hashlib
 import json
 import pickle
 import time
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from functools import lru_cache, wraps
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
+from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
-from unity_wheel.utils.logging import get_logger
 from unity_wheel.metrics import metrics_collector
+from unity_wheel.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -36,12 +37,12 @@ class CacheEntry:
     @property
     def is_expired(self) -> bool:
         """Check if entry has expired."""
-        return datetime.now(timezone.utc) >= self.expires_at
+        return datetime.now(UTC) >= self.expires_at
 
     @property
     def age_seconds(self) -> float:
         """Age of cache entry in seconds."""
-        return (datetime.now(timezone.utc) - self.created_at).total_seconds()
+        return (datetime.now(UTC) - self.created_at).total_seconds()
 
     def record_hit(self) -> None:
         """Record a cache hit."""
@@ -56,7 +57,7 @@ class CacheStatistics:
         self.misses = 0
         self.evictions = 0
         self.computation_time_saved_ms = 0.0
-        self.entries_by_key: Dict[str, int] = {}
+        self.entries_by_key: dict[str, int] = {}
 
     @property
     def hit_rate(self) -> float:
@@ -81,7 +82,7 @@ class CacheStatistics:
         self.evictions += 1
         metrics_collector.record_cache_eviction()
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get statistics summary."""
         return {
             "hits": self.hits,
@@ -90,7 +91,9 @@ class CacheStatistics:
             "evictions": self.evictions,
             "time_saved_ms": round(self.computation_time_saved_ms, 2),
             "unique_keys": len(self.entries_by_key),
-            "top_keys": sorted(self.entries_by_key.items(), key=lambda x: x[1], reverse=True)[:5],
+            "top_keys": sorted(
+                self.entries_by_key.items(), key=lambda x: x[1], reverse=True
+            )[:5],
         }
 
 
@@ -108,13 +111,13 @@ class IntelligentCache:
         self,
         max_size_mb: float = 100.0,
         default_ttl: timedelta = timedelta(minutes=15),
-        persistence_path: Optional[Path] = None,
+        persistence_path: Path | None = None,
     ):
         self.max_size_bytes = int(max_size_mb * 1024 * 1024)
         self.default_ttl = default_ttl
         self.persistence_path = persistence_path
 
-        self._cache: Dict[str, CacheEntry] = {}
+        self._cache: dict[str, CacheEntry] = {}
         self._total_size = 0
         self._stats = CacheStatistics()
 
@@ -157,7 +160,11 @@ class IntelligentCache:
         # Sort by score: age * hit_count / computation_time
         # (prefer evicting old, rarely used, cheap-to-compute entries)
         entries = list(self._cache.values())
-        entries.sort(key=lambda e: e.age_seconds / (e.hit_count + 1) / (e.computation_time_ms + 1))
+        entries.sort(
+            key=lambda e: e.age_seconds
+            / (e.hit_count + 1)
+            / (e.computation_time_ms + 1)
+        )
 
         # Evict until we have space
         while self._total_size + required_space > self.max_size_bytes and entries:
@@ -175,9 +182,9 @@ class IntelligentCache:
     def get(
         self,
         key: str,
-        compute_func: Optional[Callable[[], T]] = None,
-        ttl: Optional[timedelta] = None,
-    ) -> Optional[T]:
+        compute_func: Callable[[], T] | None = None,
+        ttl: timedelta | None = None,
+    ) -> T | None:
         """
         Get value from cache or compute it.
 
@@ -221,7 +228,8 @@ class IntelligentCache:
             value = compute_func()
         except (ValueError, KeyError, AttributeError) as e:
             logger.error(
-                f"Failed to compute value for cache key {key}", extra={"key": key, "error": str(e)}
+                f"Failed to compute value for cache key {key}",
+                extra={"key": key, "error": str(e)},
             )
             raise
 
@@ -236,7 +244,7 @@ class IntelligentCache:
         self,
         key: str,
         value: T,
-        ttl: Optional[timedelta] = None,
+        ttl: timedelta | None = None,
         computation_time_ms: float = 0.0,
     ) -> None:
         """Store value in cache."""
@@ -249,7 +257,7 @@ class IntelligentCache:
         self._evict_if_needed(size_bytes)
 
         # Create entry
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         entry = CacheEntry(
             key=key,
             value=value,
@@ -294,7 +302,9 @@ class IntelligentCache:
             self._remove_entry(key)
 
         if keys_to_remove:
-            logger.info(f"Invalidated {len(keys_to_remove)} cache entries matching {pattern}")
+            logger.info(
+                f"Invalidated {len(keys_to_remove)} cache entries matching {pattern}"
+            )
 
         return len(keys_to_remove)
 
@@ -304,7 +314,7 @@ class IntelligentCache:
         self._total_size = 0
         logger.info("Cache cleared")
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         stats = self._stats.get_summary()
         stats.update(
@@ -340,7 +350,7 @@ class IntelligentCache:
             # Convert to serializable format
             cache_data = {
                 "version": 1,
-                "saved_at": datetime.now(timezone.utc).isoformat(),
+                "saved_at": datetime.now(UTC).isoformat(),
                 "entries": {
                     key: {
                         "value": entry.value,
@@ -370,7 +380,7 @@ class IntelligentCache:
 
         try:
             # Use JSON instead of pickle for security
-            with open(self.persistence_path, "r") as f:
+            with open(self.persistence_path) as f:
                 cache_data = json.load(f)
 
             loaded = 0
@@ -403,8 +413,8 @@ _cache = IntelligentCache()
 
 
 def cached(
-    ttl: Union[timedelta, int] = timedelta(minutes=15),
-    key_prefix: Optional[str] = None,
+    ttl: timedelta | int = timedelta(minutes=15),
+    key_prefix: str | None = None,
 ) -> Callable[[F], F]:
     """
     Decorator for caching function results.
@@ -441,7 +451,7 @@ def cached(
     return decorator
 
 
-def invalidate_cache(pattern: Optional[str] = None) -> None:
+def invalidate_cache(pattern: str | None = None) -> None:
     """Invalidate cache entries matching pattern."""
     if pattern:
         _cache.invalidate_pattern(pattern)
@@ -449,6 +459,6 @@ def invalidate_cache(pattern: Optional[str] = None) -> None:
         _cache.clear()
 
 
-def get_cache_stats() -> Dict[str, Any]:
+def get_cache_stats() -> dict[str, Any]:
     """Get global cache statistics."""
     return _cache.get_stats()

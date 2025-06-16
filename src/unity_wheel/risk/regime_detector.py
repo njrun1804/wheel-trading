@@ -6,7 +6,6 @@ Prevents risk skewing from mixing different market regimes.
 """
 
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -45,8 +44,8 @@ class RegimeDetector:
 
     def __init__(self, n_regimes: int = 3):
         self.n_regimes = n_regimes
-        self.model: Optional[GaussianMixture] = None
-        self.regime_info: Dict[int, RegimeInfo] = {}
+        self.model: GaussianMixture | None = None
+        self.regime_info: dict[int, RegimeInfo] = {}
 
     def fit(self, returns: np.ndarray) -> None:
         """Fit regime model to historical returns."""
@@ -109,7 +108,7 @@ class RegimeDetector:
             regimes=[r.name for r in self.regime_info.values()],
         )
 
-    def get_current_regime(self, returns: np.ndarray) -> Tuple[RegimeInfo, float]:
+    def get_current_regime(self, returns: np.ndarray) -> tuple[RegimeInfo, float]:
         """Get current regime and confidence."""
 
         if self.model is None:
@@ -142,7 +141,7 @@ class RegimeDetector:
 
     def calculate_regime_adjusted_var(
         self, returns: np.ndarray, confidence_level: float = 0.95
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Calculate VaR adjusted for current regime."""
 
         current_regime, regime_confidence = self.get_current_regime(returns)
@@ -178,7 +177,9 @@ class RegimeDetector:
     ) -> float:
         """Calculate EWMA VaR."""
         n = len(returns)
-        weights = np.array([(1 - lambda_param) * lambda_param**i for i in range(n - 1, -1, -1)])
+        weights = np.array(
+            [(1 - lambda_param) * lambda_param**i for i in range(n - 1, -1, -1)]
+        )
         weights = weights / weights.sum()
 
         # Sort returns with weights

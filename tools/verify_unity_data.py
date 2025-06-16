@@ -9,6 +9,7 @@ from pathlib import Path
 import duckdb
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -160,9 +161,11 @@ def verify_unity_data():
 
         print(f"\n5. OLD DATABENTO_OPTION_CHAINS: {old_chains:,} records")
         if old_chains > 0:
-            print("   ⚠️  WARNING: This table should be empty (contained synthetic data)")
+            print(
+                "   ⚠️  WARNING: This table should be empty (contained synthetic data)"
+            )
     except Exception as e:
-        print(f"\n5. OLD DATABENTO_OPTION_CHAINS: Table not found (good)")
+        print("\n5. OLD DATABENTO_OPTION_CHAINS: Table not found (good)")
 
     # 6. Summary statistics
     print("\n" + "=" * 60)

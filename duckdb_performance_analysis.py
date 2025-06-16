@@ -34,6 +34,7 @@ import numpy as np
 import pandas as pd
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -140,14 +141,22 @@ class PerformanceAnalyzer:
 
                     # Implied volatility smile
                     if option_type == "put":
-                        iv = 0.60 + 0.15 * abs(moneyness - 1.0) + np.random.normal(0, 0.05)
+                        iv = (
+                            0.60
+                            + 0.15 * abs(moneyness - 1.0)
+                            + np.random.normal(0, 0.05)
+                        )
                         delta = (
                             -np.random.uniform(0.05, 0.95)
                             if moneyness < 1.2
                             else -np.random.uniform(0.01, 0.15)
                         )
                     else:
-                        iv = 0.58 + 0.12 * abs(moneyness - 1.0) + np.random.normal(0, 0.05)
+                        iv = (
+                            0.58
+                            + 0.12 * abs(moneyness - 1.0)
+                            + np.random.normal(0, 0.05)
+                        )
                         delta = (
                             np.random.uniform(0.05, 0.95)
                             if moneyness > 0.8
@@ -158,9 +167,14 @@ class PerformanceAnalyzer:
 
                     # Price based on Black-Scholes approximation
                     intrinsic = max(
-                        0, (spot_price - strike) if option_type == "call" else (strike - spot_price)
+                        0,
+                        (spot_price - strike)
+                        if option_type == "call"
+                        else (strike - spot_price),
                     )
-                    time_value = max(0.01, iv * np.sqrt(days_to_expiry / 365) * spot_price * 0.4)
+                    time_value = max(
+                        0.01, iv * np.sqrt(days_to_expiry / 365) * spot_price * 0.4
+                    )
                     mid_price = intrinsic + time_value
 
                     # Bid-ask spread
@@ -228,7 +242,9 @@ class PerformanceAnalyzer:
             tracemalloc.stop()
 
             execution_time_ms = (end_time - start_time) * 1000
-            memory_usage_mb = (current_memory - start_memory * 1024 * 1024) / 1024 / 1024
+            memory_usage_mb = (
+                (current_memory - start_memory * 1024 * 1024) / 1024 / 1024
+            )
             peak_memory_mb = peak_memory / 1024 / 1024
 
             ops_per_second = (
@@ -267,12 +283,16 @@ class PerformanceAnalyzer:
 
             try:
                 # Setup data
-                with self.measure_performance(f"{backend_name}_data_load", len(options_df)):
+                with self.measure_performance(
+                    f"{backend_name}_data_load", len(options_df)
+                ):
                     backend.setup_data(options_df)
                 backend_results["data_load"] = self._last_benchmark_result
 
                 # Query 1: Load all put options for Unity
-                with self.measure_performance(f"{backend_name}_load_puts", len(options_df) // 2):
+                with self.measure_performance(
+                    f"{backend_name}_load_puts", len(options_df) // 2
+                ):
                     puts = backend.get_put_options("U")
                 backend_results["load_puts"] = self._last_benchmark_result
 
@@ -283,7 +303,9 @@ class PerformanceAnalyzer:
 
                 # Query 3: Filter by expiration (30-60 days)
                 with self.measure_performance(f"{backend_name}_filter_expiry"):
-                    expiry_filtered = backend.filter_by_days_to_expiry(delta_filtered, 30, 60)
+                    expiry_filtered = backend.filter_by_days_to_expiry(
+                        delta_filtered, 30, 60
+                    )
                 backend_results["filter_expiry"] = self._last_benchmark_result
 
                 # Query 4: Calculate expected returns
@@ -293,7 +315,9 @@ class PerformanceAnalyzer:
 
                 # Query 5: Rank by multiple criteria
                 with self.measure_performance(f"{backend_name}_rank_options"):
-                    ranked = backend.rank_options(returns, ["expected_return", "delta", "volume"])
+                    ranked = backend.rank_options(
+                        returns, ["expected_return", "delta", "volume"]
+                    )
                 backend_results["rank_options"] = self._last_benchmark_result
 
                 # Query 6: Complex aggregation (portfolio level analysis)
@@ -325,7 +349,9 @@ class PerformanceAnalyzer:
         results = {}
 
         for backend_name, backend in self.storage_backends.items():
-            if backend_name in ["redis"]:  # Skip backends that don't support concurrent well
+            if backend_name in [
+                "redis"
+            ]:  # Skip backends that don't support concurrent well
                 continue
 
             logger.info(f"\nTesting concurrent access for {backend_name.upper()}...")
@@ -347,10 +373,13 @@ class PerformanceAnalyzer:
                 num_queries_per_worker = 5
                 total_queries = num_workers * num_queries_per_worker
 
-                with self.measure_performance(f"{backend_name}_concurrent", total_queries):
+                with self.measure_performance(
+                    f"{backend_name}_concurrent", total_queries
+                ):
                     with ThreadPoolExecutor(max_workers=num_workers) as executor:
                         futures = [
-                            executor.submit(concurrent_query, i) for i in range(total_queries)
+                            executor.submit(concurrent_query, i)
+                            for i in range(total_queries)
                         ]
 
                         query_times = []
@@ -359,7 +388,9 @@ class PerformanceAnalyzer:
 
                 # Add stats about individual query performance
                 avg_query_time = np.mean(query_times)
-                self._last_benchmark_result.notes = f"Avg query time: {avg_query_time:.2f}ms"
+                self._last_benchmark_result.notes = (
+                    f"Avg query time: {avg_query_time:.2f}ms"
+                )
 
                 results[backend_name] = self._last_benchmark_result
 
@@ -387,7 +418,9 @@ class PerformanceAnalyzer:
                 "strikes_per_expiry": 15,
                 "expiry_dates": 6,
                 "option_types": 2,
-                "total_permutations": 200 * 6 * 3,  # options * expiry * criteria combinations
+                "total_permutations": 200
+                * 6
+                * 3,  # options * expiry * criteria combinations
             },
             "data_access_patterns": {
                 "read_heavy": True,
@@ -451,12 +484,12 @@ class PerformanceAnalyzer:
 
                 # Extract key metrics
                 if "results" in audit_data:
-                    results["test_summaries"]["clean_sharpe_ratio"] = audit_data["results"].get(
-                        "clean_sharpe", 0
-                    )
-                    results["test_summaries"]["clean_return"] = audit_data["results"].get(
-                        "clean_return", 0
-                    )
+                    results["test_summaries"]["clean_sharpe_ratio"] = audit_data[
+                        "results"
+                    ].get("clean_sharpe", 0)
+                    results["test_summaries"]["clean_return"] = audit_data[
+                        "results"
+                    ].get("clean_return", 0)
                     results["test_summaries"]["completion_rate"] = audit_data.get(
                         "completion_rate", 0
                     )
@@ -511,20 +544,38 @@ class PerformanceAnalyzer:
                 "overall_arbitrage_free": True,
             },
             "return_distribution_analysis": {
-                "normality_tests": {"jarque_bera_p_value": 0.23, "passes_normality": True},
+                "normality_tests": {
+                    "jarque_bera_p_value": 0.23,
+                    "passes_normality": True,
+                },
                 "fat_tail_analysis": {"excess_kurtosis": 2.1, "has_fat_tails": True},
-                "skewness_analysis": {"skewness": -0.15, "approximately_symmetric": True},
-                "var_model_validation": {"var_95_accuracy": 0.94, "var_99_accuracy": 0.98},
-                "monte_carlo_convergence": {"simulations_needed": 10000, "converged": True},
+                "skewness_analysis": {
+                    "skewness": -0.15,
+                    "approximately_symmetric": True,
+                },
+                "var_model_validation": {
+                    "var_95_accuracy": 0.94,
+                    "var_99_accuracy": 0.98,
+                },
+                "monte_carlo_convergence": {
+                    "simulations_needed": 10000,
+                    "converged": True,
+                },
             },
             "risk_model_validation": {
-                "portfolio_var_tests": {"backtesting_accuracy": 0.95, "passes_kupiec_test": True},
+                "portfolio_var_tests": {
+                    "backtesting_accuracy": 0.95,
+                    "passes_kupiec_test": True,
+                },
                 "correlation_stability": {"rolling_correlation_stability": 0.88},
                 "stress_test_scenarios": {
                     "2008_crisis": {"portfolio_loss": -0.23},
                     "covid_crash": {"portfolio_loss": -0.31},
                 },
-                "regime_detection": {"regimes_identified": 3, "transition_accuracy": 0.82},
+                "regime_detection": {
+                    "regimes_identified": 3,
+                    "transition_accuracy": 0.82,
+                },
             },
         }
 
@@ -599,7 +650,9 @@ class PerformanceAnalyzer:
         # Recommendations
         report["recommendations"] = {
             "primary_storage": self._recommend_primary_storage(query_results),
-            "caching_strategy": self._recommend_caching_strategy(query_results, concurrent_results),
+            "caching_strategy": self._recommend_caching_strategy(
+                query_results, concurrent_results
+            ),
             "optimization_opportunities": self._identify_optimizations(
                 query_results, concurrent_results
             ),
@@ -608,23 +661,33 @@ class PerformanceAnalyzer:
 
         return report
 
-    def _determine_best_backend(self, query_results: dict[str, dict[str, BenchmarkResult]]) -> str:
+    def _determine_best_backend(
+        self, query_results: dict[str, dict[str, BenchmarkResult]]
+    ) -> str:
         """Determine the best performing backend overall."""
         backend_scores = {}
 
         for backend_name, results in query_results.items():
             total_time = sum(
-                r.execution_time_ms for r in results.values() if r.execution_time_ms != float("inf")
+                r.execution_time_ms
+                for r in results.values()
+                if r.execution_time_ms != float("inf")
             )
             total_memory = sum(
-                r.memory_usage_mb for r in results.values() if r.memory_usage_mb != float("inf")
+                r.memory_usage_mb
+                for r in results.values()
+                if r.memory_usage_mb != float("inf")
             )
 
             # Simple scoring: lower is better
             score = total_time + total_memory * 10  # Weight memory more heavily
             backend_scores[backend_name] = score
 
-        return min(backend_scores.items(), key=lambda x: x[1])[0] if backend_scores else "unknown"
+        return (
+            min(backend_scores.items(), key=lambda x: x[1])[0]
+            if backend_scores
+            else "unknown"
+        )
 
     def _format_query_results(
         self, query_results: dict[str, dict[str, BenchmarkResult]]
@@ -707,10 +770,14 @@ class PerformanceAnalyzer:
         if DUCKDB_AVAILABLE and "duckdb" in query_results:
             duckdb_results = query_results["duckdb"]
             slow_queries = [
-                name for name, result in duckdb_results.items() if result.execution_time_ms > 100
+                name
+                for name, result in duckdb_results.items()
+                if result.execution_time_ms > 100
             ]
             if slow_queries:
-                optimizations.append(f"Optimize slow DuckDB queries: {', '.join(slow_queries)}")
+                optimizations.append(
+                    f"Optimize slow DuckDB queries: {', '.join(slow_queries)}"
+                )
 
         return optimizations
 
@@ -744,7 +811,8 @@ class PerformanceAnalyzer:
 
         if save_results:
             output_file = (
-                self.data_dir / f"duckdb_performance_analysis_{datetime.now():%Y%m%d_%H%M%S}.json"
+                self.data_dir
+                / f"duckdb_performance_analysis_{datetime.now():%Y%m%d_%H%M%S}.json"
             )
             with open(output_file, "w") as f:
                 json.dump(report, f, indent=2, default=str)
@@ -767,7 +835,9 @@ class StorageBackend:
         """Get all put options for a symbol."""
         raise NotImplementedError
 
-    def filter_by_delta_range(self, data: Any, min_delta: float, max_delta: float) -> Any:
+    def filter_by_delta_range(
+        self, data: Any, min_delta: float, max_delta: float
+    ) -> Any:
         """Filter options by delta range."""
         raise NotImplementedError
 
@@ -999,7 +1069,9 @@ class SQLiteBackend(StorageBackend):
 
         # Create indexes
         conn.execute("CREATE INDEX IF NOT EXISTS idx_symbol ON options(symbol)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_option_type ON options(option_type)")
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_option_type ON options(option_type)"
+        )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_delta ON options(delta)")
         conn.commit()
 
@@ -1152,7 +1224,9 @@ class RedisBackend(StorageBackend):
     def filter_by_days_to_expiry(
         self, data: list[dict], min_days: int, max_days: int
     ) -> list[dict]:
-        return [opt for opt in data if min_days <= opt.get("days_to_expiry", 0) <= max_days]
+        return [
+            opt for opt in data if min_days <= opt.get("days_to_expiry", 0) <= max_days
+        ]
 
     def calculate_expected_returns(self, data: list[dict]) -> list[dict]:
         for opt in data:
@@ -1163,7 +1237,9 @@ class RedisBackend(StorageBackend):
         return data
 
     def rank_options(self, data: list[dict], criteria: list[str]) -> list[dict]:
-        return sorted(data, key=lambda x: x.get("expected_return_annualized", 0), reverse=True)[:20]
+        return sorted(
+            data, key=lambda x: x.get("expected_return_annualized", 0), reverse=True
+        )[:20]
 
     def calculate_portfolio_metrics(self, data: list[dict]) -> dict[str, float]:
         if not data:
@@ -1194,7 +1270,10 @@ class PostgreSQLBackend(StorageBackend):
             raise ImportError("PostgreSQL not available")
         try:
             self.conn = psycopg2.connect(
-                host="localhost", database="postgres", user="postgres", password="postgres"
+                host="localhost",
+                database="postgres",
+                user="postgres",
+                password="postgres",
             )
             self.conn.autocommit = True
         except Exception as e:
@@ -1343,7 +1422,9 @@ def main():
     """Main entry point for the performance analysis."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="DuckDB Performance Analysis for Wheel Trading")
+    parser = argparse.ArgumentParser(
+        description="DuckDB Performance Analysis for Wheel Trading"
+    )
     parser.add_argument(
         "--save-results", action="store_true", help="Save analysis results to JSON file"
     )

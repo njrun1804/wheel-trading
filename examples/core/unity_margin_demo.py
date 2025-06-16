@@ -41,7 +41,7 @@ def demo_unity_margin():
     print("1. IRA Account")
     print(f"   Margin Required: ${ira_result.margin_required:,.2f}")
     print(f"   Margin Type: {ira_result.margin_type}")
-    print(f"   Note: 100% cash secured (no margin allowed)")
+    print("   Note: 100% cash secured (no margin allowed)")
     print()
 
     # 2. Cash Account - Also full cash for puts
@@ -57,7 +57,7 @@ def demo_unity_margin():
     print("2. Cash Account")
     print(f"   Margin Required: ${cash_result.margin_required:,.2f}")
     print(f"   Margin Type: {cash_result.margin_type}")
-    print(f"   Note: Cash secured puts (no margin for puts)")
+    print("   Note: Cash secured puts (no margin for puts)")
     print()
 
     # 3. Margin Account - Standard margin with Unity adjustment
@@ -75,7 +75,7 @@ def demo_unity_margin():
     print(f"   Unity Multiplier: {margin_result.details['unity_multiplier']}x")
     print(f"   Unity Adjusted: ${margin_result.margin_required:,.2f}")
     print(f"   Calculation Method: {margin_result.calculation_method}")
-    print(f"   Note: 1.5x standard margin due to Unity volatility")
+    print("   Note: 1.5x standard margin due to Unity volatility")
     print()
 
     # 4. Portfolio Margin - Risk-based with Unity adjustment
@@ -95,13 +95,15 @@ def demo_unity_margin():
         f"   Standard Portfolio Margin: ${portfolio_result.details['standard_portfolio_margin']:,.2f}"
     )
     print(f"   Unity Adjusted: ${portfolio_result.margin_required:,.2f}")
-    print(f"   Note: Even portfolio margin gets Unity adjustment")
+    print("   Note: Even portfolio margin gets Unity adjustment")
     print()
 
     # 5. Comparison Summary
     print("Margin Comparison Summary")
     print("-" * 50)
-    print(f"IRA/Cash Account:      ${ira_result.margin_required:>10,.2f} (100% secured)")
+    print(
+        f"IRA/Cash Account:      ${ira_result.margin_required:>10,.2f} (100% secured)"
+    )
     print(
         f"Margin Account:        ${margin_result.margin_required:>10,.2f} ({margin_result.margin_required/ira_result.margin_required:.1%} of cash)"
     )

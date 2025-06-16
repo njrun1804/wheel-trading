@@ -6,16 +6,16 @@ Quantifies historical impact and adjusts strategy parameters.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
 
 from src.config.loader import get_config
-from ..utils import get_logger, timed_operation, with_recovery
-from ..utils.recovery import RecoveryStrategy
+
+from ..utils import get_logger, timed_operation
 
 logger = get_logger(__name__)
 
@@ -63,8 +63,8 @@ class EventImpactAnalyzer:
             config = get_config()
             symbol = config.unity.ticker
         self.symbol = symbol
-        self.event_history: Dict[EventType, List[Dict]] = {}
-        self.event_calendar: List[UpcomingEvent] = []
+        self.event_history: dict[EventType, list[dict]] = {}
+        self.event_calendar: list[UpcomingEvent] = []
 
         # Unity-specific constants
         self.earnings_iv_expansion = 1.5  # 50% IV increase typical
@@ -95,7 +95,7 @@ class EventImpactAnalyzer:
         else:
             return self._analyze_generic_event(event_type, historical_data)
 
-    def update_event_calendar(self, events: List[Dict]) -> None:
+    def update_event_calendar(self, events: list[dict]) -> None:
         """Update upcoming events calendar."""
         self.event_calendar = []
 
@@ -118,9 +118,13 @@ class EventImpactAnalyzer:
                 accuracy = historical_impact["confidence"]
             else:
                 # Defaults
-                expected_move = 0.05 if event_type != EventType.EARNINGS else self.earnings_avg_move
+                expected_move = (
+                    0.05 if event_type != EventType.EARNINGS else self.earnings_avg_move
+                )
                 iv_expansion = (
-                    1.2 if event_type != EventType.EARNINGS else self.earnings_iv_expansion
+                    1.2
+                    if event_type != EventType.EARNINGS
+                    else self.earnings_iv_expansion
                 )
                 accuracy = 0.5
 
@@ -138,9 +142,13 @@ class EventImpactAnalyzer:
         # Sort by date
         self.event_calendar.sort(key=lambda x: x.date)
 
-        logger.info(f"Updated event calendar", extra={"n_events": len(self.event_calendar)})
+        logger.info(
+            "Updated event calendar", extra={"n_events": len(self.event_calendar)}
+        )
 
-    def get_next_event(self, event_type: Optional[EventType] = None) -> Optional[UpcomingEvent]:
+    def get_next_event(
+        self, event_type: EventType | None = None
+    ) -> UpcomingEvent | None:
         """Get next upcoming event of specified type."""
         for event in self.event_calendar:
             if event_type is None or event.event_type == event_type:
@@ -150,7 +158,7 @@ class EventImpactAnalyzer:
 
     def should_adjust_for_event(
         self, dte_target: int, current_iv_rank: float
-    ) -> Tuple[bool, Dict[str, float]]:
+    ) -> tuple[bool, dict[str, float]]:
         """
         Determine if strategy should be adjusted for upcoming events.
 
@@ -173,7 +181,9 @@ class EventImpactAnalyzer:
                 # Too close to earnings
                 adjustments["size_adjustment"] = 0.0  # No position
                 adjustments["confidence"] = 0.3
-                logger.warning(f"Earnings in {earnings.days_until} days - avoiding position")
+                logger.warning(
+                    f"Earnings in {earnings.days_until} days - avoiding position"
+                )
             else:
                 # Adjust for expected IV expansion
                 if current_iv_rank < 50:
@@ -253,7 +263,9 @@ class EventImpactAnalyzer:
             confidence=0.9,
         )
 
-    def _analyze_generic_event(self, event_type: EventType, data: pd.DataFrame) -> EventImpact:
+    def _analyze_generic_event(
+        self, event_type: EventType, data: pd.DataFrame
+    ) -> EventImpact:
         """Generic event analysis."""
         return EventImpact(
             event_type=event_type,
@@ -265,7 +277,7 @@ class EventImpactAnalyzer:
             confidence=0.5,
         )
 
-    def _get_historical_impact(self, event_type: EventType) -> Dict:
+    def _get_historical_impact(self, event_type: EventType) -> dict:
         """Get historical impact statistics for event type."""
         if event_type not in self.event_history:
             return {"avg_move": 0.05, "avg_iv_expansion": 1.1, "confidence": 0.5}
@@ -277,13 +289,15 @@ class EventImpactAnalyzer:
 
         return {
             "avg_move": np.mean(np.abs(moves)) if moves else 0.05,
-            "avg_iv_expansion": np.mean([c for c in iv_changes if c > 1]) if iv_changes else 1.1,
+            "avg_iv_expansion": np.mean([c for c in iv_changes if c > 1])
+            if iv_changes
+            else 1.1,
             "confidence": min(1.0, len(history) / 10),
         }
 
     def calculate_event_adjusted_params(
         self, base_delta: float, base_dte: int, base_kelly: float
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calculate parameter adjustments for all upcoming events.
 
@@ -317,11 +331,10 @@ class EventImpactAnalyzer:
                     kelly *= 0.75
                     confidence *= 0.9
 
-            elif event.event_type == EventType.OPEX:
-                if event.days_until <= 7:
-                    # Can benefit from pinning
-                    delta *= 1.1  # Slightly more aggressive
-                    confidence *= 1.05
+            elif event.event_type == EventType.OPEX and event.days_until <= 7:
+                # Can benefit from pinning
+                delta *= 1.1  # Slightly more aggressive
+                confidence *= 1.05
 
         return {
             "delta": np.clip(delta, 0.10, 0.40),
@@ -332,7 +345,7 @@ class EventImpactAnalyzer:
             "next_event_days": near_events[0].days_until if near_events else 999,
         }
 
-    def generate_event_report(self) -> List[str]:
+    def generate_event_report(self) -> list[str]:
         """Generate human-readable event impact report."""
         report = ["=== EVENT CALENDAR & IMPACT ===", ""]
 

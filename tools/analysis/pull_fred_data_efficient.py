@@ -3,8 +3,6 @@
 
 import asyncio
 import time
-from datetime import date as Date
-from datetime import timedelta
 
 from src.unity_wheel.data import FREDDataManager, WheelStrategyFREDSeries
 from src.unity_wheel.storage.storage import Storage
@@ -32,7 +30,15 @@ async def pull_data_efficient():
     print("\n3. Determining data requirements...")
 
     # Daily series need 5 years
-    daily_series = ["DGS3", "DGS1", "DFF", "VIXCLS", "VXDCLS", "TEDRATE", "BAMLH0A0HYM2"]
+    daily_series = [
+        "DGS3",
+        "DGS1",
+        "DFF",
+        "VIXCLS",
+        "VXDCLS",
+        "TEDRATE",
+        "BAMLH0A0HYM2",
+    ]
     # Monthly series need less data
     monthly_series = ["UNRATE", "CPIAUCSL"]
 
@@ -58,7 +64,7 @@ async def pull_data_efficient():
         elapsed = time.time() - start_time
 
         print(f"\n✅ Data pull complete in {elapsed:.1f} seconds!")
-        print(f"\nData pulled:")
+        print("\nData pulled:")
         print(f"{'Series':<15} {'Count':>8} {'Description'}")
         print("-" * 60)
 
@@ -85,12 +91,12 @@ async def pull_data_efficient():
         test_elapsed = (time.time() - test_start) * 1000
 
         print(f"   ✓ Retrieved latest values in {test_elapsed:.1f}ms")
-        print(f"\nCurrent market data:")
+        print("\nCurrent market data:")
         print(f"   3-month risk-free rate: {rf_rate*100:.2f}%")
         print(f"   VIX: {vix:.2f} ({regime} volatility)")
 
         # Show storage location
-        print(f"\n6. Storage location:")
+        print("\n6. Storage location:")
         print(f"   {storage.config.cache_config.cache_dir}")
 
         # Get storage stats

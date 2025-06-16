@@ -10,10 +10,9 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.unity_wheel.storage.duckdb_cache import CacheConfig, DuckDBCache
-
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 async def check_price_history():
@@ -60,7 +59,7 @@ async def check_price_history():
         """
         ).fetchone()
 
-        print(f"\nData characteristics:")
+        print("\nData characteristics:")
         print(f"Total records: {stats[0]}")
         print(f"Zero volume days: {stats[2]} ({stats[2]/stats[0]*100:.1f}%)")
         print(f"No price movement: {stats[3]} ({stats[3]/stats[0]*100:.1f}%)")

@@ -8,17 +8,14 @@ Additional features:
 """
 from __future__ import annotations
 
-
 from datetime import date, datetime, time, timedelta
-from typing import Dict, List, Optional, Tuple
 
+from src.config.unified_config import get_config
 from unity_wheel.math import CalculationResult
 
 from .trading_calendar import SimpleTradingCalendar
 
-from src.config.unified_config import get_config
 config = get_config()
-
 
 
 class EnhancedTradingCalendar(SimpleTradingCalendar):
@@ -67,7 +64,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
     def __init__(self):
         """Initialize enhanced calendar."""
         super().__init__()
-        self._early_close_cache: Dict[int, List[date]] = {}
+        self._early_close_cache: dict[int, list[date]] = {}
 
     def is_early_close(self, check_date: datetime) -> bool:
         """Check if market closes early on given date (1 PM ET).
@@ -85,13 +82,13 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         early_closes = self._get_early_closes_for_year(year)
         return check_date in early_closes
 
-    def _get_early_closes_for_year(self, year: int) -> List[date]:
+    def _get_early_closes_for_year(self, year: int) -> list[date]:
         """Get all early close dates for a year."""
         if year in self._early_close_cache:
             return self._early_close_cache[year]
 
         early_closes = []
-        for name, calculator in self.EARLY_CLOSE_DAYS.items():
+        for _name, calculator in self.EARLY_CLOSE_DAYS.items():
             early_close = calculator(year)
             if early_close and self.is_trading_day(early_close):
                 early_closes.append(early_close)
@@ -99,7 +96,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         self._early_close_cache[year] = early_closes
         return early_closes
 
-    def get_market_hours(self, check_date: datetime) -> Tuple[time, time]:
+    def get_market_hours(self, check_date: datetime) -> tuple[time, time]:
         """Get market open and close times for a date.
 
         Args:
@@ -145,7 +142,9 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
         remaining_minutes = close_minutes - current_minutes
         return CalculationResult(remaining_minutes / 60.0, 1.0, [])
 
-    def is_near_unity_earnings(self, check_date: datetime, days_buffer: int = 7) -> bool:
+    def is_near_unity_earnings(
+        self, check_date: datetime, days_buffer: int = 7
+    ) -> bool:
         """Check if date is near Unity earnings (typically 3rd week of earnings months).
 
         Unity reports earnings quarterly, usually in the 3rd week of:
@@ -180,7 +179,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
 
     def get_expiry_fridays_avoiding_earnings(
         self, from_date: datetime, count: int = 3
-    ) -> List[Tuple[date, bool]]:
+    ) -> list[tuple[date, bool]]:
         """Get next expiry Fridays with earnings warnings.
 
         Args:
@@ -203,7 +202,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
 
     def calculate_theta_decay_days(
         self, start_date: datetime, expiry_date: datetime
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Calculate detailed theta decay metrics.
 
         Options decay faster over weekends and holidays since
@@ -243,7 +242,9 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
             "early_close_days": early_closes,
             "effective_theta_days": effective_days,
             "daily_decay_rate": 1.0 / effective_days if effective_days > 0 else 0,
-            "weekend_acceleration": non_trading_days / total_days if total_days > 0 else 0,
+            "weekend_acceleration": non_trading_days / total_days
+            if total_days > 0
+            else 0,
         }
 
     def optimal_entry_day(self, target_expiry: datetime) -> datetime:
@@ -280,7 +281,7 @@ class EnhancedTradingCalendar(SimpleTradingCalendar):
 
 
 # Convenience functions
-def get_market_hours(date: datetime) -> Tuple[time, time]:
+def get_market_hours(date: datetime) -> tuple[time, time]:
     """Get market open/close for a date."""
     calendar = EnhancedTradingCalendar()
     return calendar.get_market_hours(date)
@@ -292,7 +293,7 @@ def is_near_unity_earnings(date: datetime, buffer: int = 7) -> bool:
     return calendar.is_near_unity_earnings(date, buffer)
 
 
-def calculate_theta_decay(start: datetime, expiry: datetime) -> Dict[str, float]:
+def calculate_theta_decay(start: datetime, expiry: datetime) -> dict[str, float]:
     """Calculate theta decay metrics."""
     calendar = EnhancedTradingCalendar()
     return calendar.calculate_theta_decay_days(start, expiry)

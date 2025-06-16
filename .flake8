@@ -19,7 +19,9 @@ extend-ignore =
     # C901: Function is too complex (we'll address case-by-case)
     C901,
     # B007: Loop control variable not used (sometimes intentional)
-    B007
+    B007,
+    # B001 and B902 for bare except handling
+    B001,B902,E722
 exclude =
     .git,
     __pycache__,
@@ -52,5 +54,3 @@ per-file-ignores =
     # F841: local variable assigned but never used (common in examples)
     examples/*/*.py:F841
 max-complexity = 15
-# Exclude B001 and B902 for bare except handling
-extend-ignore = B001,B902,E722

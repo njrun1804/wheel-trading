@@ -2,4 +2,4 @@
 
 from .vector_index import HybridVectorIndex
 
-__all__ = ['HybridVectorIndex']
+__all__ = ["HybridVectorIndex"]

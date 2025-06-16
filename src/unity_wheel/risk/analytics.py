@@ -4,19 +4,19 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
 from scipy import stats
 
-from src.config.loader import get_config
-from ..models.position import Position
+from ..config.loader import get_config
 
 from ..models.greeks import Greeks
+from ..models.position import Position
 from ..storage.cache.general_cache import cached
 from ..utils import RecoveryStrategy, get_logger, timed_operation, with_recovery
 
@@ -47,9 +47,9 @@ class RiskMetrics:
     portfolio_theta: float
     margin_requirement: float
     margin_utilization: float
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "var_95": self.var_95,
@@ -101,13 +101,15 @@ class RiskLimits:
         # Use config values as defaults if not explicitly set
         if self.max_var_95 is None:
             # Default to 5% VaR limit
-            self.max_var_95 = getattr(config.risk.limits, 'max_var_95', 0.05)
+            self.max_var_95 = getattr(config.risk.limits, "max_var_95", 0.05)
         if self.max_cvar_95 is None:
             # Default to 10% CVaR limit
-            self.max_cvar_95 = getattr(config.risk.limits, 'max_cvar_95', 0.10)
+            self.max_cvar_95 = getattr(config.risk.limits, "max_cvar_95", 0.10)
         if self.max_kelly_fraction is None:
             # Default to 50% Kelly fraction
-            self.max_kelly_fraction = getattr(config.risk.limits, 'max_kelly_fraction', 0.50)
+            self.max_kelly_fraction = getattr(
+                config.risk.limits, "max_kelly_fraction", 0.50
+            )
         if self.max_delta_exposure is None:
             self.max_delta_exposure = config.risk.greeks.max_delta_exposure
         if self.max_gamma_exposure is None:
@@ -117,7 +119,9 @@ class RiskLimits:
         if self.max_margin_utilization is None:
             self.max_margin_utilization = config.risk.margin.max_utilization
 
-    def scale_by_volatility(self, current_vol: float, baseline_vol: float = 0.15) -> None:
+    def scale_by_volatility(
+        self, current_vol: float, baseline_vol: float = 0.15
+    ) -> None:
         """Scale limits based on current volatility regime."""
         self.volatility_scalar = baseline_vol / max(current_vol, 0.05)
 
@@ -140,9 +144,9 @@ class RiskAnalyzer:
 
     def __init__(
         self,
-        config: Optional[Dict[str, Any]] = None,
-        limits: Optional[RiskLimits] = None,
-        history_file: Optional[Path] = None,
+        config: dict[str, Any] | None = None,
+        limits: RiskLimits | None = None,
+        history_file: Path | None = None,
     ):
         """
         Initialize risk analyzer.
@@ -175,7 +179,7 @@ class RiskAnalyzer:
         returns: np.ndarray,
         confidence_level: float = 0.95,
         method: str = "parametric",
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Calculate VaR with confidence score.
 
@@ -286,7 +290,7 @@ class RiskAnalyzer:
         returns: np.ndarray,
         confidence_level: float = 0.95,
         method: str = "parametric",
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Calculate CVaR (Expected Shortfall) with confidence score.
 
@@ -373,7 +377,7 @@ class RiskAnalyzer:
         avg_win: float,
         avg_loss: float,
         apply_half_kelly: bool = True,
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Calculate Kelly criterion for position sizing.
 
@@ -446,9 +450,9 @@ class RiskAnalyzer:
     @timed_operation(threshold_ms=5.0)
     def aggregate_portfolio_greeks(
         self,
-        positions: List[Tuple[Position, Greeks, float]],
-        correlations: Optional[Dict[Tuple[str, str], float]] = None,
-    ) -> Tuple[Dict[str, float], float]:
+        positions: list[tuple[Position, Greeks, float]],
+        correlations: dict[tuple[str, str], float] | None = None,
+    ) -> tuple[dict[str, float], float]:
         """
         Aggregate Greeks across portfolio.
 
@@ -520,13 +524,17 @@ class RiskAnalyzer:
             for j, b in enumerate(unique_underlyings):
                 if i == j:
                     continue
-                corr_matrix[i, j] = correlations.get((a, b), correlations.get((b, a), 0.0))
+                corr_matrix[i, j] = correlations.get(
+                    (a, b), correlations.get((b, a), 0.0)
+                )
 
         def aggregate_component(key: str, dollar: bool = False) -> float:
-            vec = np.array([
-                exposures[u][key] * (price_lookup[u] if dollar else 1.0)
-                for u in unique_underlyings
-            ])
+            vec = np.array(
+                [
+                    exposures[u][key] * (price_lookup[u] if dollar else 1.0)
+                    for u in unique_underlyings
+                ]
+            )
             return float(np.sqrt(vec @ corr_matrix @ vec))
 
         aggregated = {
@@ -550,7 +558,9 @@ class RiskAnalyzer:
         missing_greeks = sum(
             1
             for pos, greeks, _ in positions
-            if any(getattr(greeks, g) is None for g in ["delta", "gamma", "vega", "theta"])
+            if any(
+                getattr(greeks, g) is None for g in ["delta", "gamma", "vega", "theta"]
+            )
         )
         if positions and missing_greeks > 0:
             confidence *= 1.0 - missing_greeks / len(positions) * 0.2
@@ -561,8 +571,8 @@ class RiskAnalyzer:
 
     def estimate_margin_requirement(
         self,
-        positions: List[Tuple[Position, float, float]],
-    ) -> Tuple[float, float]:
+        positions: list[tuple[Position, float, float]],
+    ) -> tuple[float, float]:
         """
         Estimate total margin requirement.
 
@@ -599,7 +609,9 @@ class RiskAnalyzer:
 
         # Slightly reduce confidence for complex positions
         complex_positions = sum(
-            1 for pos, _, _ in positions if pos.position_type not in ["put", "call", "stock"]
+            1
+            for pos, _, _ in positions
+            if pos.position_type not in ["put", "call", "stock"]
         )
         if positions and complex_positions > 0:
             confidence *= 0.85
@@ -610,7 +622,7 @@ class RiskAnalyzer:
         self,
         metrics: RiskMetrics,
         portfolio_value: float,
-    ) -> List[RiskLimitBreach]:
+    ) -> list[RiskLimitBreach]:
         """
         Check current metrics against configured limits.
 
@@ -634,7 +646,7 @@ class RiskAnalyzer:
                         if var_pct > self.limits.max_var_95 * 1.5
                         else RiskLevel.MEDIUM
                     ),
-                    timestamp=datetime.now(timezone.utc),
+                    timestamp=datetime.now(UTC),
                     recommendation="Reduce position sizes or hedge portfolio",
                 )
             )
@@ -652,7 +664,7 @@ class RiskAnalyzer:
                         if cvar_pct > self.limits.max_cvar_95 * 1.5
                         else RiskLevel.HIGH
                     ),
-                    timestamp=datetime.now(timezone.utc),
+                    timestamp=datetime.now(UTC),
                     recommendation="Immediately reduce tail risk exposure",
                 )
             )
@@ -665,7 +677,7 @@ class RiskAnalyzer:
                     current_value=metrics.portfolio_delta,
                     limit_value=self.limits.max_delta_exposure,
                     severity=RiskLevel.MEDIUM,
-                    timestamp=datetime.now(timezone.utc),
+                    timestamp=datetime.now(UTC),
                     recommendation="Adjust delta hedge to reduce directional risk",
                 )
             )
@@ -678,9 +690,11 @@ class RiskAnalyzer:
                     current_value=metrics.margin_utilization,
                     limit_value=self.limits.max_margin_utilization,
                     severity=(
-                        RiskLevel.HIGH if metrics.margin_utilization > 0.75 else RiskLevel.MEDIUM
+                        RiskLevel.HIGH
+                        if metrics.margin_utilization > 0.75
+                        else RiskLevel.MEDIUM
                     ),
-                    timestamp=datetime.now(timezone.utc),
+                    timestamp=datetime.now(UTC),
                     recommendation="Reduce leverage or add capital",
                 )
             )
@@ -690,12 +704,12 @@ class RiskAnalyzer:
     def generate_risk_report(
         self,
         metrics: RiskMetrics,
-        breaches: List[RiskLimitBreach],
+        breaches: list[RiskLimitBreach],
         portfolio_value: float,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate comprehensive risk report."""
         report = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "portfolio_value": portfolio_value,
             "metrics": metrics.to_dict(),
             "breaches": [
@@ -708,7 +722,9 @@ class RiskAnalyzer:
                 }
                 for b in breaches
             ],
-            "risk_score": self._calculate_risk_score(metrics, breaches, portfolio_value),
+            "risk_score": self._calculate_risk_score(
+                metrics, breaches, portfolio_value
+            ),
             "recommendations": self._generate_recommendations(metrics, breaches),
         }
 
@@ -725,7 +741,7 @@ class RiskAnalyzer:
     def _calculate_risk_score(
         self,
         metrics: RiskMetrics,
-        breaches: List[RiskLimitBreach],
+        breaches: list[RiskLimitBreach],
         portfolio_value: float,
     ) -> float:
         """Calculate overall risk score (0-100)."""
@@ -751,8 +767,8 @@ class RiskAnalyzer:
     def _generate_recommendations(
         self,
         metrics: RiskMetrics,
-        breaches: List[RiskLimitBreach],
-    ) -> List[str]:
+        breaches: list[RiskLimitBreach],
+    ) -> list[str]:
         """Generate actionable recommendations."""
         recommendations = []
 
@@ -766,7 +782,9 @@ class RiskAnalyzer:
             recommendations.append("High theta decay - consider rolling positions")
 
         if abs(metrics.portfolio_vega) > 5000:
-            recommendations.append("High vega exposure - vulnerable to volatility changes")
+            recommendations.append(
+                "High vega exposure - vulnerable to volatility changes"
+            )
 
         if metrics.kelly_fraction < 0.05:
             recommendations.append(
@@ -784,10 +802,10 @@ class AccuracyTracker:
         self.history_file = history_file
         self.history = self._load_history()
 
-    def _load_history(self) -> List[Dict[str, Any]]:
+    def _load_history(self) -> list[dict[str, Any]]:
         """Load historical predictions."""
         if self.history_file.exists():
-            with open(self.history_file, "r") as f:
+            with open(self.history_file) as f:
                 return json.load(f)
         return []
 
@@ -823,10 +841,13 @@ class AccuracyTracker:
             if (
                 pred["metric"] == metric
                 and not pred["validated"]
-                and abs((datetime.fromisoformat(pred["timestamp"]) - timestamp).total_seconds())
+                and abs(
+                    (
+                        datetime.fromisoformat(pred["timestamp"]) - timestamp
+                    ).total_seconds()
+                )
                 < 86400
             ):
-
                 pred["actual"] = actual_value
                 pred["validated"] = True
                 pred["error"] = abs(pred["predicted"] - actual_value)
@@ -844,9 +865,11 @@ class AccuracyTracker:
 
         self._save_history()
 
-    def get_accuracy_stats(self, metric: str, lookback_days: int = 30) -> Dict[str, float]:
+    def get_accuracy_stats(
+        self, metric: str, lookback_days: int = 30
+    ) -> dict[str, float]:
         """Get accuracy statistics for a metric."""
-        cutoff = datetime.now(timezone.utc) - pd.Timedelta(days=lookback_days)
+        cutoff = datetime.now(UTC) - pd.Timedelta(days=lookback_days)
 
         relevant = [
             p
@@ -883,8 +906,10 @@ class AccuracyTracker:
     def _save_history(self) -> None:
         """Save history to file."""
         # Keep only last 90 days
-        cutoff = datetime.now(timezone.utc) - pd.Timedelta(days=90)
-        self.history = [p for p in self.history if datetime.fromisoformat(p["timestamp"]) > cutoff]
+        cutoff = datetime.now(UTC) - pd.Timedelta(days=90)
+        self.history = [
+            p for p in self.history if datetime.fromisoformat(p["timestamp"]) > cutoff
+        ]
 
         with open(self.history_file, "w") as f:
             json.dump(self.history, f, indent=2)

@@ -8,11 +8,13 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Final, Literal
 
 # Add project root to path
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -20,25 +22,23 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from src.config import get_settings
-from src.config.unity import COMPANY_NAME, TICKER
-from src.config.loader import get_config
-from ..__version__ import __version__, API_VERSION
-from unity_wheel.api import MarketSnapshot, OptionData, WheelAdvisor
-from unity_wheel.data_providers.databento.client import DatabentoClient
-from unity_wheel.data_providers.databento.integration import DatabentoIntegration
-from unity_wheel.data_providers.validation import validate_market_data
-from unity_wheel.data_providers.base import FREDDataManager
-from unity_wheel.storage.storage import Storage
-from unity_wheel.monitoring import get_performance_monitor
-from unity_wheel.monitoring.diagnostics import SelfDiagnostics
-from unity_wheel.observability import get_observability_exporter
-from unity_wheel.metrics import metrics_collector
-from unity_wheel.risk import RiskLimits
-from unity_wheel.secrets.integration import SecretInjector
-from unity_wheel.strategy import WheelParameters
+from ..config import get_settings
+from ..config.loader import get_config
+from ..config.unity import COMPANY_NAME, TICKER
+from ..api import WheelAdvisor
+from ..data_providers.base import FREDDataManager
+from ..data_providers.validation import validate_market_data
+from ..metrics import metrics_collector
+from ..monitoring import get_performance_monitor
+from ..observability import get_observability_exporter
+from ..risk import RiskLimits
+from ..storage.storage import Storage
+from ..strategy import WheelParameters
+
+from ..__version__ import API_VERSION, __version__
 
 config = get_config()
+
 
 def get_version_string() -> str:
     """Get version string."""
@@ -110,8 +110,8 @@ def generate_recommendation(
 
     # Create risk limits (could be from config)
     risk_limits = RiskLimits(
-        max_var_95 = config.risk.max_var_95,
-        max_cvar_95 = config.risk.max_cvar_95,
+        max_var_95=config.risk.limits.max_var_95,
+        max_cvar_95=config.risk.limits.max_cvar_95,
         max_margin_utilization=0.5,
     )
     # Scale limits based on volatility regime
@@ -128,7 +128,10 @@ def generate_recommendation(
         market_snapshot, confidence = get_market_data_sync(
             portfolio_value, TICKER, risk_free_rate=rf_rate
         )
-        logger.info("Successfully fetched real Unity market data", extra={"confidence": confidence})
+        logger.info(
+            "Successfully fetched real Unity market data",
+            extra={"confidence": confidence},
+        )
         current_price = market_snapshot.current_price
 
         # CRITICAL: Validate this is real market data, not mock/dummy data
@@ -188,7 +191,9 @@ def generate_recommendation(
 
 def display_recommendation_text(rec: dict[str, Any]) -> None:
     """Display recommendation in human-readable format."""
-    console.print(f"\n[bold blue]🎯 Unity ({TICKER}) Wheel Strategy Recommendation[/bold blue]")
+    console.print(
+        f"\n[bold blue]🎯 Unity ({TICKER}) Wheel Strategy Recommendation[/bold blue]"
+    )
     console.print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     console.print("=" * 60)
 
@@ -217,8 +222,10 @@ def display_recommendation_text(rec: dict[str, Any]) -> None:
 
         # Risk metrics
         rm = r["risk_metrics"]
-        console.print(f"\n[yellow]Risk Metrics:[/yellow]")
-        console.print(f"   Probability of Assignment: {rm['probability_assignment']:.1%}")
+        console.print("\n[yellow]Risk Metrics:[/yellow]")
+        console.print(
+            f"   Probability of Assignment: {rm['probability_assignment']:.1%}"
+        )
         console.print(f"   Expected Return: {rm['expected_return']:.2%}")
         console.print(f"   Edge Ratio: {rm['edge_ratio']:.3f}")
         console.print(f"   95% VaR: ${rm['var_95']:,.0f}")
@@ -229,77 +236,80 @@ def display_recommendation_text(rec: dict[str, Any]) -> None:
         console.print(f"   Confidence: {rec['recommendation']['confidence']:.1%}")
 
 
-
 def run_diagnostics():
     """Run system diagnostics."""
+    import duckdb
     from rich.console import Console
     from rich.table import Table
-    import duckdb
-    
+
     console = Console()
     console.print("\n[bold blue]Unity Wheel Trading System Diagnostics[/bold blue]\n")
-    
+
     results = {}
-    
+
     # 1. Check database
     try:
         conn = duckdb.connect("data/wheel_trading_optimized.duckdb", read_only=True)
-        
+
         # Get data counts
         stock_count = conn.execute(
             "SELECT COUNT(*) FROM market.price_data WHERE symbol='U'"
         ).fetchone()[0]
-        
+
         options_count = conn.execute(
             "SELECT COUNT(*) FROM options.contracts WHERE symbol='U'"
         ).fetchone()[0]
-        
+
         ml_count = conn.execute(
             "SELECT COUNT(*) FROM analytics.ml_features WHERE symbol='U'"
         ).fetchone()[0]
-        
+
         conn.close()
-        
-        results["Database"] = f"✅ Connected ({stock_count} stocks, {options_count} options, {ml_count} ML records)"
+
+        results[
+            "Database"
+        ] = f"✅ Connected ({stock_count} stocks, {options_count} options, {ml_count} ML records)"
     except Exception as e:
         results["Database"] = f"❌ Error: {str(e)[:50]}"
-    
+
     # 2. Check API configuration
     try:
         from unity_wheel.secrets.manager import SecretManager
+
         secrets = SecretManager()
-        
+
         databento_key = secrets.get_secret("databento_api_key")
-        fred_key = secrets.get_secret("ofred_api_key") or secrets.get_secret("fred_api_key")
-        
+        fred_key = secrets.get_secret("ofred_api_key") or secrets.get_secret(
+            "fred_api_key"
+        )
+
         if databento_key and not databento_key.startswith("your_"):
             results["Databento API"] = "✅ Configured"
         else:
             results["Databento API"] = "❌ Not configured"
-            
+
         if fred_key and not fred_key.startswith("your_"):
             results["FRED API"] = "✅ Configured"
         else:
             results["FRED API"] = "❌ Not configured"
     except Exception as e:
         results["APIs"] = f"❌ Error: {str(e)[:50]}"
-    
+
     # 3. Check configuration
     try:
         from src.config.loader import get_config
-        config = get_config()
+
+        get_config()
         results["Configuration"] = "✅ Loaded"
     except Exception as e:
         results["Configuration"] = f"❌ Error: {str(e)[:50]}"
-    
+
     # 4. Check math libraries
     try:
-        import numpy as np
-        import scipy
         from unity_wheel.math.options import black_scholes_price_validated
-        
+
         # Test calculation
-        result = black_scholes_price_validated(100, 100, 30/365, 0.05, 0.25, "call")
+        result = black_scholes_price_validated(100, 100, 30 / 365, 0.05, 0.25, "call")
         price = result.value
         if price > 0:
             results["Math Libraries"] = "✅ Working"
@@ -307,17 +317,17 @@ def run_diagnostics():
             results["Math Libraries"] = "❌ Calculation error"
     except Exception as e:
         results["Math Libraries"] = f"❌ Error: {str(e)[:50]}"
-    
+
     # 5. Display results
     table = Table(title="System Status")
     table.add_column("Component", style="cyan")
     table.add_column("Status", style="green")
-    
+
     for component, status in results.items():
         table.add_row(component, status)
-    
+
     console.print(table)
-    
+
     # Overall status
     if all("✅" in status for status in results.values()):
         console.print("\n[green]✅ All systems operational![/green]")
@@ -380,7 +390,7 @@ def main(
     # Run diagnostics if requested
     if diagnose:
         return run_diagnostics()
-    
+
     if performance:
         monitor = get_performance_monitor()
         perf_report = monitor.generate_report(format=output_format)
@@ -439,9 +449,11 @@ def main(
             console.print(f"   InfluxDB: {influx_path}")
             console.print(f"   Prometheus: {prom_path}")
             console.print(f"   CSV: {csv_path}")
-            console.print(f"\n[blue]24-hour Summary:[/blue]")
+            console.print("\n[blue]24-hour Summary:[/blue]")
             console.print(f"   Total metrics: {summary['metrics']['total_count']}")
-            console.print(f"   Unique metrics: {len(summary['metrics']['unique_metrics'])}")
+            console.print(
+                f"   Unique metrics: {len(summary['metrics']['unique_metrics'])}"
+            )
             console.print(f"   Events: {len(summary['events'])}")
 
         return 0
@@ -460,7 +472,11 @@ def main(
 
         return 0
     except (ValueError, KeyError, AttributeError) as e:
-        error_response = {"timestamp": datetime.now().isoformat(), "error": str(e), "type": "FATAL"}
+        error_response = {
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "type": "FATAL",
+        }
 
         if output_format == "json":
             print(json.dumps(error_response, indent=2))

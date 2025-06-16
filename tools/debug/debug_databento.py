@@ -4,7 +4,7 @@
 import asyncio
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,7 +26,7 @@ async def debug_databento():
         from databento_dbn import Schema
 
         # Get last trading day (skip weekends)
-        today = datetime.now(timezone.utc)
+        today = datetime.now(UTC)
 
         # Find last Thursday (OPRA data usually available through Thursday)
         # Go back more days to ensure we get valid trading data
@@ -100,7 +100,9 @@ async def debug_databento():
             count = 0
             for trade in response:
                 count += 1
-                print(f"   Trade: price={trade.price} size={trade.size} time={trade.ts_event}")
+                print(
+                    f"   Trade: price={trade.price} size={trade.size} time={trade.ts_event}"
+                )
                 if count >= 3:
                     break
 

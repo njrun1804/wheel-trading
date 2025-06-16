@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""
+BOB Unified Entry Point
+=======================
+
+Single entry point for the unified BOB system that consolidates:
+- Einstein semantic search capabilities
+- BOLT 8-agent orchestration system
+- Wheel trading integration
+- Hardware acceleration (M4 Pro + Metal GPU)
+
+This replaces the fragmented CLI interfaces:
+- bolt_cli.py (problem solving)
+- bob_cli.py (natural language commands)  
+- unified_cli.py (system management)
+"""
+
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+
+# Import the main CLI
+try:
+    from bob.cli.main import main
+    sys.exit(main())
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"❌ BOB CLI not available: {e}")
+    print("🔧 Falling back to basic interface...")
+    
+    # Basic fallback interface
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="BOB - Unified System (Fallback Mode)")
+    parser.add_argument('command', nargs='*', help='Command to execute')
+    parser.add_argument('--version', action='store_true', help='Show version')
+    
+    args = parser.parse_args()
+    
+    if args.version:
+        print("BOB - Unified System v2.0.0 (Fallback Mode)")
+        print("Status: Limited functionality available")
+        sys.exit(0)
+    
+    if args.command:
+        command_str = ' '.join(args.command)
+        print(f"🤖 BOB FALLBACK: Processing '{command_str}'")
+        print("⚠️  Limited functionality - full system not available")
+        print("🔧 To enable full functionality, ensure all dependencies are installed")
+    else:
+        print("🚀 BOB - Unified System (Fallback Mode)")
+        print("Usage examples:")
+        print("  ./bob_unified search 'wheel strategy'")
+        print("  ./bob_unified solve 'optimize performance'")
+        print("  ./bob_unified system status")
+        print("  ./bob_unified --version")
+        
+    sys.exit(0)

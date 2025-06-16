@@ -1,10 +1,8 @@
 """Bridge between Databento data and WheelAdvisor market snapshot."""
 from __future__ import annotations
 
-
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Optional
 
 from unity_wheel.models.position import Position
 from unity_wheel.storage import Storage
@@ -27,10 +25,10 @@ class DatentoMarketSnapshotBuilder:
     def build_from_chain(
         self,
         chain: OptionChain,
-        definitions: Dict[int, InstrumentDefinition],
+        definitions: dict[int, InstrumentDefinition],
         buying_power: float,
         margin_used: float = 0.0,
-        positions: Optional[list[Position]] = None,
+        positions: list[Position] | None = None,
         risk_free_rate: float = 0.05,
     ) -> MarketSnapshot:
         """Build MarketSnapshot from Databento option chain.
@@ -99,7 +97,9 @@ class DatentoMarketSnapshotBuilder:
 
         # Calculate overall IV (use ATM or average)
         all_ivs = [
-            opt.implied_volatility for opt in option_chain.values() if opt.implied_volatility > 0
+            opt.implied_volatility
+            for opt in option_chain.values()
+            if opt.implied_volatility > 0
         ]
         overall_iv = sum(all_ivs) / len(all_ivs) if all_ivs else 0.65
 
@@ -120,8 +120,8 @@ class DatentoMarketSnapshotBuilder:
         ticker: str,
         buying_power: float,
         margin_used: float = 0.0,
-        positions: Optional[list[Position]] = None,
-    ) -> Optional[MarketSnapshot]:
+        positions: list[Position] | None = None,
+    ) -> MarketSnapshot | None:
         """Get latest market snapshot from stored data.
 
         Args:
@@ -139,7 +139,7 @@ class DatentoMarketSnapshotBuilder:
         # Look for recent data (last 7 days)
         for days_back in range(7):
             check_date = today - timedelta(days=days_back)
-            date_str = check_date.strftime("%Y%m%d")
+            check_date.strftime("%Y%m%d")
 
             # In pull-when-asked architecture, cache checking is handled by Storage
             # This method would be replaced by storage.get_or_fetch pattern

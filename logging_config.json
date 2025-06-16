@@ -8,6 +8,16 @@
     },
     "simple": {
       "format": "%(levelname)s - %(message)s"
+    },
+    "json": {
+      "class": "pythonjsonlogger.jsonlogger.JsonFormatter",
+      "format": "%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(funcName)s %(lineno)d",
+      "datefmt": "%Y-%m-%dT%H:%M:%S.%fZ"
+    },
+    "structured": {
+      "class": "pythonjsonlogger.jsonlogger.JsonFormatter",
+      "format": "%(asctime)s %(name)s %(levelname)s %(message)s %(process)d %(thread)d %(module)s %(funcName)s %(lineno)d",
+      "datefmt": "%Y-%m-%dT%H:%M:%S.%fZ"
     }
   },
   "handlers": {
@@ -40,6 +50,38 @@
       "filename": "logs/trading.log",
       "maxBytes": 10485760,
       "backupCount": 5
+    },
+    "file_json": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "DEBUG",
+      "formatter": "json",
+      "filename": "logs/wheel_trading_json.log",
+      "maxBytes": 52428800,
+      "backupCount": 10
+    },
+    "file_performance": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "INFO",
+      "formatter": "structured",
+      "filename": "logs/performance.log",
+      "maxBytes": 52428800,
+      "backupCount": 10
+    },
+    "file_alerts": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "WARNING",
+      "formatter": "structured",
+      "filename": "logs/alerts.log",
+      "maxBytes": 10485760,
+      "backupCount": 5
+    },
+    "file_audit": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "INFO",
+      "formatter": "structured",
+      "filename": "logs/audit.log",
+      "maxBytes": 52428800,
+      "backupCount": 30
     }
   },
   "loggers": {
@@ -48,7 +90,39 @@
       "handlers": [
         "console",
         "file_all",
-        "file_errors"
+        "file_errors",
+        "file_json"
+      ],
+      "propagate": false
+    },
+    "unity_wheel.monitoring": {
+      "level": "INFO",
+      "handlers": [
+        "file_performance",
+        "file_json"
+      ],
+      "propagate": true
+    },
+    "unity_wheel.observability": {
+      "level": "INFO",
+      "handlers": [
+        "file_performance",
+        "file_json"
+      ],
+      "propagate": true
+    },
+    "unity_wheel.alerts": {
+      "level": "WARNING",
+      "handlers": [
+        "file_alerts",
+        "console"
+      ],
+      "propagate": false
+    },
+    "unity_wheel.audit": {
+      "level": "INFO",
+      "handlers": [
+        "file_audit"
       ],
       "propagate": false
     },

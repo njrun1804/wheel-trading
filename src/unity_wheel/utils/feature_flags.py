@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any
 
 from .logging import get_logger
 
@@ -31,12 +32,12 @@ class Feature:
     name: str
     description: str
     status: FeatureStatus = FeatureStatus.DISABLED
-    dependencies: List[str] = field(default_factory=list)
-    fallback: Optional[Callable] = None
+    dependencies: list[str] = field(default_factory=list)
+    fallback: Callable | None = None
     error_count: int = 0
     max_errors: int = 3
-    last_error: Optional[str] = None
-    last_error_time: Optional[datetime] = None
+    last_error: str | None = None
+    last_error_time: datetime | None = None
 
     def should_auto_disable(self) -> bool:
         """Check if feature should be auto-disabled due to errors."""
@@ -72,11 +73,11 @@ class FeatureFlags:
         "metrics_export",
     }
 
-    def __init__(self, config_file: Optional[Path] = None):
+    def __init__(self, config_file: Path | None = None):
         """Initialize feature flag system."""
         self.config_file = config_file or Path("feature_flags.json")
-        self.features: Dict[str, Feature] = {}
-        self.disabled_by_error: Set[str] = set()
+        self.features: dict[str, Feature] = {}
+        self.disabled_by_error: set[str] = set()
 
         # Initialize default features
         self._initialize_default_features()
@@ -163,8 +164,8 @@ class FeatureFlags:
         name: str,
         description: str,
         status: FeatureStatus = FeatureStatus.DISABLED,
-        dependencies: Optional[List[str]] = None,
-        fallback: Optional[Callable] = None,
+        dependencies: list[str] | None = None,
+        fallback: Callable | None = None,
         max_errors: int = 3,
     ) -> None:
         """Register a new feature flag."""
@@ -202,11 +203,7 @@ class FeatureFlags:
             return False
 
         # Check dependencies
-        for dep in feature.dependencies:
-            if not self.is_enabled(dep):
-                return False
-
-        return True
+        return all(self.is_enabled(dep) for dep in feature.dependencies)
 
     def is_experimental(self, feature_name: str) -> bool:
         """Check if a feature is experimental."""
@@ -222,12 +219,16 @@ class FeatureFlags:
 
         # Check if it's a core feature being disabled
         if feature_name in self.CORE_FEATURES and not force:
-            logger.warning(f"Enabling core feature {feature_name} (already should be enabled)")
+            logger.warning(
+                f"Enabling core feature {feature_name} (already should be enabled)"
+            )
 
         # Check dependencies
         for dep in feature.dependencies:
             if not self.is_enabled(dep):
-                logger.error(f"Cannot enable {feature_name}: dependency {dep} is disabled")
+                logger.error(
+                    f"Cannot enable {feature_name}: dependency {dep} is disabled"
+                )
                 return False
 
         feature.status = FeatureStatus.ENABLED
@@ -255,7 +256,7 @@ class FeatureFlags:
         self._save_config()
         return True
 
-    def degrade(self, feature_name: str, error: Optional[Exception] = None) -> None:
+    def degrade(self, feature_name: str, error: Exception | None = None) -> None:
         """Degrade a feature due to error."""
         feature = self.features.get(feature_name)
         if not feature:
@@ -263,7 +264,7 @@ class FeatureFlags:
 
         feature.error_count += 1
         feature.last_error = str(error) if error else "Unknown error"
-        feature.last_error_time = datetime.now(timezone.utc)
+        feature.last_error_time = datetime.now(UTC)
 
         if feature.should_auto_disable():
             feature.status = FeatureStatus.DEGRADED
@@ -281,7 +282,7 @@ class FeatureFlags:
                 extra={"error": str(error)},
             )
 
-    def get_fallback(self, feature_name: str) -> Optional[Callable]:
+    def get_fallback(self, feature_name: str) -> Callable | None:
         """Get fallback function for a feature."""
         feature = self.features.get(feature_name)
         return feature.fallback if feature else None
@@ -308,7 +309,8 @@ class FeatureFlags:
                         fallback = self.get_fallback(feature_name)
                         if fallback:
                             logger.info(
-                                f"Using fallback for {feature_name}", extra={"error": str(e)}
+                                f"Using fallback for {feature_name}",
+                                extra={"error": str(e)},
                             )
                             return fallback()
                         raise
@@ -344,10 +346,10 @@ class FeatureFlags:
 
             logger.info(f"Reset errors for feature: {feature_name}")
 
-    def get_status_report(self) -> Dict[str, Any]:
+    def get_status_report(self) -> dict[str, Any]:
         """Get comprehensive status report."""
         report = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "features": {},
             "summary": {
                 "total": len(self.features),
@@ -380,7 +382,7 @@ class FeatureFlags:
     def _save_config(self) -> None:
         """Save current configuration to file."""
         config = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "features": {
                 name: {
                     "status": feature.status.value,
@@ -404,7 +406,7 @@ class FeatureFlags:
             return
 
         try:
-            with open(self.config_file, "r") as f:
+            with open(self.config_file) as f:
                 config = json.load(f)
 
             # Update feature states
@@ -423,7 +425,7 @@ class FeatureFlags:
 
 
 # Global singleton instance
-_feature_flags: Optional[FeatureFlags] = None
+_feature_flags: FeatureFlags | None = None
 
 
 def get_feature_flags() -> FeatureFlags:

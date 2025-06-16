@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-import asyncio
 from datetime import date as Date
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple
+from datetime import timedelta
 
 import numpy as np
-import pandas as pd
 
 from unity_wheel.storage.storage import Storage
 from unity_wheel.utils import get_logger, timed_operation, with_recovery
@@ -17,7 +13,7 @@ from unity_wheel.utils import get_logger, timed_operation, with_recovery
 from ..fred.fred_client import FREDClient
 from ..fred.fred_models import FREDDataset, WheelStrategyFREDSeries
 from ..fred.fred_storage import FREDStorage
-from .validation import DataAnomalyDetector, get_anomaly_detector
+from .validation import get_anomaly_detector
 
 logger = get_logger(__name__)
 
@@ -29,7 +25,7 @@ class FREDDataManager:
         self,
         tenor_months: int = 3,
         fetch_if_stale_days: int = 1,
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Get risk-free rate using get_or_fetch pattern.
 
@@ -62,7 +58,9 @@ class FREDDataManager:
             async with FREDClient(self.api_key) as client:
                 # Fetch last 7 days to ensure we get latest
                 start_date = Date.today() - timedelta(days=7)
-                observations = await client.get_observations(series_id, start_date=start_date)
+                observations = await client.get_observations(
+                    series_id, start_date=start_date
+                )
 
                 if observations:
                     # Save the new observations
@@ -85,8 +83,8 @@ class FREDDataManager:
 
     def __init__(
         self,
-        storage: Optional[Storage] = None,
-        api_key: Optional[str] = None,
+        storage: Storage | None = None,
+        api_key: str | None = None,
         auto_update: bool = True,
     ):
         """
@@ -106,11 +104,11 @@ class FREDDataManager:
         self.api_key = api_key
         self.auto_update = auto_update
         self.anomaly_detector = get_anomaly_detector()
-        self._client: Optional[FREDClient] = None
+        self._client: FREDClient | None = None
 
         logger.info("FRED data manager initialized", extra={"auto_update": auto_update})
 
-    async def initialize_data(self, lookback_days: int = 1825) -> Dict[str, int]:
+    async def initialize_data(self, lookback_days: int = 1825) -> dict[str, int]:
         """
         Initialize database with historical data.
 
@@ -140,12 +138,15 @@ class FREDDataManager:
 
         logger.info(
             "Data initialization complete",
-            extra={"series_count": len(counts), "total_observations": sum(counts.values())},
+            extra={
+                "series_count": len(counts),
+                "total_observations": sum(counts.values()),
+            },
         )
 
         return counts
 
-    async def update_data(self) -> Dict[str, int]:
+    async def update_data(self) -> dict[str, int]:
         """
         Update data with latest observations.
 
@@ -177,7 +178,11 @@ class FREDDataManager:
                             # Validate new data
                             issues = self.anomaly_detector.check_observations(
                                 series_id,
-                                [obs.value for obs in dataset.observations if obs.value],
+                                [
+                                    obs.value
+                                    for obs in dataset.observations
+                                    if obs.value
+                                ],
                             )
 
                             if not issues:
@@ -213,7 +218,7 @@ class FREDDataManager:
         return updates
 
     @timed_operation(threshold_ms=50)
-    async def get_latest_values(self) -> Dict[str, Tuple[float, Date]]:
+    async def get_latest_values(self) -> dict[str, tuple[float, Date]]:
         """
         Get latest value for each series.
 
@@ -233,7 +238,7 @@ class FREDDataManager:
 
         return values
 
-    async def get_risk_free_rate(self, tenor_months: int = 3) -> Tuple[float, float]:
+    async def get_risk_free_rate(self, tenor_months: int = 3) -> tuple[float, float]:
         """
         Get risk-free rate for given tenor.
 
@@ -282,7 +287,7 @@ class FREDDataManager:
         logger.warning(f"No risk-free rate data for {tenor_months}M, using default")
         return 0.05, 0.5  # 5% with low confidence
 
-    async def get_volatility_regime(self) -> Tuple[str, float]:
+    async def get_volatility_regime(self) -> tuple[str, float]:
         """
         Get current volatility regime.
 
@@ -297,7 +302,9 @@ class FREDDataManager:
 
         if risk_metrics and risk_metrics.get("vix") is not None:
             vix = risk_metrics["vix"]
-            regime = risk_metrics.get("volatility_regime", self._classify_volatility_regime(vix))
+            regime = risk_metrics.get(
+                "volatility_regime", self._classify_volatility_regime(vix)
+            )
             return regime, vix
 
         # Fallback to latest observation
@@ -331,7 +338,7 @@ class FREDDataManager:
 
     async def calculate_iv_rank(
         self, current_iv: float, lookback_days: int = 252
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Calculate IV rank based on VIX history.
 
@@ -361,7 +368,11 @@ class FREDDataManager:
             vix_values + [vix_equivalent],
             [100 * i / len(vix_values) for i in range(len(vix_values))],
         )
-        iv_rank = np.interp(vix_equivalent, rank, range(len(vix_values))) / len(vix_values) * 100
+        iv_rank = (
+            np.interp(vix_equivalent, rank, range(len(vix_values)))
+            / len(vix_values)
+            * 100
+        )
 
         # Confidence based on data completeness
         confidence = min(1.0, len(vix_values) / lookback_days)
@@ -410,7 +421,7 @@ class FREDDataManager:
 
         logger.debug(f"Calculated features for {series_id}")
 
-    async def get_data_health_report(self) -> Dict[str, Any]:
+    async def get_data_health_report(self) -> dict[str, Any]:
         """Generate comprehensive data health report."""
         summary = await self.fred_storage.get_data_summary()
         latest_values = await self.get_latest_values()
@@ -439,7 +450,8 @@ class FREDDataManager:
         return {
             "summary": summary,
             "latest_values": {
-                k: {"value": v[0], "date": v[1].isoformat()} for k, v in latest_values.items()
+                k: {"value": v[0], "date": v[1].isoformat()}
+                for k, v in latest_values.items()
             },
             "freshness_issues": freshness_issues,
             "volatility_regime": volatility_regime,

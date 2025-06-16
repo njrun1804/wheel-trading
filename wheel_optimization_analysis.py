@@ -26,7 +26,9 @@ class OptimizationConfig:
     call_strikes_range: tuple[float, float] = (1.05, 1.25)  # % of stock price
     num_strikes: int = 20
 
-    expirations: list[int] = field(default_factory=lambda: [7, 14, 21, 30, 45, 60, 90])  # days
+    expirations: list[int] = field(
+        default_factory=lambda: [7, 14, 21, 30, 45, 60, 90]
+    )  # days
     max_contracts: int = 50
 
     # Optimization parameters
@@ -44,7 +46,9 @@ class PermutationAnalyzer:
         """Calculate the full permutation space"""
 
         # Stock position permutations
-        stock_positions = list(range(0, self.config.max_shares + 1, self.config.share_increment))
+        stock_positions = list(
+            range(0, self.config.max_shares + 1, self.config.share_increment)
+        )
         num_stock_positions = len(stock_positions)
 
         # Cash positions after stock purchase
@@ -70,7 +74,8 @@ class PermutationAnalyzer:
             # Approximate put premium at 2% of strike
             avg_put_premium = np.mean(put_strikes) * 0.02
             max_put_contracts = min(
-                int(cash / (100 * np.min(put_strikes))), self.config.max_contracts  # Cash-secured
+                int(cash / (100 * np.min(put_strikes))),
+                self.config.max_contracts,  # Cash-secured
             )
 
             # For each expiration, strike, and contract count
@@ -91,13 +96,17 @@ class PermutationAnalyzer:
                 continue
 
             max_call_contracts = shares // 100
-            perms = len(self.config.expirations) * len(call_strikes) * max_call_contracts
+            perms = (
+                len(self.config.expirations) * len(call_strikes) * max_call_contracts
+            )
             call_permutations_per_position.append(perms)
 
         # Total permutations
         total_permutations = 0
         for i, shares in enumerate(stock_positions):
-            position_perms = put_permutations_per_cash[i] * call_permutations_per_position[i]
+            position_perms = (
+                put_permutations_per_cash[i] * call_permutations_per_position[i]
+            )
             total_permutations += position_perms
 
         # Memory requirements (assuming 8 bytes per float, 10 metrics per position)
@@ -488,8 +497,12 @@ def main():
 
     print(f"   System Memory: {requirements['system_memory_gb']:.1f} GB")
     print(f"   CPU Cores: {requirements['cpu_cores']}")
-    print(f"   Full Optimization Time: {requirements['full_optimization_time_hours']:.1f} hours")
-    print(f"   Parallel Time: {requirements['parallel_optimization_time_minutes']:.1f} minutes")
+    print(
+        f"   Full Optimization Time: {requirements['full_optimization_time_hours']:.1f} hours"
+    )
+    print(
+        f"   Parallel Time: {requirements['parallel_optimization_time_minutes']:.1f} minutes"
+    )
     print(f"   Fits in Memory: {requirements['can_fit_in_memory']}")
     print()
 
@@ -498,7 +511,9 @@ def main():
     opt_result = engine.optimize_portfolio({})
     print(f"   Variables: {opt_result['num_variables']}")
     print(f"   Constraints: {opt_result['num_constraints']}")
-    print(f"   Optimization Time: {opt_result['optimization_time_seconds']:.3f} seconds")
+    print(
+        f"   Optimization Time: {opt_result['optimization_time_seconds']:.3f} seconds"
+    )
     print()
 
     # 5. Practical Implementation
@@ -531,7 +546,9 @@ def main():
         print(f"     {param}: {data['critical_threshold']}")
 
     print("\n=== SUMMARY ===")
-    print(f"Full optimization space: {perm_space['permutations_scientific']} permutations")
+    print(
+        f"Full optimization space: {perm_space['permutations_scientific']} permutations"
+    )
     print(f"Intelligent bucketing reduces by: {buckets['reduction_factor']:.0f}x")
     print("2% granularity captures 98% of optimal returns")
     print("Real-time decisions possible with heuristics + selective optimization")

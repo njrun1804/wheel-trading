@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 """Set up comprehensive logging for Wheel Trading project."""
 
-import os
-import logging
-import logging.handlers
-from pathlib import Path
 import json
+from pathlib import Path
+
 
 def setup_project_logging():
     """Configure project-wide logging to files and console."""
-    
+
     # Create logs directory
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
-    
+
     # Create logging configuration
     logging_config = {
         "version": 1,
@@ -21,18 +19,16 @@ def setup_project_logging():
         "formatters": {
             "detailed": {
                 "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S"
+                "datefmt": "%Y-%m-%d %H:%M:%S",
             },
-            "simple": {
-                "format": "%(levelname)s - %(message)s"
-            }
+            "simple": {"format": "%(levelname)s - %(message)s"},
         },
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
                 "level": "INFO",
                 "formatter": "simple",
-                "stream": "ext://sys.stdout"
+                "stream": "ext://sys.stdout",
             },
             "file_all": {
                 "class": "logging.handlers.RotatingFileHandler",
@@ -40,7 +36,7 @@ def setup_project_logging():
                 "formatter": "detailed",
                 "filename": "logs/wheel_trading.log",
                 "maxBytes": 10485760,  # 10MB
-                "backupCount": 5
+                "backupCount": 5,
             },
             "file_errors": {
                 "class": "logging.handlers.RotatingFileHandler",
@@ -48,7 +44,7 @@ def setup_project_logging():
                 "formatter": "detailed",
                 "filename": "logs/errors.log",
                 "maxBytes": 10485760,
-                "backupCount": 3
+                "backupCount": 3,
             },
             "file_trading": {
                 "class": "logging.handlers.RotatingFileHandler",
@@ -56,42 +52,39 @@ def setup_project_logging():
                 "formatter": "detailed",
                 "filename": "logs/trading.log",
                 "maxBytes": 10485760,
-                "backupCount": 5
-            }
+                "backupCount": 5,
+            },
         },
         "loggers": {
             "unity_wheel": {
                 "level": "DEBUG",
                 "handlers": ["console", "file_all", "file_errors"],
-                "propagate": False
+                "propagate": False,
             },
             "unity_wheel.strategy": {
                 "level": "INFO",
                 "handlers": ["file_trading"],
-                "propagate": True
+                "propagate": True,
             },
             "unity_wheel.risk": {
                 "level": "INFO",
                 "handlers": ["file_trading"],
-                "propagate": True
+                "propagate": True,
             },
             "jarvis2": {
                 "level": "DEBUG",
                 "handlers": ["console", "file_all"],
-                "propagate": False
-            }
+                "propagate": False,
+            },
         },
-        "root": {
-            "level": "INFO",
-            "handlers": ["console", "file_all"]
-        }
+        "root": {"level": "INFO", "handlers": ["console", "file_all"]},
     }
-    
+
     # Save configuration
     config_path = Path("logging_config.json")
     with open(config_path, "w") as f:
         json.dump(logging_config, f, indent=2)
-    
+
     print("✅ Logging configuration created at logging_config.json")
     print("📁 Log files will be written to ./logs/")
     print("")
@@ -101,7 +94,7 @@ def setup_project_logging():
     print("  with open('logging_config.json') as f:")
     print("      logging.config.dictConfig(json.load(f))")
     print("  logger = logging.getLogger('unity_wheel')")
-    
+
     # Create example integration file
     integration_example = '''"""Example of how to use project logging."""
 import logging.config
@@ -120,13 +113,14 @@ logger = logging.getLogger(__name__)
 # Now use it
 logger.info("Module initialized with project logging")
 '''
-    
+
     example_path = Path("src/unity_wheel/utils/logging_setup.py")
     example_path.parent.mkdir(parents=True, exist_ok=True)
     with open(example_path, "w") as f:
         f.write(integration_example)
-    
+
     print("\n✅ Created example integration at src/unity_wheel/utils/logging_setup.py")
+
 
 if __name__ == "__main__":
     setup_project_logging()

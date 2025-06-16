@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
@@ -37,7 +38,9 @@ recent = conn.execute(
 print("Date        Open    High    Low     Close   Volume")
 print("----------  ------  ------  ------  ------  -----------")
 for row in recent:
-    print(f"{row[0]}  ${row[1]:6.2f}  ${row[2]:6.2f}  ${row[3]:6.2f}  ${row[4]:6.2f}  {row[5]:11,}")
+    print(
+        f"{row[0]}  ${row[1]:6.2f}  ${row[2]:6.2f}  ${row[3]:6.2f}  ${row[4]:6.2f}  {row[5]:11,}"
+    )
 
 # 2. Price statistics
 print("\n2. UNITY PRICE STATISTICS:")
@@ -101,7 +104,9 @@ recent_vol = df[["date", "close", "volatility_20d"]].tail(5)
 print("Date        Close   20-Day Vol")
 print("----------  ------  ----------")
 for _, row in recent_vol.iterrows():
-    vol_str = f"{row['volatility_20d']:.1f}%" if pd.notna(row["volatility_20d"]) else "N/A"
+    vol_str = (
+        f"{row['volatility_20d']:.1f}%" if pd.notna(row["volatility_20d"]) else "N/A"
+    )
     print(f"{row['date']}  ${row['close']:6.2f}  {vol_str:>10}")
 
 print("\n✓ All data shown is REAL Unity stock data from Databento")

@@ -15,8 +15,8 @@ from sklearn.mixture import GaussianMixture
 from statsmodels.stats.multitest import multipletests
 
 from unity_wheel.config.unified_config import get_config
-config = get_config()
 
+config = get_config()
 
 
 def validate_data_cleanliness():
@@ -204,7 +204,9 @@ def test_parameter_significance():
             t_stat = sharpe * np.sqrt(len(returns) / 21)
             p_value = 1 - stats.norm.cdf(abs(t_stat))
 
-            results.append({"delta": delta, "dte": dte, "sharpe": sharpe, "p_value": p_value})
+            results.append(
+                {"delta": delta, "dte": dte, "sharpe": sharpe, "p_value": p_value}
+            )
 
     # Apply FDR control
     results_df = pd.DataFrame(results)
@@ -319,7 +321,9 @@ def scenario_shock_test():
         unity_impact = market_drop * unity_beta
         position_loss = unity_impact * 0.10  # 10% position size
 
-        print(f"{event:<18} | {market_drop:>6.1%} | {unity_impact:>12.1%} | {position_loss:>16.1%}")
+        print(
+            f"{event:<18} | {market_drop:>6.1%} | {unity_impact:>12.1%} | {position_loss:>16.1%}"
+        )
 
         if abs(position_loss) > 0.10:  # More than 10% loss
             all_survive = False

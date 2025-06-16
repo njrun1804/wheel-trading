@@ -8,26 +8,26 @@ Options: Daily snapshots of all strikes/expirations
 """
 
 import logging
-import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 import pytz
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.unity_wheel.data_providers.databento import DatabentoClient
-
 from unity_wheel.config.unified_config import get_config
+
 config = get_config()
 
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(message)s", stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
 
 
@@ -113,7 +113,14 @@ class UnityDailyDataDownloader:
                     (date, open, high, low, close, volume)
                     VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                    (date, row["open"], row["high"], row["low"], row["close"], row["volume"]),
+                    (
+                        date,
+                        row["open"],
+                        row["high"],
+                        row["low"],
+                        row["close"],
+                        row["volume"],
+                    ),
                 )
                 return True
         except Exception as e:
@@ -173,16 +180,22 @@ class UnityDailyDataDownloader:
                             opt_type = info[6]  # C or P
                             strike_str = info[7:]  # Strike * 1000
 
-                            expiration = datetime.strptime("20" + exp_str, "%Y%m%d").date()
+                            expiration = datetime.strptime(
+                                "20" + exp_str, "%Y%m%d"
+                            ).date()
                             strike = float(strike_str) / 1000
 
                             # Get latest quote
                             latest = group.iloc[-1]
                             bid = (
-                                latest.get("bid_px_01", 0) / 10000.0 if "bid_px_01" in latest else 0
+                                latest.get("bid_px_01", 0) / 10000.0
+                                if "bid_px_01" in latest
+                                else 0
                             )
                             ask = (
-                                latest.get("ask_px_01", 0) / 10000.0 if "ask_px_01" in latest else 0
+                                latest.get("ask_px_01", 0) / 10000.0
+                                if "ask_px_01" in latest
+                                else 0
                             )
 
                             self.conn.execute(
@@ -260,7 +273,9 @@ class UnityDailyDataDownloader:
                         )
             current += timedelta(days=1)
 
-        logger.info(f"✓ Options data complete: {options_days} days, {total_contracts:,} contracts")
+        logger.info(
+            f"✓ Options data complete: {options_days} days, {total_contracts:,} contracts"
+        )
 
         # Commit all changes
         self.conn.commit()
@@ -288,7 +303,7 @@ class UnityDailyDataDownloader:
         """
         ).fetchone()
 
-        logger.info(f"\nSTOCK DATA:")
+        logger.info("\nSTOCK DATA:")
         logger.info(f"  Trading days: {stock_stats[0]}")
         logger.info(f"  Date range: {stock_stats[1]} to {stock_stats[2]}")
         logger.info(f"  Price range: ${stock_stats[4]:.2f} - ${stock_stats[5]:.2f}")
@@ -308,7 +323,7 @@ class UnityDailyDataDownloader:
         """
         ).fetchone()
 
-        logger.info(f"\nOPTIONS DATA:")
+        logger.info("\nOPTIONS DATA:")
         logger.info(f"  Trading days: {options_stats[0]}")
         logger.info(f"  Total contracts: {options_stats[1]:,}")
         logger.info(f"  Unique expirations: {options_stats[2]}")
